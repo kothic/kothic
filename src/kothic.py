@@ -1,7 +1,19 @@
 #!/usr/bin/env python
-#use Cairo;
-#import cairo
-#use Gtk2 '-init';
+# -*- coding: utf-8 -*-
+#    This file is part of kothic, the realtime map renderer.
+
+#   kothic is free software: you can redistribute it and/or modify
+#   it under the terms of the GNU General Public License as published by
+#   the Free Software Foundation, either version 3 of the License, or
+#   (at your option) any later version.
+
+#   kothic is distributed in the hope that it will be useful,
+#   but WITHOUT ANY WARRANTY; without even the implied warranty of
+#   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#   GNU General Public License for more details.
+
+#   You should have received a copy of the GNU General Public License
+#   along with kothic.  If not, see <http://www.gnu.org/licenses/>.
 import pygtk
 pygtk.require('2.0')
 import gtk
@@ -11,27 +23,9 @@ import string
 import threading
 import time
 import Queue
+from twms import projections
 
-#use Glib qw(TRUE FALSE);
-#use Time::HiRes qw(gettimeofday tv_interval);
-#use strict;
-#use POSIX qw(ceil floor);
-#use style qw(@style);
-#use navigator_lib;
 
-#my $dbname = "moscow.db";
-#my $dbargs = {AutoCommit => 0,
-#	PrintError => 1,
-#};
-#
-
-#my $latmin;
-#my $latmax;
-#my $lonmin;
-#my $lonmax;
-
-#my $latcenter = 55.6304; 
-#my $loncenter = 37.49305; 
 
 class Renderer(threading.Thread):
 	def __init__(self, comm):
@@ -45,21 +39,21 @@ class Renderer(threading.Thread):
 				request = self.comm[0].get()
 				if(self.comm[0].empty):
 					break
-			print ("  got request:", request)
-			res = RasterTile(request[2][0], request[2][1]) 
-			res.update_surface(request[0][0], request[0][1], request[1], self.tc, request[3])
+			#print ("  got request:", request)
+			res = RasterTile(request.size[0], request.size[1], request.zoomlevel, request.data_projection)
+			res.update_surface(request.center_lonlat[0], request.center_lonlat[1], request.zoom, self.tc, request.style)
 			print ("  render complete")
 			comm[1].put(res)
-#			comm[2].get_window().invalidate_rect(None, True)
-			comm[2].queue_draw()
 
 class Navigator:
 	def __init__(self, comm):
 		self.comm = comm
-		self.lat_c = 55.6304
-		self.lon_c = 37.49305
+		self.lon_c = 27.6749791
+                self.lat_c = 53.8621394
 		self.width, self.height = 640, 480
-		self.zoom = self.width/0.02;
+                self.zoomlevel = 17
+                self.data_projection = "EPSG:4326"
+		self.zoom = self.width/0.09;
 		self.window = gtk.Window(gtk.WINDOW_TOPLEVEL)
 		self.dx = 0
 		self.dy = 0
@@ -102,16 +96,29 @@ class Navigator:
 		self.window.set_size_request(self.width, self.height)
 		self.window.add(da)
 		self.window.connect("delete_event", self.delete_ev)
-		self.comm.append(da)
 	def motion_ev(self, widget, event):
 #		print("Motion")
 		if self.drag:
 			self.dx = event.x - self.drag_x
 			self.dy = event.y - self.drag_y
 			if((abs(self.dx) > 100 or abs(self.dy) > 100) and self.f):
-				self.comm[0].put((self.rastertile.screen2latlon(self.rastertile.w/2 - self.dx, self.rastertile.h/2 - self.dy), self.zoom, (self.width + self.border*2, self.height + self.border*2), self.style))
+                                com = MessageContainer()
+                                com.center_lonlat = self.rastertile.screen2lonlat(self.rastertile.w/2 - self.dx, self.rastertile.h/2 - self.dy)
+                                com.data_projection = self.data_projection
+                                com.zoomlevel = self.zoomlevel
+                                com.zoom = self.zoom
+                                com.size = (self.width + self.border*2, self.height + self.border*2)
+                                com.style = self.style
+				self.comm[0].put(com)
 				self.request_d = (self.dx, self.dy)
 				self.f = False 
+			if not self.comm[1].empty():
+				self.rastertile = self.comm[1].get()
+				self.f = True
+				self.drag_x += self.request_d[0]
+				self.drag_y += self.request_d[1]
+				self.dx = event.x - self.drag_x
+				self.dy = event.y - self.drag_y
 			widget.queue_draw()
 	def delete_ev(self, widget, event):
 		gtk.main_quit()
@@ -126,12 +133,21 @@ class Navigator:
 #		print("ll:", self.latcenter, self.loncenter)
 		print("LL before: ",self.lat_c, self.lon_c)
 		print("dd: ",self.dx, self.dy)
-		self.lat_c, self.lon_c = self.rastertile.screen2latlon(self.rastertile.w/2 - self.dx, self.rastertile.h/2 - self.dy);
-#		self.dx = self.dy = 0
+		self.lon_c, self.lat_c = self.rastertile.screen2lonlat(self.rastertile.w/2 - self.dx, self.rastertile.h/2 - self.dy);
+		self.dx = self.dy = 0
 		self.f = True
 		print("LL after: ",self.lat_c, self.lon_c)
+		
+		com = MessageContainer()
+		com.center_lonlat = (self.lon_c,self.lat_c)
+		com.data_projection = self.data_projection
+		com.zoomlevel = self.zoomlevel
+		com.zoom = self.zoom
+		com.size = (self.width + self.border*2, self.height + self.border*2)
+		com.style = self.style
+		self.comm[0].put(com)
 #		self.rastertile.update_surface( self.lat_c, self.lon_c, self.zoom, self.tilecache, self.style)
-		self.comm[0].put(((self.lat_c, self.lon_c), self.zoom, (self.width + self.border*2, self.height + self.border*2), self.style))
+
 		widget.queue_draw()
 	def expose_ev(self, widget, event):
 #		print("Expose")
@@ -141,28 +157,23 @@ class Navigator:
 			self.height = widget.allocation.height
 			self.rastertile = None
 		if self.rastertile is None:
-			self.rastertile = RasterTile(self.width + self.border*2, self.height + self.border*2)
-			self.rastertile.update_surface(self.lat_c, self.lon_c, self.zoom, self.tilecache, self.style)
-		if not self.comm[1].empty():
-			ort = self.rastertile
-			nrt = self.comm[1].get()
-			lat, lon = ort.screen2latlon(ort.w/2 - self.dx, ort.h/2 - self.dy)
-			ox, oy = nrt.latlon2screen(lat, lon, nrt.zoom)
-			ox -= nrt.w/2
-			oy -= nrt.h/2
-			print (ox, oy)
-			self.rastertile.offset_x = ox
-			self.rastertile.offset_y = oy
-			self.f = True
-			self.rastertile = nrt
-
+			self.rastertile = RasterTile(self.width + self.border*2, self.height + self.border*2, self.zoomlevel, self.data_projection)
+			self.rastertile.update_surface(self.lon_c, self.lat_c, self.zoom, self.tilecache, self.style)
 		cr = widget.window.cairo_create()
-		cr.set_source_surface(self.rastertile.surface, self.dx-self.border + self.rastertile.offset_x, self.dy - self.border + self.rastertile.offset_y)
+		cr.set_source_surface(self.rastertile.surface, self.dx-self.border, self.dy - self.border)
 		cr.paint()
+#		cr.
 
 	def main(self):
 		self.window.show_all()
 		gtk.main()
+
+class MessageContainer:
+    """
+    A class to keep messages to render-threads in.
+    """
+    pass
+
 
 def line(cr, c):
 	cr.move_to(c[0], c[1])
@@ -185,34 +196,36 @@ def ways(t):
 
 def load_tile(k):
 	print("loading tile: ", k)
-	f = open(key_to_filename(k))
+	try:
+          f = open(key_to_filename(k))
+        except IOError:
+          print "Failed open: %s" % key_to_filename(k)
+          return {}
 	t = {}
-	while True:
-		str = f.readline()
-		if str is None or str == "":
-			break
-		str = str.rstrip("\n")
-		a = str.split(" ")
+	for line in f:
+		a = line.split(" ")
 		w = Way(a[0], int(a[1]), int(a[2]), map(lambda x: float(x), a[3:]))
 		t[w.id] = w 
 	f.close()
 	return t
 
 class RasterTile:
-	def __init__(self, width, height):
+        def __init__(self, width, height, zoom, data_projection):
 		self.w = width
 		self.h = height
 		self.surface = cairo.ImageSurface(cairo.FORMAT_RGB24, self.w, self.h)
-		self.offset_x = 0
-		self.offset_y = 0 
+		self.x_offset = 0
+		self.y_offset = 0 
 		self.lat_c = None
 		self.lon_c = None
-		self.zoom = None 
-	def screen2latlon(self, x, y):
-		return -(y - self.h/2)/self.zoom + self.lat_c, (x - self.w/2)/(math.cos(self.lat_c*math.pi/180)*self.zoom) + self.lon_c
-	def latlon2screen(self, lat, lon, lcc):
+		self.zoomlevel = zoom
+		self.zoom = None
+		self.data_projection = data_projection
+	def screen2lonlat(self, x, y):
+		return (x - self.w/2)/(math.cos(self.lat_c*math.pi/180)*self.zoom) + self.lon_c, -(y - self.h/2)/self.zoom + self.lat_c
+	def lonlat2screen(self, lon, lat, lcc):
 		return (lon - self.lon_c)*lcc*self.zoom + self.w/2, -(lat - self.lat_c)*self.zoom + self.h/2
-	def update_surface(self, lat, lon, zoom, tilecache, style):
+	def update_surface(self, lon, lat, zoom, tilecache, style):
 		self.zoom = zoom
 		self.lat_c = lat
 		self.lon_c = lon
@@ -220,16 +233,14 @@ class RasterTile:
 		cr.rectangle(0, 0, self.w, self.h)
 		cr.set_source_rgb(0.7, 0.7, 0.7)
 		cr.fill()
-		latmin, lonmin = self.screen2latlon(0, self.h)
-		latmax, lonmax = self.screen2latlon(self.w, 0)
-		latkey_min = int(latmin*100)
-		latkey_max = int(latmax*100)
-		lonkey_min = int(lonmin*100)
-		lonkey_max = int(lonmax*100)
-		print(latmin, lonmin, latmax, lonmax)
-		print( latkey_min, latkey_max, lonkey_min, lonkey_max)
+		lonmin, latmin = self.screen2lonlat(0, self.h)
+		lonmax, latmax = self.screen2lonlat(self.w, 0)
+                a,d,c,b = [int(x) for x in projections.tile_by_bbox((lonmin, latmin, lonmax, latmax),self.zoomlevel, self.data_projection)]
+
+                print(latmin, lonmin, latmax, lonmax)
+                print( a, b, c, d)
 #FIXME: add time
-		active_tile = set([(i,j) for i in range(latkey_min, latkey_max+1) for j in range(lonkey_min, lonkey_max+1)])
+                active_tile = set([(self.zoomlevel,i,j) for i in range(a, c+1) for j in range(b, d+1)])
 		print(active_tile)
 		for k in tilecache.keys():
 			if k not in active_tile:
@@ -247,7 +258,7 @@ class RasterTile:
 		for w in ww:
 			cs = []
 			for k in range(0, len(w.coords), 2):
-				x, y = self.latlon2screen(w.coords[k], w.coords[k+1], lcc);
+				x, y = self.lonlat2screen(w.coords[k], w.coords[k+1], lcc);
 				cs.append(x)
 				cs.append(y)
 			w.cs = cs
@@ -272,12 +283,12 @@ class Way:
 		self.style = style
 		self.cs = None
 
-def key_to_filename(k):
-	return "data/" + str(k[0]//100) + "/" + str(k[1]//100) + "/" + str(k[0]%100) + "/" + str(k[1]%100) + ".map"
+def key_to_filename((z,x,y)):
+  return "tiles/z%s/%s/x%s/%s/y%s.vtile"%(z, x/1024, x, y/1024, y)
 
 if __name__ == "__main__":
+	comm = (Queue.Queue(), Queue.Queue())
 	gtk.gdk.threads_init()
-	comm = [Queue.Queue(), Queue.Queue()]
 	nav = Navigator(comm)
 	r = Renderer(comm)
 	r.daemon = True
