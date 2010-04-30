@@ -86,11 +86,13 @@ class Navigator:
 		da.add_events(gtk.gdk.POINTER_MOTION_MASK)
 		da.add_events(gtk.gdk.BUTTON_PRESS_MASK)
 		da.add_events(gtk.gdk.BUTTON_RELEASE_MASK)
+		da.add_events(gtk.gdk.SCROLL)
 #		self.window.add_events(gtk.gdk.BUTTON1_MOTION_MASK)
 		da.connect("expose_event",self.expose_ev)
 		da.connect("motion_notify_event",self.motion_ev)
 		da.connect("button_press_event",self.press_ev)
 		da.connect("button_release_event",self.release_ev)
+		da.connect("scroll_event",self.scroll_ev)
 		self.da = da
 #		self.surface = cairo.ImageSurfaceicreate(gtk.RGB24, self.width, self.height)
 		self.window.set_size_request(self.width, self.height)
@@ -123,32 +125,44 @@ class Navigator:
 	def delete_ev(self, widget, event):
 		gtk.main_quit()
 	def press_ev(self, widget, event):
-		print("Start drag")
-		self.drag = True
-		self.drag_x = event.x
-		self.drag_y = event.y
+		if event.button == 1:
+			print("Start drag")
+			self.drag = True
+			self.drag_x = event.x
+			self.drag_y = event.y
+		elif event.button == 2:
+			print("Button2")
+		elif event.button == 3:
+			print("Button3")
 	def release_ev(self, widget, event):
-		print("Stop drag")
-		self.drag = False
-#		print("ll:", self.latcenter, self.loncenter)
-		print("LL before: ",self.lat_c, self.lon_c)
-		print("dd: ",self.dx, self.dy)
-		self.lon_c, self.lat_c = self.rastertile.screen2lonlat(self.rastertile.w/2 - self.dx, self.rastertile.h/2 - self.dy);
-		self.dx = self.dy = 0
-		self.f = True
-		print("LL after: ",self.lat_c, self.lon_c)
-		
-		com = MessageContainer()
-		com.center_lonlat = (self.lon_c,self.lat_c)
-		com.data_projection = self.data_projection
-		com.zoomlevel = self.zoomlevel
-		com.zoom = self.zoom
-		com.size = (self.width + self.border*2, self.height + self.border*2)
-		com.style = self.style
-		self.comm[0].put(com)
-#		self.rastertile.update_surface( self.lat_c, self.lon_c, self.zoom, self.tilecache, self.style)
-
-		widget.queue_draw()
+		if event.button == 1:
+			print("Stop drag")
+			self.drag = False
+	#		print("ll:", self.latcenter, self.loncenter)
+			print("LL before: ",self.lat_c, self.lon_c)
+			print("dd: ",self.dx, self.dy)
+			self.lon_c, self.lat_c = self.rastertile.screen2lonlat(self.rastertile.w/2 - self.dx, self.rastertile.h/2 - self.dy);
+			self.dx = self.dy = 0
+			self.f = True
+			print("LL after: ",self.lat_c, self.lon_c)
+			
+			com = MessageContainer()
+			com.center_lonlat = (self.lon_c,self.lat_c)
+			com.data_projection = self.data_projection
+			com.zoomlevel = self.zoomlevel
+			com.zoom = self.zoom
+			com.size = (self.width + self.border*2, self.height + self.border*2)
+			com.style = self.style
+			self.comm[0].put(com)
+	#		self.rastertile.update_surface( self.lat_c, self.lon_c, self.zoom, self.tilecache, self.style)
+			widget.queue_draw()
+	def scroll_ev(self, widget, event):
+		# Zoom test :3
+		if event.direction == gtk.gdk.SCROLL_UP:
+			self.zoom *= 2
+			print("Zoom in")
+		elif event.direction == gtk.gdk.SCROLL_DOWN:
+			print("Zoom out")
 	def expose_ev(self, widget, event):
 #		print("Expose")
 		if(widget.allocation.width != self.width):
