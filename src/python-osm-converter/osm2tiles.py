@@ -36,7 +36,9 @@ style["L"] = {
   3:  set([("highway",("secondary"))]),
   4:  set([("highway",("residential", "tertiary", "living_street"))]),
   5:  set([("highway",("service", "unclassified"))]),
-  8:  set([("highway", None)]),
+#  8:  set([("highway", None)]),
+  12: set([("waterway", ("river"))]),
+  13: set([("waterway", ("stream"))]),
 }
 style["P"] = {
   6:  set([("building",None)]),
@@ -44,6 +46,8 @@ style["P"] = {
   9:  set([("landuse",("industrial"))]),
   10: set([("natural",("water")),("waterway",("riverbank"))]),
   11: set([("landuse",("residential"))]),
+  14: set([("landuse", ("allotments"))]),
+#  13: set([("landuse", None)]),
 }
 
 #  elsif($k eq 'highway' and $v eq 'footway' or $v eq 'path' or $v eq 'track'){
@@ -106,26 +110,27 @@ def main ():
 
 
        way_simplified = {}
-       #for zoom in xrange(MAXZOOM,-1,-1):          ########   generalize a bit
+       for zoom in xrange(MAXZOOM,-1,-1):          ########   generalize a bit
 
-         #prev_point = curway[0]
-         #way = [prev_point]
-         #for point in curway:
-           #if pix_distance(point, prev_point, zoom) > 2.:
-             #way.append(point)
-           #else:
-             #DROPPED_POINTS += 1
-           #prev_point = point
-         #if len(way) == 1:
-           #mzoom = zoom
-           #print zoom
-           #break
-         #if len(way) > 1:
-           #way_simplified[zoom] = way
-           ##print way
+         prev_point = curway[0]
+         way = [prev_point]
+         for point in curway:
+           if pix_distance(point, prev_point, zoom) > 2.:
+             way.append(point)
+           else:
+             DROPPED_POINTS += 1
+           prev_point = point
+         if len(way) == 1:
+           mzoom = zoom
+           print zoom
+           break
+         if len(way) > 1:
+           way_simplified[zoom] = way
+           #print way
 
        waytype, waynum = 0, 0
        for objtype, tagset in style.iteritems():
+
             for tid, tagz in tagset.iteritems():
                for k, v in tagz:
                  if k in tags:
@@ -136,20 +141,21 @@ def main ():
                    waytype = objtype
                    waynum = tid
 
-           
-       for tile in tilelist_by_geometry(curway, mzoom):
+       if waytype is not 0:
+        for tile in tilelist_by_geometry(curway, mzoom+1):
+         z, x, y = tile
+         path = "tiles/z%s/%s/x%s/%s/"%(z, x/1024, x, y/1024)
          if tile not in tilefiles:
-           z, x, y = tile
-           path = "tiles/z%s/%s/x%s/%s/"%(z, x/1024, x, y/1024)
+
            if not os.path.exists(path):
             os.makedirs(path)
            tilefiles[tile] = "aaa"
            tilefile = open(path+"y"+str(y)+".vtile","wb")
-         tilefile = open(path+"y"+str(y)+".vtile","ab")
-
-                   
-         print >>tilefile, "%s %s %s" % (waytype, items["id"], waynum), " ".join([str(x[0])+" "+str(x[1]) for x in curway])#_simplified[tile[0]]])
+         tilefile = open(path+"y"+str(y)+".vtile","a")
+         print >>tilefile, "%s %s %s" % (waytype, items["id"], waynum), " ".join([str(x[0])+" "+str(x[1]) for x in way_simplified[tile[0]]])
          tilefile.flush()
+         tilefile.close()
+         print len(tilefiles)
        #print >>corr, "%s %s %s %s %s %s"% (curway[0][0],curway[0][1],curway[1][0],curway[1][1], user, ts )
        curway = []
        tags = {}
