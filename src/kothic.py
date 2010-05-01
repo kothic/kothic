@@ -25,6 +25,15 @@ import time
 import Queue
 from twms import projections
 
+from debug import debug, Timer
+#debug = lambda a: None
+
+
+try:
+        import psyco
+        psyco.full()
+except ImportError:
+        debug("Psyco import failed. Program may run slower. Ir you run it on i386 machine, please install Psyco to get best performance.")
 
 
 class Renderer(threading.Thread):
@@ -32,17 +41,18 @@ class Renderer(threading.Thread):
 		self.comm = comm
 		threading.Thread.__init__(self)
 	def run(self):
-		print ("Thread started")
+		debug("Thread started")
 		self.tc = {}
 		while(True):
 			while(True):
 				request = self.comm[0].get()
 				if(self.comm[0].empty):
 					break
-			#print ("  got request:", request)
+			#debug ("  got request:", request)
+			t = Timer("Rendering screen")
 			res = RasterTile(request.size[0], request.size[1], request.zoomlevel, request.data_projection)
 			res.update_surface(request.center_lonlat[0], request.center_lonlat[1], request.zoom, self.tc, request.style)
-			print ("  render complete")
+			t.stop()
 			comm[1].put(res)
 
 class Navigator:
@@ -99,7 +109,7 @@ class Navigator:
 		self.window.add(da)
 		self.window.connect("delete_event", self.delete_ev)
 	def motion_ev(self, widget, event):
-#		print("Motion")
+#		debug("Motion")
 		if self.drag:
 			self.dx = event.x - self.drag_x
 			self.dy = event.y - self.drag_y
@@ -126,25 +136,25 @@ class Navigator:
 		gtk.main_quit()
 	def press_ev(self, widget, event):
 		if event.button == 1:
-			print("Start drag")
+			debug("Start drag")
 			self.drag = True
 			self.drag_x = event.x
 			self.drag_y = event.y
 		elif event.button == 2:
-			print("Button2")
+			debug("Button2")
 		elif event.button == 3:
-			print("Button3")
+			debug("Button3")
 	def release_ev(self, widget, event):
 		if event.button == 1:
-			print("Stop drag")
+			debug("Stop drag")
 			self.drag = False
-	#		print("ll:", self.latcenter, self.loncenter)
-			print("LL before: ",self.lat_c, self.lon_c)
-			print("dd: ",self.dx, self.dy)
+	#		debug("ll:", self.latcenter, self.loncenter)
+			debug("LL before: %s, %s" % (self.lon_c, self.lat_c))
+			debug("dd: %s,%s "%(self.dx, self.dy))
 			self.lon_c, self.lat_c = self.rastertile.screen2lonlat(self.rastertile.w/2 - self.dx, self.rastertile.h/2 - self.dy);
 			self.dx = self.dy = 0
 			self.f = True
-			print("LL after: ",self.lat_c, self.lon_c)
+			debug("LL after: %s, %s" % (self.lon_c, self.lat_c))
 			
 			com = MessageContainer()
 			com.center_lonlat = (self.lon_c,self.lat_c)
@@ -160,13 +170,13 @@ class Navigator:
 		# Zoom test :3
 		if event.direction == gtk.gdk.SCROLL_UP:
 			self.zoom *= 2
-			print("Zoom in")
+			debug("Zoom in")
 		elif event.direction == gtk.gdk.SCROLL_DOWN:
-			print("Zoom out")
+			debug("Zoom out")
 	def expose_ev(self, widget, event):
-#		print("Expose")
+#		debug("Expose")
 		if(widget.allocation.width != self.width):
-			print("Rrresize!")
+			debug("Rrresize!")
 			self.width = widget.allocation.width
 			self.height = widget.allocation.height
 			self.rastertile = None
@@ -209,11 +219,11 @@ def ways(t):
 	return r.values()
 
 def load_tile(k):
-	print("loading tile: ", k)
+	#debug("loading tile: ", k)
 	try:
           f = open(key_to_filename(k))
         except IOError:
-          print "Failed open: %s" % key_to_filename(k)
+         # debug ( "Failed open: %s" % key_to_filename(k) )
           return {}
 	t = {}
 	for line in f:
@@ -251,21 +261,21 @@ class RasterTile:
 		lonmax, latmax = self.screen2lonlat(self.w, 0)
                 a,d,c,b = [int(x) for x in projections.tile_by_bbox((lonmin, latmin, lonmax, latmax),self.zoomlevel, self.data_projection)]
 
-                print(latmin, lonmin, latmax, lonmax)
-                print( a, b, c, d)
+                debug((latmin, lonmin, latmax, lonmax))
+                debug(( a, b, c, d))
 #FIXME: add time
                 active_tile = set([(self.zoomlevel,i,j) for i in range(a, c+1) for j in range(b, d+1)])
-		print(active_tile)
+		debug(active_tile)
 		for k in tilecache.keys():
 			if k not in active_tile:
 				del tilecache[k]
-				print("del tile:", k)
+				debug("del tile: %s" % (k,))
 		for k in active_tile:
 			if k not in tilecache:
 				tilecache[k] = load_tile(k)
 		#FIXME add time2
 		ww = ways(tilecache)
-		print("ways: ", len(ww))
+		debug("ways: %s" % len(ww))
 
 		ww.sort(key=lambda x: style[x.style][3])
 		lcc = math.cos(self.lat_c*math.pi/180)
@@ -277,7 +287,7 @@ class RasterTile:
 				cs.append(y)
 			w.cs = cs
 		for passn in range(1, 4):
-			print("pass ",passn)
+			debug("pass %s" % passn)
 			for w in ww: 
 				stn = w.style
 				if stn < len(style) and style[stn] is not None and style[stn][passn-1] is not None:
