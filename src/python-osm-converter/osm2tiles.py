@@ -104,14 +104,12 @@ def main ():
     elif elem.tag == "tag":
        tags[items["k"]] = items["v"]
     elif elem.tag == "way":
-      tags = way_interesting(tags)
-      if tags:
        mzoom = 1
 
 
        way_simplified = {}
        for zoom in xrange(MAXZOOM,-1,-1):          ########   generalize a bit
-
+                                                   # TODO: Douglas-Peucker
          prev_point = curway[0]
          way = [prev_point]
          for point in curway:
@@ -144,7 +142,7 @@ def main ():
        if waytype is not 0:
         for tile in tilelist_by_geometry(curway, mzoom+1):
          z, x, y = tile
-         path = "tiles/z%s/%s/x%s/%s/"%(z, x/1024, x, y/1024)
+         path = "../tiles/z%s/%s/x%s/%s/"%(z, x/1024, x, y/1024)
          if tile not in tilefiles:
 
            if not os.path.exists(path):
@@ -162,7 +160,7 @@ def main ():
        #user = default_user
        #ts = ""
  print DROPPED_POINTS
-
+ print len(nodes)
 
 main()
 
