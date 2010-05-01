@@ -26,7 +26,7 @@ try:
 except ImportError:
   pass
 
-MAXZOOM = 18
+MAXZOOM = 16
 proj = "EPSG:4326"
 
 style = {}
@@ -106,26 +106,6 @@ def main ():
     elif elem.tag == "way":
       mzoom = 1
 
-
-      way_simplified = {}
-      for zoom in xrange(MAXZOOM,-1,-1):      ########   generalize a bit
-                            # TODO: Douglas-Peucker
-        prev_point = curway[0]
-        way = [prev_point]
-        for point in curway:
-          if pix_distance(point, prev_point, zoom) > 2.:
-            way.append(point)
-          else:
-            DROPPED_POINTS += 1
-          prev_point = point
-        if len(way) == 1:
-          mzoom = zoom
-          #print zoom
-          break
-        if len(way) > 1:
-          way_simplified[zoom] = way
-          #print way
-
       waytype, waynum = 0, 0
       for objtype, tagset in style.iteritems():
 
@@ -140,6 +120,25 @@ def main ():
               waynum = tid
 
       if waytype is not 0:
+        way_simplified = {MAXZOOM: curway}
+        
+        for zoom in xrange(MAXZOOM+1,-1,-1):      ########   generalize a bit
+                              # TODO: Douglas-Peucker
+          prev_point = curway[0]
+          way = [prev_point]
+          for point in curway:
+            if pix_distance(point, prev_point, zoom) > 2.:
+              way.append(point)
+            else:
+              DROPPED_POINTS += 1
+            prev_point = point
+          if len(way) == 1:
+            mzoom = zoom
+            #print zoom
+            break
+          if len(way) > 1:
+            way_simplified[zoom] = way
+            #print way
         for tile in tilelist_by_geometry(curway, mzoom+1):
           z, x, y = tile
           path = "../tiles/z%s/%s/x%s/%s/"%(z, x/1024, x, y/1024)

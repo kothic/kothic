@@ -1,0 +1,4 @@
+src/data/
+src/tiles/
+.*~
+.*.pyc
