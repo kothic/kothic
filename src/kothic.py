@@ -25,8 +25,14 @@ import time
 import Queue
 from twms import projections
 
+
+
+
+
+#  Ucomment one of the following lines depending on current mode:
 from debug import debug, Timer
-#debug = lambda a: None
+#from production import debug, Timer
+
 
 
 try:
@@ -60,7 +66,7 @@ class Navigator:
     self.comm = comm
     self.lon_c = 27.6749791
     self.lat_c = 53.8621394
-    self.width, self.height = 640, 480
+    self.width, self.height = 800, 480
     self.zoomlevel = 15
     self.data_projection = "EPSG:4326"
     self.zoom = self.width/0.02;
@@ -113,15 +119,8 @@ class Navigator:
     if self.drag:
       self.dx = event.x - self.drag_x
       self.dy = event.y - self.drag_y
-      if((abs(self.dx) > 30 or abs(self.dy) > 30) and self.f):
-        com = MessageContainer()
-        com.center_lonlat = self.rastertile.screen2lonlat(self.rastertile.w/2 - self.dx, self.rastertile.h/2 - self.dy)
-        com.data_projection = self.data_projection
-        com.zoomlevel = self.zoomlevel
-        com.zoom = self.zoom
-        com.size = (self.width + self.border*2, self.height + self.border*2)
-        com.style = self.style
-        self.comm[0].put(com)
+      if((abs(self.dx) > 150 or abs(self.dy) > 150) and self.f):
+        self.redraw()
         self.request_d = (self.dx, self.dy)
         self.f = False
       if not self.comm[1].empty():
@@ -155,24 +154,35 @@ class Navigator:
       self.dx = self.dy = 0
       self.f = True
       debug("LL after: %s, %s" % (self.lon_c, self.lat_c))
-
-      com = MessageContainer()
-      com.center_lonlat = (self.lon_c,self.lat_c)
-      com.data_projection = self.data_projection
-      com.zoomlevel = self.zoomlevel
-      com.zoom = self.zoom
-      com.size = (self.width + self.border*2, self.height + self.border*2)
-      com.style = self.style
-      self.comm[0].put(com)
-  #       self.rastertile.update_surface( self.lat_c, self.lon_c, self.zoom, self.tilecache, self.style)
+      self.redraw()
       widget.queue_draw()
   def scroll_ev(self, widget, event):
     # Zoom test :3
     if event.direction == gtk.gdk.SCROLL_UP:
       self.zoom *= 2
+      self.zoomlevel += 1
       debug("Zoom in")
     elif event.direction == gtk.gdk.SCROLL_DOWN:
+      self.zoom /= 2
+      self.zoomlevel -= 1
+
       debug("Zoom out")
+    self.redraw()
+    widget.queue_draw()
+  def redraw(self):
+    """
+    Force screen redraw.
+    """
+    com = MessageContainer()
+    com.center_lonlat = (self.lon_c,self.lat_c)
+    debug((self.lon_c,self.lat_c))
+    com.data_projection = self.data_projection
+    com.zoomlevel = self.zoomlevel
+    com.zoom = self.zoom
+    com.size = (self.width + self.border*2, self.height + self.border*2)
+    com.style = self.style
+    self.comm[0].put(com)
+
   def expose_ev(self, widget, event):
 #       debug("Expose")
     if(widget.allocation.width != self.width):
@@ -191,6 +201,7 @@ class Navigator:
   def main(self):
     self.window.show_all()
     gtk.main()
+    exit()
 
 class MessageContainer:
   """
