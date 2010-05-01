@@ -57,25 +57,29 @@ class Renderer(threading.Thread):
       #debug ("  got request:", request)
       t = Timer("Rendering screen")
       res = RasterTile(request.size[0], request.size[1], request.zoomlevel, request.data_projection)
-      res.update_surface(request.center_lonlat[0], request.center_lonlat[1], request.zoom, self.tc, request.style)
+      res.update_surface(request.center_lonlat, request.zoom, self.tc, request.style)
       t.stop()
       comm[1].put(res)
+      comm[0].task_done()
+      comm[2].queue_draw()
 
 class Navigator:
   def __init__(self, comm):
     self.comm = comm
-    self.lon_c = 27.6749791
-    self.lat_c = 53.8621394
+    self.center_coord = (27.6749791, 53.8621394)
     self.width, self.height = 800, 480
-    self.zoomlevel = 15
+    self.zoomlevel = 16
     self.data_projection = "EPSG:4326"
     self.zoom = self.width/0.02;
+    self.request_d = (0,0)
     self.window = gtk.Window(gtk.WINDOW_TOPLEVEL)
     self.dx = 0
     self.dy = 0
+    self.drag_x = 0
+    self.drag_y = 0
     self.drag = False
     self.tilecache = {}
-    self.border = 200
+    self.border = 500
     self.rastertile = None
     self.f = True
     undef = None
@@ -114,22 +118,17 @@ class Navigator:
     self.window.set_size_request(self.width, self.height)
     self.window.add(da)
     self.window.connect("delete_event", self.delete_ev)
+    self.comm.append(da)
+    self.comm.append(threading.Lock())
   def motion_ev(self, widget, event):
 #       debug("Motion")
     if self.drag:
       self.dx = event.x - self.drag_x
       self.dy = event.y - self.drag_y
-      if((abs(self.dx) > 150 or abs(self.dy) > 150) and self.f):
-        self.redraw()
-        self.request_d = (self.dx, self.dy)
-        self.f = False
-      if not self.comm[1].empty():
-        self.rastertile = self.comm[1].get()
-        self.f = True
-        self.drag_x += self.request_d[0]
-        self.drag_y += self.request_d[1]
-        self.dx = event.x - self.drag_x
-        self.dy = event.y - self.drag_y
+      #if((abs(self.dx) > 150 or abs(self.dy) > 150) and self.f):
+      #  self.redraw()
+#        self.request_d = (self.dx, self.dy)
+      #  self.f = False
       widget.queue_draw()
   def delete_ev(self, widget, event):
     gtk.main_quit()
@@ -148,14 +147,14 @@ class Navigator:
       debug("Stop drag")
       self.drag = False
   #       debug("ll:", self.latcenter, self.loncenter)
-      debug("LL before: %s, %s" % (self.lon_c, self.lat_c))
+      debug("LL before: %s, %s" % self.center_coord)
       debug("dd: %s,%s "%(self.dx, self.dy))
-      self.lon_c, self.lat_c = self.rastertile.screen2lonlat(self.rastertile.w/2 - self.dx, self.rastertile.h/2 - self.dy);
-      self.dx = self.dy = 0
+      self.center_coord = self.rastertile.screen2lonlat(self.rastertile.w/2 - self.dx, self.rastertile.h/2 - self.dy);
+      #self.dx = self.dy = 0
       self.f = True
-      debug("LL after: %s, %s" % (self.lon_c, self.lat_c))
+      debug("LL after: %s, %s" % self.center_coord)
       self.redraw()
-      widget.queue_draw()
+     # widget.queue_draw()
   def scroll_ev(self, widget, event):
     # Zoom test :3
     if event.direction == gtk.gdk.SCROLL_UP:
@@ -168,14 +167,13 @@ class Navigator:
 
       debug("Zoom out")
     self.redraw()
-    widget.queue_draw()
+   # widget.queue_draw()
   def redraw(self):
     """
     Force screen redraw.
     """
     com = MessageContainer()
-    com.center_lonlat = (self.lon_c,self.lat_c)
-    debug((self.lon_c,self.lat_c))
+    com.center_lonlat = self.center_coord
     com.data_projection = self.data_projection
     com.zoomlevel = self.zoomlevel
     com.zoom = self.zoom
@@ -185,17 +183,41 @@ class Navigator:
 
   def expose_ev(self, widget, event):
 #       debug("Expose")
-    if(widget.allocation.width != self.width):
+
+    self.comm[3].acquire()
+    if(widget.allocation.width != self.width or widget.allocation.height != self.height ):
       debug("Rrresize!")
       self.width = widget.allocation.width
       self.height = widget.allocation.height
       self.rastertile = None
     if self.rastertile is None:
       self.rastertile = RasterTile(self.width + self.border*2, self.height + self.border*2, self.zoomlevel, self.data_projection)
-      self.rastertile.update_surface(self.lon_c, self.lat_c, self.zoom, self.tilecache, self.style)
+      self.rastertile.update_surface(self.center_coord, self.zoom, self.tilecache, self.style, None)
+    nrt = None
+    while(not self.comm[1].empty()):
+      nrt = self.comm[1].get()
+      self.comm[1].task_done()
+    if nrt is not None:
+      ort = self.rastertile
+      #nrt = self.comm[1].get()
+      lonlat = ort.screen2lonlat(ort.w/2, ort.h/2)
+      ox, oy = nrt.lonlat2screen(lonlat)
+      ox -= nrt.w/2
+      oy -= nrt.h/2
+      self.drag_x += ox
+      self.drag_y += oy
+      self.dx -= ox
+      self.dy -= oy
+      #debug( (lat, lon, ox, oy) )
+      self.rastertile.offset_x = -ox
+      self.rastertile.offset_y = -oy
+      self.f = True
+      self.rastertile = nrt
+
     cr = widget.window.cairo_create()
-    cr.set_source_surface(self.rastertile.surface, self.dx-self.border, self.dy - self.border)
+    cr.set_source_surface(self.rastertile.surface, self.dx-self.border + self.rastertile.offset_x, self.dy - self.border + self.rastertile.offset_y)
     cr.paint()
+    self.comm[3].release()
 #       cr.
 
   def main(self):
@@ -229,7 +251,7 @@ def ways(t):
     r.update(i)
   return r.values()
 
-def load_tile(k):
+def load_tile(k,lock = None):
   #debug("loading tile: ", k)
   try:
     f = open(key_to_filename(k))
@@ -242,6 +264,9 @@ def load_tile(k):
     w = Way(a[0], int(a[1]), int(a[2]), map(lambda x: float(x), a[3:]))
     t[w.id] = w
   f.close()
+  if lock is not None:
+    lock.acquire()
+    lock.release()
   return t
 
 class RasterTile:
@@ -249,21 +274,19 @@ class RasterTile:
     self.w = width
     self.h = height
     self.surface = cairo.ImageSurface(cairo.FORMAT_RGB24, self.w, self.h)
-    self.x_offset = 0
-    self.y_offset = 0
-    self.lat_c = None
-    self.lon_c = None
+    self.offset_x = 0
+    self.offset_y = 0 
+    self.center_coord = None
     self.zoomlevel = zoom
     self.zoom = None
     self.data_projection = data_projection
   def screen2lonlat(self, x, y):
-    return (x - self.w/2)/(math.cos(self.lat_c*math.pi/180)*self.zoom) + self.lon_c, -(y - self.h/2)/self.zoom + self.lat_c
-  def lonlat2screen(self, lon, lat, lcc):
-    return (lon - self.lon_c)*lcc*self.zoom + self.w/2, -(lat - self.lat_c)*self.zoom + self.h/2
-  def update_surface(self, lon, lat, zoom, tilecache, style):
+    return (x - self.w/2)/(math.cos(self.center_coord[1]*math.pi/180)*self.zoom) + self.center_coord[0], -(y - self.h/2)/self.zoom + self.center_coord[1]
+  def lonlat2screen(self, (lon, lat)):
+    return (lon - self.center_coord[0])*self.lcc*self.zoom + self.w/2, -(lat - self.center_coord[1])*self.zoom + self.h/2
+  def update_surface(self, lonlat, zoom, tilecache, style, lock = None):
     self.zoom = zoom
-    self.lat_c = lat
-    self.lon_c = lon
+    self.center_coord = lonlat
     cr = cairo.Context(self.surface)
     cr.rectangle(0, 0, self.w, self.h)
     cr.set_source_rgb(0.7, 0.7, 0.7)
@@ -287,13 +310,16 @@ class RasterTile:
     #FIXME add time2
     ww = ways(tilecache)
     debug("ways: %s" % len(ww))
-
+    if lock is not None:
+      lock.acquire()
+      lock.release()
+    self.lcc = math.cos(self.center_coord[1]*math.pi/180)
     ww.sort(key=lambda x: style[x.style][3])
-    lcc = math.cos(self.lat_c*math.pi/180)
+    lcc = math.cos(self.center_coord[1]*math.pi/180)
     for w in ww:
       cs = []
       for k in range(0, len(w.coords), 2):
-        x, y = self.lonlat2screen(w.coords[k], w.coords[k+1], lcc);
+        x, y = self.lonlat2screen((w.coords[k], w.coords[k+1]));
         cs.append(x)
         cs.append(y)
       w.cs = cs
@@ -301,6 +327,9 @@ class RasterTile:
       debug("pass %s" % passn)
       for w in ww:
         stn = w.style
+        if lock is not None:
+          lock.acquire()
+          lock.release()
         if stn < len(style) and style[stn] is not None and style[stn][passn-1] is not None:
           st = style[w.style][passn-1]
           cr.set_line_width(st[0])
@@ -322,8 +351,9 @@ def key_to_filename((z,x,y)):
   return "tiles/z%s/%s/x%s/%s/y%s.vtile"%(z, x/1024, x, y/1024, y)
 
 if __name__ == "__main__":
-  comm = (Queue.Queue(), Queue.Queue())
+
   gtk.gdk.threads_init()
+  comm = [Queue.Queue(), Queue.Queue()]
   nav = Navigator(comm)
   r = Renderer(comm)
   r.daemon = True
