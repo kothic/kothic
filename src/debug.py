@@ -18,23 +18,22 @@ import datetime
 import sys
 
 def debug(st):
-  """
-  Debug write to stderr
-  """
+    """
+    Debug write to stderr
+    """
 
-  sys.stderr.write(str(st)+"\n")
-  sys.stderr.flush()
+    sys.stderr.write(str(st)+"\n")
+    sys.stderr.flush()
 
 
 
 class Timer:
-  """
-  A small timer for debugging
-  """
-  def __init__(self, comment):
-    self.time = datetime.datetime.now()
-    self.comment = comment
-    debug("%s started" % comment)
-  def stop(self):
-    debug("%s finished in %s" % (self.comment, str(datetime.datetime.now() - self.time)))
-      
+    """
+    A small timer for debugging
+    """
+    def __init__(self, comment):
+        self.time = datetime.datetime.now()
+        self.comment = comment
+        debug("%s started" % comment)
+    def stop(self):
+        debug("%s finished in %s" % (self.comment, str(datetime.datetime.now() - self.time)))
