@@ -76,7 +76,7 @@ class Navigator:
     self.drag_y = 0
     self.drag = False
     self.tilecache = {}
-    self.border = 500
+    self.border = 200
     self.rastertile = None
     self.f = True
     undef = None
