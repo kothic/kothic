@@ -82,19 +82,20 @@ def main ():
       if style.get_style("way", tags, True):            # if way is stylized
         tags = style.filter_tags(tags)
         towrite = ";".join(["%s=%s"%x for x in tags.iteritems()])  ### TODO: sanitize keys and values
-        print towrite
+        #print towrite
         way_simplified = {MAXZOOM: curway}
         
-        for zoom in xrange(MAXZOOM+1,-1,-1):      ########   generalize a bit
+        for zoom in xrange(MAXZOOM-1,-1,-1):      ########   generalize a bit
                               # TODO: Douglas-Peucker
           prev_point = curway[0]
           way = [prev_point]
           for point in curway:
-            if pix_distance(point, prev_point, zoom) > 2.:
+            if pix_distance(point, prev_point, zoom) > 1.5:
               way.append(point)
+              prev_point = point
             else:
               DROPPED_POINTS += 1
-            prev_point = point
+
           if len(way) == 1:
             mzoom = zoom
             #print zoom
