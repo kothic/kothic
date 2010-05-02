@@ -27,7 +27,7 @@ try:
 except ImportError:
   pass
 
-MAXZOOM = 15
+MAXZOOM = 16
 proj = "EPSG:4326"
 
 style = Styling()
@@ -90,66 +90,66 @@ def main ():
         print "Ways read:", WAYS_READ
         
       mzoom = 1
+      tags = style.filter_tags(tags)
+      if tags:
+        if style.get_style("way", tags, True):            # if way is stylized
+          towrite = ";".join(["%s=%s"%x for x in tags.iteritems()])  ### TODO: sanitize keys and values
+          #print towrite
+          way_simplified = {MAXZOOM: curway}
 
-      if style.get_style("way", tags, True):            # if way is stylized
-        tags = style.filter_tags(tags)
-        towrite = ";".join(["%s=%s"%x for x in tags.iteritems()])  ### TODO: sanitize keys and values
-        #print towrite
-        way_simplified = {MAXZOOM: curway}
-        
-        for zoom in xrange(MAXZOOM-1,-1,-1):      ########   generalize a bit
-                              # TODO: Douglas-Peucker
-          prev_point = curway[0]
-          way = [prev_point]
-          for point in curway:
-            if pix_distance(point, prev_point, zoom) > 1.5:
-              way.append(point)
-              prev_point = point
-            else:
-              DROPPED_POINTS += 1
+          for zoom in xrange(MAXZOOM-1,-1,-1):      ########   generalize a bit
+                                # TODO: Douglas-Peucker
+            prev_point = curway[0]
+            way = [prev_point]
+            for point in curway:
+              if pix_distance(point, prev_point, zoom) > 1.5:
+                way.append(point)
+                prev_point = point
+              else:
+                DROPPED_POINTS += 1
 
-          if len(way) == 1:
-            mzoom = zoom
-            #print zoom
-            break
-          if len(way) > 1:
-            way_simplified[zoom] = way
-            #print way
-        for tile in tilelist_by_geometry(curway, mzoom+1):
-          z, x, y = tile
-          path = "tiles/z%s/%s/x%s/%s/"%(z, x/1024, x, y/1024)
-          if tile not in tilefiles:
+            if len(way) == 1:
+              mzoom = zoom
+              #print zoom
+              break
+            if len(way) > 1:
+              way_simplified[zoom] = way
+              #print way
+          for tile in tilelist_by_geometry(curway, mzoom+1):
+            z, x, y = tile
+            path = "tiles/z%s/%s/x%s/%s/"%(z, x/1024, x, y/1024)
+            if tile not in tilefiles:
 
-            if not os.path.exists(path):
-              os.makedirs(path)
-            tilefiles[tile] = open(path+"y"+str(y)+".vtile","wb")
-            tilefiles_hist.append(tile)
-          else:
-            if not tilefiles[tile]:
-              tilefiles[tile] = open(path+"y"+str(y)+".vtile","a")
+              if not os.path.exists(path):
+                os.makedirs(path)
+              tilefiles[tile] = open(path+"y"+str(y)+".vtile","wb")
               tilefiles_hist.append(tile)
-          tilefiles_hist.remove(tile)
-          tilefiles_hist.append(tile)
-          print >>tilefiles[tile], "%s %s" % (towrite, items["id"]), " ".join([str(x[0])+" "+str(x[1]) for x in way_simplified[tile[0]]])
-          if len(tilefiles_hist) > 400:
-            print "Cleaned up tiles. Wrote by now:", len(tilefiles),"active:",len(tilefiles_hist)
-            for tile in tilefiles_hist[0:len(tilefiles_hist)-100]:
-              
-            
-              tilefiles_hist.remove(tile)
-              tilefiles[tile].flush()
-              tilefiles[tile].close()
-              tilefiles[tile] = None
-              
-          
-      #print >>corr, "%s %s %s %s %s %s"% (curway[0][0],curway[0][1],curway[1][0],curway[1][1], user, ts )
-      WAYS_WRITTEN += 1
-      if WAYS_WRITTEN % 10000 == 0:
-        print WAYS_WRITTEN
-      curway = []
-      tags = {}
-      #user = default_user
-      #ts = ""
+            else:
+              if not tilefiles[tile]:
+                tilefiles[tile] = open(path+"y"+str(y)+".vtile","a")
+                tilefiles_hist.append(tile)
+            tilefiles_hist.remove(tile)
+            tilefiles_hist.append(tile)
+            print >>tilefiles[tile], "%s %s" % (towrite, items["id"]), " ".join([str(x[0])+" "+str(x[1]) for x in way_simplified[tile[0]]])
+            if len(tilefiles_hist) > 400:
+              print "Cleaned up tiles. Wrote by now:", len(tilefiles),"active:",len(tilefiles_hist)
+              for tile in tilefiles_hist[0:len(tilefiles_hist)-100]:
+
+
+                tilefiles_hist.remove(tile)
+                tilefiles[tile].flush()
+                tilefiles[tile].close()
+                tilefiles[tile] = None
+
+
+        #print >>corr, "%s %s %s %s %s %s"% (curway[0][0],curway[0][1],curway[1][0],curway[1][1], user, ts )
+        WAYS_WRITTEN += 1
+        if WAYS_WRITTEN % 10000 == 0:
+          print WAYS_WRITTEN
+        curway = []
+        tags = {}
+        #user = default_user
+        #ts = ""
   print "Tiles generated:",len(tilefiles)
   print "Nodes dropped when generalizing:", DROPPED_POINTS
   print "Nodes in memory:", len(nodes)
