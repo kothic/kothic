@@ -225,7 +225,17 @@ def poly(cr, c):
   for k in range(2, len(c), 2):
     cr.line_to(c[k], c[k + 1])
   cr.fill()
-
+class Color:
+  def __init__(self):
+    self.colortable = {}
+  def translate(self, col):
+    try:
+      return self.colortable[col]
+    except KeyError:
+      colz = gtk.gdk.Color(col)
+      self.colortable[col] = (colz.red/65536., colz.green/65536., colz.blue/65536.)
+      return self.colortable[col]
+color_tool = Color()
 
 
 class RasterTile:
@@ -298,9 +308,12 @@ class RasterTile:
       for obj in data:
         #debug(obj[1])
         if "fill-color" in obj[1]:
+          #color = color_tool.translate(obj[1]["fill-color"])
           color = gtk.gdk.Color(obj[1]["fill-color"])
-          cr.set_source_rgb(color.red, color.green, color.blue)
-          cr.set_line_width (0)
+          #debug((color.red/65536., color.green/65536., color.blue/65536.))
+          cr.set_source_rgb(color.red/65535., color.green/65535., color.blue/65535.)
+          #cr.set_source_rgb(color[0], color[1], color[2])
+          cr.set_line_width (1)
           #debug("poly!")
           poly(cr, obj[0].cs)
       # - draw casings on layer
