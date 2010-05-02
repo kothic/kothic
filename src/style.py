@@ -31,20 +31,44 @@ class Styling():
     self.Selectors["relation"] = []
     if not stylefile:
       ### using "builtin" styling
-      self.Selectors["way"].append(StyleSelector( ( [ ( ("highway",),("residential", "tertiary", "living_street")) ]  ),{"width": 5, "color":"#ffffff"} ))
-      self.Selectors["way"].append(StyleSelector( ( [ ( ("building",),(None) ) ] ),{"width": 1, "fill-color":"#ff0000"} ))
+      self.Selectors["way"].append(StyleSelector( ( [ ( ("highway",),("residential", "tertiary", "living_street")) ]  ),{"width": 3, "color":"#ffffff", "casing-width": 5, "z-index":100} ))
+      self.Selectors["way"].append(StyleSelector( ( [ ( ("building",),(None) ) ] ),{"fill-color":"#ff0000"} ))
     self.stylefile = stylefile
+    self.useful_keys = set()
+    for objtype in self.Selectors.values():  # getting useful keys
+      for selector in objtype:
+        debug(selector)
+        for tag in selector.tags:
+          self.useful_keys.update(set(tag[0]))
+    
 
-  def get_style(self, objtype, tags):
+  def get_style(self, objtype, tags, nodata = False):
     """
     objtype is "node", "way" or "relation"
     tags - object tags
+    nodata - we won't render that now, don't need exact styling
     """
     resp = {}
     for selector in self.Selectors[objtype]:
       resp.update(selector.get_style(tags))
+      if nodata:
+        if resp:
+          return True
+    if not nodata and resp:
+      resp["layer"] = int(tags.get("layer",0))*100+resp.get("z-index",0)+1000
     return resp
-    
+  def filter_tags(self, tags):
+    """
+    Returns only tags that are useful for rendering
+    """
+    resp = {}
+    for k,v in tags.iteritems():
+      if k in self.useful_keys:
+        resp[k] = v
+    return resp
+
+  
+  
 class StyleSelector():
   def __init__(self, tags, style):
     """
@@ -66,7 +90,8 @@ class StyleSelector():
           if v:
             if tags[j] in v:
               styled = True
-          styled = True
+          else:
+            styled = True
         if styled:
           return self.style
     return {}
@@ -75,4 +100,9 @@ if __name__ == "__main__":
   c = Styling()
   print c.get_style("way", {"building":"yes"})
   print c.get_style("way", {"highway":"residential"})
+  print c.get_style("way", {"highway":"road"})
   print c.get_style("way", {"highway":"residential", "building": "yes"})
+  print c.get_style("way", {"highwadfgaay":"resifdgsdential", "builafgding": "yedfgs"})
+  print c.get_style("way", {"highwadfgaay":"resifdgsdential", "builafgding": "yedfgs"}, True)
+  print c.get_style("way", {"highway":"residential", "building": "yes"}, True)
+  print c.filter_tags({"highwadfgaay":"resifdgsdential", "builafgding": "yedfgs", "building": "residential"})

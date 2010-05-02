@@ -19,6 +19,7 @@ import os
 import sys
 from lxml import etree
 from twms import projections
+from style import Styling
 
 try:
   import psyco
@@ -29,26 +30,7 @@ except ImportError:
 MAXZOOM = 16
 proj = "EPSG:4326"
 
-style = {}
-style["L"] = {
-  1:  set([("highway",("primary", "motorway", "trunk"))]),
-  2:  set([("highway",("primary_link", "motorway_link", "trunk_link"))]),
-  3:  set([("highway",("secondary"))]),
-  4:  set([("highway",("residential", "tertiary", "living_street"))]),
-  5:  set([("highway",("service", "unclassified"))]),
-#  8:  set([("highway", None)]),
-  12: set([("waterway", ("river"))]),
-  13: set([("waterway", ("stream"))]),
-}
-style["P"] = {
-  6:  set([("building",None)]),
-  7:  set([("natural",("wood")), ("landuse",("forest")), ("leisure", ("park"))]),
-  9:  set([("landuse",("industrial"))]),
-  10: set([("natural",("water")),("waterway",("riverbank"))]),
-  11: set([("landuse",("residential"))]),
-  14: set([("landuse", ("allotments"))]),
-#  13: set([("landuse", None)]),
-}
+style = Styling()
 
 #  elsif($k eq 'highway' and $v eq 'footway' or $v eq 'path' or $v eq 'track'){
 
@@ -77,15 +59,6 @@ def pix_distance(a,b,z):
   """
   return 2**z*256*(((a[0]-b[0])/360.)**2+((a[1]-b[1])/180.)**2)**0.5
 
-needed_ways_tags = set(['highway','building','landuse'])
-
-def way_interesting(tags):
-  res = {}
-  for k,v in tags.iteritems():
-    if k in needed_ways_tags:
-      res[k] = v
-  return res
-
 
 def main ():
   DROPPED_POINTS = 0
@@ -106,20 +79,10 @@ def main ():
     elif elem.tag == "way":
       mzoom = 1
 
-      waytype, waynum = 0, 0
-      for objtype, tagset in style.iteritems():
-
-        for tid, tagz in tagset.iteritems():
-          for k, v in tagz:
-            if k in tags:
-              if v:
-                if tags[k] not in v:
-                  continue
-              #print k, v
-              waytype = objtype
-              waynum = tid
-
-      if waytype is not 0:
+      if style.get_style("way", tags, True):            # if way is stylized
+        tags = style.filter_tags(tags)
+        towrite = ";".join(["%s=%s"%x for x in tags.iteritems()])  ### TODO: sanitize keys and values
+        print towrite
         way_simplified = {MAXZOOM: curway}
         
         for zoom in xrange(MAXZOOM+1,-1,-1):      ########   generalize a bit
@@ -141,7 +104,7 @@ def main ():
             #print way
         for tile in tilelist_by_geometry(curway, mzoom+1):
           z, x, y = tile
-          path = "../tiles/z%s/%s/x%s/%s/"%(z, x/1024, x, y/1024)
+          path = "tiles/z%s/%s/x%s/%s/"%(z, x/1024, x, y/1024)
           if tile not in tilefiles:
 
             if not os.path.exists(path):
@@ -149,7 +112,7 @@ def main ():
             tilefiles[tile] = "aaa"
             tilefile = open(path+"y"+str(y)+".vtile","wb")
           tilefile = open(path+"y"+str(y)+".vtile","a")
-          print >>tilefile, "%s %s %s" % (waytype, items["id"], waynum), " ".join([str(x[0])+" "+str(x[1]) for x in way_simplified[tile[0]]])
+          print >>tilefile, "%s %s" % (towrite, items["id"]), " ".join([str(x[0])+" "+str(x[1]) for x in way_simplified[tile[0]]])
           tilefile.flush()
           tilefile.close()
           

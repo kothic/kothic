@@ -19,11 +19,11 @@ from debug import debug
 from twms import projections
 
 class Way:
-  def __init__(self, type, style, coords):
-    self.type = type
+  def __init__(self, tags, coords):
     self.coords = coords
-    self.style = style
     self.cs = None
+    #print [x.split("=") for x in tags.split(";")]
+    self.tags = dict((x.split("=") for x in tags.split(";")))
 
 class QuadTileBackend:
   """
@@ -54,7 +54,7 @@ class QuadTileBackend:
     t = {}
     for line in f:
       a = line.split(" ")
-      w = Way(a[0], int(a[2]), [float(x) for x in a[3:]])
+      w = Way(a[0], [float(x) for x in a[2:]])
       t[int(a[1])] = w
     f.close()
     return t

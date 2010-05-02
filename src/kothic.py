@@ -28,6 +28,7 @@ import Queue
 
 from debug import debug, Timer
 from vtiles_backend import QuadTileBackend as DataBackend
+from style import Styling
 
 
 
@@ -80,24 +81,8 @@ class Navigator:
     self.rastertile = None
     self.f = True
     undef = None
-    self.style = [
-[None, None, None, 0],
-[undef, [6.0, [0,0,0]], [4.0, [1, 1, .7]], 1],
-[undef, [4.5, [0,0,0]], [2.5, [1, 1, .7]], 2],
-[undef, [3.5, [0,0,0]], [2.5, [1, 1, .7]], 3],
-[undef, [2.8, [0,0,0]], [2.0, [1, 1, 1]], 4],
-[undef, undef, [1.0, [1, 1, 1]], 5],
-[undef, [0, [0.7, 0.4, 0.4]], undef, 6],
-[[1, [0.30, 0.5, 0.30]], undef, undef, 7],
-[undef, undef, [2, [1, 0.3, 0.3]], 8],
-[[0, [0.7, 0.6, 0.6]], undef, undef, 9],
-[[0, [0.4, 0.4, 1.0]], undef, undef, 10],
-[[0, [0.6, 0.6, 0.6]], undef, undef, 11],
-[undef, [3.5, [0.4, 0.4, 1.0]], undef, 12],
-[undef, [2, [0.4, 0.4, 1.0]], undef, 13],
-[[0, [0.72, 0.51, 0.32]], undef, undef, 14],
-[[0, [1, 0.0, 0.0]], undef, undef, 0] #unknown landuse
-]
+    self.style = Styling()
+    
     da = gtk.DrawingArea()
     da.add_events(gtk.gdk.BUTTON1_MOTION_MASK)
     da.add_events(gtk.gdk.POINTER_MOTION_MASK)
@@ -273,35 +258,79 @@ class RasterTile:
     #FIXME add time2
     #ww = ways(tilecache)
     #debug("ways: %s" % len(ww))
-    ww = self.data.get_vectors((lonmin,latmin,lonmax,latmax),self.zoomlevel).values()
+    ww = [ (x, style.get_style("way", x.tags)) for x in self.data.get_vectors((lonmin,latmin,lonmax,latmax),self.zoomlevel).values()]
+    ww1 = []
+    for way in ww:
+      if way[1]:
+        ww1.append(way)
+    ww = ww1
     if lock is not None:
       lock.acquire()
       lock.release()
     self.lcc = math.cos(self.center_coord[1]*math.pi/180)
-    ww.sort(key=lambda x: style[x.style][3])
+    #ww = dict([(int(x[1]["layer"]/100), x) for x in ww])
+
+    #debug(objs_by_layers)
+    #ww = [x[0] for x in ww]
+    
     lcc = math.cos(self.center_coord[1]*math.pi/180)
     for w in ww:
       cs = []
-      for k in range(0, len(w.coords), 2):
-        x, y = self.lonlat2screen((w.coords[k], w.coords[k+1]));
+      for k in range(0, len(w[0].coords), 2):
+        x, y = self.lonlat2screen((w[0].coords[k], w[0].coords[k+1]));
         cs.append(x)
         cs.append(y)
-      w.cs = cs
-    for passn in range(1, 4):
-      debug("pass %s" % passn)
-      for w in ww:
-        stn = w.style
-        if lock is not None:
-          lock.acquire()
-          lock.release()
-        if stn < len(style) and style[stn] is not None and style[stn][passn-1] is not None:
-          st = style[w.style][passn-1]
-          cr.set_line_width(st[0])
-          cr.set_source_rgb(st[1][0], st[1][1], st[1][2])
-          if w.type == "L":
-            line(cr, w.cs)
-          elif w.type == "P":
-            poly(cr, w.cs)
+      w[0].cs = cs
+
+    ww.sort(key=lambda x: x[1]["layer"])
+    layers = list(set([int(x[1]["layer"]/100) for x in ww]))
+    layers.sort()
+    objs_by_layers = {}
+    for layer in layers:
+      objs_by_layers[layer] = []
+    for obj in ww:
+    #  debug(obj)
+      objs_by_layers[int(obj[1]["layer"]/100)].append(obj)
+    del ww
+    for layer in layers:
+      data = objs_by_layers[layer]
+      # - fill polygons
+      for obj in data:
+        #debug(obj[1])
+        if "fill-color" in obj[1]:
+          color = gtk.gdk.Color(obj[1]["fill-color"])
+          cr.set_source_rgb(color.red, color.green, color.blue)
+          cr.set_line_width (0)
+          #debug("poly!")
+          poly(cr, obj[0].cs)
+      # - draw casings on layer
+      for obj in data:
+        if "casing-width" in obj[1] or "casing-color" in obj[1]:
+          color = gtk.gdk.Color(obj[1].get("casing-color", "#000"))
+          cr.set_source_rgb(color.red, color.green, color.blue)
+          cr.set_line_width (obj[1].get("casing-width", obj[1].get("width",0)+1 ))
+          line(cr, obj[0].cs)
+      # - draw line centers
+      for obj in data:
+        if "width" in obj[1] or "color" in obj[1]:
+          color = gtk.gdk.Color(obj[1].get("color", "#000"))
+          cr.set_source_rgb(color.red, color.green, color.blue)
+          cr.set_line_width (obj[1].get("width", 1))
+          line(cr, obj[0].cs)
+      #debug("pass %s" % passn)
+      #for w in ww:
+        #stn = w.style
+        #if lock is not None:
+          #lock.acquire()
+          #lock.release()
+        #if stn < len(style) and style[stn] is not None and style[stn][passn-1] is not None:
+          #st = style[w.style][passn-1]
+          #cr.set_line_width(st[0])
+          #cr.set_source_rgb(st[1][0], st[1][1], st[1][2])
+          #if w.type == "L":
+            #line(cr, w.cs)
+          #elif w.type == "P":
+            #poly(cr, w.cs)
 
 
 
