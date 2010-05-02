@@ -27,7 +27,7 @@ try:
 except ImportError:
   pass
 
-MAXZOOM = 16
+MAXZOOM = 15
 proj = "EPSG:4326"
 
 style = Styling()
@@ -62,8 +62,13 @@ def pix_distance(a,b,z):
 
 def main ():
   DROPPED_POINTS = 0
+  WAYS_WRITTEN = 0
+  NODES_READ = 0
+  WAYS_READ = 0
   tilefiles = {}
+  tilefiles_hist = []
   osm_infile = open("minsk.osm", "rb")
+  osm_infile = sys.stdin
   nodes = {}
   curway = []
   tags = {}
@@ -71,12 +76,19 @@ def main ():
   for action, elem in context:
     items = dict(elem.items())
     if elem.tag == "node":
+      NODES_READ += 1
+      if NODES_READ % 10000 == 0:
+        print "Nodes read:", NODES_READ
       nodes[int(items["id"])] = (float(items["lon"]), float(items["lat"]))
     elif elem.tag == "nd":
       curway.append(nodes[int(items["ref"])])
     elif elem.tag == "tag":
       tags[items["k"]] = items["v"]
     elif elem.tag == "way":
+      WAYS_READ += 1
+      if WAYS_READ % 1000 == 0:
+        print "Ways read:", WAYS_READ
+        
       mzoom = 1
 
       if style.get_style("way", tags, True):            # if way is stylized
@@ -110,14 +122,30 @@ def main ():
 
             if not os.path.exists(path):
               os.makedirs(path)
-            tilefiles[tile] = "aaa"
-            tilefile = open(path+"y"+str(y)+".vtile","wb")
-          tilefile = open(path+"y"+str(y)+".vtile","a")
-          print >>tilefile, "%s %s" % (towrite, items["id"]), " ".join([str(x[0])+" "+str(x[1]) for x in way_simplified[tile[0]]])
-          tilefile.flush()
-          tilefile.close()
+            tilefiles[tile] = open(path+"y"+str(y)+".vtile","wb")
+            tilefiles_hist.append(tile)
+          else:
+            if not tilefiles[tile]:
+              tilefiles[tile] = open(path+"y"+str(y)+".vtile","a")
+              tilefiles_hist.append(tile)
+          tilefiles_hist.remove(tile)
+          tilefiles_hist.append(tile)
+          print >>tilefiles[tile], "%s %s" % (towrite, items["id"]), " ".join([str(x[0])+" "+str(x[1]) for x in way_simplified[tile[0]]])
+          if len(tilefiles_hist) > 400:
+            print "Cleaned up tiles. Wrote by now:", len(tilefiles),"active:",len(tilefiles_hist)
+            for tile in tilefiles_hist[0:len(tilefiles_hist)-100]:
+              
+            
+              tilefiles_hist.remove(tile)
+              tilefiles[tile].flush()
+              tilefiles[tile].close()
+              tilefiles[tile] = None
+              
           
       #print >>corr, "%s %s %s %s %s %s"% (curway[0][0],curway[0][1],curway[1][0],curway[1][1], user, ts )
+      WAYS_WRITTEN += 1
+      if WAYS_WRITTEN % 10000 == 0:
+        print WAYS_WRITTEN
       curway = []
       tags = {}
       #user = default_user
