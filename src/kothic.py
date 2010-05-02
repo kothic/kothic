@@ -65,7 +65,7 @@ class Navigator:
     self.comm = comm
     self.center_coord = (27.6749791, 53.8621394)
     self.width, self.height = 800, 480
-    self.zoomlevel = 15
+    self.zoomlevel = 15.
     self.data_projection = "EPSG:4326"
     self.zoom = self.width/0.02;
     self.request_d = (0,0)
@@ -140,13 +140,13 @@ class Navigator:
   def scroll_ev(self, widget, event):
     # Zoom test :3
     if event.direction == gtk.gdk.SCROLL_UP:
-      self.zoom *= 2
-      self.zoomlevel += 1
+      self.zoom *= 2.**0.5
+      self.zoomlevel += 0.5
       debug("Zoom in")
     elif event.direction == gtk.gdk.SCROLL_DOWN:
       if self.zoomlevel >= 0: ## negative zooms are nonsense
-        self.zoom /= 2
-        self.zoomlevel -= 1
+        self.zoom /= 2.**0.5
+        self.zoomlevel -= 0.5
         debug("Zoom out")
     self.redraw()
    # widget.queue_draw()

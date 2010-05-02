@@ -73,6 +73,7 @@ class QuadTileBackend:
           debug ("tile killed not by us: %s" % (tile,))
 
   def get_vectors (self, bbox, zoom):
+    zoom = int(zoom)
     zoom = min(zoom, self.max_zoom)     ## If requested zoom is better than the best, take the best
     zoom = max(zoom, 0)                 ## Negative zooms are nonsense
     a,d,c,b = [int(x) for x in projections.tile_by_bbox(bbox,zoom, self.data_projection)]
