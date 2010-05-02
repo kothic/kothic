@@ -320,14 +320,14 @@ class RasterTile:
       for obj in data:
         if "casing-width" in obj[1] or "casing-color" in obj[1]:
           color = gtk.gdk.Color(obj[1].get("casing-color", "#000"))
-          cr.set_source_rgb(color.red, color.green, color.blue)
+          cr.set_source_rgb(color.red/65535., color.green/65535., color.blue/65535.)
           cr.set_line_width (obj[1].get("casing-width", obj[1].get("width",0)+1 ))
           line(cr, obj[0].cs)
       # - draw line centers
       for obj in data:
         if "width" in obj[1] or "color" in obj[1]:
           color = gtk.gdk.Color(obj[1].get("color", "#000"))
-          cr.set_source_rgb(color.red, color.green, color.blue)
+          cr.set_source_rgb(color.red/65535., color.green/65535., color.blue/65535.)
           cr.set_line_width (obj[1].get("width", 1))
           line(cr, obj[0].cs)
       #debug("pass %s" % passn)
