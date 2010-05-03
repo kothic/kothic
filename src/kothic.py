@@ -77,7 +77,6 @@ class Navigator:
     self.drag_y = 0
     self.drag = False
     self.tilecache = {}
-    self.border = 200
     self.rastertile = None
     self.f = True
     undef = None
@@ -107,10 +106,10 @@ class Navigator:
     if self.drag:
       self.dx = event.x - self.drag_x
       self.dy = event.y - self.drag_y
-      if((abs(self.dx) > 150 or abs(self.dy) > 150) and self.f):
-        self.redraw()
+      #if((abs(self.dx) > 150 or abs(self.dy) > 150) and self.f):
+      #  self.redraw()
 #        self.request_d = (self.dx, self.dy)
-        self.f = False
+      #  self.f = False
       widget.queue_draw()
   def delete_ev(self, widget, event):
     gtk.main_quit()
@@ -159,7 +158,7 @@ class Navigator:
     com.data_backend = self.data
     com.zoomlevel = self.zoomlevel
     com.zoom = self.zoom
-    com.size = (self.width + self.border*2, self.height + self.border*2)
+    com.size = (self.width*3, self.height*3)
     com.style = self.style
     self.comm[0].put(com)
 
@@ -173,7 +172,7 @@ class Navigator:
       self.height = widget.allocation.height
       self.rastertile = None
     if self.rastertile is None:
-      self.rastertile = RasterTile(self.width + self.border*2, self.height + self.border*2, self.zoomlevel, self.data)
+      self.rastertile = RasterTile(self.width*3, self.height*3, self.zoomlevel, self.data)
       self.rastertile.update_surface(self.center_coord, self.zoom, self.tilecache, self.style, None)
     nrt = None
     while(not self.comm[1].empty()):
@@ -197,7 +196,7 @@ class Navigator:
       self.rastertile = nrt
 
     cr = widget.window.cairo_create()
-    cr.set_source_surface(self.rastertile.surface, self.dx-self.border + self.rastertile.offset_x, self.dy - self.border + self.rastertile.offset_y)
+    cr.set_source_surface(self.rastertile.surface, self.dx-self.width + self.rastertile.offset_x, self.dy - self.height + self.rastertile.offset_y)
     cr.paint()
     self.comm[3].release()
 #       cr.
