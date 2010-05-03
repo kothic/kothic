@@ -24,6 +24,17 @@ class Way:
     self.cs = None
     #print [x.split("=") for x in tags.split(";")]
     self.tags = dict((x.split("=") for x in tags.split(";")))
+    # calculating center point
+    c= coords
+    sumz = [c[0],c[1]]
+    for k in range(2, len(c), 2):
+      sumz[0] +=  c[k]
+      sumz[1] +=  c[k + 1]
+    self.center = sumz
+    #  left for the better times:
+    #self.center = reduce(lambda x, y: (x[0]+y[0],x[1]+y[1]), coords)
+    self.center = (self.center[0]/len(self.coords)*2,self.center[1]/len(self.coords)*2)
+    debug(self.center)
 
 class QuadTileBackend:
   """

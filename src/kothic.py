@@ -52,10 +52,8 @@ class Renderer(threading.Thread):
         if(self.comm[0].empty):
           break
       #debug ("  got request:", request)
-      t = Timer("Rendering screen")
       res = RasterTile(request.size[0], request.size[1], request.zoomlevel, request.data_backend)
       res.update_surface(request.center_lonlat, request.zoom, self.tc, request.style)
-      t.stop()
       comm[1].put(res)
       comm[0].task_done()
       comm[2].queue_draw()
@@ -106,11 +104,11 @@ class Navigator:
     if self.drag:
       self.dx = event.x - self.drag_x
       self.dy = event.y - self.drag_y
-      #if((abs(self.dx) > 150 or abs(self.dy) > 150) and self.f):
+      if((abs(self.dx) > 3 or abs(self.dy) > 3) and self.f):
       #  self.redraw()
 #        self.request_d = (self.dx, self.dy)
       #  self.f = False
-      widget.queue_draw()
+        widget.queue_draw()
   def delete_ev(self, widget, event):
     gtk.main_quit()
   def press_ev(self, widget, event):
@@ -119,6 +117,7 @@ class Navigator:
       self.drag = True
       self.drag_x = event.x
       self.drag_y = event.y
+      self.timer = Timer("Drag")
     elif event.button == 2:
       debug("Button2")
     elif event.button == 3:
@@ -127,6 +126,7 @@ class Navigator:
     if event.button == 1:
       debug("Stop drag")
       self.drag = False
+      self.timer.stop()
   #       debug("ll:", self.latcenter, self.loncenter)
       debug("LL before: %s, %s" % self.center_coord)
       debug("dd: %s,%s "%(self.dx, self.dy))
@@ -135,7 +135,7 @@ class Navigator:
       self.f = True
       debug("LL after: %s, %s" % self.center_coord)
       self.redraw()
-     # widget.queue_draw()
+      #widget.queue_draw()
   def scroll_ev(self, widget, event):
     # Zoom test :3
     if event.direction == gtk.gdk.SCROLL_UP:
@@ -243,6 +243,8 @@ class RasterTile:
   def lonlat2screen(self, (lon, lat)):
     return (lon - self.center_coord[0])*self.lcc*self.zoom + self.w/2, -(lat - self.center_coord[1])*self.zoom + self.h/2
   def update_surface(self, lonlat, zoom, tilecache, style, lock = None):
+    rendertimer = Timer("Rendering image")
+    timer = Timer("Gettimg data")
     self.zoom = zoom
     self.center_coord = lonlat
     cr = cairo.Context(self.surface)
@@ -251,23 +253,19 @@ class RasterTile:
     cr.fill()
     lonmin, latmin = self.screen2lonlat(0, self.h)
     lonmax, latmax = self.screen2lonlat(self.w, 0)
-###########################################3
-#FIXME: add time
-    
-    #FIXME add time2
-    #ww = ways(tilecache)
-    #debug("ways: %s" % len(ww))
     ww = [ (x, style.get_style("way", x.tags)) for x in self.data.get_vectors((lonmin,latmin,lonmax,latmax),self.zoomlevel).values()]
     ww1 = []
     for way in ww:
       if way[1]:
         ww1.append(way)
+    debug( "%s objects on screen (%s in dataset)"%(len(ww1),len(ww)) )
     ww = ww1
+    
     if lock is not None:
       lock.acquire()
       lock.release()
     self.lcc = math.cos(self.center_coord[1]*math.pi/180)
-    #ww = dict([(int(x[1]["layer"]/100), x) for x in ww])
+
 
     #debug(objs_by_layers)
     #ww = [x[0] for x in ww]
@@ -292,19 +290,16 @@ class RasterTile:
       objs_by_layers[int(obj[1]["layer"]/100.)].append(obj)
       #debug ((obj[1]["layer"], obj[0].tags))
     del ww
+    timer.stop()
+    timer = Timer("Rasterizing image")
     for layer in layers:
       data = objs_by_layers[layer]
       # - fill polygons
       for obj in data:
-        #debug(obj[1])
         if "fill-color" in obj[1]:
-          #color = color_tool.translate(obj[1]["fill-color"])
           color = obj[1]["fill-color"]
-          #debug((color.red/65536., color.green/65536., color.blue/65536.))
           cr.set_source_rgb(color[0], color[1], color[2])
-          #cr.set_source_rgb(color[0], color[1], color[2])
           cr.set_line_width (1)
-          #debug("poly!")
           poly(cr, obj[0].cs)
       # - draw casings on layer
       for obj in data:
@@ -320,20 +315,34 @@ class RasterTile:
           cr.set_source_rgb(color[0], color[1], color[2])
           cr.set_line_width (obj[1].get("width", 1))
           line(cr, obj[0].cs)
-      #debug("pass %s" % passn)
-      #for w in ww:
-        #stn = w.style
-        #if lock is not None:
-          #lock.acquire()
-          #lock.release()
-        #if stn < len(style) and style[stn] is not None and style[stn][passn-1] is not None:
-          #st = style[w.style][passn-1]
-          #cr.set_line_width(st[0])
-          #cr.set_source_rgb(st[1][0], st[1][1], st[1][2])
-          #if w.type == "L":
-            #line(cr, w.cs)
-          #elif w.type == "P":
-            #poly(cr, w.cs)
+      # - render text labels
+      for obj in data:
+        if "text" in obj[1]:
+          
+          text = obj[1]["text"]
+          
+          cr.set_line_width (obj[1].get("width", 1))
+          cr.set_font_size(obj[1].get("font-size", 9))
+          where = self.lonlat2screen(obj[0].center)
+          debug ("drawing text: %s at %s"%(text, where))
+          if "text-halo-color" in obj[1] or "text-halo-radius" in obj[1]:
+            cr.new_path()
+            cr.move_to(where[0], where[1])
+            cr.set_line_width (obj[1].get("text-halo-radius", 1))
+            color = obj[1].get("text-halo-color", (1.,1.,1.))
+            cr.set_source_rgb(color[0], color[1], color[2])
+            cr.text_path(text)
+            cr.stroke()
+          cr.new_path()
+          cr.move_to(where[0], where[1])
+          cr.set_line_width (obj[1].get("text-halo-radius", 1))
+          color = obj[1].get("text-color", (0.,0.,0.))
+          cr.set_source_rgb(color[0], color[1], color[2])
+          cr.text_path(text)
+          cr.fill()
+          
+    timer.stop()
+    rendertimer.stop()
 
 
 

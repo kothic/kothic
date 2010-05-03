@@ -53,15 +53,19 @@ class Styling():
       self.Selectors["way"].append(StyleSelector( ( [ ( ("highway",),("footway","pedestrian","path" )) ]  ),{"width":2.5, "color":"#655", "z-index":3} ))
       self.Selectors["way"].append(StyleSelector( ( [ ( ("bridge",),("yes") ) ] ),{"casing-width":10} ))
       self.Selectors["way"].append(StyleSelector( ( [ ( ("power",),("line",)) ]  ),{"width": 1, "color":"#ccc",} ))
-      self.Selectors["way"].append(StyleSelector( ( [ ( ("building",),(None) ) ] ),{"fill-color": "#522","z-index": 1} ))
+      self.Selectors["way"].append(StyleSelector( ( [ ( ("building",),(None) ) ] ),{"fill-color": "#522","z-index": 1, "text": "addr:housenumber"} ))
       
     self.stylefile = stylefile
     self.useful_keys = set(["layer"])
     for objtype in self.Selectors.values():  # getting useful keys
       for selector in objtype:
-        debug(selector)
+        #debug(selector)
         for tag in selector.tags:
           self.useful_keys.update(set(tag[0]))
+        if "text" in selector.style:
+          self.useful_keys.update(set((selector.style["text"],)))
+    debug(self.useful_keys)
+    
     
 
   def get_style(self, objtype, tags, nodata = False):
@@ -79,6 +83,13 @@ class Styling():
     if not nodata and resp:
       #debug((tags, tags.get("layer",0)), )
       resp["layer"] = int(tags.get("layer",0))*100+resp.get("z-index",0)+1000
+      
+    if "text" in resp:    # unpacking text
+      if resp["text"] in tags:
+        resp["text"] = tags[resp["text"]]
+        debug("text: %s"%resp["text"])
+      else:
+        del resp["text"]
     return resp
   def filter_tags(self, tags):
     """
