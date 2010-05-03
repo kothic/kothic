@@ -20,6 +20,8 @@
 
 from debug import debug
 
+from webcolors.webcolors import whatever_to_cairo as colorparser
+
 class Styling():
   """
   Class used to choose the right way of rendering an object.
@@ -98,7 +100,17 @@ class StyleSelector():
     style - MapCSS rules to apply
     """
     self.tags = tags
-    self.style = style
+    self.style = {}
+    for key in style:
+      
+      keyz = key.lower()
+      
+      if "color" in keyz:
+        self.style[keyz] = colorparser(style[key])
+        debug((colorparser(style[key]),style[key]))
+      else:
+        self.style[keyz] = style[key]
+    
   def get_style(self, tags):
     """
     Get actual styling for object.

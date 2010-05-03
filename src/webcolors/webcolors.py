@@ -848,7 +848,10 @@ def whatever_to_rgb(string):
       a = md5.new(string)
       return hex_to_rgb("#"+a.hexdigest()[:6])
     
-    
+def whatever_to_cairo(string):
+  a = whatever_to_rgb(string)
+  return a[0]/255.,a[1]/255.,a[2]/255.,
+
   
 
 
