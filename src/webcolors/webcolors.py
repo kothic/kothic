@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 A simple library for working with the color names and color codes
 defined by the HTML and CSS specifications.
@@ -188,6 +189,7 @@ values to normalized color names. These eight mappings are as follows:
 
 import math
 import re
+import md5
 
 
 def _reversedict(d):
@@ -821,6 +823,39 @@ def rgb_percent_to_rgb(rgb_percent_triplet):
     
     """
     return tuple(map(_percent_to_integer, rgb_percent_triplet))
+
+
+
+
+
+
+
+
+
+
+
+
+def whatever_to_rgb(string):
+  """
+  Converts CSS3 color or a hex into rgb triplet; hash of string if fails.
+  """
+  try:
+    return name_to_rgb(string)
+  except ValueError:
+    try:
+      return hex_to_rgb(string)
+    except ValueError:
+      a = md5.new(string)
+      return hex_to_rgb("#"+a.hexdigest()[:6])
+    
+    
+  
+
+
+
+
+
+
 
 
 if __name__ == '__main__':
