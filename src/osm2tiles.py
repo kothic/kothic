@@ -21,13 +21,16 @@ from lxml import etree
 from twms import projections
 from style import Styling
 
+reload(sys)
+sys.setdefaultencoding("utf-8")          # a hack to support UTF-8 
+
 try:
   import psyco
   psyco.full()
 except ImportError:
   pass
 
-MAXZOOM = 16
+MAXZOOM = 15
 proj = "EPSG:4326"
 
 style = Styling()
@@ -80,6 +83,7 @@ def main ():
       if NODES_READ % 10000 == 0:
         print "Nodes read:", NODES_READ
       nodes[int(items["id"])] = (float(items["lon"]), float(items["lat"]))
+      tags = {}
     elif elem.tag == "nd":
       curway.append(nodes[int(items["ref"])])
     elif elem.tag == "tag":
@@ -101,7 +105,7 @@ def main ():
                                 # TODO: Douglas-Peucker
             prev_point = curway[0]
             way = [prev_point]
-            for point in curway:
+            for point in way_simplified[zoom+1]:
               if pix_distance(point, prev_point, zoom) > 1.5:
                 way.append(point)
                 prev_point = point
@@ -146,8 +150,8 @@ def main ():
         WAYS_WRITTEN += 1
         if WAYS_WRITTEN % 10000 == 0:
           print WAYS_WRITTEN
-        curway = []
-        tags = {}
+      curway = []
+      tags = {}
         #user = default_user
         #ts = ""
   print "Tiles generated:",len(tilefiles)
