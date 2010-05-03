@@ -37,21 +37,24 @@ class Styling():
       self.Selectors["way"].append(StyleSelector( ( [ ( ("barrier",),(None) ) ] ),{"casing-width":1,} ))
       self.Selectors["way"].append(StyleSelector( ( [ ( ("highway",),("residential", "tertiary", "living_street")) ]  ),{"width": 3, "color":"#ffffff", "casing-width": 5, "z-index":10} ))
       self.Selectors["way"].append(StyleSelector( ( [ ( ("highway",),("service", "unclassified")) ]  ),{"width": 2.5, "color":"#ccc", "casing-width": 4, "z-index":9} ))
+
       self.Selectors["way"].append(StyleSelector( ( [ ( ("highway",),("primary", "motorway", "trunk")) ]  ),{"width": 4, "color":"#ff0", "casing-width": 6, "z-index":11} ))
       self.Selectors["way"].append(StyleSelector( ( [ ( ("highway",),("primary_link", "motorway_link", "trunk_link")) ]  ),{"width": 3.5, "color":"#ff0", "casing-width": 6, "z-index":11} ))
       self.Selectors["way"].append(StyleSelector( ( [ ( ("highway",),("secondary", )) ]  ),{"width": 4, "color":"orange", "casing-width": 6, "z-index":10} ))
       self.Selectors["way"].append(StyleSelector( ( [ ( ("living_street",),("yes")) ]  ),{"width": 2, "casing-width": 3, "z-index": 0} ))
       self.Selectors["way"].append(StyleSelector( ( [ ( ("landuse","natural"),("forest", "wood") ) ] ),{"fill-color": "#020"} ))
       self.Selectors["way"].append(StyleSelector( ( [ ( ("landuse",),("industrial",) ) ] ),{"fill-color": "#855"} ))
+      self.Selectors["way"].append(StyleSelector( ( [ ( ("landuse",),("military",) ) ] ),{"fill-color": "pink"} ))
       self.Selectors["way"].append(StyleSelector( ( [ ( ("waterway","natural"),("riverbank", "water") ) ] ),{"fill-color": "#002"} ))
       self.Selectors["way"].append(StyleSelector( ( [ ( ("waterway","natural"),("river", "stream") ) ] ),{"color": "#002"} ))
       self.Selectors["way"].append(StyleSelector( ( [ ( ("landuse","natural"),("grass",) ) ] ),{"fill-color": "#050",} ))
       self.Selectors["way"].append(StyleSelector( ( [ ( ("highway",),("footway","pedestrian","path" )) ]  ),{"width":2.5, "color":"#655", "z-index":3} ))
-      self.Selectors["way"].append(StyleSelector( ( [ ( ("bridge",),("yes") ) ] ),{"casing-width":10,"z-index": 100} ))
+      self.Selectors["way"].append(StyleSelector( ( [ ( ("bridge",),("yes") ) ] ),{"casing-width":10} ))
+      self.Selectors["way"].append(StyleSelector( ( [ ( ("power",),("line",)) ]  ),{"width": 1, "color":"#ccc",} ))
       self.Selectors["way"].append(StyleSelector( ( [ ( ("building",),(None) ) ] ),{"fill-color": "#522","z-index": 1} ))
       
     self.stylefile = stylefile
-    self.useful_keys = set()
+    self.useful_keys = set(["layer"])
     for objtype in self.Selectors.values():  # getting useful keys
       for selector in objtype:
         debug(selector)
@@ -72,6 +75,7 @@ class Styling():
         if resp:
           return True
     if not nodata and resp:
+      #debug((tags, tags.get("layer",0)), )
       resp["layer"] = int(tags.get("layer",0))*100+resp.get("z-index",0)+1000
     return resp
   def filter_tags(self, tags):
