@@ -30,7 +30,7 @@ try:
 except ImportError:
   pass
 
-MAXZOOM = 15
+MAXZOOM = 16
 proj = "EPSG:4326"
 
 style = Styling()

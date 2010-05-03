@@ -292,14 +292,15 @@ class RasterTile:
       w[0].cs = cs
 
     ww.sort(key=lambda x: x[1]["layer"])
-    layers = list(set([int(x[1]["layer"]/100) for x in ww]))
+    layers = list(set([int(x[1]["layer"]/100.) for x in ww]))
     layers.sort()
     objs_by_layers = {}
     for layer in layers:
       objs_by_layers[layer] = []
     for obj in ww:
     #  debug(obj)
-      objs_by_layers[int(obj[1]["layer"]/100)].append(obj)
+      objs_by_layers[int(obj[1]["layer"]/100.)].append(obj)
+      #debug ((obj[1]["layer"], obj[0].tags))
     del ww
     for layer in layers:
       data = objs_by_layers[layer]
