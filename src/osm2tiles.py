@@ -62,7 +62,13 @@ def pix_distance(a,b,z):
   """
   return 2**z*256*(((a[0]-b[0])/360.)**2+((a[1]-b[1])/180.)**2)**0.5
 
+def sanitize(string):
+  string=string.replace(" ", "_")
+  string=string.replace(";", ",")
+  string=string.replace("=", "###")
+  return string
 
+print sanitize (" ;=")
 def main ():
   DROPPED_POINTS = 0
   WAYS_WRITTEN = 0
@@ -87,7 +93,7 @@ def main ():
     elif elem.tag == "nd":
       curway.append(nodes[int(items["ref"])])
     elif elem.tag == "tag":
-      tags[items["k"]] = items["v"]
+      tags[sanitize(items["k"])] = sanitize(items["v"])
     elif elem.tag == "way":
       WAYS_READ += 1
       if WAYS_READ % 1000 == 0:
