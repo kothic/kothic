@@ -53,7 +53,7 @@ class Styling():
       self.Selectors["way"].append(StyleSelector( ( [ ( ("highway",),("footway","pedestrian","path" )) ]  ),{"width":2.5, "color":"#655", "z-index":3} ))
       self.Selectors["way"].append(StyleSelector( ( [ ( ("bridge",),("yes") ) ] ),{"casing-width":10} ))
       self.Selectors["way"].append(StyleSelector( ( [ ( ("power",),("line",)) ]  ),{"width": 1, "color":"#ccc",} ))
-      self.Selectors["way"].append(StyleSelector( ( [ ( ("building",),(None) ) ] ),{"fill-color": "#522","z-index": 1, "text": "addr:housenumber"} ))
+      self.Selectors["way"].append(StyleSelector( ( [ ( ("building",),(None) ) ] ),{"fill-color": "#522","z-index": 1, "text": "addr:housenumber","text-halo-radius":2} ))
       
     self.stylefile = stylefile
     self.useful_keys = set(["layer"])
