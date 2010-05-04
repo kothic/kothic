@@ -294,6 +294,8 @@ class RasterTile:
     timer = Timer("Rasterizing image")
     linecaps = {"butt":0, "round":1, "square":2}
     linejoin = {"miter":0, "round":1, "bevel":2}
+
+    text_rendered_at = set([(-100,-100)])
     #cr.set_antialias(2)
     for layer in layers:
       data = objs_by_layers[layer]
@@ -343,22 +345,27 @@ class RasterTile:
           cr.set_line_width (obj[1].get("width", 1))
           cr.set_font_size(obj[1].get("font-size", 9))
           where = self.lonlat2screen(obj[0].center)
+          for t in text_rendered_at:
+            if ((t[0]-where[0])**2+(t[1]-where[1])**2)**(0.5) < 15:
+              break
+          else:
+              text_rendered_at.add(where)
           #debug ("drawing text: %s at %s"%(text, where))
-          if "text-halo-color" in obj[1] or "text-halo-radius" in obj[1]:
-            cr.new_path()
-            cr.move_to(where[0], where[1])
-            cr.set_line_width (obj[1].get("text-halo-radius", 1))
-            color = obj[1].get("text-halo-color", (1.,1.,1.))
-            cr.set_source_rgb(color[0], color[1], color[2])
-            cr.text_path(text)
-            cr.stroke()
-          cr.new_path()
-          cr.move_to(where[0], where[1])
-          cr.set_line_width (obj[1].get("text-halo-radius", 1))
-          color = obj[1].get("text-color", (0.,0.,0.))
-          cr.set_source_rgb(color[0], color[1], color[2])
-          cr.text_path(text)
-          cr.fill()
+              if "text-halo-color" in obj[1] or "text-halo-radius" in obj[1]:
+                cr.new_path()
+                cr.move_to(where[0], where[1])
+                cr.set_line_width (obj[1].get("text-halo-radius", 1))
+                color = obj[1].get("text-halo-color", (1.,1.,1.))
+                cr.set_source_rgb(color[0], color[1], color[2])
+                cr.text_path(text)
+                cr.stroke()
+              cr.new_path()
+              cr.move_to(where[0], where[1])
+              cr.set_line_width (obj[1].get("text-halo-radius", 1))
+              color = obj[1].get("text-color", (0.,0.,0.))
+              cr.set_source_rgb(color[0], color[1], color[2])
+              cr.text_path(text)
+              cr.fill()
       texttimer.stop()
           
     timer.stop()
