@@ -104,7 +104,7 @@ class Navigator:
     if self.drag:
       self.dx = event.x - self.drag_x
       self.dy = event.y - self.drag_y
-      if((abs(self.dx) > 3 or abs(self.dy) > 3) and self.f):
+      if((abs(self.dx) > 1 or abs(self.dy) > 1) and self.f):
       #  self.redraw()
 #        self.request_d = (self.dx, self.dy)
       #  self.f = False
@@ -292,30 +292,49 @@ class RasterTile:
     del ww
     timer.stop()
     timer = Timer("Rasterizing image")
+    linecaps = {"butt":0, "round":1, "square":2}
+    linejoin = {"miter":0, "round":1, "bevel":2}
+    #cr.set_antialias(2)
     for layer in layers:
       data = objs_by_layers[layer]
       # - fill polygons
       for obj in data:
-        if "fill-color" in obj[1]:
+        if "fill-color" in obj[1]:   ## TODO: fill-image
           color = obj[1]["fill-color"]
-          cr.set_source_rgb(color[0], color[1], color[2])
-          cr.set_line_width (1)
+          cr.set_source_rgba(color[0], color[1], color[2], obj[1].get("fill-opacity", 1))
+          
+          #cr.set_line_width (1)
           poly(cr, obj[0].cs)
       # - draw casings on layer
-      for obj in data:
+      for obj in data:   
+        ### Extras: casing-linecap, casing-linejoin
         if "casing-width" in obj[1] or "casing-color" in obj[1]:
-          color = obj[1].get("casing-color", (0,0,0))
-          cr.set_source_rgb(color[0], color[1], color[2])
+          cr.set_dash(obj[1].get("casing-dashes",obj[1].get("dashes", [])))
+          cr.set_line_join(linejoin.get(obj[1].get("casing-linejoin",obj[1].get("linejoin", "round")),1))
+          color = obj[1].get("casing-color", (0,0,0))          
+          cr.set_source_rgba(color[0], color[1], color[2], obj[1].get("casing-opacity", 1))
+                ## TODO: good combining of transparent lines and casing
+                ## Probable solution: render casing, render way as mask and put casing with mask chopped out onto image
+
+                                                                                               
           cr.set_line_width (obj[1].get("casing-width", obj[1].get("width",0)+1 ))
+          cr.set_line_cap(linecaps.get(obj[1].get("casing-linecap", obj[1].get("linecap", "butt")),0))
           line(cr, obj[0].cs)
       # - draw line centers
       for obj in data:
         if "width" in obj[1] or "color" in obj[1]:
+          cr.set_dash(obj[1].get("dashes", []))
+          cr.set_line_join(linejoin.get(obj[1].get("linejoin", "round"),1))
           color = obj[1].get("color", (0,0,0))
-          cr.set_source_rgb(color[0], color[1], color[2])
+          cr.set_source_rgba(color[0], color[1], color[2], obj[1].get("opacity", 1))
+                ## TODO: better overlapping of transparent lines.
+                ## Probable solution: render them (while they're of the same opacity and layer) on a temporary canvas that's merged into main later
           cr.set_line_width (obj[1].get("width", 1))
+          cr.set_line_cap(linecaps.get(obj[1].get("linecap", "butt"),0))
           line(cr, obj[0].cs)
       # - render text labels
+      texttimer = Timer("Text rendering")
+      cr.set_line_join(1)  # setting linejoin to "round" to get less artifacts on halo render
       for obj in data:
         if "text" in obj[1]:
           
@@ -324,7 +343,7 @@ class RasterTile:
           cr.set_line_width (obj[1].get("width", 1))
           cr.set_font_size(obj[1].get("font-size", 9))
           where = self.lonlat2screen(obj[0].center)
-          debug ("drawing text: %s at %s"%(text, where))
+          #debug ("drawing text: %s at %s"%(text, where))
           if "text-halo-color" in obj[1] or "text-halo-radius" in obj[1]:
             cr.new_path()
             cr.move_to(where[0], where[1])
@@ -340,6 +359,7 @@ class RasterTile:
           cr.set_source_rgb(color[0], color[1], color[2])
           cr.text_path(text)
           cr.fill()
+      texttimer.stop()
           
     timer.stop()
     rendertimer.stop()
