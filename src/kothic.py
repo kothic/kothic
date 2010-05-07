@@ -253,7 +253,9 @@ class RasterTile:
     cr.fill()
     lonmin, latmin = self.screen2lonlat(0, self.h)
     lonmax, latmax = self.screen2lonlat(self.w, 0)
+    datatimer = Timer("Asking backend and styling")
     ww = [ (x, style.get_style("way", x.tags)) for x in self.data.get_vectors((lonmin,latmin,lonmax,latmax),self.zoomlevel).values()]
+    datatimer.stop()
     ww1 = []
     for way in ww:
       if way[1]:
@@ -305,8 +307,26 @@ class RasterTile:
           color = obj[1]["fill-color"]
           cr.set_source_rgba(color[0], color[1], color[2], obj[1].get("fill-opacity", 1))
           
-          #cr.set_line_width (1)
-          poly(cr, obj[0].cs)
+          if not "extrude" in obj[1]:
+            poly(cr, obj[0].cs)
+          else:
+            line(cr, obj[0].cs)
+        if "extrude" in obj[1]:
+          hgt = obj[1]["extrude"]
+          c = obj[0].cs
+          excoords = [c[0], c[1]-hgt]
+          #pp = (c[0],c[1])
+          cr.set_line_width (1)
+          for k in range(2, len(c), 2):
+            excoords.append(c[k])
+            excoords.append(c[k + 1]-hgt)
+            
+            line(cr, [c[k],c[k+1],c[k],c[k+1]-hgt],)
+          poly(cr,excoords)
+          #line(cr, obj[0].cs)
+        
+          
+        
       # - draw casings on layer
       for obj in data:   
         ### Extras: casing-linecap, casing-linejoin
@@ -344,28 +364,31 @@ class RasterTile:
           
           cr.set_line_width (obj[1].get("width", 1))
           cr.set_font_size(obj[1].get("font-size", 9))
-          where = self.lonlat2screen(obj[0].center)
-          for t in text_rendered_at:
-            if ((t[0]-where[0])**2+(t[1]-where[1])**2)**(0.5) < 15:
-              break
-          else:
-              text_rendered_at.add(where)
-          #debug ("drawing text: %s at %s"%(text, where))
-              if "text-halo-color" in obj[1] or "text-halo-radius" in obj[1]:
+          if obj[1].get("text-position", "center") == "center":
+            where = self.lonlat2screen(obj[0].center)
+            for t in text_rendered_at:
+              if ((t[0]-where[0])**2+(t[1]-where[1])**2)**(0.5) < 15:
+                break
+            else:
+                text_rendered_at.add(where)
+            #debug ("drawing text: %s at %s"%(text, where))
+                if "text-halo-color" in obj[1] or "text-halo-radius" in obj[1]:
+                  cr.new_path()
+                  cr.move_to(where[0], where[1])
+                  cr.set_line_width (obj[1].get("text-halo-radius", 1))
+                  color = obj[1].get("text-halo-color", (1.,1.,1.))
+                  cr.set_source_rgb(color[0], color[1], color[2])
+                  cr.text_path(text)
+                  cr.stroke()
                 cr.new_path()
                 cr.move_to(where[0], where[1])
                 cr.set_line_width (obj[1].get("text-halo-radius", 1))
-                color = obj[1].get("text-halo-color", (1.,1.,1.))
+                color = obj[1].get("text-color", (0.,0.,0.))
                 cr.set_source_rgb(color[0], color[1], color[2])
                 cr.text_path(text)
-                cr.stroke()
-              cr.new_path()
-              cr.move_to(where[0], where[1])
-              cr.set_line_width (obj[1].get("text-halo-radius", 1))
-              color = obj[1].get("text-color", (0.,0.,0.))
-              cr.set_source_rgb(color[0], color[1], color[2])
-              cr.text_path(text)
-              cr.fill()
+                cr.fill()
+          else:
+            pass
       texttimer.stop()
           
     timer.stop()
