@@ -34,7 +34,7 @@ class Way:
     #  left for the better times:
     #self.center = reduce(lambda x, y: (x[0]+y[0],x[1]+y[1]), coords)
     self.center = (self.center[0]/len(self.coords)*2,self.center[1]/len(self.coords)*2)
-    debug(self.center)
+    #debug(self.center)
 
 class QuadTileBackend:
   """
@@ -64,6 +64,7 @@ class QuadTileBackend:
       return {}
     t = {}
     for line in f:
+      #debug(line)
       a = line.split(" ")
       w = Way(a[0], [float(x) for x in a[2:]])
       t[int(a[1])] = w
