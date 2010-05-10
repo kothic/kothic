@@ -32,9 +32,9 @@ class Styling():
     self.Selectors["node"] = []
     self.Selectors["relation"] = []
     if not stylefile:
-      self.Selectors["way"].append(StyleSelector( ( [ ( ("building",),(None) ) ] ),{"fill-color": "#f00"} ))
+     # self.Selectors["way"].append(StyleSelector( ( [ ( ("building",),(None) ) ] ),{"fill-color": "#00f"} ))
     
-    if stylefile=="zzzz":
+    #if stylefile=="zzzz":
       ### using "builtin" styling
       self.Selectors["way"].append(StyleSelector( ( [ ( ("area",),("yes") ) ] ),{"fill-color": "#ff0000"} ))
       self.Selectors["way"].append(StyleSelector( ( [ ( ("highway",),(None) ) ] ),{"width":1,"color":"#ff0000","text": "name", "text-position":"line"} ))
@@ -56,7 +56,7 @@ class Styling():
       self.Selectors["way"].append(StyleSelector( ( [ ( ("highway",),("footway","pedestrian","path" )) ]  ),{"width":2.5, "color":"#655", "dashes": [3,1],"z-index":3} ))
       self.Selectors["way"].append(StyleSelector( ( [ ( ("bridge",),("yes") ) ] ),{"casing-width":10} ))
       self.Selectors["way"].append(StyleSelector( ( [ ( ("power",),("line",)) ]  ),{"width": 1, "color":"#ccc",} ))
-      self.Selectors["way"].append(StyleSelector( ( [ ( ("building",),(None) ) ] ),{"fill-color": "#522","z-index": 1, "text": "addr:housenumber","text-halo-radius":2,"extrude":10,"z-index":100} ))
+      self.Selectors["way"].append(StyleSelector( ( [ ( ("building",),(None) ) ] ),{"fill-color": "#522","text": "addr:housenumber","text-halo-radius":2,"z-index":100} ))#"extrude":10,
       
     self.stylefile = stylefile
     self.useful_keys = set(["layer"])
@@ -85,12 +85,15 @@ class Styling():
           return True
     if not nodata and resp:
       #debug((tags, tags.get("layer",0)), )
-      resp["layer"] = int(tags.get("layer",0))*100+resp.get("z-index",0)+1000
+      try: 
+        resp["layer"] = int(tags.get("layer",0))*100+resp.get("z-index",0)+1000
+      except ValueError:
+        resp["layer"] = 1000000
       
     if "text" in resp:    # unpacking text
       if resp["text"] in tags:
         resp["text"] = tags[resp["text"]]
-        debug("text: %s"%resp["text"])
+        #debug("text: %s"%resp["text"])
       else:
         del resp["text"]
     return resp

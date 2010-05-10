@@ -46,7 +46,6 @@ class Renderer(threading.Thread):
     threading.Thread.__init__(self)
   def run(self):
     debug("Thread started")
-    self.tc = {}
     while(True):
       while(True):
         request = self.comm[0].get()
@@ -54,7 +53,7 @@ class Renderer(threading.Thread):
           break
       #debug ("  got request:", request)
       res = RasterTile(request.size[0], request.size[1], request.zoomlevel, request.data_backend)
-      res.update_surface(request.center_lonlat, request.zoom, self.tc, request.style)
+      res.update_surface_by_center(request.center_lonlat, request.zoom, request.style)
       comm[1].put(res)
       comm[0].task_done()
       comm[2].queue_draw()
@@ -75,7 +74,6 @@ class Navigator:
     self.drag_x = 0
     self.drag_y = 0
     self.drag = False
-    self.tilecache = {}
     self.rastertile = None
     self.f = True
     undef = None
@@ -128,15 +126,10 @@ class Navigator:
       debug("Stop drag")
       self.drag = False
       self.timer.stop()
-  #       debug("ll:", self.latcenter, self.loncenter)
-      debug("LL before: %s, %s" % self.center_coord)
       debug("dd: %s,%s "%(self.dx, self.dy))
       self.center_coord = self.rastertile.screen2lonlat(self.rastertile.w/2 - self.dx, self.rastertile.h/2 - self.dy);
-      #self.dx = self.dy = 0
       self.f = True
-      debug("LL after: %s, %s" % self.center_coord)
       self.redraw()
-      #widget.queue_draw()
   def scroll_ev(self, widget, event):
     # Zoom test :3
     if event.direction == gtk.gdk.SCROLL_UP:
@@ -174,7 +167,7 @@ class Navigator:
       self.rastertile = None
     if self.rastertile is None:
       self.rastertile = RasterTile(self.width*3, self.height*3, self.zoomlevel, self.data)
-      self.rastertile.update_surface(self.center_coord, self.zoom, self.tilecache, self.style, None)
+      self.rastertile.update_surface_by_center(self.center_coord, self.zoom, self.style, None)
     nrt = None
     while(not self.comm[1].empty()):
       nrt = self.comm[1].get()

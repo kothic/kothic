@@ -16,20 +16,21 @@
 #   along with kothic.  If not, see <http://www.gnu.org/licenses/>.
 
 from debug import debug, Timer
+from twms import projections
 import cairo
 import math
 
 
 def line(cr, c):
-  cr.move_to(c[0], c[1])
-  for k in range(2, len(c), 2):
-    cr.line_to(c[k], c[k + 1])
+  cr.move_to(*c[0])
+  for k in c:
+    cr.line_to(*k)
   cr.stroke()
 
 def poly(cr, c):
-  cr.move_to(c[0], c[1])
-  for k in range(2, len(c), 2):
-    cr.line_to(c[k], c[k + 1])
+  cr.move_to(*c[0])
+  for k in c:
+    cr.line_to(*k)
   cr.fill()
 
 
@@ -37,33 +38,52 @@ def poly(cr, c):
 
 
 class RasterTile:
-  def __init__(self, width, height, zoom, data_backend):
+  def __init__(self, width, height, zoomlevel, data_backend, raster_proj="EPSG:3395"):
     self.w = width
     self.h = height
     self.surface = cairo.ImageSurface(cairo.FORMAT_RGB24, self.w, self.h)
     self.offset_x = 0
     self.offset_y = 0
-    self.center_coord = None
-    self.zoomlevel = zoom
+    self.bbox = (0.,0.,0.,0.)
+    self.bbox_p = (0.,0.,0.,0.)
+    self.zoomlevel = zoomlevel
     self.zoom = None
     self.data = data_backend
-  def screen2lonlat(self, x, y):
-    return (x - self.w/2)/(math.cos(self.center_coord[1]*math.pi/180)*self.zoom) + self.center_coord[0], -(y - self.h/2)/self.zoom + self.center_coord[1]
+    self.proj = raster_proj
+  def screen2lonlat(self, lon, lat):
+    lo1, la1, lo2, la2 = self.bbox_p
+    return projections.to4326(((lon)*(self.w-1)*abs(lo2-lo1)+lo1, la2+((lat)/(self.h-1)*(la2-la1))),self.proj)
+  #  return (x - self.w/2)/(math.cos(self.center_coord[1]*math.pi/180)*self.zoom) + self.center_coord[0], -(y - self.h/2)/self.zoom + self.center_coord[1]
   def lonlat2screen(self, (lon, lat)):
-    return (lon - self.center_coord[0])*self.lcc*self.zoom + self.w/2, -(lat - self.center_coord[1])*self.zoom + self.h/2
-  def update_surface(self, lonlat, zoom, tilecache, style, lock = None):
+    lo1, la1, lo2, la2 = self.bbox_p
+    return ((lon-lo1)*(self.w-1)/abs(lo2-lo1), ((la2-lat)*(self.h-1)/(la2-la1)))
+  #  return (lon - self.center_coord[0])*self.lcc*self.zoom + self.w/2, -(lat - self.center_coord[1])*self.zoom + self.h/2
+  def update_surface_by_center(self, lonlat, zoom, style, lock = None):
+    self.zoom = zoom
+    self.zoom = 0.1
+    xy = projections.from4326(lonlat, self.proj)
+    xy1 = projections.to4326((xy[0]-self.w/2/self.zoom, xy[1]-self.h/2/self.zoom), self.proj)
+    xy2 = projections.to4326((xy[0]+self.w/2/self.zoom, xy[1]+self.h/2/self.zoom), self.proj)
+    bbox = (xy1[0],xy1[1],xy2[0],xy2[1])
+    debug (bbox)
+    return self.update_surface(bbox, zoom, style, lock)
+
+    
+  def update_surface(self, bbox, zoom, style, lock = None):
     rendertimer = Timer("Rendering image")
     timer = Timer("Gettimg data")
     self.zoom = zoom
-    self.center_coord = lonlat
+    self.bbox = bbox
+    self.bbox_p = projections.from4326(bbox,self.proj)
+
+    
     cr = cairo.Context(self.surface)
     cr.rectangle(0, 0, self.w, self.h)
-    cr.set_source_rgb(0.7, 0.7, 0.7)
+    #cr.set_source_rgb(0.7, 0.7, 0.7)
+    cr.set_source_rgb(0, 0, 0)
     cr.fill()
-    lonmin, latmin = self.screen2lonlat(0, self.h)
-    lonmax, latmax = self.screen2lonlat(self.w, 0)
     datatimer = Timer("Asking backend and styling")
-    ww = [ (x, style.get_style("way", x.tags)) for x in self.data.get_vectors((lonmin,latmin,lonmax,latmax),self.zoomlevel).values()]
+    ww = [ (x, style.get_style("way", x.tags)) for x in self.data.get_vectors(bbox,self.zoomlevel).values()]
     datatimer.stop()
     ww1 = []
     for way in ww:
@@ -75,20 +95,10 @@ class RasterTile:
     if lock is not None:
       lock.acquire()
       lock.release()
-    self.lcc = math.cos(self.center_coord[1]*math.pi/180)
-
-
-    #debug(objs_by_layers)
-    #ww = [x[0] for x in ww]
-
-    lcc = math.cos(self.center_coord[1]*math.pi/180)
     for w in ww:
-      cs = []
-      for k in range(0, len(w[0].coords), 2):
-        x, y = self.lonlat2screen((w[0].coords[k], w[0].coords[k+1]));
-        cs.append(x)
-        cs.append(y)
-      w[0].cs = cs
+      w[0].cs = [self.lonlat2screen(coord) for coord in projections.from4326(w[0].coords, self.proj)]
+      #debug(w[0].cs)
+      
 
     ww.sort(key=lambda x: x[1]["layer"])
     layers = list(set([int(x[1]["layer"]/100.) for x in ww]))
@@ -122,15 +132,10 @@ class RasterTile:
             line(cr, obj[0].cs)
         if "extrude" in obj[1]:
           hgt = obj[1]["extrude"]
-          c = obj[0].cs
-          excoords = [c[0], c[1]-hgt]
-          #pp = (c[0],c[1])
           cr.set_line_width (1)
-          for k in range(2, len(c), 2):
-            excoords.append(c[k])
-            excoords.append(c[k + 1]-hgt)
-
-            line(cr, [c[k],c[k+1],c[k],c[k+1]-hgt],)
+          excoords = [(a[0],a[1]+hgt) for a in obj[0].cs]
+          for c in excoords:
+            line(cr, [(c[0],c[1]),(c[0],c[1]-hgt)])
           poly(cr,excoords)
           #line(cr, obj[0].cs)
 
@@ -202,3 +207,4 @@ class RasterTile:
 
     timer.stop()
     rendertimer.stop()
+    debug(self.bbox)
