@@ -76,7 +76,7 @@ def main ():
   WAYS_READ = 0
   tilefiles = {}
   tilefiles_hist = []
-  osm_infile = open("minsk.osm", "rb")
+  #osm_infile = open("minsk.osm", "rb")
   osm_infile = sys.stdin
   nodes = {}
   curway = []

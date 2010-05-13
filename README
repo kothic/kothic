@@ -1,0 +1,19 @@
+   Kothic  Map Renderer
+   
+   Depends:
+   1. tWMS http://twms.googlecode.com/
+     symlink twms directory into src/
+   2. python-lxml
+   3. python-psyco, if available.
+   4. pygtk for GUI
+   5. pycairo
+
+
+   To run:
+   1. Install all dependancies.
+   2. cd src/
+   3. cat small_test_osm_dump.osm | ./osm2tiles.py
+   4. wait a bit and check if tiles ggot generated
+   5. python kothic.py to run GUI
+
+   NOT READY FOR DAILY USAGE!

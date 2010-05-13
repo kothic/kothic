@@ -79,8 +79,8 @@ class RasterTile:
     
     cr = cairo.Context(self.surface)
     cr.rectangle(0, 0, self.w, self.h)
-    #cr.set_source_rgb(0.7, 0.7, 0.7)
-    cr.set_source_rgb(0, 0, 0)
+    cr.set_source_rgb(0.7, 0.7, 0.7)
+    #cr.set_source_rgb(0, 0, 0)
     cr.fill()
     datatimer = Timer("Asking backend and styling")
     ww = [ (x, style.get_style("way", x.tags)) for x in self.data.get_vectors(bbox,self.zoomlevel).values()]
