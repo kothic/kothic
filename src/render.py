@@ -202,7 +202,70 @@ class RasterTile:
                 cr.text_path(text)
                 cr.fill()
           else:  ### render text along line
-            pass
+            c = obj[0].cs
+            text = unicode(text,"utf-8")
+            # - calculate line length
+            length = reduce(lambda x,y: (x[0]+((y[0]-x[1])**2 + (y[1]-x[2])**2 )**0.5, y[0], y[1]), c, (0,c[0][0],c[0][1]))[0]
+            print length, text, cr.text_extents(text)
+            if length > cr.text_extents(text)[2]:
+
+              # - function to get (x, y, normale) from (c, length_along_c)
+              def get_xy_from_len(c,length_along_c):
+                x0, y0 = c[0]
+                for x,y in c:
+                  seg_len = ((x-x0)**2+(y-y0)**2)**0.5
+                  if length_along_c < seg_len:
+                    normed =  length_along_c /seg_len
+                    return (x-x0)*normed+x0, (y-y0)*normed+y0, math.atan2(y-y0,x-x0)
+                  else:
+                    length_along_c -= seg_len
+                    x0,y0 = x,y
+                else:
+                  return None
+              da = 0
+              os = 1
+              z = length/2-cr.text_extents(text)[2]/2
+              print get_xy_from_len(c,z)
+              if c[0][0] < c[1][0] and get_xy_from_len(c,z)[2]<math.pi/2 and get_xy_from_len(c,z)[2] > -math.pi/2:
+                da = 0
+                os = 1
+                z = length/2-cr.text_extents(text)[2]/2
+              else:
+                da = math.pi
+                os = -1
+                z = length/2+cr.text_extents(text)[2]/2
+              z1=z
+              if "text-halo-color" in obj[1] or "text-halo-radius" in obj[1]:
+                cr.set_line_width (obj[1].get("text-halo-radius", 1))
+                color = obj[1].get("text-halo-color", (1.,1.,1.))
+                cr.set_source_rgb(color[0], color[1], color[2])
+                for letter in text:
+                  cr.new_path()
+                  xy = get_xy_from_len(c,z)
+                  #print letter, cr.text_extents(letter)
+                  cr.move_to(xy[0],xy[1])
+                  cr.save()
+                  cr.rotate(xy[2]+da)
+                  cr.text_path(letter)
+                  cr.restore()
+                  cr.stroke()
+                  z += os*cr.text_extents(letter)[4]
+
+              color = obj[1].get("text-color", (0.,0.,0.))
+              cr.set_source_rgb(color[0], color[1], color[2])
+              z = z1
+              for letter in text:
+                cr.new_path()
+                xy = get_xy_from_len(c,z)
+                #print letter, cr.text_extents(letter)
+                cr.move_to(xy[0],xy[1])
+                cr.save()
+                cr.rotate(xy[2]+da)
+                cr.text_path(letter)
+                cr.restore()
+                cr.fill()
+                z += os*cr.text_extents(letter)[4]
+
       texttimer.stop()
 
     timer.stop()

@@ -37,7 +37,7 @@ class Styling():
     #if stylefile=="zzzz":
       ### using "builtin" styling
       self.Selectors["way"].append(StyleSelector( ( [ ( ("area",),("yes") ) ] ),{"fill-color": "#ff0000"} ))
-      self.Selectors["way"].append(StyleSelector( ( [ ( ("highway",),(None) ) ] ),{"width":1,"color":"#ff0000","text": "name", "text-position":"line"} ))
+      self.Selectors["way"].append(StyleSelector( ( [ ( ("highway",),(None) ) ] ),{"width":1,"color":"#ff0000","text": "name", "text-position":"line","text-halo-radius":2,} ))
 
       self.Selectors["way"].append(StyleSelector( ( [ ( ("barrier",),(None) ) ] ),{"casing-width":1,} ))
       self.Selectors["way"].append(StyleSelector( ( [ ( ("highway",),("residential", "tertiary", "living_street")) ]  ),{"width": 3, "color":"#ffffff", "casing-width": 5, "z-index":10} ))
