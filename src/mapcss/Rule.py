@@ -20,23 +20,30 @@ class Rule():
   def __init__(self, s=''):
     self.conditions = []
     self.isAnd = True
-    self.minZoom = 13   #### FIXME: take from MapCSS creation thingz
+    self.minZoom = 0   #### FIXME: take from MapCSS creation thingz
     self.maxZoom = 19
     self.subject = s    # "", "way", "node" or "relation"
   def __repr__(self):
     return "%s|z%s-%s %s"%(self.subject,self.minZoom,self.maxZoom, self.conditions)
 
   #public function test(obj:Entity,tags:Object):Boolean {
-    #if (subject!='' && obj.getType()!=subject) { return false; }
+  def test(self, obj, tags, zoom):
+    if (self.subject!='') & (obj!=self.subject):
+      return False
+    if (zoom < self.minZoom) or (zoom > self.maxZoom):
+      return False
+    v=True
+    i=0
+    for condition in self.conditions:
+      r = condition.test(tags)
+      if i==0:
+        v=r
+      elif self.isAnd:
+        v = v & r
+      else:
+        v = v | r
+      i += 1
+      
+    return v
     
-    #var v:Boolean=true; var i:uint=0;
-    #for each (var condition:Condition in conditions) {
-      #var r:Boolean=condition.test(tags);
-      #if (i==0) { v=r; }
-      #else if (isAnd) { v=v && r; }
-      #else { v = v || r;}
-      #i++;
-      #}
-      #return v;
-      #}
       

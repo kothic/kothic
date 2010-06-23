@@ -26,40 +26,44 @@ class Condition:
     
     self.compiled_regex = ""
 
-  def test(self, params):
+  def test(self, tags):
     """
     Test a hash against this condition
     """
     
 
     t = self.type
-    if t == 'eq':
-      return tags[params[0]]==params[1]
-    if t == 'ne':
-      return tags[params[0]]!=params[1]
-    if t == 'regex':
-      return bool(self.regex.match(tags[params[0]]))
-    if t == 'true':
-      return tags[params[0]]=='true' | tags[params[0]]=='yes' | tags[params[0]]=='1'
-    if t == 'untrue':
-      return tags[params[0]]!='true' & tags[params[0]]!='yes' & tags[params[0]]!='1'
-    if t == 'set':
-      if params[0] in tags:
-        return tags[params[0]]!=''
-      return False
-    if t == 'unset':
-      if params[0] in tags:
-        return tags[params[0]]==''
-      return True
-      
-    if t == '<':
-      return (Number(tags[params[0]])< Number(params[1]))
-    if t == '<=':
-      return (Number(tags[params[0]])<=Number(params[1]))
-    if t == '>':
-      return (Number(tags[params[0]])> Number(params[1]))
-    if t == '>=':
-      return (Number(tags[params[0]])>=Number(params[1]))
+    params = self.params
+    try:
+      if t == 'eq':
+        return tags[params[0]]==params[1]
+      if t == 'ne':
+        return tags[params[0]]!=params[1]
+      if t == 'regex':
+        return bool(self.regex.match(tags[params[0]]))
+      if t == 'true':
+        return (tags[params[0]]=='true') | (tags[params[0]]=='yes') | (tags[params[0]]=='1')
+      if t == 'untrue':
+        return (tags[params[0]]!='true') & (tags[params[0]]!='yes') & (tags[params[0]]!='1')
+      if t == 'set':
+        if params[0] in tags:
+          return tags[params[0]]!=''
+        return False
+      if t == 'unset':
+        if params[0] in tags:
+          return tags[params[0]]==''
+        return True
+
+      if t == '<':
+        return (Number(tags[params[0]])< Number(params[1]))
+      if t == '<=':
+        return (Number(tags[params[0]])<=Number(params[1]))
+      if t == '>':
+        return (Number(tags[params[0]])> Number(params[1]))
+      if t == '>=':
+        return (Number(tags[params[0]])>=Number(params[1]))
+    except KeyError:
+      pass
     return False;
 
   def __repr__(self):

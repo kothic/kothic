@@ -87,18 +87,27 @@ class MapCSS():
 
     def parseZoom(self, s):
 
-                  if ZOOM_MINMAX.match(s):
-                    return ZOOM_MINMAX.match(s).groups()
-                  elif ZOOM_MIN.match(s):
-                    return ZOOM_MIN.match(s).group(), self.maxscale
-                  elif ZOOM_MAX.match(s):
-                    return self.minscale,ZOOM_MAX.match(s).group()
-                  elif ZOOM_SINGLE.match(s):
-                    return ZOOM_SINGLE.match(s).group(),ZOOM_SINGLE.match(s).group()
-                  else:
-                    logging.error("unparsed zoom: %s" %s)
+      if ZOOM_MINMAX.match(s):
+        return ZOOM_MINMAX.match(s).groups()
+      elif ZOOM_MIN.match(s):
+        return ZOOM_MIN.match(s).group(), self.maxscale
+      elif ZOOM_MAX.match(s):
+        return self.minscale,ZOOM_MAX.match(s).group()
+      elif ZOOM_SINGLE.match(s):
+        return ZOOM_SINGLE.match(s).group(),ZOOM_SINGLE.match(s).group()
+      else:
+        logging.error("unparsed zoom: %s" %s)
 
-
+    def get_style (self, type, tags, zoom):
+      """
+      Kothic styling API
+      """
+      style = []
+      #return [{"width": 1, "color":(0,0,0), "layer": 1}, {"width": 3, "color":(1,1,1), "layer":0}]
+      for chooser in self.choosers:
+        style = chooser.updateStyles(style, type, tags, zoom)
+      return style
+      
     def parse(self, css):
       """
       Parses MapCSS given as string
@@ -106,7 +115,7 @@ class MapCSS():
       log = logging.getLogger('mapcss.parser')
       previous = 0  # what was the previous CSS word?
       sc=StyleChooser() #currently being assembled
-      choosers=[]
+      #choosers=[]
       
         
 
@@ -129,7 +138,7 @@ class MapCSS():
                   self.choosers.append(sc)
                   sc = StyleChooser()
                 
-                cond = CLASS.match(css).group()
+                cond = CLASS.match(css).groups()[0]
                 log.debug("class found: %s"% (cond))
                 css = CLASS.sub("", css)
                 
@@ -144,7 +153,7 @@ class MapCSS():
                   self.choosers.append(sc)
                   sc = StyleChooser()
 
-                cond = NOT_CLASS.match(css).group()
+                cond = NOT_CLASS.match(css).groups()[0]
                 log.debug("not_class found: %s"% (cond))
                 css = NOT_CLASS.sub("", css)
                 sc.addCondition(Condition('unset',cond));
@@ -223,7 +232,7 @@ class MapCSS():
       if (previous==oDECLARATION):
         self.choosers.append(sc)
         sc= StyleChooser()
-    #  print self.choosers
+      print self.choosers
       return 
 #}
 

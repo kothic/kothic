@@ -18,18 +18,23 @@
 
 from debug import debug, Timer
 from vtiles_backend import QuadTileBackend as DataBackend
-from style import Styling
+#from style import Styling
+from mapcss import MapCSS
+
 from render import RasterTile
 
+
+style = MapCSS(1, 19)     #zoom levels
+style.parse(open("styles/default.mapcss","r").read())
 
 
 bbox = (27.115768874532,53.740327031764,28.028320754378,54.067187302158)
 
-w,h = 630,364
-z = 14
+w,h = 630*3,364*3
+z = 10
 
 db = DataBackend()
-style = Styling()
+#style = Styling()
 
 res = RasterTile(w, h, z, db)
 res.update_surface(bbox, z, style)

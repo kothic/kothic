@@ -60,7 +60,7 @@ class RasterTile:
   #  return (lon - self.center_coord[0])*self.lcc*self.zoom + self.w/2, -(lat - self.center_coord[1])*self.zoom + self.h/2
   def update_surface_by_center(self, lonlat, zoom, style, lock = None):
     self.zoom = zoom
-    self.zoom = 0.1
+    #self.zoom = 0.1
     xy = projections.from4326(lonlat, self.proj)
     xy1 = projections.to4326((xy[0]-self.w/2/self.zoom, xy[1]-self.h/2/self.zoom), self.proj)
     xy2 = projections.to4326((xy[0]+self.w/2/self.zoom, xy[1]+self.h/2/self.zoom), self.proj)
@@ -73,6 +73,7 @@ class RasterTile:
     rendertimer = Timer("Rendering image")
     timer = Timer("Gettimg data")
     self.zoom = zoom
+    print self.zoom, self.zoomlevel
     self.bbox = bbox
     self.bbox_p = projections.from4326(bbox,self.proj)
 
@@ -83,14 +84,21 @@ class RasterTile:
     #cr.set_source_rgb(0, 0, 0)
     cr.fill()
     datatimer = Timer("Asking backend and styling")
-    ww = [ (x, style.get_style("way", x.tags)) for x in self.data.get_vectors(bbox,self.zoomlevel).values()]
+    vectors = self.data.get_vectors(bbox,self.zoom).values()
+    ww = []
+    for way in vectors:
+      st = style.get_style("way", way.tags, self.zoom)
+      if st:
+       for fpt in st:
+        ww.append((way, fpt))
+    #ww = [ (x, style.get_style("way", x.tags, self.zoom)) for x in self.data.get_vectors(bbox,self.zoom).values()]
     datatimer.stop()
-    ww1 = []
-    for way in ww:
-      if way[1]:
-        ww1.append(way)
-    debug( "%s objects on screen (%s in dataset)"%(len(ww1),len(ww)) )
-    ww = ww1
+    #ww1 = []
+    #for way in ww:
+    #  if way[1]:
+    #    ww1.append(way)
+    debug( "%s objects on screen (%s in dataset)"%(len(ww),len(vectors)) )
+    #ww = ww1
 
     if lock is not None:
       lock.acquire()

@@ -17,7 +17,7 @@
  
 
 from Rule import Rule
-
+from webcolors.webcolors import whatever_to_cairo as colorparser
 
 class StyleChooser:
   """
@@ -47,21 +47,40 @@ class StyleChooser:
 
   # // Update the current StyleList from this StyleChooser
 
-  def updateStyles(obj, tags, sl, imageWidths):
+  def updateStyles(self,sl,type, tags, zoom):
                   # // Are any of the ruleChains fulfilled?
-                  # // ** needs to cope with min/max zoom
+                  # // FIXME: needs to cope with min/max zoom
                   w = 0
                   fulfilled=False
                   for c in self.ruleChains:
-                       if (testChain(c,-1,obj,tags)):
+                       if (self.testChain(c,type,tags,zoom)):
                                   fulfilled=True
                                   break
 
                   if (not fulfilled):
-                    return
-
+                    return sl
+                 # return self.styles
+             
                   ## // Update StyleList
-                  #for r in self.styles:
+                  
+                  for r in self.styles:
+                    ### FIXME: here we should do all the eval()'s
+                    ra = {}
+                    
+                    for a, b in r.iteritems():
+                      if "color" in a:
+                        ra[a] = colorparser(b)
+                      if "text" == a[-4:]:
+                        ra[a] = tags.get(b,"")
+                      if any(x in a for x in ("width", "z-index", "opacity", "offset", "radius")):
+                        try:
+                          ra[a] = float(b)
+                        except ValueError:
+                          pass
+                    ra["layer"] = float(tags.get("layer",1))*100+ra.get("z-index",1)
+                    #print ra
+                    sl.append(ra)
+                  return [ra]
                           #a = ""
                           #if (r is ShapeStyle) {
                                   #a=sl.shapeStyles;
@@ -124,6 +143,16 @@ class StyleChooser:
                   #}
                   #return false;
           #}
+
+  def testChain(self,chain, obj, tags, zoom):
+    """
+    Tests an object against a chain
+    """
+    ### FIXME: total MapCSS misreading
+    for r in chain:
+      if r.test(obj,tags,zoom):
+        return True
+    return False
 
 
           ## // ---------------------------------------------------------------------------------------------
