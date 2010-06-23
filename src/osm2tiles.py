@@ -158,6 +158,7 @@ def main ():
           print WAYS_WRITTEN
       curway = []
       tags = {}
+    elem.clear()
         #user = default_user
         #ts = ""
   print "Tiles generated:",len(tilefiles)
