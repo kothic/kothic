@@ -139,9 +139,16 @@ class MapCSS():
                 previous=oCONDITION;
 
               #// Not class - !.motorway, !.builtup, !:hover
-              #} else if ((o=NOT_CLASS.exec(css))) {
-                      #if (previous==oDECLARATION) { saveChooser(sc); sc=new StyleChooser(); }
+              elif NOT_CLASS.match(css):
+                if (previous==oDECLARATION):
+                  self.choosers.append(sc)
+                  sc = StyleChooser()
 
+                cond = NOT_CLASS.match(css).group()
+                log.debug("not_class found: %s"% (cond))
+                css = NOT_CLASS.sub("", css)
+                sc.addCondition(Condition('unset',cond));
+                previous=oCONDITION;
                       #css=css.replace(NOT_CLASS,'');
                       #sc.addCondition(new Condition('unset',o[1]));
                       #previous=oCONDITION;
@@ -155,7 +162,7 @@ class MapCSS():
                 log.debug("zoom found: %s"% (cond))
                 css=ZOOM.sub("",css)
                 sc.addZoom(self.parseZoom(cond))
-                previous=oCONDITION;
+                previous=oZOOM;
 
                       #css=css.replace(ZOOM,'');
                       #var z:Array=parseZoom(o[1]);
@@ -186,7 +193,7 @@ class MapCSS():
                 if (previous==oDECLARATION):
                   self.choosers.append(sc)
                   sc = StyleChooser()
-                obj = OBJECT.match(css).group()
+                obj = OBJECT.match(css).groups()[0]
                 log.debug("object found: %s"% (obj))
                 css=OBJECT.sub("",css)
                 sc.newObject(obj)
@@ -216,7 +223,7 @@ class MapCSS():
       if (previous==oDECLARATION):
         self.choosers.append(sc)
         sc= StyleChooser()
-      print self.choosers
+    #  print self.choosers
       return 
 #}
 
@@ -224,27 +231,27 @@ class MapCSS():
 
 
 def parseCondition(s):
-
+            log = logging.getLogger('mapcss.parser.condition')
             if      CONDITION_TRUE.match(s):
               a = CONDITION_TRUE.match(s).groups()
-              logging.debug("condition true: %s"%(a[0]))
+              log.debug("condition true: %s"%(a[0]))
               return  Condition('true'     ,a)
 
             if      CONDITION_FALSE.match(s):
               a = CONDITION_FALSE.match(s).groups()
-              logging.debug("condition false: %s"%(a[0]))
+              log.debug("condition false: %s"%(a[0]))
               return  Condition('false'     ,a)
 
 
             if      CONDITION_SET.match(s):
               a = CONDITION_SET.match(s).groups()
-              logging.debug("condition set: %s"%(a))
+              log.debug("condition set: %s"%(a))
               return  Condition('set'     ,a)
 
 
             if      CONDITION_UNSET.match(s):
               a = CONDITION_UNSET.match(s).groups()
-              logging.debug("condition unset: %s"%(a))
+              log.debug("condition unset: %s"%(a))
               return  Condition('unset'     ,a)
 
               ## FIXME: convert other conditions to python
@@ -258,14 +265,12 @@ def parseCondition(s):
 
             if      CONDITION_EQ.match(s):
               a = CONDITION_EQ.match(s).groups()
-              logging.debug("condition EQ: %s = %s"%(a[0], a[1]))
+              log.debug("condition EQ: %s = %s"%(a[0], a[1]))
               return  Condition('eq'     ,a)
 
             else:
-              logging.warning("condition UNKNOWN: %s"%(s))
-              #return null;
-              #}
-              
+              log.warning("condition UNKNOWN: %s"%(s))
+
 
 def parseDeclaration(s):
                   """
