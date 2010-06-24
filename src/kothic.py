@@ -173,9 +173,15 @@ class Navigator:
       ort = self.rastertile
       #nrt = self.comm[1].get()
       lonlat = ort.screen2lonlat(ort.w/2, ort.h/2)
-      ox, oy = nrt.lonlat2screen(lonlat)
+      debug(lonlat)
+      debug(self.center_coord)
+      ox, oy = nrt.lonlat2screen(lonlat, epsg4326=True)
+      ox, oy = int(ox),int(oy)
       ox -= nrt.w/2
       oy -= nrt.h/2
+      debug(ox)
+      debug(oy)
+      
       self.drag_x += ox
       self.drag_y += oy
       self.dx -= ox

@@ -50,13 +50,17 @@ class RasterTile:
     self.zoom = None
     self.data = data_backend
     self.proj = raster_proj
-  def screen2lonlat(self, lon, lat):
+  def screen2lonlat(self, x, y):
     lo1, la1, lo2, la2 = self.bbox_p
     
-    #debug ("%s %s %s"%(lon, lat, repr(self.bbox_p)))
-    return projections.to4326(((lon)/(self.w-1)*(lo2-lo1)+lo2, la2+((lat)/(self.h-1)*(la2-la1))),self.proj)
+    debug ("%s %s - %s %s"%(x,y,self.w, self.h))
+    debug(self.bbox_p)
+    debug((1.*x/self.w*(lo2-lo1)+lo1, la1+(1.*y/(self.h)*(la2-la1))))
+    return projections.to4326( (1.*x/self.w*(lo2-lo1)+lo1, la1+(1.*y/(self.h)*(la2-la1))),self.proj)
   #  return (x - self.w/2)/(math.cos(self.center_coord[1]*math.pi/180)*self.zoom) + self.center_coord[0], -(y - self.h/2)/self.zoom + self.center_coord[1]
-  def lonlat2screen(self, (lon, lat)):
+  def lonlat2screen(self, (lon, lat), epsg4326=False):
+    if epsg4326:
+      lon, lat = projections.from4326((lon,lat),self.proj)
     lo1, la1, lo2, la2 = self.bbox_p
     return ((lon-lo1)*(self.w-1)/abs(lo2-lo1), ((la2-lat)*(self.h-1)/(la2-la1)))
   #  return (lon - self.center_coord[0])*self.lcc*self.zoom + self.w/2, -(lat - self.center_coord[1])*self.zoom + self.h/2
