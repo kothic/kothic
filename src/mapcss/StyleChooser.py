@@ -62,6 +62,7 @@ class StyleChooser:
                  # return self.styles
              
                   ## // Update StyleList
+                  object_id = 1
                   
                   for r in self.styles:
                     ### FIXME: here we should do all the eval()'s
@@ -69,18 +70,40 @@ class StyleChooser:
                     
                     for a, b in r.iteritems():
                       if "color" in a:
+                        "parsing color value to 3-tuple"
                         ra[a] = colorparser(b)
-                      if "text" == a[-4:]:
+                      elif "text" == a[-4:]:
+                        "substituting text with value"
                         ra[a] = tags.get(b,"")
-                      if any(x in a for x in ("width", "z-index", "opacity", "offset", "radius")):
+                        if ra[a] == "":
+                          del ra[a]
+                      elif any(x in a for x in ("width", "z-index", "opacity", "offset", "radius")):
+                        "these things are float's or not in table at all"
                         try:
                           ra[a] = float(b)
                         except ValueError:
                           pass
+                      elif "dashes" in a:
+                        "these things are arrays of float's or not in table at all"
+                        try:
+                          b = b.split(",")
+                          b = [float(x) for x in b]
+                        except ValueError:
+                          pass
+                      else:
+                        ra[a]=b
                     ra["layer"] = float(tags.get("layer",1))*100+ra.get("z-index",1)
                     #print ra
-                    sl.append(ra)
-                  return [ra]
+                    if "object-id" not in ra:
+                      ra["object-id"] = str(object_id)
+                    for x in sl:
+                      if x.get("object-id","1") == ra["object-id"]:
+                        x.update(ra)
+                        break
+                    else:
+                      sl.append(ra)
+                    object_id += 1
+                  return sl
                           #a = ""
                           #if (r is ShapeStyle) {
                                   #a=sl.shapeStyles;

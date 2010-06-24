@@ -81,14 +81,36 @@ class RasterTile:
     print self.zoom, self.zoomlevel
     self.bbox = bbox
     self.bbox_p = projections.from4326(bbox,self.proj)
-    debug(zoom)
-    bgs = style.get_style("canvas", {}, self.zoom)[0]
+    
     cr = cairo.Context(self.surface)
+    # getting and setting canvas properties
+    bgs = style.get_style("canvas", {}, self.zoom)
+    if not bgs:
+      bgs = [{}]
+    bgs = bgs[0]
     cr.rectangle(0, 0, self.w, self.h)
+    # canvas color and opcity
     color = bgs.get("fill-color",(0.7, 0.7, 0.7))
     cr.set_source_rgba(color[0], color[1], color[2], bgs.get("fill-opacity", 1))
-    #cr.set_source_rgb(0, 0, 0)
     cr.fill()
+
+    # canvas antialiasing
+    antialias = bgs.get("antialias", "full")
+    if   antialias == "none":
+      "no antialiasing enabled"
+      cr.set_antialias(1)
+      #cr.font_options_set_antialias(1)
+    elif antialias == "text":
+      "only text antialiased"
+      cr.set_antialias(1)
+      #cr.font_options_set_antialias(2)
+    else:
+      "full antialias"
+      cr.set_antialias(2)
+      #cr.font_options_set_antialias(2)
+
+
+    
     datatimer = Timer("Asking backend and styling")
     vectors = self.data.get_vectors(bbox,self.zoom).values()
     ww = []
@@ -96,22 +118,18 @@ class RasterTile:
       st = style.get_style("way", way.tags, self.zoom)
       if st:
        for fpt in st:
+        #debug(fpt)
         ww.append((way, fpt))
-    #ww = [ (x, style.get_style("way", x.tags, self.zoom)) for x in self.data.get_vectors(bbox,self.zoom).values()]
+    
     datatimer.stop()
-    #ww1 = []
-    #for way in ww:
-    #  if way[1]:
-    #    ww1.append(way)
     debug( "%s objects on screen (%s in dataset)"%(len(ww),len(vectors)) )
-    #ww = ww1
 
     if lock is not None:
       lock.acquire()
       lock.release()
     for w in ww:
       w[0].cs = [self.lonlat2screen(coord) for coord in projections.from4326(w[0].coords, self.proj)]
-      #debug(w[0].cs)
+
       
 
     ww.sort(key=lambda x: x[1]["layer"])
@@ -121,9 +139,7 @@ class RasterTile:
     for layer in layers:
       objs_by_layers[layer] = []
     for obj in ww:
-    #  debug(obj)
       objs_by_layers[int(obj[1]["layer"]/100.)].append(obj)
-      #debug ((obj[1]["layer"], obj[0].tags))
     del ww
     timer.stop()
     timer = Timer("Rasterizing image")
@@ -131,7 +147,7 @@ class RasterTile:
     linejoin = {"miter":0, "round":1, "bevel":2}
 
     text_rendered_at = set([(-100,-100)])
-    #cr.set_antialias(2)
+    
     for layer in layers:
       data = objs_by_layers[layer]
       # - fill polygons
@@ -187,13 +203,14 @@ class RasterTile:
       cr.set_line_join(1)  # setting linejoin to "round" to get less artifacts on halo render
       for obj in data:
         if "text" in obj[1]:
-
+          
           text = obj[1]["text"]
+          print obj[1].get("text-position", "cesdsdfgdfnter")
 
-          cr.set_line_width (obj[1].get("width", 1))
+          #cr.set_line_width (obj[1].get("width", 1))
           cr.set_font_size(obj[1].get("font-size", 9))
           if obj[1].get("text-position", "center") == "center":
-            where = self.lonlat2screen(obj[0].center)
+            where = self.lonlat2screen(projections.from4326(obj[0].center,self.proj))
             for t in text_rendered_at:
               if ((t[0]-where[0])**2+(t[1]-where[1])**2)**(0.5) < 15:
                 break

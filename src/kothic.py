@@ -78,6 +78,7 @@ class Navigator:
     self.f = True
     undef = None
     self.style = Styling()
+    self.style.parse(open("styles/default.mapcss","r").read())
     
     da = gtk.DrawingArea()
     da.add_events(gtk.gdk.BUTTON1_MOTION_MASK)
