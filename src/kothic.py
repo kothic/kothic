@@ -28,7 +28,8 @@ import Queue
 
 from debug import debug, Timer
 from vtiles_backend import QuadTileBackend as DataBackend
-from style import Styling
+#from style import Styling
+from mapcss import MapCSS as Styling
 from render import RasterTile
 
 
@@ -52,7 +53,7 @@ class Renderer(threading.Thread):
         if(self.comm[0].empty):
           break
       #debug ("  got request:", request)
-      res = RasterTile(request.size[0], request.size[1], request.zoomlevel, request.data_backend)
+      res = RasterTile(request.size[0], request.size[1], request.zoom, request.data_backend)
       res.update_surface_by_center(request.center_lonlat, request.zoom, request.style)
       comm[1].put(res)
       comm[0].task_done()
@@ -63,9 +64,8 @@ class Navigator:
     self.comm = comm
     self.center_coord = (27.6749791, 53.8621394)
     self.width, self.height = 800, 480
-    self.zoomlevel = 15.
+    self.zoom = 15.
     self.data_projection = "EPSG:4326"
-    self.zoom = self.width/0.02;
     self.request_d = (0,0)
     self.window = gtk.Window(gtk.WINDOW_TOPLEVEL)
     self.data = DataBackend()
@@ -133,13 +133,13 @@ class Navigator:
   def scroll_ev(self, widget, event):
     # Zoom test :3
     if event.direction == gtk.gdk.SCROLL_UP:
-      self.zoom *= 2.**0.5
-      self.zoomlevel += 0.5
+      #self.zoom *= 2.**0.5
+      self.zoom += 0.5
       debug("Zoom in")
     elif event.direction == gtk.gdk.SCROLL_DOWN:
-      if self.zoomlevel >= 0: ## negative zooms are nonsense
-        self.zoom /= 2.**0.5
-        self.zoomlevel -= 0.5
+      if self.zoom >= 0: ## negative zooms are nonsense
+        #self.zoom /= 2.**0.5
+        self.zoom -= 0.5
         debug("Zoom out")
     self.redraw()
    # widget.queue_draw()
@@ -150,7 +150,6 @@ class Navigator:
     com = MessageContainer()
     com.center_lonlat = self.center_coord
     com.data_backend = self.data
-    com.zoomlevel = self.zoomlevel
     com.zoom = self.zoom
     com.size = (self.width*3, self.height*3)
     com.style = self.style
@@ -166,7 +165,7 @@ class Navigator:
       self.height = widget.allocation.height
       self.rastertile = None
     if self.rastertile is None:
-      self.rastertile = RasterTile(self.width*3, self.height*3, self.zoomlevel, self.data)
+      self.rastertile = RasterTile(self.width*3, self.height*3, self.zoom, self.data)
       self.rastertile.update_surface_by_center(self.center_coord, self.zoom, self.style, None)
     nrt = None
     while(not self.comm[1].empty()):

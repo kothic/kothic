@@ -62,8 +62,8 @@ class RasterTile:
     self.zoom = zoom
     #self.zoom = 0.1
     xy = projections.from4326(lonlat, self.proj)
-    xy1 = projections.to4326((xy[0]-self.w/2/self.zoom, xy[1]-self.h/2/self.zoom), self.proj)
-    xy2 = projections.to4326((xy[0]+self.w/2/self.zoom, xy[1]+self.h/2/self.zoom), self.proj)
+    xy1 = projections.to4326((xy[0]-40075016*0.5**self.zoom/256*self.w, xy[1]-40075016*0.5**self.zoom/256*self.h), self.proj)
+    xy2 = projections.to4326((xy[0]+40075016*0.5**self.zoom/256*self.w, xy[1]+40075016*0.5**self.zoom/256*self.h), self.proj)
     bbox = (xy1[0],xy1[1],xy2[0],xy2[1])
     debug (bbox)
     return self.update_surface(bbox, zoom, style, lock)
@@ -76,11 +76,12 @@ class RasterTile:
     print self.zoom, self.zoomlevel
     self.bbox = bbox
     self.bbox_p = projections.from4326(bbox,self.proj)
-
-    
+    debug(zoom)
+    bgs = style.get_style("canvas", {}, self.zoom)[0]
     cr = cairo.Context(self.surface)
     cr.rectangle(0, 0, self.w, self.h)
-    cr.set_source_rgb(0.7, 0.7, 0.7)
+    color = bgs.get("fill-color",(0.7, 0.7, 0.7))
+    cr.set_source_rgba(color[0], color[1], color[2], bgs.get("fill-opacity", 1))
     #cr.set_source_rgb(0, 0, 0)
     cr.fill()
     datatimer = Timer("Asking backend and styling")

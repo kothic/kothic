@@ -75,15 +75,24 @@ CENTER = re.compile(r'^center$/i')
 HEX = re.compile(r'^#([0-9a-f]+)$/i')
 
 
+builtin_style = """
+canvas {fill-color: #ccc}
+way {width: 1}
+"""
+
+
   ## ** also needs to support @import rules
 
 class MapCSS():
-    def __init__(self,minscale,maxscale):
+    def __init__(self,minscale=0,maxscale=19):
       """
       """
       self.minscale=minscale
       self.maxscale=maxscale
       self.choosers = []
+      self.style_loaded = False
+      self.parse(builtin_style)
+      self.style_loaded = False #override one after loading
 
     def parseZoom(self, s):
 
@@ -112,6 +121,8 @@ class MapCSS():
       """
       Parses MapCSS given as string
       """
+      if not self.style_loaded:
+        self.choosers = []
       log = logging.getLogger('mapcss.parser')
       previous = 0  # what was the previous CSS word?
       sc=StyleChooser() #currently being assembled
