@@ -52,7 +52,9 @@ class RasterTile:
     self.proj = raster_proj
   def screen2lonlat(self, lon, lat):
     lo1, la1, lo2, la2 = self.bbox_p
-    return projections.to4326(((lon)*(self.w-1)*abs(lo2-lo1)+lo1, la2+((lat)/(self.h-1)*(la2-la1))),self.proj)
+    
+    #debug ("%s %s %s"%(lon, lat, repr(self.bbox_p)))
+    return projections.to4326(((lon)/(self.w-1)*(lo2-lo1)+lo2, la2+((lat)/(self.h-1)*(la2-la1))),self.proj)
   #  return (x - self.w/2)/(math.cos(self.center_coord[1]*math.pi/180)*self.zoom) + self.center_coord[0], -(y - self.h/2)/self.zoom + self.center_coord[1]
   def lonlat2screen(self, (lon, lat)):
     lo1, la1, lo2, la2 = self.bbox_p
@@ -60,7 +62,6 @@ class RasterTile:
   #  return (lon - self.center_coord[0])*self.lcc*self.zoom + self.w/2, -(lat - self.center_coord[1])*self.zoom + self.h/2
   def update_surface_by_center(self, lonlat, zoom, style, lock = None):
     self.zoom = zoom
-    #self.zoom = 0.1
     xy = projections.from4326(lonlat, self.proj)
     xy1 = projections.to4326((xy[0]-40075016*0.5**self.zoom/256*self.w, xy[1]-40075016*0.5**self.zoom/256*self.h), self.proj)
     xy2 = projections.to4326((xy[0]+40075016*0.5**self.zoom/256*self.w, xy[1]+40075016*0.5**self.zoom/256*self.h), self.proj)
@@ -71,7 +72,7 @@ class RasterTile:
     
   def update_surface(self, bbox, zoom, style, lock = None):
     rendertimer = Timer("Rendering image")
-    timer = Timer("Gettimg data")
+    timer = Timer("Getting data")
     self.zoom = zoom
     print self.zoom, self.zoomlevel
     self.bbox = bbox

@@ -76,8 +76,8 @@ HEX = re.compile(r'^#([0-9a-f]+)$/i')
 
 
 builtin_style = """
-canvas {fill-color: #ccc}
-way {width: 1}
+canvas {fill-color: #cccccc}
+way {width: 1; casing-width:1; casing-color: white}
 """
 
 
