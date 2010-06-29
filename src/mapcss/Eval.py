@@ -35,9 +35,9 @@ class Eval():
         tag[k] = float(v)
       except:
         pass
-   # try:
-    return str(eval(self.expr, {}, {
-      "tags":lambda x: tags.get(x,""),
+    try:
+      return str(eval(self.expr, {}, {
+      "tag":lambda x: tags.get(x,""),
       "prop":lambda x: props.get(x,""),
       "num": m_num,
       "metric": lambda x: m_metric(x, xscale),
@@ -45,8 +45,8 @@ class Eval():
       "str": str,
       "any": m_any,
         }))
-   # except:
-   #   return ""
+    except:
+      return ""
 
     
   def __repr__(self):
@@ -94,6 +94,6 @@ def m_metric(x, t):
 
 
 if __name__ == "__main__":
-  a = Eval("""eval( any(metric(tags("height")), metric ( tags("building:levels") ) * 3))""")
+  a = Eval("""eval( any(metric(tag("height")), metric ( tag("building:levels") ) * 3))""")
   print repr(a)
   print a.compute({"building:levels":"3m"})
