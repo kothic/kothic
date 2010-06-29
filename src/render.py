@@ -81,10 +81,12 @@ class RasterTile:
     print self.zoom, self.zoomlevel
     self.bbox = bbox
     self.bbox_p = projections.from4326(bbox,self.proj)
-    
+    print self.bbox_p
+    scale = abs(self.w/(self.bbox_p[0] - self.bbox_p[2])/math.cos(math.pi*(self.bbox[0]+self.bbox[1])/2/180))
+    zscale = 0.5*scale
     cr = cairo.Context(self.surface)
     # getting and setting canvas properties
-    bgs = style.get_style("canvas", {}, self.zoom)
+    bgs = style.get_style("canvas", {}, self.zoom, scale, zscale)
     if not bgs:
       bgs = [{}]
     bgs = bgs[0]
@@ -114,8 +116,10 @@ class RasterTile:
     datatimer = Timer("Asking backend and styling")
     vectors = self.data.get_vectors(bbox,self.zoom).values()
     ww = []
+
     for way in vectors:
-      st = style.get_style("way", way.tags, self.zoom)
+      
+      st = style.get_style("way", way.tags, self.zoom, scale, zscale)
       if st:
        for fpt in st:
         #debug(fpt)
@@ -158,24 +162,13 @@ class RasterTile:
 
           if not "extrude" in obj[1]:
             poly(cr, obj[0].cs)
-          else:
-            line(cr, obj[0].cs)
-        if "extrude" in obj[1]:
-          hgt = obj[1]["extrude"]
-          print "extruding! %s" % hgt
-          cr.set_line_width (1)
-          excoords = [(a[0],a[1]-hgt) for a in obj[0].cs]
-          for c in excoords:
-            line(cr, [(c[0],c[1]),(c[0],c[1]+hgt)])
-          poly(cr,excoords)
-          #line(cr, obj[0].cs)
 
 
 
       # - draw casings on layer
       for obj in data:
         ### Extras: casing-linecap, casing-linejoin
-        if "casing-width" in obj[1] or "casing-color" in obj[1]:
+        if "casing-width" in obj[1] or "casing-color" in obj[1] and "extrude" not in obj[1]:
           cr.set_dash(obj[1].get("casing-dashes",obj[1].get("dashes", [])))
           cr.set_line_join(linejoin.get(obj[1].get("casing-linejoin",obj[1].get("linejoin", "round")),1))
           color = obj[1].get("casing-color", (0,0,0))
@@ -184,12 +177,13 @@ class RasterTile:
                 ## Probable solution: render casing, render way as mask and put casing with mask chopped out onto image
 
 
-          cr.set_line_width (obj[1].get("casing-width", obj[1].get("width",0)+1 ))
+          cr.set_line_width (obj[1].get("width",0)+obj[1].get("casing-width", 1 ))
           cr.set_line_cap(linecaps.get(obj[1].get("casing-linecap", obj[1].get("linecap", "butt")),0))
           line(cr, obj[0].cs)
+          
       # - draw line centers
       for obj in data:
-        if "width" in obj[1] or "color" in obj[1]:
+        if "width" in obj[1] or "color" in obj[1] and "extrude" not in obj[1]:
           cr.set_dash(obj[1].get("dashes", []))
           cr.set_line_join(linejoin.get(obj[1].get("linejoin", "round"),1))
           color = obj[1].get("color", (0,0,0))
@@ -199,6 +193,47 @@ class RasterTile:
           cr.set_line_width (obj[1].get("width", 1))
           cr.set_line_cap(linecaps.get(obj[1].get("linecap", "butt"),0))
           line(cr, obj[0].cs)
+
+           # - fill polygons
+      for obj in data:
+        if "extrude" in obj[1]:
+          def face_to_poly(face, hgt):
+            """
+            Converts a line into height-up extruded poly
+            """
+            return [face[0], face[1], (face[1][0], face[1][1]-hgt), (face[0][0], face[0][1]-hgt), face[0]]
+          hgt = obj[1]["extrude"]
+
+          # print "extruding! %s" % hgt
+          color = obj[1].get("extrude-edge-color", obj[1].get("color", (0,0,0) ))
+          cr.set_source_rgba(color[0], color[1], color[2], obj[1].get("extrude-edge-opacity", obj[1].get("opacity", 1)))
+          cr.set_line_width (0.5)
+          excoords = [(a[0],a[1]-hgt) for a in obj[0].cs]
+          faces = []
+          p_coord = obj[0].cs[-1]
+          for coord in obj[0].cs:
+            faces.append([coord, p_coord])
+            p_coord = coord
+          faces.sort(lambda x,y:cmp(min([x1[1] for x1 in x]), min([x1[1] for x1 in y])))
+          for face in faces:
+            ply = face_to_poly(face,hgt)
+            color = obj[1].get("extrude-face-color", obj[1].get("color", (0,0,0) ))
+            cr.set_source_rgba(color[0], color[1], color[2], obj[1].get("extrude-face-opacity", obj[1].get("opacity", 1)))
+            poly(cr, ply)
+            color = obj[1].get("extrude-edge-color", obj[1].get("color", (0,0,0) ))
+            cr.set_source_rgba(color[0], color[1], color[2], obj[1].get("extrude-edge-opacity", obj[1].get("opacity", 1)))
+            cr.set_line_width (0.5)
+            line(cr, ply)
+
+
+          color = obj[1]["fill-color"]
+          cr.set_source_rgba(color[0], color[1], color[2], obj[1].get("fill-opacity", 1))
+          poly(cr,excoords)
+          color = obj[1].get("extrude-edge-color", obj[1].get("color", (0,0,0) ))
+          cr.set_source_rgba(color[0], color[1], color[2], obj[1].get("extrude-edge-opacity", obj[1].get("opacity", 1)))
+          line(cr,excoords)
+
+          
       # - render text labels
       texttimer = Timer("Text rendering")
       cr.set_line_join(1)  # setting linejoin to "round" to get less artifacts on halo render

@@ -100,9 +100,9 @@ def main ():
         print "Ways read:", WAYS_READ
         
       mzoom = 1
-      tags = style.filter_tags(tags)
+      #tags = style.filter_tags(tags)
       if tags:
-        if style.get_style("way", tags, True):            # if way is stylized
+        if True:#style.get_style("way", tags, True):            # if way is stylized
           towrite = ";".join(["%s=%s"%x for x in tags.iteritems()])  ### TODO: sanitize keys and values
           #print towrite
           way_simplified = {MAXZOOM: curway}

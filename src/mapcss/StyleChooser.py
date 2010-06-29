@@ -48,7 +48,7 @@ class StyleChooser:
 
   # // Update the current StyleList from this StyleChooser
 
-  def updateStyles(self,sl,type, tags, zoom):
+  def updateStyles(self,sl,type, tags, zoom, scale, zscale):
                   # // Are any of the ruleChains fulfilled?
                   # // FIXME: needs to cope with min/max zoom
                   w = 0
@@ -76,7 +76,7 @@ class StyleChooser:
                       if b.strip()[:5] == "eval(":
                         ev = Eval(b)
                         ## FIXME: properties && metrics
-                        b = ev.compute(tags,{})
+                        b = ev.compute(tags,{}, scale, zscale)
                       ra[a] = b
                     r = ra
                     ra = {}
@@ -95,7 +95,8 @@ class StyleChooser:
                         "these things are arrays of float's or not in table at all"
                         try:
                           b = b.split(",")
-                          b = [float(x) for x in b]
+                          b = [int(x) for x in b]
+                          ra[a]= b
                         except ValueError:
                           pass
                       else:

@@ -62,7 +62,7 @@ class Renderer(threading.Thread):
 class Navigator:
   def __init__(self, comm):
     self.comm = comm
-    self.center_coord = (27.6749791, 53.8621394)
+    self.center_coord = (27.6549791, 53.8698)
     self.width, self.height = 800, 480
     self.zoom = 17.
     self.data_projection = "EPSG:4326"
@@ -78,7 +78,7 @@ class Navigator:
     self.f = True
     undef = None
     self.style = Styling()
-    self.style.parse(open("styles/default.mapcss","r").read())
+    self.style.parse(open("styles/openstreetinfo.mapcss","r").read())
     
     da = gtk.DrawingArea()
     da.add_events(gtk.gdk.BUTTON1_MOTION_MASK)
@@ -104,7 +104,7 @@ class Navigator:
     if self.drag:
       self.dx = event.x - self.drag_x
       self.dy = event.y - self.drag_y
-      if((abs(self.dx) > 1 or abs(self.dy) > 1) and self.f):
+      if((abs(self.dx) > 3 or abs(self.dy) > 3) and self.f):
       #  self.redraw()
 #        self.request_d = (self.dx, self.dy)
       #  self.f = False

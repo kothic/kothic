@@ -107,14 +107,14 @@ class MapCSS():
       else:
         logging.error("unparsed zoom: %s" %s)
 
-    def get_style (self, type, tags, zoom):
+    def get_style (self, type, tags, zoom, scale, zscale):
       """
       Kothic styling API
       """
       style = []
       #return [{"width": 1, "color":(0,0,0), "layer": 1}, {"width": 3, "color":(1,1,1), "layer":0}]
       for chooser in self.choosers:
-        style = chooser.updateStyles(style, type, tags, zoom)
+        style = chooser.updateStyles(style, type, tags, zoom, scale, zscale)
       return style
       
     def parse(self, css):
