@@ -49,7 +49,7 @@ class QuadTileBackend:
     self.lang = lang                    # map language to use
     self.tiles = {}                     # loaded vector tiles go here
     self.data_projection = proj         # which projection used to cut map in tiles
-    self.keep_tiles = 90                # a number of tiles to cache in memory
+    self.keep_tiles = 190                # a number of tiles to cache in memory
     self.tile_load_log = []             # used when selecting which tile to unload
     
   def filename(self, (z,x,y)):
@@ -90,13 +90,17 @@ class QuadTileBackend:
     a,d,c,b = [int(x) for x in projections.tile_by_bbox(bbox,zoom, self.data_projection)]
     resp = {}
     for tile in set([(zoom,i,j) for i in range(a, c+1) for j in range(b, d+1)]):
-      if tile not in self.tiles:
-        self.tiles[tile] = self.load_tile(tile)
+      try:
+        resp.update(self.tiles[tile])
+      except KeyError:
+        ti = self.load_tile(tile)
+        self.tiles[tile] = ti
+        resp.update(ti)
       try:
         self.tile_load_log.remove(tile)
       except ValueError:
         pass
       self.tile_load_log.append(tile)
-      resp.update(self.tiles[tile])
+      
     self.collect_garbage()
     return resp

@@ -62,7 +62,7 @@ class RasterTile:
     if epsg4326:
       lon, lat = projections.from4326((lon,lat),self.proj)
     lo1, la1, lo2, la2 = self.bbox_p
-    return ((lon-lo1)*(self.w-1)/abs(lo2-lo1), ((la2-lat)*(self.h-1)/(la2-la1)))
+    return ((lon-lo1)*(self.w)/abs(lo2-lo1), ((la2-lat)*(self.h)/(la2-la1)))
   #  return (lon - self.center_coord[0])*self.lcc*self.zoom + self.w/2, -(lat - self.center_coord[1])*self.zoom + self.h/2
   def update_surface_by_center(self, lonlat, zoom, style, lock = None):
     self.zoom = zoom
@@ -205,8 +205,6 @@ class RasterTile:
         if "text" in obj[1]:
           
           text = obj[1]["text"]
-          print obj[1].get("text-position", "cesdsdfgdfnter")
-
           #cr.set_line_width (obj[1].get("width", 1))
           cr.set_font_size(obj[1].get("font-size", 9))
           if obj[1].get("text-position", "center") == "center":
