@@ -9,7 +9,7 @@ way[landuse=residential]
     {fill-color: #daf4a4; color:#b8cd14 }
 
 way[highway]
-    {width: eval( any( metric(tag("width")), metric ( num(tag("lanes")) * 2.4), metric("7m")));
+    {width: eval( any( metric(tag("width")), metric ( num(tag("lanes")) * 4), metric("7m")));
     color:#ffffff;
     text: name; text-position: line; text-color:#0000ff;text-halo-radius:2;text-halo-color:#ffffc8; casing-width: 1}
 

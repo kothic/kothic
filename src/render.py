@@ -154,7 +154,7 @@ class RasterTile:
     
     for layer in layers:
       data = objs_by_layers[layer]
-      data.sort(lambda x,y:cmp(min([x1[1] for x1 in x[0].cs]), min([x1[1] for x1 in y[0].cs])))
+      data.sort(lambda x,y:cmp(max([x1[1] for x1 in x[0].cs]), max([x1[1] for x1 in y[0].cs])))
       # - fill polygons
       
       for obj in data:
@@ -209,14 +209,16 @@ class RasterTile:
           # print "extruding! %s" % hgt
           color = obj[1].get("extrude-edge-color", obj[1].get("color", (0,0,0) ))
           cr.set_source_rgba(color[0], color[1], color[2], obj[1].get("extrude-edge-opacity", obj[1].get("opacity", 1)))
-          cr.set_line_width (0.5)
+          cr.set_line_width (1.)
+          cr.set_dash([])
           excoords = [(a[0],a[1]-hgt) for a in obj[0].cs]
           faces = []
+          
           p_coord = obj[0].cs[-1]
           for coord in obj[0].cs:
             faces.append([coord, p_coord])
             p_coord = coord
-          faces.sort(lambda x,y:cmp(min([x1[1] for x1 in x]), min([x1[1] for x1 in y])))
+          faces.sort(lambda x,y:cmp(max([x1[1] for x1 in x]), max([x1[1] for x1 in y])))
           for face in faces:
             ply = face_to_poly(face,hgt)
             color = obj[1].get("extrude-face-color", obj[1].get("color", (0,0,0) ))
@@ -224,7 +226,7 @@ class RasterTile:
             poly(cr, ply)
             color = obj[1].get("extrude-edge-color", obj[1].get("color", (0,0,0) ))
             cr.set_source_rgba(color[0], color[1], color[2], obj[1].get("extrude-edge-opacity", obj[1].get("opacity", 1)))
-            cr.set_line_width (0.5)
+            cr.set_line_width (.5)
             line(cr, ply)
 
 
