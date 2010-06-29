@@ -154,7 +154,9 @@ class RasterTile:
     
     for layer in layers:
       data = objs_by_layers[layer]
+      data.sort(lambda x,y:cmp(min([x1[1] for x1 in x[0].cs]), min([x1[1] for x1 in y[0].cs])))
       # - fill polygons
+      
       for obj in data:
         if "fill-color" in obj[1]:   ## TODO: fill-image
           color = obj[1]["fill-color"]
