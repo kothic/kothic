@@ -214,8 +214,8 @@ class StyleChooser:
     adds into the current ruleChain (existing Rule)
     """
           
-    self.ruleChains[self.rcpos][len(self.ruleChains[self.rcpos])-1].minZoom=z[0]
-    self.ruleChains[self.rcpos][len(self.ruleChains[self.rcpos])-1].maxZoom=z[1]
+    self.ruleChains[self.rcpos][len(self.ruleChains[self.rcpos])-1].minZoom=float(z[0])
+    self.ruleChains[self.rcpos][len(self.ruleChains[self.rcpos])-1].maxZoom=float(z[1])
           
 
 

@@ -99,11 +99,11 @@ class MapCSS():
       if ZOOM_MINMAX.match(s):
         return ZOOM_MINMAX.match(s).groups()
       elif ZOOM_MIN.match(s):
-        return ZOOM_MIN.match(s).group(), self.maxscale
+        return ZOOM_MIN.match(s).groups()[0], self.maxscale
       elif ZOOM_MAX.match(s):
-        return self.minscale,ZOOM_MAX.match(s).group()
+        return self.minscale,ZOOM_MAX.match(s).groups()[0]
       elif ZOOM_SINGLE.match(s):
-        return ZOOM_SINGLE.match(s).group(),ZOOM_SINGLE.match(s).group()
+        return ZOOM_SINGLE.match(s).groups()[0],ZOOM_SINGLE.match(s).groups()[0]
       else:
         logging.error("unparsed zoom: %s" %s)
 
@@ -200,7 +200,7 @@ class MapCSS():
                 if (previous==oDECLARATION):
                   self.choosers.append(sc)
                   sc = StyleChooser()
-                if (previous!=oOBJECT & previous!=oZOOM & previous!=oCONDITION):
+                if (previous!=oOBJECT) and (previous!=oZOOM) and (previous!=oCONDITION):
                   sc.newObject()
                 cond = CONDITION.match(css).groups()[0]
                 log.debug("condition found: %s"% (cond))

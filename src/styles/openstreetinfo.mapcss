@@ -32,7 +32,7 @@ way[waterway=riverbank],
 way[natural=water] {fill-color: #5ba7ff; color: #0000a0}
 
 way[waterway=river],
-way[waterway=stream]{color: #5ba7ff;casing-width: 1; casing-color: #0000a0}
+way[waterway=stream]{color: #5ba7ff;casing-width: 1}
 
 way[leisure=stadium]{fill-color: #d0ffff; casing-width: 2; casing-color: #00ccff;z-index:10;}
 
@@ -44,9 +44,9 @@ way[landuse=military] {fill-color: pink}
 
 way[amenity=parking] {fill-color: #d2e8ed;color:cad4e1}
 
-way[bridge=yes] {casing-width:10}
+way[bridge=yes] {casing-width:3}
 
-way[building] {
+way|z16-[building] {
   width: .5;
   text: addr:housenumber; text-halo-radius:1; text-position: center;
   

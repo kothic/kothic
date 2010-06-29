@@ -55,8 +55,8 @@ class RasterTile:
     
     debug ("%s %s - %s %s"%(x,y,self.w, self.h))
     debug(self.bbox_p)
-    debug((1.*x/self.w*(lo2-lo1)+lo1, la1+(1.*y/(self.h)*(la2-la1))))
-    return projections.to4326( (1.*x/self.w*(lo2-lo1)+lo1, la1+(1.*y/(self.h)*(la2-la1))),self.proj)
+    
+    return projections.to4326( (1.*x/self.w*(lo2-lo1)+lo1, la2+(1.*y/(self.h)*(la1-la2))),self.proj)
   #  return (x - self.w/2)/(math.cos(self.center_coord[1]*math.pi/180)*self.zoom) + self.center_coord[0], -(y - self.h/2)/self.zoom + self.center_coord[1]
   def lonlat2screen(self, (lon, lat), epsg4326=False):
     if epsg4326:
