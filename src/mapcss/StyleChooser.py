@@ -18,6 +18,7 @@
 
 from Rule import Rule
 from webcolors.webcolors import whatever_to_cairo as colorparser
+from Eval import Eval
 
 class StyleChooser:
   """
@@ -67,17 +68,24 @@ class StyleChooser:
                   for r in self.styles:
                     ### FIXME: here we should do all the eval()'s
                     ra = {}
+                    for a,b in r.iteritems():
+                      if "text" == a[-4:]:
+                        if b.strip()[:5] != "eval(":
+                          b = "eval(tag(\""+b+"\"))"
+                        
+                      if b.strip()[:5] == "eval(":
+                        ev = Eval(b)
+                        ## FIXME: properties && metrics
+                        b = ev.compute(tags,{})
+                      ra[a] = b
+                    r = ra
+                    ra = {}
                     
                     for a, b in r.iteritems():
                       if "color" in a:
                         "parsing color value to 3-tuple"
                         ra[a] = colorparser(b)
-                      elif "text" == a[-4:]:
-                        "substituting text with value"
-                        ra[a] = tags.get(b,"")
-                        if ra[a] == "":
-                          del ra[a]
-                      elif any(x in a for x in ("width", "z-index", "opacity", "offset", "radius")):
+                      elif any(x in a for x in ("width", "z-index", "opacity", "offset", "radius", "extrude")):
                         "these things are float's or not in table at all"
                         try:
                           ra[a] = float(b)

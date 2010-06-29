@@ -22,7 +22,7 @@ class Eval():
     """
     Parse expression and convert it into Python
     """
-    s = s[5:-1].strip()
+    s = s.strip()[5:-1].strip()
     s
     self.expr = compile (s, "MapCSS expression", "eval")
 
@@ -94,6 +94,6 @@ def m_metric(x, t):
 
 
 if __name__ == "__main__":
-  a = Eval("""eval( any(metric(tag("height")), metric ( tag("building:levels") ) * 3))""")
+  a = Eval(""" eval( any( metric(tag("height")), metric ( num(tag("building:levels")) * 3), metric("1m"))) """)
   print repr(a)
-  print a.compute({"building:levels":"3m"})
+  print a.compute({"building:levels":"3"})

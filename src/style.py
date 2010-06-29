@@ -20,7 +20,7 @@
 
 from debug import debug
 
-from webcolors.webcolors import whatever_to_cairo as colorparser
+from mapcss.webcolors.webcolors import whatever_to_cairo as colorparser
 
 class Styling():
   """
@@ -101,11 +101,11 @@ class Styling():
     """
     Returns only tags that are useful for rendering
     """
-    resp = {}
-    for k,v in tags.iteritems():
-      if k in self.useful_keys:
-        resp[k] = v
-    return resp
+    #resp = {}
+    #for k,v in tags.iteritems():
+    #  if k in self.useful_keys:
+    #    resp[k] = v
+    return tags
 
   
   

@@ -162,10 +162,11 @@ class RasterTile:
             line(cr, obj[0].cs)
         if "extrude" in obj[1]:
           hgt = obj[1]["extrude"]
+          print "extruding! %s" % hgt
           cr.set_line_width (1)
-          excoords = [(a[0],a[1]+hgt) for a in obj[0].cs]
+          excoords = [(a[0],a[1]-hgt) for a in obj[0].cs]
           for c in excoords:
-            line(cr, [(c[0],c[1]),(c[0],c[1]-hgt)])
+            line(cr, [(c[0],c[1]),(c[0],c[1]+hgt)])
           poly(cr,excoords)
           #line(cr, obj[0].cs)
 
@@ -235,7 +236,7 @@ class RasterTile:
             text = unicode(text,"utf-8")
             # - calculate line length
             length = reduce(lambda x,y: (x[0]+((y[0]-x[1])**2 + (y[1]-x[2])**2 )**0.5, y[0], y[1]), c, (0,c[0][0],c[0][1]))[0]
-            print length, text, cr.text_extents(text)
+            #print length, text, cr.text_extents(text)
             if length > cr.text_extents(text)[2]:
 
               # - function to get (x, y, normale) from (c, length_along_c)
@@ -254,7 +255,7 @@ class RasterTile:
               da = 0
               os = 1
               z = length/2-cr.text_extents(text)[2]/2
-              print get_xy_from_len(c,z)
+           #  print get_xy_from_len(c,z)
               if c[0][0] < c[1][0] and get_xy_from_len(c,z)[2]<math.pi/2 and get_xy_from_len(c,z)[2] > -math.pi/2:
                 da = 0
                 os = 1
