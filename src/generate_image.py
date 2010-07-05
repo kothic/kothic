@@ -17,7 +17,8 @@
 
 
 from debug import debug, Timer
-from vtiles_backend import QuadTileBackend as DataBackend
+#from backend.vtile import QuadTileBackend as DataBackend
+from backend.postgis import PostGisBackend as DataBackend
 #from style import Styling
 from mapcss import MapCSS
 
@@ -25,7 +26,7 @@ from render import RasterTile
 
 
 style = MapCSS(1, 19)     #zoom levels
-style.parse(open("styles/default.mapcss","r").read())
+style.parse(open("styles/openstreetinfo.mapcss","r").read())
 
 
 bbox = (27.115768874532,53.740327031764,28.028320754378,54.067187302158)
