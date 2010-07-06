@@ -18,14 +18,20 @@
 import re
 
 class Condition:
-  def __init__(self, type, params):
-    self.type=type         # eq, regex, lt, gt etc.
+  def __init__(self, typez, params):
+    self.type=typez         # eq, regex, lt, gt etc.
+    if type(params) == type(str()):
+      params = (params,)
     self.params=params       # e.g. ('highway','primary')
-    if type == "regex":
+    if typez == "regex":
       self.regex = re.compile(self.params[0], re.I)
-    
-    self.compiled_regex = ""
 
+    self.compiled_regex = ""
+    
+  def get_interesting_tags(self):
+
+     return set([self.params[0]])
+    
   def test(self, tags):
     """
     Test a hash against this condition

@@ -45,5 +45,14 @@ class Rule():
       i += 1
       
     return v
-    
-      
+  def get_interesting_tags(self, obj, zoom):
+    if obj:
+      if (self.subject!='') & (obj!=self.subject):
+        return set()
+    if zoom:
+      if (zoom < self.minZoom) or (zoom > self.maxZoom):
+        return set()
+    a = set()
+    for condition in self.conditions:
+      a.update(condition.get_interesting_tags())
+    return a

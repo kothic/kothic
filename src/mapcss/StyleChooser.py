@@ -42,26 +42,39 @@ class StyleChooser:
   def __init__(self):
     self.ruleChains = [[],]
     self.styles = []
+    self.eval_type = type(Eval())
 
     self.rcpos=0
     self.stylepos=0
 
+
+  def get_interesting_tags(self, type, zoom):
+    """
+    Returns a set of tags that were used in here.
+    """
+    ### FIXME
+    a = set()
+    for c in self.ruleChains:
+      for r in c:
+        a.update(r.get_interesting_tags(type, zoom))
+    if a:   ## FIXME: semi-illegal optimization, may wreck in future on tagless matches
+      
+      for r in self.styles:
+        for c,b in r.iteritems():
+          if __builtins__["type"](b) == self.eval_type:
+            a.update(b.extract_tags())
+    return a
   # // Update the current StyleList from this StyleChooser
 
   def updateStyles(self,sl,type, tags, zoom, scale, zscale):
                   # // Are any of the ruleChains fulfilled?
-                  # // FIXME: needs to cope with min/max zoom
                   w = 0
-                  fulfilled=False
                   for c in self.ruleChains:
-                       if (self.testChain(c,type,tags,zoom)):
-                                  fulfilled=True
-                                  break
-
-                  if (not fulfilled):
+                    if (self.testChain(c,type,tags,zoom)):
+                      break
+                  else:
                     return sl
-                 # return self.styles
-             
+
                   ## // Update StyleList
                   object_id = 1
                   
@@ -69,14 +82,9 @@ class StyleChooser:
                     ### FIXME: here we should do all the eval()'s
                     ra = {}
                     for a,b in r.iteritems():
-                      if "text" == a[-4:]:
-                        if b.strip()[:5] != "eval(":
-                          b = "eval(tag(\""+b+"\"))"
-                        
-                      if b.strip()[:5] == "eval(":
-                        ev = Eval(b)
+                      if __builtins__["type"](b) == self.eval_type:
                         ## FIXME: properties && metrics
-                        b = ev.compute(tags,{}, scale, zscale)
+                        b = b.compute(tags,{}, scale, zscale)
                       ra[a] = b
                     r = ra
                     ra = {}
@@ -230,4 +238,17 @@ class StyleChooser:
     """
     adds to this.styles
     """
-    self.styles = self.styles + a
+    rb = []
+    for r in a:
+      ra = {}
+      for a,b in r.iteritems():
+        if "text" == a[-4:]:
+          if b.strip()[:5] != "eval(":
+            b = "eval(tag(\""+b+"\"))"
+
+        if b.strip()[:5] == "eval(":
+          b = Eval(b)
+        ra[a] = b
+      rb.append(ra)
+   # print rb
+    self.styles = self.styles + rb

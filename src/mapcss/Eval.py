@@ -27,8 +27,36 @@ class Eval():
     try:
       self.expr = compile (s, "MapCSS expression", "eval")
     except:
-      self.expr = compile ("", "MapCSS expression", "eval")
+      self.expr = compile ("0", "MapCSS expression", "eval")
 
+
+  def extract_tags(self):
+    """
+    Extracts list of tags that might be used in calculation
+    """
+    def fake_compute(*x):
+      """
+      Perform a fake computation. Always computes all the parameters, always returns 0.
+      WARNING: Might not cope with complex statements.
+      """
+      for t in x:
+        q = x
+      return 0
+    tags = set([])
+    a = eval(self.expr,{},{
+      "tag":lambda x: tags.add(x),
+      "prop": lambda x: "",
+      "num": fake_compute,
+      "metric": fake_compute,
+      "zmetric": fake_compute,
+      "str": fake_compute,
+      "any": fake_compute,
+      "min": fake_compute,
+      "max": fake_compute,
+    })
+    return tags
+
+    
   def compute(self, tags={}, props = {}, xscale = 1., zscale = 0.5 ):
     """
     Compute this eval()
@@ -120,3 +148,4 @@ if __name__ == "__main__":
   a = Eval(""" eval( any( metric(tag("height")), metric ( num(tag("building:levels")) * 3), metric("1m"))) """)
   print repr(a)
   print a.compute({"building:levels":"3"})
+  print a.extract_tags()

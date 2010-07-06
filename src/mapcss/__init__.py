@@ -116,7 +116,20 @@ class MapCSS():
       for chooser in self.choosers:
         style = chooser.updateStyles(style, type, tags, zoom, scale, zscale)
       return style
-      
+
+
+
+    def get_interesting_tags(self, type=None, zoom=None):
+      """
+      Get set of interesting tags.
+      """
+      tags = set()
+      for chooser in self.choosers:
+        tags.update(chooser.get_interesting_tags(type, zoom))
+      return tags
+
+
+
     def parse(self, css):
       """
       Parses MapCSS given as string
@@ -554,3 +567,4 @@ if __name__ == "__main__":
   
 
   """)
+  print mc.get_interesting_tags()
