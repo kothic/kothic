@@ -1,0 +1,64 @@
+/*
+  Deja Vu MapCSS styles
+  Osmosnimki maps style
+*/
+
+canvas {fill-color: #FAF8F8}
+
+way[highway]
+    {width: eval( any( metric(tag("width")), metric ( num(tag("lanes")) * 4), metric("7m")));
+    color:#ffffff;
+    text: name; text-position: line; text-color:#000000;text-halo-radius:2;text-halo-color:#ffffff;
+    casing-color: #D29D39;}
+
+way[highway=primary]
+    {z-index:1; width:9; color: #FCE57D; casing-width:1; casing-color: #CBB48B; }
+    {z-index:2; width:1; color: #FBCB7C;}
+
+    
+
+
+way[highway][area=yes]{fill-color: #ffffff;width:0}
+
+/* With this eval, if bridge is applied to invisible line, no bridge renders */
+way[bridge=yes] {casing-width:eval(min(3, num(prop("width"))/2 ));}
+
+
+way[natural=forest],
+way[natural=wood],
+way[landuse=forest],
+way[landuse=wood]
+    {fill-color: #C5E9A5;}
+
+way[landuse=grass],
+way[natural=grass]{fill-color: #B9DE96;}
+
+
+way[landuse=garages]
+{fill-color: #d2e8ed; color: #cad4e1}
+
+way[waterway=riverbank],
+way[natural=water] {fill-color: #C4D4F5; color: #7281A0}
+
+way[waterway=river],
+way[waterway=stream]{color: #C4D4F5; casing-width: 1; casing-color: #7281A0 }
+
+way[leisure=stadium]{fill-color: #d0ffff; casing-width: 2; casing-color: #00ccff;z-index:10;}
+
+way[railway=tram]{width: eval( any( metric(tag("width")), metric("1.52m")));color: #ffffff; casing-color: #000000}
+            {width: eval( metric("2.7m")); color: #000000; dashes: 1,10; z-index:1; object-id: "shpala"}
+
+/*way[landuse=industrial] {fill-color: #855}*/
+way[landuse=military] {fill-color: pink}
+
+
+way|z12-[building] {
+  width: .5;
+  text: addr:housenumber; text-halo-radius:1; text-position: center;
+  
+  fill-color: #E7CCB4;
+  color: #D29D39;
+}
+way|z12-[building != yes] {
+  fill-color: #D8D1D1;
+}
