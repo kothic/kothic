@@ -34,9 +34,7 @@ for a in t:
 
 print dct
 print """
-# OsmType  Tag                DataType      Flags
-node,way   note               text          delete   # These tags can be long but are useless for rendering
-node,way   source             text          delete   # This indicates that we shouldn't store them"""
+# OsmType  Tag                DataType      Flags"""
 for k,v in dct.iteritems():
   s = ""
   for i in v:
