@@ -23,8 +23,11 @@ class Eval():
     Parse expression and convert it into Python
     """
     s = s.strip()[5:-1].strip()
-    s
-    self.expr = compile (s, "MapCSS expression", "eval")
+    self.expr_text = s
+    try:
+      self.expr = compile (s, "MapCSS expression", "eval")
+    except:
+      self.expr = compile ("", "MapCSS expression", "eval")
 
   def compute(self, tags={}, props = {}, xscale = 1., zscale = 0.5 ):
     """
@@ -44,6 +47,8 @@ class Eval():
       "zmetric": lambda x: m_metric(x, zscale),
       "str": str,
       "any": m_any,
+      "min": m_min,
+      "max": m_max,
         }))
     except:
       return ""
@@ -51,6 +56,24 @@ class Eval():
     
   def __repr__(self):
     return "eval(%s)"%repr(self.expr)
+
+def m_min(*x):
+  """
+  min() MapCSS Feature
+  """
+  try:
+    return min([m_num(t) for t in x])
+  except:
+    return 0
+
+def m_max(*x):
+  """
+  max() MapCSS Feature
+  """
+  try:
+    return max([m_num(t) for t in x])
+  except:
+    return 0
 
 def m_any(*x):
   """
