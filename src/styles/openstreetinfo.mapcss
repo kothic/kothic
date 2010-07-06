@@ -11,9 +11,17 @@ way[landuse=residential]
 way[highway]
     {width: eval( any( metric(tag("width")), metric ( num(tag("lanes")) * 4), metric("7m")));
     color:#ffffff;
-    text: name; text-position: line; text-color:#0000ff;text-halo-radius:2;text-halo-color:#ffffc8; casing-width: 1}
+    text: name; text-position: line; text-color:#0000ff;text-halo-radius:2;text-halo-color:#ffffc8}
+
+way[highway]
+    {casing-width: eval(min(1, num(prop("width"))/5 ));}
+
 
 way[highway][area=yes]{fill-color: #ffffff;width:0}
+
+/* With this eval, if bridge is applied to invisible line, no bridge renders */
+way[bridge=yes] {casing-width:eval(min(3, num(prop("width"))/2 ));}
+
 
 way[natural=forest],
 way[natural=wood],
@@ -44,7 +52,7 @@ way[landuse=military] {fill-color: pink}
 
 way[amenity=parking] {fill-color: #d2e8ed;color:cad4e1}
 
-way[bridge=yes] {casing-width:3}
+
 
 way|z16-[building] {
   width: .5;
