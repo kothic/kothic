@@ -274,9 +274,12 @@ def parseCondition(s):
               log.debug("condition unset: %s"%(a))
               return  Condition('unset'     ,a)
 
+            if      CONDITION_NE.match(s):
+              a = CONDITION_NE.match(s).groups()
+              log.debug("condition NE: %s = %s"%(a[0], a[1]))
+              return  Condition('ne'     ,a)
               ## FIXME: convert other conditions to python
 
-              #else if ((o=CONDITION_NE.exec(s)))    { return new Condition('ne'       ,o[1],o[2]); }
               #else if ((o=CONDITION_GT.exec(s)))    { return new Condition('>'        ,o[1],o[2]); }
               #else if ((o=CONDITION_GE.exec(s)))    { return new Condition('>='       ,o[1],o[2]); }
               #else if ((o=CONDITION_LT.exec(s)))    { return new Condition('<'        ,o[1],o[2]); }
