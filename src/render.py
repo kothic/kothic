@@ -38,7 +38,7 @@ def poly(cr, c):
 
 
 class RasterTile:
-  def __init__(self, width, height, zoomlevel, data_backend, raster_proj="EPSG:3395"):
+  def __init__(self, width, height, zoomlevel, data_backend, raster_proj="EPSG:3857"):
     self.w = width
     self.h = height
     self.surface = cairo.ImageSurface(cairo.FORMAT_RGB24, self.w, self.h)
@@ -113,8 +113,10 @@ class RasterTile:
 
 
     
-    datatimer = Timer("Asking backend and styling")
+    datatimer = Timer("Asking backend")
     vectors = self.data.get_vectors(bbox,self.zoom).values()
+    datatimer.stop()
+    datatimer = Timer("Applying styles")
     ww = []
 
     for way in vectors:
@@ -131,9 +133,15 @@ class RasterTile:
     if lock is not None:
       lock.acquire()
       lock.release()
-    for w in ww:
-      w[0].cs = [self.lonlat2screen(coord) for coord in projections.from4326(w[0].coords, self.proj)]
+    er = Timer("Projecing data")
+    if self.data.proj != self.proj:
+      for w in ww:
+        w[0].cs = [self.lonlat2screen(coord) for coord in projections.transform(w[0].coords, self.data.proj, self.proj)]
+    else:
+      for w in ww:
+        w[0].cs = [self.lonlat2screen(coord) for coord in w[0].coords]
 
+    er.stop()
       
 
     ww.sort(key=lambda x: x[1]["layer"])
@@ -248,7 +256,7 @@ class RasterTile:
           #cr.set_line_width (obj[1].get("width", 1))
           cr.set_font_size(obj[1].get("font-size", 9))
           if obj[1].get("text-position", "center") == "center":
-            where = self.lonlat2screen(projections.from4326(obj[0].center,self.proj))
+            where = self.lonlat2screen(projections.transform(obj[0].center,self.data.proj,self.proj))
             for t in text_rendered_at:
               if ((t[0]-where[0])**2+(t[1]-where[1])**2)**(0.5) < 15:
                 break

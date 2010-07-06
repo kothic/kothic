@@ -52,14 +52,14 @@ class PostGisBackend:
     self.path = path                    # path to tile files
     self.lang = lang                    # map language to use
     self.tiles = {}                     # loaded vector tiles go here
-    self.data_projection = proj         # which projection used to cut map in tiles
+    self.proj = proj         # which projection used to cut map in tiles
     self.keep_tiles = 190                # a number of tiles to cache in memory
     self.tile_load_log = []             # used when selecting which tile to unload
     
   def get_vectors (self, bbox, zoom):
     a = psycopg2.connect(self.database)
     b = a.cursor()
-    bbox = tuple(projections.from4326(bbox,self.data_projection))
+    bbox = tuple(projections.from4326(bbox,self.proj))
     ### FIXME: hardcoded EPSG:3857 in database
     tables = ("planet_osm_line","planet_osm_polygon")  # FIXME: points
     resp = {}
@@ -86,7 +86,7 @@ class PostGisBackend:
               continue
               ### FIXME
           
-          geom = projections.to4326(geom, self.data_projection)
+          #geom = projections.to4326(geom, self.proj)
           del row_dict["way"]
           oid = row_dict["osm_id"]
           del row_dict["osm_id"]
