@@ -20,7 +20,7 @@ from debug import debug, Timer
 from mapcss import MapCSS
 
 style = MapCSS(1, 19)     #zoom levels
-style.parse(open("styles/openstreetinfo.mapcss","r").read())
+style.parse(open("styles/mapink.mapcss","r").read())
 
 t = ("way", "node")
 dct = {}
@@ -32,13 +32,20 @@ for a in t:
     dct[tag].add(a)
 
 
-print dct
+
 print """
 # OsmType  Tag                DataType      Flags"""
+for t in ("z_order","way_area",":area"):
+  if t in dct:
+    del dct[t]
+
 for k,v in dct.iteritems():
   s = ""
   for i in v:
     s += i
     s += ","
   s = s[:-1]
-  print "%-10s %-18s %-13s %s"%(s, k, "text", "linear")
+  print "%-10s %-18s %-13s %s"%(s, k, "text", "polygon")
+print """
+node,way   z_order            int4          linear # This is calculated during import
+way        way_area           real                 # This is calculated during import"""

@@ -81,6 +81,7 @@ class PostGisBackend:
             try:
               geom = geom.boundary
               geom = list(geom.coords)
+              row_dict[":area"] = "yes"
             except NotImplementedError:
               "multipolygon"
               continue

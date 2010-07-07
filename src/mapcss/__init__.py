@@ -252,11 +252,11 @@ class MapCSS():
                 log.warning("choked on: %s"%(css))
                 return 
 
-      print sc
+      #print sc
       if (previous==oDECLARATION):
         self.choosers.append(sc)
         sc= StyleChooser()
-      print self.choosers
+      #print self.choosers
       return 
 #}
 
