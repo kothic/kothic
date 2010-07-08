@@ -125,7 +125,9 @@ canvas {fill-color: #f2efe9}  /* for land; for water use #b5d0d0 */
     </Rule>
 </Style>
 <Style name="highway-area-casing">*/
-way|z14- [highway=residential] :area, way|z14- [highway=unclassified] :area {casing-color: #999; casing-width:1}
+way|z14-[highway=residential]:area,
+way|z14-[highway=unclassified]:area
+  {casing-color: #999; casing-width:1}
 
    /*<Rule>
       <Filter>[highway] = 'residential' or [highway]='unclassified'</Filter>
@@ -135,10 +137,10 @@ way|z14- [highway=residential] :area, way|z14- [highway=unclassified] :area {cas
         <CssParameter name="stroke-width">1</CssParameter>
       </LineSymbolizer>
    </Rule>*/
-way|z14- [highway=pedestrian] :area,
-way|z14- [highway=service] :area,
-way|z14- [highway=footway] :area,
-way|z14- [highway=path] :area
+way|z14-[highway=pedestrian]:area,
+way|z14-[highway=service]:area,
+way|z14-[highway=footway]:area,
+way|z14-[highway=path]:area
         {casing-color: grey; casing-width:1}
    /*<Rule>
       <Filter>[highway] = 'pedestrian' or [highway]='service' or [highway]='footway' or [highway]='path'</Filter>
@@ -148,7 +150,7 @@ way|z14- [highway=path] :area
         <CssParameter name="stroke-width">1</CssParameter>
       </LineSymbolizer>
    </Rule>*/
-way|z14- [highway=path] :area
+way|z14-[highway=path]:area
         {casing-color: #996600; casing-width:2}
    /*<Rule>
       <Filter>[highway] = 'track'</Filter>
@@ -160,7 +162,7 @@ way|z14- [highway=path] :area
    </Rule>
 </Style>*/
 
-way|z14- [highway=living_street] :area {fill-color: #ccc}
+way|z14-[highway=living_street]:area {fill-color: #ccc}
    
 /*<Style name="highway-area-fill">
     <Rule>
@@ -171,7 +173,10 @@ way|z14- [highway=living_street] :area {fill-color: #ccc}
       </PolygonSymbolizer>
    </Rule>*/
 
-way|z14- [highway=residential] :area, way|z14- [highway=unclassified] :area,  way|z14- [highway=service] :area {fill-color: #fff}
+way|z14-[highway=residential]:area, 
+way|z14-[highway=unclassified]:area,  
+way|z14-[highway=service]:area 
+   {fill-color: #fff}
    /*<Rule>
       <Filter>[highway] = 'residential' or [highway]='unclassified' or [highway]='service'</Filter>
       &maxscale_zoom14;
@@ -180,9 +185,9 @@ way|z14- [highway=residential] :area, way|z14- [highway=unclassified] :area,  wa
       </PolygonSymbolizer>
    </Rule>*/
    
-   way|z14- [highway=pedestrian] :area,
-   way|z14- [highway=footway] :area,
-   way|z14- [highway=path] :area
+   way|z14-[highway=pedestrian]:area,
+   way|z14-[highway=footway]:area,
+   way|z14-[highway=path]:area
    {fill-color: #ededed}
    /*<Rule>
       <Filter>[highway] = 'pedestrian' or [highway]='service' or [highway]='footway' or [highway]='path'</Filter>
@@ -191,7 +196,7 @@ way|z14- [highway=residential] :area, way|z14- [highway=unclassified] :area,  wa
         <CssParameter name="fill">#ededed</CssParameter>
       </PolygonSymbolizer>
    </Rule>*/
-   way|z14- [highway=track] :area {fill-color: #dfcc66;}
+   way|z14-[highway=track]:area {fill-color: #dfcc66;}
    /*<Rule>
       <Filter>[highway] = 'track'</Filter>
       &maxscale_zoom14;
@@ -201,7 +206,8 @@ way|z14- [highway=residential] :area, way|z14- [highway=unclassified] :area,  wa
    </Rule>
 </Style>
 <Style name="leisure">*/
-way|z13- [leisure=playground] {fill-color: #ccfff1; width: 0.3; color: #666;}
+way|z13-[leisure=playground] 
+  {fill-color: #ccfff1; width: 0.3; color: #666;}
 /*
     <Rule>
       <Filter>[leisure] = 'playground'</Filter>
@@ -214,7 +220,9 @@ way|z13- [leisure=playground] {fill-color: #ccfff1; width: 0.3; color: #666;}
         <CssParameter name="stroke-width">0.3</CssParameter>
       </LineSymbolizer>
     </Rule>*/
-way|z13- [tourism=camp_site], way|z13- [tourism=picnic_site] {fill-color: #ccff99; fill-opacity:0.5; width: 0.3; color: #666;}
+way|z13-[tourism=camp_site],
+way|z13-[tourism=picnic_site] 
+     {fill-color: #ccff99; fill-opacity:0.5; width: 0.3; color: #666;}
 /*
     <Rule>
       <Filter>[tourism] = 'camp_site' or [tourism]='caravan_site' or [tourism] = 'picnic_site'</Filter>
@@ -229,7 +237,7 @@ way|z13- [tourism=camp_site], way|z13- [tourism=picnic_site] {fill-color: #ccff9
       </LineSymbolizer>
     </Rule>*/
 
-way|z10- [tourism=attraction] {fill-color: #f2caea;}
+way|z10-[tourism=attraction] {fill-color: #f2caea;}
 /*    <Rule>
       <Filter>[tourism] = 'attraction'</Filter>
       &maxscale_zoom10;
@@ -238,7 +246,7 @@ way|z10- [tourism=attraction] {fill-color: #f2caea;}
      </PolygonSymbolizer>
     </Rule>*/
 
-way|z11- [landuse=quarry] {fill-image: mapink/quarry2.png; width: 0.5; color: grey;}
+way|z11-[landuse=quarry] {fill-image: mapink/quarry2.png; width: 0.5; color: grey;}
 /*    <Rule>
       <Filter>[landuse] = 'quarry'</Filter>
       &maxscale_zoom11;
@@ -249,7 +257,7 @@ way|z11- [landuse=quarry] {fill-image: mapink/quarry2.png; width: 0.5; color: gr
       </LineSymbolizer>
     </Rule>*/
 
-way|z10-12 [leisure=nature_reserve], way|z10-12 [landuse=vineyard] {fill-color: #abdf96;}
+way|z10-12[leisure=nature_reserve], way|z10-12[landuse=vineyard] {fill-color: #abdf96;}
     /*<Rule>
       <Filter>[leisure] = 'nature_reserve' or [landuse] = 'vineyard'</Filter>
       &maxscale_zoom10;
@@ -258,13 +266,13 @@ way|z10-12 [leisure=nature_reserve], way|z10-12 [landuse=vineyard] {fill-color: 
         <CssParameter name="fill">#abdf96</CssParameter>
      </PolygonSymbolizer>
     </Rule>*/
-way|z10- [landuse=orchard] {fill-image: mapink/orchard.png;}
+way|z10-[landuse=orchard] {fill-image: mapink/orchard.png;}
 /*    <Rule>
       <Filter>[landuse] = 'orchard'</Filter>
       &maxscale_zoom10;
       <PolygonPatternSymbolizer file="&symbols;/orchard.png" />
     </Rule>*/
-way|z13- [landuse=vineyard] {fill-image: mapink/vineyard.png;}
+way|z13-[landuse=vineyard] {fill-image: mapink/vineyard.png;}
 /*  <Rule>
     <Filter>[landuse] = 'vineyard'</Filter>
       &maxscale_zoom13;
@@ -276,23 +284,23 @@ way|z13- [landuse=vineyard] {fill-image: mapink/vineyard.png;}
       &maxscale_zoom15;
       <PolygonPatternSymbolizer file="&symbols;/vineyard.png" />
     </Rule>*/
-way|z13 [leisure=nature_reserve] {fill-image: mapink/nature_reserve.png;}
+way|z13[leisure=nature_reserve] {fill-image: mapink/nature_reserve.png;}
 /*    <Rule>
       <Filter>[leisure] = 'nature_reserve'</Filter>
       &maxscale_zoom13;
       &minscale_zoom13;
       <PolygonPatternSymbolizer file="&symbols;/nature_reserve.png" />
     </Rule>*/
-way|z14 [leisure=nature_reserve] {fill-image: mapink/nature_reserve2.png;}
+way|z14[leisure=nature_reserve] {fill-image: mapink/nature_reserve2.png;}
     /*<Rule>
       <Filter>[leisure] = 'nature_reserve'</Filter>
       &maxscale_zoom14;
       <PolygonPatternSymbolizer file="&symbols;/nature_reserve2.png" />
     </Rule>*/
 
-way|z10-14 [landuse=cemetery],
-way|z10-14 [landuse=grave_yard],
-way|z10-14 [amenity=grave_yard],
+way|z10-14[landuse=cemetery],
+way|z10-14[landuse=grave_yard],
+way|z10-14[amenity=grave_yard],
  {fill-color: #aacbaf;}
     /*<Rule>
       &maxscale_zoom10;
@@ -303,7 +311,7 @@ way|z10-14 [amenity=grave_yard],
       </PolygonSymbolizer>
     </Rule>*/
 
-    way|z10- [landuse=residential]
+    way|z10-[landuse=residential]
 {fill-color: #ddd;}
     
     /*<Rule>
@@ -314,7 +322,7 @@ way|z10-14 [amenity=grave_yard],
         <CssParameter name="fill">#ddd</CssParameter>
       </PolygonSymbolizer>
     </Rule>*/
-    way|z10- [military=barracks]
+    way|z10-[military=barracks]
     {fill-color: #ff8f8f;}
     
     /*<Rule>
@@ -325,7 +333,7 @@ way|z10-14 [amenity=grave_yard],
         <CssParameter name="fill">#ff8f8f</CssParameter>
       </PolygonSymbolizer>
     </Rule>*/
-    way|z10- [landuse=military]
+    way|z10-[landuse=military]
     {fill-color: #ffa8a8; fill-opacity: 0.4}
     /*<Rule>
       &maxscale_zoom10;
@@ -336,8 +344,8 @@ way|z10-14 [amenity=grave_yard],
         <CssParameter name="fill-opacity">0.4</CssParameter>
       </PolygonSymbolizer>
     </Rule>*/
-    way|z10- [landuse=field],
-    way|z10- [natural=field],
+    way|z10-[landuse=field],
+    way|z10-[natural=field],
     {fill-color: #666600; fill-opacity: 0.2;
     color:#666600; opacity: 0.4, width: 0.3}
     /*<Rule>
@@ -364,7 +372,7 @@ way|z10-14 [amenity=grave_yard],
       </LineSymbolizer>
     </Rule>*/
 
-    way|z9-10 [military=danger_area],
+    way|z9-10[military=danger_area],
     {fill-color: pink; fill-opacity: 0.3}
     /*<Rule>
       &maxscale_zoom9;
@@ -375,7 +383,7 @@ way|z10-14 [amenity=grave_yard],
         <CssParameter name="fill-opacity">0.3</CssParameter>
       </PolygonSymbolizer>
     </Rule>*/
-    way|z11-18 [military=danger_area],
+    way|z11-18[military=danger_area],
     {fill-color: pink; fill-opacity: 0.3}
     /*<Rule>
       &maxscale_zoom11;
@@ -384,9 +392,9 @@ way|z10-14 [amenity=grave_yard],
       <PolygonPatternSymbolizer file="&symbols;/danger.png" />
     </Rule>*/
 
-    way|z14- [landuse=cemetery] [religion=jewish],
-    way|z14- [landuse=grave_yard] [religion=jewish],
-    way|z14- [amenity=grave_yard] [religion=jewish]
+    way|z14-[landuse=cemetery][religion=jewish],
+    way|z14-[landuse=grave_yard][religion=jewish],
+    way|z14-[amenity=grave_yard][religion=jewish]
     
     {fill-image: mapink/cemetery_jewish.18.png}
     /*<Rule>
@@ -394,9 +402,9 @@ way|z10-14 [amenity=grave_yard],
       <Filter>([landuse] = 'cemetery' or [landuse] = 'grave_yard' or [amenity]='grave_yard') and [religion] = 'jewish'</Filter>
       <PolygonPatternSymbolizer file="&symbols;/cemetery_jewish.18.png" />
     </Rule>*/
-    way|z14- [landuse=cemetery] [religion!=jewish],
-    way|z14- [landuse=grave_yard] [religion!=jewish],
-    way|z14- [amenity=grave_yard] [religion!=jewish]
+    way|z14-[landuse=cemetery][religion!=jewish],
+    way|z14-[landuse=grave_yard][religion!=jewish],
+    way|z14-[amenity=grave_yard][religion!=jewish]
     
     {fill-image: mapink/grave_yard.png}
     
@@ -405,8 +413,8 @@ way|z10-14 [amenity=grave_yard],
       <Filter>([landuse] = 'cemetery' or [landuse] = 'grave_yard' or [amenity]='grave_yard') and (not [religion] &lt;&gt; '' or [religion] &lt;&gt; 'jewish')</Filter>
       <PolygonPatternSymbolizer file="&symbols;/grave_yard.png" />
     </Rule>*/
-    way|z10- [landuse=meadow],
-    way|z10- [landuse=grass]
+    way|z10-[landuse=meadow],
+    way|z10-[landuse=grass]
     
     {fill-color: #cfeca8;}
     /*<Rule>
@@ -416,8 +424,8 @@ way|z10-14 [amenity=grave_yard],
         <CssParameter name="fill">#cfeca8</CssParameter>
      </PolygonSymbolizer>
     </Rule>*/
-    way|z10- [leisure=park],
-    way|z10- [leisure=recreation_ground]
+    way|z10-[leisure=park],
+    way|z10-[leisure=recreation_ground]
     
     {fill-color: #b6fdb6; fill-opacity: 0.6}
     /*<Rule>
@@ -428,15 +436,15 @@ way|z10-14 [amenity=grave_yard],
         <CssParameter name="fill-opacity">0.6</CssParameter>
      </PolygonSymbolizer>
     </Rule>*/
-    way|z10- [tourism=zoo]  {fill-image: mapink/zoo.png}
+    way|z10-[tourism=zoo]  {fill-image: mapink/zoo.png}
     
     /*<Rule>
       <Filter>[tourism] = 'zoo'</Filter>
       &maxscale_zoom10;
       <PolygonPatternSymbolizer file="&symbols;/zoo.png" />
     </Rule>*/
-    way|z10- [leisure=common],
-    way|z10- [leisure=garden]
+    way|z10-[leisure=common],
+    way|z10-[leisure=garden]
      {fill-color: #cfeca8}
     
     /*<Rule>
@@ -453,7 +461,7 @@ way|z10-14 [amenity=grave_yard],
         <CssParameter name="fill">#cfeca8</CssParameter>
      </PolygonSymbolizer>
     </Rule>*/
-    way|z10- [leisure=golf_course]    {fill-color: #b5e3b5}
+    way|z10-[leisure=golf_course]    {fill-color: #b5e3b5}
     /*<Rule>
       <Filter>[leisure] = 'golf_course'</Filter>
       &maxscale_zoom10;
@@ -461,7 +469,7 @@ way|z10-14 [amenity=grave_yard],
         <CssParameter name="fill">#b5e3b5</CssParameter>
      </PolygonSymbolizer>
     </Rule>*/
-    way|z10- [landuse=allotments]    {fill-color: #c8b084}
+    way|z10-[landuse=allotments]    {fill-color: #c8b084}
     /*<Rule>
       <Filter>[landuse] = 'allotments'</Filter>
       &maxscale_zoom10;
@@ -469,7 +477,7 @@ way|z10-14 [amenity=grave_yard],
         <CssParameter name="fill">#c8b084</CssParameter>
      </PolygonSymbolizer>
     </Rule>*/
-    way|z8-13 [landuse=forest]    {fill-color: #8dc56c}
+    way|z8-13[landuse=forest]    {fill-color: #8dc56c}
     /*<Rule>
       <Filter>[landuse] = 'forest'</Filter>
       &maxscale_zoom8;
@@ -478,7 +486,7 @@ way|z10-14 [amenity=grave_yard],
         <CssParameter name="fill">#8dc56c</CssParameter>
      </PolygonSymbolizer>
     </Rule>*/
-    way|z14- [landuse=forest]    {fill-image: mapink/forest.png}
+    way|z14-[landuse=forest]    {fill-image: mapink/forest.png}
     
     /*<Rule>
       <Filter>[landuse] = 'forest'</Filter>
@@ -486,7 +494,7 @@ way|z10-14 [amenity=grave_yard],
       <PolygonPatternSymbolizer file="&symbols;/forest.png" />
     </Rule>*/
 
-    way|z9-  [landuse=farmyard]    {fill-color: #ddbf92}
+    way|z9-[landuse=farmyard]    {fill-color: #ddbf92}
     /*<Rule>
       <Filter>[landuse]='farmyard'</Filter>
       &maxscale_zoom9;
@@ -494,8 +502,8 @@ way|z10-14 [amenity=grave_yard],
         <CssParameter name="fill">#ddbf92</CssParameter>
      </PolygonSymbolizer>
     </Rule>*/
-    way|z9-  [landuse=farmy],
-    way|z9-  [landuse=farmland]
+    way|z9-[landuse=farmy],
+    way|z9-[landuse=farmland]
     {fill-color: #ead8bd}
     /*<Rule>
       <Filter>[landuse] = 'farm' or [landuse]='farmland'</Filter>
@@ -504,8 +512,8 @@ way|z10-14 [amenity=grave_yard],
         <CssParameter name="fill">#ead8bd</CssParameter>
      </PolygonSymbolizer>
     </Rule>*/
-    way|z10-  [landuse=recreation_ground],
-    way|z10-  [landuse=conservation]
+    way|z10-[landuse=recreation_ground],
+    way|z10-[landuse=conservation]
     {fill-color: #ead8bd}
     /*<Rule>
       <Filter>[landuse] = 'recreation_ground' or [landuse] = 'conservation'</Filter>
@@ -514,7 +522,7 @@ way|z10-14 [amenity=grave_yard],
         <CssParameter name="fill">#cfeca8</CssParameter>
      </PolygonSymbolizer>
     </Rule>*/
-    way|z11-  [landuse=village_green]
+    way|z11-[landuse=village_green]
     {fill-color: #cfeca8}
     /*<Rule>
       <Filter>[landuse] = 'village_green'</Filter>
@@ -523,7 +531,7 @@ way|z10-14 [amenity=grave_yard],
         <CssParameter name="fill">#cfeca8</CssParameter>
      </PolygonSymbolizer>
     </Rule>*/
-    way|z10-  [landuse=retail]
+    way|z10-[landuse=retail]
     {fill-color: #f1dada}
     /*<Rule>
       <Filter>[landuse] = 'retail'</Filter>
@@ -533,7 +541,7 @@ way|z10-14 [amenity=grave_yard],
      </PolygonSymbolizer>
     </Rule>*/
 
-    way|z15-  [landuse=retail]
+    way|z15-[landuse=retail]
     {color: red; width: 0.3}
     /*<Rule>
       <Filter>[landuse] = 'retail'</Filter>
@@ -543,8 +551,8 @@ way|z10-14 [amenity=grave_yard],
         <CssParameter name="stroke-width">0.3</CssParameter>
       </LineSymbolizer>
     </Rule>*/
-    way|z10-  [landuse=industrial],
-    way|z10-  [landuse=railway]
+    way|z10-[landuse=industrial],
+    way|z10-[landuse=railway]
     {fill-color: #dfd1d6}
     /*<Rule>
       <Filter>[landuse] = 'industrial' or [landuse]='railway'</Filter>
@@ -553,7 +561,7 @@ way|z10-14 [amenity=grave_yard],
         <CssParameter name="fill">#dfd1d6</CssParameter>
      </PolygonSymbolizer>
     </Rule>*/
-    way|z10-  [power=station]
+    way|z10-[power=station]
     {fill-color: #bbb}
     /*<Rule>
       <Filter>[power] = 'station'</Filter>
@@ -563,7 +571,7 @@ way|z10-14 [amenity=grave_yard],
         <CssParameter name="fill">#bbb</CssParameter>
      </PolygonSymbolizer>
     </Rule>*/
-    way|z12-  [power=station]
+    way|z12-[power=station]
     {color: #555; width: 0.4}
     
     /*<Rule>
@@ -577,7 +585,7 @@ way|z10-14 [amenity=grave_yard],
         <CssParameter name="stroke-width">0.4</CssParameter>
       </LineSymbolizer>
     </Rule>*/
-    way|z13-  [power=sub_station]
+    way|z13-[power=sub_station]
     {fill-color: #bbb; color: #555; width: 0.4}
     /*<Rule>
       <Filter>[power] = 'sub_station'</Filter>
@@ -591,7 +599,7 @@ way|z10-14 [amenity=grave_yard],
       </LineSymbolizer>
     </Rule>*/
 
-    way|z10-  [landuse=commercial]
+    way|z10-[landuse=commercial]
     {fill-color: #efc8c8}
     /*<Rule>
       <Filter>[landuse] = 'commercial'</Filter>
@@ -601,10 +609,10 @@ way|z10-14 [amenity=grave_yard],
      </PolygonSymbolizer>
     </Rule>*/
 
-    way|z10-  [landuse=brownfield],
-    way|z10-  [landuse=landfill],
-    way|z10-  [landuse=greenfield],
-    way|z10-  [landuse=construction]
+    way|z10-[landuse=brownfield],
+    way|z10-[landuse=landfill],
+    way|z10-[landuse=greenfield],
+    way|z10-[landuse=construction]
     {fill-color: #9d9d6c}
     /*<Rule>
       <Filter>[landuse] = 'brownfield' or [landuse]='landfill' or [landuse] = 'greenfield' or [landuse]='construction'</Filter>
@@ -614,8 +622,8 @@ way|z10-14 [amenity=grave_yard],
      </PolygonSymbolizer>
     </Rule>*/
 
-    way|z9-  [natural=wood],
-    way|z9-  [landuse=wood]
+    way|z9-[natural=wood],
+    way|z9-[landuse=wood]
     {fill-color: #aed1a0}
      /*<Rule>
       <Filter>[natural] = 'wood' or [landuse] = 'wood'</Filter>
@@ -624,7 +632,7 @@ way|z10-14 [amenity=grave_yard],
         <CssParameter name="fill">#aed1a0</CssParameter>
      </PolygonSymbolizer>
     </Rule>*/
-     way|z10-  [natural=heath]
+     way|z10-[natural=heath]
      {fill-color: #ffffc0}
      /*<Rule>
       <Filter>[natural] = 'heath'</Filter>
@@ -634,11 +642,11 @@ way|z10-14 [amenity=grave_yard],
      </PolygonSymbolizer>
     </Rule>*/
 
-     way|z10-  [amenity=university],
-     way|z10-  [amenity=college],
-     way|z10-  [amenity=school],
-     way|z10-  [amenity=hospital],
-     way|z10-  [amenity=kindergarten]
+     way|z10-[amenity=university],
+     way|z10-[amenity=college],
+     way|z10-[amenity=school],
+     way|z10-[amenity=hospital],
+     way|z10-[amenity=kindergarten]
      {fill-color: #f0f0d8}
     /*<Rule>
       <Filter>[amenity] = 'university' or [amenity] = 'college' or [amenity] = 'school' or [amenity]='hospital' or [amenity]='kindergarten'</Filter>
@@ -647,11 +655,11 @@ way|z10-14 [amenity=grave_yard],
         <CssParameter name="fill">#f0f0d8</CssParameter>
       </PolygonSymbolizer>
     </Rule>*/
-    way|z12-  [amenity=university],
-    way|z12-  [amenity=college],
-    way|z12-  [amenity=school],
-    way|z12-  [amenity=hospital],
-    way|z12-  [amenity=kindergarten]
+    way|z12-[amenity=university],
+    way|z12-[amenity=college],
+    way|z12-[amenity=school],
+    way|z12-[amenity=hospital],
+    way|z12-[amenity=kindergarten]
     {color: brown; width: 0.3}
     /*<Rule>
       <Filter>[amenity] = 'university' or [amenity] = 'college' or [amenity] = 'school' or [amenity]='hospital' or [amenity]='kindergarten'</Filter>
@@ -661,7 +669,7 @@ way|z10-14 [amenity=grave_yard],
         <CssParameter name="stroke-width">0.3</CssParameter>
       </LineSymbolizer>
     </Rule>*/
-    way|z10- [amenity=parking] {fill-color: #f7efb7}
+    way|z10-[amenity=parking] {fill-color: #f7efb7}
     /*<Rule>
       <Filter>[amenity] = 'parking'</Filter>
       &maxscale_zoom10;
@@ -669,7 +677,7 @@ way|z10-14 [amenity=grave_yard],
          <CssParameter name="fill">#f7efb7</CssParameter>
       </PolygonSymbolizer>
     </Rule>*/
-    way|z15- [amenity=parking] {color: #eeeed1; width: 0.3}
+    way|z15-[amenity=parking] {color: #eeeed1; width: 0.3}
     /*<Rule>
       <Filter>[amenity] = 'parking'</Filter>
       &maxscale_zoom15;
@@ -678,7 +686,7 @@ way|z10-14 [amenity=grave_yard],
         <CssParameter name="stroke-width">0.3</CssParameter>
       </LineSymbolizer>
     </Rule>*/
-    way|z12- [aeroway=apron]  {fill-color: #e9d1ff}
+    way|z12-[aeroway=apron]  {fill-color: #e9d1ff}
     /*<Rule>
       <Filter>[aeroway] = 'apron'</Filter>
       &maxscale_zoom12;
@@ -686,7 +694,7 @@ way|z10-14 [amenity=grave_yard],
          <CssParameter name="fill">#e9d1ff</CssParameter>
       </PolygonSymbolizer>
     </Rule>*/
-    way|z12- [aeroway=aerodrome]  {fill-color: #ccc; fill-opacity: 0.2; color:#555; width:0.2}
+    way|z12-[aeroway=aerodrome]  {fill-color: #ccc; fill-opacity: 0.2; color:#555; width:0.2}
     /*<Rule>
       <Filter>[aeroway] = 'aerodrome'</Filter>
       &maxscale_zoom12;
@@ -699,13 +707,13 @@ way|z10-14 [amenity=grave_yard],
         <CssParameter name="stroke-width">0.2</CssParameter>
       </LineSymbolizer>
     </Rule>*/
-    way|z13- [natural=beach]  {fill-image: mapink/beach.png}
+    way|z13-[natural=beach]  {fill-image: mapink/beach.png}
     /*<Rule>
       <Filter>[natural] = 'beach'</Filter>
       &maxscale_zoom13;
       <PolygonPatternSymbolizer file="&symbols;/beach.png" />
     </Rule>*/
-    way|z13- [natural=beach]  {fill-image: mapink/mud.png}
+    way|z13-[natural=beach]  {fill-image: mapink/mud.png}
     /*<Rule>
       <Filter>[natural] = 'mud'</Filter>
       &maxscale_zoom13;
