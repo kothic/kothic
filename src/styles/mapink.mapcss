@@ -1040,8 +1040,8 @@ way|z10-14[amenity=grave_yard],
 </Style>*/
 
 
-way|z12- [highway=motorway] [tunnel = yes],
-way|z12- [highway=motorway_link] [tunnel = yes]
+way|z12-[highway=motorway][tunnel=yes],
+way|z12-[highway=motorway_link][tunnel=yes]
 {casing-width: 1.5; casing-color:#506077; casing-dashes: 4,2}
 
 /*    
