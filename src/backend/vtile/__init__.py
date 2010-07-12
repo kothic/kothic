@@ -48,9 +48,10 @@ class QuadTileBackend:
     self.path = path                    # path to tile files
     self.lang = lang                    # map language to use
     self.tiles = {}                     # loaded vector tiles go here
-    self.data_projection = proj         # which projection used to cut map in tiles
+    self.proj = proj         # which projection used to cut map in tiles
     self.keep_tiles = 190                # a number of tiles to cache in memory
     self.tile_load_log = []             # used when selecting which tile to unload
+    
     
   def filename(self, (z,x,y)):
     return "%s/z%s/%s/x%s/%s/y%s.vtile"%(self.path, z, x/1024, x, y/1024, y)
@@ -87,7 +88,7 @@ class QuadTileBackend:
     zoom = int(zoom)
     zoom = min(zoom, self.max_zoom)     ## If requested zoom is better than the best, take the best
     zoom = max(zoom, 0)                 ## Negative zooms are nonsense
-    a,d,c,b = [int(x) for x in projections.tile_by_bbox(bbox,zoom, self.data_projection)]
+    a,d,c,b = [int(x) for x in projections.tile_by_bbox(bbox,zoom, self.proj)]
     resp = {}
     for tile in set([(zoom,i,j) for i in range(a, c+1) for j in range(b, d+1)]):
       try:

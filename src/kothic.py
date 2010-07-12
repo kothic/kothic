@@ -27,7 +27,9 @@ import Queue
 
 
 from debug import debug, Timer
-from vtiles_backend import QuadTileBackend as DataBackend
+
+from backend.postgis import PostGisBackend as DataBackend
+from backend.vtile import QuadTileBackend as DataBackend
 #from style import Styling
 from mapcss import MapCSS as Styling
 from render import RasterTile
@@ -78,7 +80,7 @@ class Navigator:
     self.f = True
     undef = None
     self.style = Styling()
-    self.style.parse(open("styles/openstreetinfo.mapcss","r").read())
+    self.style.parse(open("styles/mapink.mapcss","r").read())
     
     da = gtk.DrawingArea()
     da.add_events(gtk.gdk.BUTTON1_MOTION_MASK)
