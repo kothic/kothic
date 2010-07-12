@@ -7,13 +7,15 @@
    3. python-psyco, if available.
    4. pygtk for GUI
    5. pycairo
-
+   6. python-psycopg2
+   7. python-shapely
+   8. python-pyproj
 
    To run:
    1. Install all dependancies.
    2. cd src/
    3. cat small_test_osm_dump.osm | ./osm2tiles.py
-   4. wait a bit and check if tiles ggot generated
+   4. wait a bit and check if tiles got generated
    5. python kothic.py to run GUI
 
    NOT READY FOR DAILY USAGE!
