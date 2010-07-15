@@ -127,7 +127,14 @@ class MapCSS():
       for chooser in self.choosers:
         tags.update(chooser.get_interesting_tags(type, zoom))
       return tags
-
+    def get_sql_hints(self, type=None, zoom=None):
+      """
+      Get set of interesting tags.
+      """
+      hints = set()
+      for chooser in self.choosers:
+        hints.update(chooser.get_sql_hints(type, zoom))
+      return hints
 
 
     def parse(self, css):

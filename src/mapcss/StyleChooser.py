@@ -64,6 +64,17 @@ class StyleChooser:
           if __builtins__["type"](b) == self.eval_type:
             a.update(b.extract_tags())
     return a
+
+  def get_sql_hints(self, type, zoom):
+    """
+    Returns a set of tags that were used in here in form of SQL-hints.
+    """
+    a = set()
+    for c in self.ruleChains:
+      for r in c:
+        a.update(r.get_sql_hints(type, zoom))
+    # no need to check for eval's
+    return a
   # // Update the current StyleList from this StyleChooser
 
   def updateStyles(self,sl,type, tags, zoom, scale, zscale):

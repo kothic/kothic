@@ -56,7 +56,11 @@ class PostGisBackend:
     self.keep_tiles = 190                # a number of tiles to cache in memory
     self.tile_load_log = []             # used when selecting which tile to unload
     
-  def get_vectors (self, bbox, zoom):
+  def get_vectors (self, bbox, zoom, sql_hint = None):
+    """
+    Fetches vectors for given bbox.
+    sql_hint is a set of (key, sql_for_key)
+    """
     a = psycopg2.connect(self.database)
     b = a.cursor()
     bbox = tuple(projections.from4326(bbox,self.proj))
@@ -64,7 +68,19 @@ class PostGisBackend:
     tables = ("planet_osm_line","planet_osm_polygon")  # FIXME: points
     resp = {}
     for table in tables:
-      b.execute("SELECT * FROM %s WHERE way && SetSRID('BOX3D(%s %s,%s %s)'::box3d,900913);"%(table,bbox[0],bbox[1],bbox[2],bbox[3]))
+      add = ""
+      if sql_hint:
+        add = []
+        b.execute("SELECT * FROM %s LIMIT 1;"%table)
+        names = [q[0] for q in b.description]
+        for t,v in sql_hint:
+          if t in names:
+            add.append(v)
+        add = " OR ".join(add)
+        add = "("+add+") AND"
+      req = "SELECT * FROM %s WHERE %s way && SetSRID('BOX3D(%s %s,%s %s)'::box3d,900913);"%(table,add,bbox[0],bbox[1],bbox[2],bbox[3])
+      print req
+      b.execute(req)
       names = [q[0] for q in b.description]
       for row in b.fetchall():
         

@@ -114,7 +114,11 @@ class RasterTile:
 
     
     datatimer = Timer("Asking backend")
-    vectors = self.data.get_vectors(bbox,self.zoom).values()
+    if "get_sql_hints" in dir(style):
+      hints = style.get_sql_hints('way', self.zoom)
+    else:
+      hints = None
+    vectors = self.data.get_vectors(bbox,self.zoom,sql_hint = hints).values()
     datatimer.stop()
     datatimer = Timer("Applying styles")
     ww = []

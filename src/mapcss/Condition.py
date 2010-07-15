@@ -72,6 +72,35 @@ class Condition:
       pass
     return False;
 
+  def get_sql(self):
+    params = [re.escape(x) for x in self.params]
+    t = self.type
+    try:
+      if t == 'eq':
+        return params[0], '"%s" = \'%s\''%(params[0], params[1])
+      if t == 'ne':
+        return params[0], 'not("%s" = \'%s\')'%(params[0], params[1])
+      if t == 'regex':
+        return params[0], '"%s" IS NOT NULL'%(params[0])
+      if t == 'true':
+        return params[0], '"%s" IN (\'true\', \'yes\', \'1\')'%(params[0])
+      if t == 'untrue':
+        return params[0], '"%s" NOT IN (\'true\', \'yes\', \'1\')'%(params[0])
+      if t == 'set':
+        return params[0], '"%s" IS NOT NULL'%(params[0])
+      if t == 'unset':
+        return params[0], '"%s" IS NULL'%(params[0])
+        
+      if t == '<':
+        return params[0], '"%s" IS NOT NULL'%(params[0])
+      if t == '<=':
+        return params[0], '"%s" IS NOT NULL'%(params[0])
+      if t == '>':
+        return params[0], '"%s" IS NOT NULL'%(params[0])
+      if t == '>=':
+        return params[0], '"%s" IS NOT NULL'%(params[0])
+    except KeyError:
+      pass
   def __repr__(self):
     return "%s %s "%(self.type, repr(self.params))
 def Number(tt):
