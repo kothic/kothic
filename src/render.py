@@ -50,6 +50,9 @@ class RasterTile:
     self.zoom = None
     self.data = data_backend
     self.proj = raster_proj
+  def __del__(self):
+    del self.surface
+    
   def screen2lonlat(self, x, y):
     lo1, la1, lo2, la2 = self.bbox_p
     
@@ -167,15 +170,6 @@ class RasterTile:
     for layer in layers:
       data = objs_by_layers[layer]
       data.sort(lambda x,y:cmp(max([x1[1] for x1 in x[0].cs]), max([x1[1] for x1 in y[0].cs])))
-      # - fill polygons
-      
-      for obj in data:
-        if "fill-color" in obj[1]:   ## TODO: fill-image
-          color = obj[1]["fill-color"]
-          cr.set_source_rgba(color[0], color[1], color[2], obj[1].get("fill-opacity", 1))
-
-          if not "extrude" in obj[1]:
-            poly(cr, obj[0].cs)
 
 
 
@@ -194,6 +188,15 @@ class RasterTile:
           cr.set_line_width (obj[1].get("width",0)+obj[1].get("casing-width", 1 ))
           cr.set_line_cap(linecaps.get(obj[1].get("casing-linecap", obj[1].get("linecap", "butt")),0))
           line(cr, obj[0].cs)
+
+      # - fill polygons
+      for obj in data:
+        if "fill-color" in obj[1]:   ## TODO: fill-image
+          color = obj[1]["fill-color"]
+          cr.set_source_rgba(color[0], color[1], color[2], obj[1].get("fill-opacity", 1))
+
+          if not "extrude" in obj[1]:
+            poly(cr, obj[0].cs)
           
       # - draw line centers
       for obj in data:
@@ -258,7 +261,7 @@ class RasterTile:
           
           text = obj[1]["text"]
           #cr.set_line_width (obj[1].get("width", 1))
-          cr.set_font_size(obj[1].get("font-size", 9))
+          cr.set_font_size(float(obj[1].get("font-size", 9)))
           if obj[1].get("text-position", "center") == "center":
             where = self.lonlat2screen(projections.transform(obj[0].center,self.data.proj,self.proj))
             for t in text_rendered_at:
