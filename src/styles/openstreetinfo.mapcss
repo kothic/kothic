@@ -29,7 +29,7 @@ way[landuse=forest],
 way[landuse=wood]
     {fill-color: #68ec80; color: #45a56b}
 
-way[landuse=grass],
+way|z15-[landuse=grass],
 way[natural=grass]{fill-color: #e7ffd0; color: #45a56b}
 
 

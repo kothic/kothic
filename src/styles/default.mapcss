@@ -1,40 +1,69 @@
-way[area=yes]
-    {fill-color: #ff0000}
+
+
+
 way[highway]
-    {width:1; color:#ff0000;text: name; text-position: line; text-halo-radius:2}
+    {width:
+    eval(
+            any(
+               metric(tag("width")),
+               metric( num(tag("lanes")) * 4)
+               )
+
+         );
+     color:#ff0000;text: name; text-position: line; text-halo-radius:2;
+     casing-width: 1;
+     linecap: round;
+     opacity: eval( min(1, (num(any(tag("layer"),1))+5)/6) );
+     casing-opacity: eval( min(1, (num(any(tag("layer"),1))+5)/6) );
+     }
 way[barrier]
-    {casing-width:1}
+    {casing-width:1; width: eval(metric(tag("width")))}
 
 way[highway=residential],
 way[highway=tertiary],
 way[highway=living_street]
-    {width: 3; color:#ffffff; casing-width: 5; z-index:10}
+    {width: 3; color:#ffffff; z-index:10}
 
 way[highway=service],
 way[highway=unclassified]
-    {width: 2.5; color:#ccc; casing-width: 4; z-index:9}
+    {width: eval(max(2.5, prop("width"))); color:#ccc; z-index:9}
 
 
 way[highway=primary],
 way[highway=motorway],
 way[highway=trunk]
-    {width: 4; color: #ff0; casing-width: 6; z-index: 11}
+  {width: eval(max(4, prop("width"))); color: #ff0; z-index: 11}
 
 way[highway=primary_link],
 way[highway=motorway_link],
 way[highway=trunk_link]
-    {width: 3.5; color: #ff0; casing-width: 6; z-index:11}
+    {width: 3.5; color: #ff0; z-index:11}
 
 way[highway=secondary]
-    {width: 4; color: orange; casing-width: 6; z-index:10}
+{width: eval(max(4, prop("width"))); color: orange; z-index:10}
+
 way[living_street=yes]
-    {width: 2; casing-width: 3; z-index: 0}
+  {width: eval(max(2, prop("width")));  z-index: 0}
 
 way[natural=forest],
 way[natural=wood],
 way[landuse=forest],
 way[landuse=wood]
     {fill-color: #020}
+
+way[highway=footway],
+way[highway=pedestrian],
+way[highway=path]
+{width:eval(max(2, prop("width"))); color:#655; casing-dashes: 3,1; z-index:3; linecap: butt;}
+
+way[highway=steps]
+{ width:eval(max(2, prop("width"))); color:#655; casing-dashes: 1,0;  z-index:5;
+dashes:  eval(str( max(any(metric(tag("step:length"))/100, metric("0.3m"))-1, 2) ) + ",1"); linecap: butt;
+}
+
+way[highway][area=yes]
+{fill-color: eval(prop("color")); width:0}
+    
 
 way[landuse=industrial] {fill-color: #855}
 way[landuse=military] {fill-color: pink}
@@ -48,11 +77,12 @@ way[waterway=stream]{color: #002}
 way[landuse=grass],
 way[natural=grass]{fill-color: #050}
 
-way[highway=footway],
-way[highway=pedestrian],
-way[highway=path]
-    {width:2.5; color:#655; dashes: 3,1; z-index:3}
 
-way[bridge=yes] {casing-width:10}
+way[bridge=yes] {casing-width:eval(min(3, num(prop("width"))/2 ));}
 way[power=line] {width: 1; color:#ccc}
-way[building] {fill-color: #522; text: addr:housenumber; text-halo-radius:2; z-index:100; text-position: center; extrude:  eval( any( metric(tag("height")), metric ( num(tag("building:levels")) * 3), metric("1m")))}
+way|z16-[building] {fill-color: #522; text: addr:housenumber; text-halo-radius:2; z-index:100; text-position: center;
+extrude:  eval( any( metric(tag("height")), metric ( num(tag("building:levels")) * 3)));
+extrude-face-color: #e2e2e2;
+extrude-edge-width: 1;
+extrude-edge-color: #404040;
+}
