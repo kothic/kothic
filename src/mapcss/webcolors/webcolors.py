@@ -851,7 +851,8 @@ def whatever_to_rgb(string):
 def whatever_to_cairo(string):
   a = whatever_to_rgb(string)
   return a[0]/255.,a[1]/255.,a[2]/255.,
-
+def cairo_to_hex (cairo):
+  return rgb_to_hex((cairo[0]*255,cairo[1]*255,cairo[2]*255,))
   
 
 

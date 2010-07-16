@@ -18,6 +18,7 @@
 
 from Rule import Rule
 from webcolors.webcolors import whatever_to_cairo as colorparser
+from webcolors.webcolors import cairo_to_hex
 from Eval import Eval
 
 class StyleChooser:
@@ -88,14 +89,20 @@ class StyleChooser:
 
                   ## // Update StyleList
                   object_id = 1
-                  
+
                   for r in self.styles:
                     ### FIXME: here we should do all the eval()'s
                     ra = {}
                     for a,b in r.iteritems():
                       if __builtins__["type"](b) == self.eval_type:
+                        combined_style = {}
+                        for t in sl:
+                          combined_style.update(t)
+                        for p,q in combined_style.iteritems():
+                          if "color" in p:
+                            combined_style[p] = cairo_to_hex(q)
                         ## FIXME: properties && metrics
-                        b = b.compute(tags,{}, scale, zscale)
+                        b = b.compute(tags,combined_style, scale, zscale)
                       ra[a] = b
                     r = ra
                     ra = {}
