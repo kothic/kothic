@@ -24,9 +24,14 @@ from mapcss import MapCSS
 
 from render import RasterTile
 
+svg = False
+
+if svg:
+  import cairo
+
 
 style = MapCSS(1, 19)     #zoom levels
-style.parse(open("styles/openstreetinfo.mapcss","r").read())
+style.parse(open("styles/gisrussa.mapcss","r").read())
 
 
 bbox = (27.115768874532,53.740327031764,28.028320754378,54.067187302158)
@@ -38,6 +43,13 @@ db = DataBackend()
 #style = Styling()
 
 res = RasterTile(w, h, z, db)
+if svg:
+  file = open("test.svg", "wb")
+  res.surface = cairo.SVGSurface(file.name, w,h)
 res.update_surface(bbox, z, style)
 
-res.surface.write_to_png("test.png")
+
+if not svg:
+  res.surface.write_to_png("test.png")
+else:
+  res.surface.finish()
