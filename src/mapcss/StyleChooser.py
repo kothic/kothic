@@ -128,7 +128,7 @@ class StyleChooser:
                           pass
                       else:
                         ra[a]=b
-                    ra["layer"] = float(tags.get("layer",1))*100+ra.get("z-index",1)
+                    ra["layer"] = float(tags.get("layer",0))*100+ra.get("z-index",1)
                     #print ra
                     if "object-id" not in ra:
                       ra["object-id"] = str(object_id)
