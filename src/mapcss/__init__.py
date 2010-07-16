@@ -89,6 +89,7 @@ class MapCSS():
       """
       self.minscale=minscale
       self.maxscale=maxscale
+      self.scalepair = (minscale, maxscale)
       self.choosers = []
       self.style_loaded = False
       self.parse(builtin_style)
@@ -145,7 +146,7 @@ class MapCSS():
         self.choosers = []
       log = logging.getLogger('mapcss.parser')
       previous = 0  # what was the previous CSS word?
-      sc=StyleChooser() #currently being assembled
+      sc=StyleChooser(self.scalepair) #currently being assembled
       #choosers=[]
       
         
@@ -167,7 +168,7 @@ class MapCSS():
               elif CLASS.match(css):
                 if previous==oDECLARATION:
                   self.choosers.append(sc)
-                  sc = StyleChooser()
+                  sc = StyleChooser(self.scalepair)
                 
                 cond = CLASS.match(css).groups()[0]
                 log.debug("class found: %s"% (cond))
@@ -182,7 +183,7 @@ class MapCSS():
               elif NOT_CLASS.match(css):
                 if (previous==oDECLARATION):
                   self.choosers.append(sc)
-                  sc = StyleChooser()
+                  sc = StyleChooser(self.scalepair)
 
                 cond = NOT_CLASS.match(css).groups()[0]
                 log.debug("not_class found: %s"% (cond))
@@ -219,7 +220,7 @@ class MapCSS():
               elif CONDITION.match(css):
                 if (previous==oDECLARATION):
                   self.choosers.append(sc)
-                  sc = StyleChooser()
+                  sc = StyleChooser(self.scalepair)
                 if (previous!=oOBJECT) and (previous!=oZOOM) and (previous!=oCONDITION):
                   sc.newObject()
                 cond = CONDITION.match(css).groups()[0]
@@ -232,7 +233,7 @@ class MapCSS():
               elif OBJECT.match(css):
                 if (previous==oDECLARATION):
                   self.choosers.append(sc)
-                  sc = StyleChooser()
+                  sc = StyleChooser(self.scalepair)
                 obj = OBJECT.match(css).groups()[0]
                 log.debug("object found: %s"% (obj))
                 css=OBJECT.sub("",css)
@@ -262,7 +263,7 @@ class MapCSS():
       #print sc
       if (previous==oDECLARATION):
         self.choosers.append(sc)
-        sc= StyleChooser()
+        sc= StyleChooser(self.scalepair)
       #print self.choosers
       return 
 #}

@@ -40,11 +40,12 @@ class StyleChooser:
   """
   def __repr__(self):
     return "{(%s) : [%s] }\n"%(self.ruleChains, self.styles)
-  def __init__(self):
+  def __init__(self, scalepair):
     self.ruleChains = [[],]
     self.styles = []
     self.eval_type = type(Eval())
-
+    self.scalepair = scalepair
+    print scalepair
     self.rcpos=0
     self.stylepos=0
 
@@ -250,7 +251,8 @@ class StyleChooser:
     adds into the current ruleChain (existing Rule)
     """
     self.ruleChains[self.rcpos][len(self.ruleChains[self.rcpos])-1].conditions.append(c)
-
+    self.ruleChains[self.rcpos][len(self.ruleChains[self.rcpos])-1].minZoom=float(self.scalepair[0])
+    self.ruleChains[self.rcpos][len(self.ruleChains[self.rcpos])-1].maxZoom=float(self.scalepair[1])
 
   def addStyles(self, a):
     """
