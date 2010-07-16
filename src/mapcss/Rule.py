@@ -20,7 +20,7 @@ class Rule():
   def __init__(self, s=''):
     self.conditions = []
     self.isAnd = True
-    self.minZoom = 0   #### FIXME: take from MapCSS creation thingz
+    self.minZoom = 0   
     self.maxZoom = 19
     self.subject = s    # "", "way", "node" or "relation"
   def __repr__(self):

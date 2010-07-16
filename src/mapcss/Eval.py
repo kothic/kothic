@@ -27,6 +27,7 @@ class Eval():
     try:
       self.expr = compile (s, "MapCSS expression", "eval")
     except:
+      print "Can't compile %s" % s
       self.expr = compile ("0", "MapCSS expression", "eval")
 
 

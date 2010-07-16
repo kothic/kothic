@@ -122,7 +122,7 @@ class StyleChooser:
                         "these things are arrays of float's or not in table at all"
                         try:
                           b = b.split(",")
-                          b = [int(x) for x in b]
+                          b = [float(x) for x in b]
                           ra[a]= b
                         except ValueError:
                           pass
@@ -233,6 +233,8 @@ class StyleChooser:
     adds into the current ruleChain (starting a new Rule)
     """
     self.ruleChains[self.rcpos].append(Rule(e))
+    self.ruleChains[self.rcpos][len(self.ruleChains[self.rcpos])-1].minZoom=float(self.scalepair[0])
+    self.ruleChains[self.rcpos][len(self.ruleChains[self.rcpos])-1].maxZoom=float(self.scalepair[1])
 
 
           
@@ -251,8 +253,7 @@ class StyleChooser:
     adds into the current ruleChain (existing Rule)
     """
     self.ruleChains[self.rcpos][len(self.ruleChains[self.rcpos])-1].conditions.append(c)
-    self.ruleChains[self.rcpos][len(self.ruleChains[self.rcpos])-1].minZoom=float(self.scalepair[0])
-    self.ruleChains[self.rcpos][len(self.ruleChains[self.rcpos])-1].maxZoom=float(self.scalepair[1])
+
 
   def addStyles(self, a):
     """
