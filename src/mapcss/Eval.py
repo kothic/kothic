@@ -42,12 +42,12 @@ class Eval():
       """
       for t in x:
         q = x
-      return 0
+      return ""
     tags = set([])
     a = eval(self.expr,{},{
       "tag":lambda x: tags.add(x),
       "prop": lambda x: "",
-      "num": fake_compute,
+      "num": lambda x: 0,
       "metric": fake_compute,
       "zmetric": fake_compute,
       "str": fake_compute,

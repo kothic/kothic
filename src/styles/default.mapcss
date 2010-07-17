@@ -6,7 +6,8 @@ way[highway]
     eval(
             any(
                metric(tag("width")),
-               metric( num(tag("lanes")) * 4)
+               metric( num(tag("lanes")) * 4),
+               metric( "1m"),
                )
 
          );
@@ -22,7 +23,7 @@ way[barrier]
 way[highway=residential],
 way[highway=tertiary],
 way[highway=living_street]
-    {width: 3; color:#ffffff; z-index:10}
+{width: eval(max(3, prop("width"))); color:#ffffff; z-index:10}
 
 way[highway=service],
 way[highway=unclassified]
@@ -54,12 +55,12 @@ way[landuse=wood]
 way[highway=footway],
 way[highway=pedestrian],
 way[highway=path]
-{width:eval(max(2, prop("width"))); color:#655; casing-dashes: 3,1; z-index:3; linecap: butt;}
+{width:eval(max(2, prop("width"))); color:#655; casing-dashes: 3,1; z-index:3; linecap: round;}
 
 way[highway=steps]
-{ width:eval(max(2, prop("width"))); color:#655; casing-dashes: 1,0;  z-index:5;
-dashes:  eval(str( max(any(metric(tag("step:length"))/100, metric("0.3m"))-1, 2) ) + ",1"); linecap: butt;
-}
+{z-index:5;  width:eval(max(2, prop("width"))); color:#655; casing-dashes: 1,0;  linecap: butt;}
+{z-index:6; width:eval(max(2, prop("width"))); dashes: eval("1," + str( max(num(any(num(metric(tag("step:length")))/100, num(metric("0.3m"))))-1, 1) ) ); color: black;}
+
 
 way[highway][area=yes]
 {fill-color: eval(prop("color")); width:0}
@@ -75,14 +76,16 @@ way[waterway=river],
 way[waterway=stream]{color: #002}
 
 way[landuse=grass],
-way[natural=grass]{fill-color: #050}
+way[natural=grass]{fill-color: #050; opacity: 0.8}
 
 
-way[bridge=yes] {casing-width:eval(min(3, num(prop("width"))/2 ));}
+way[bridge=yes] {casing-width:eval(min(3, num(prop("width"))/2 ));casing-linecap:butt}
 way[power=line] {width: 1; color:#ccc}
 way|z16-[building] {fill-color: #522; text: addr:housenumber; text-halo-radius:2; z-index:100; text-position: center;
+opacity: 0.7;
 extrude:  eval( any( metric(tag("height")), metric ( num(tag("building:levels")) * 3)));
 extrude-face-color: #e2e2e2;
+extrude-face-opacity: 0.7;
 extrude-edge-width: 1;
 extrude-edge-color: #404040;
 }

@@ -20,7 +20,7 @@ from debug import debug, Timer
 from mapcss import MapCSS
 
 style = MapCSS(1, 19)     #zoom levels
-style.parse(open("styles/mapink.mapcss","r").read())
+style.parse(open("styles/default.mapcss","r").read())
 
 t = ("way", "node")
 dct = {}

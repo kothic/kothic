@@ -121,9 +121,11 @@ class StyleChooser:
                       elif "dashes" in a:
                         "these things are arrays of float's or not in table at all"
                         try:
+                          print b
                           b = b.split(",")
                           b = [float(x) for x in b]
                           ra[a]= b
+                          print b
                         except ValueError:
                           pass
                       else:

@@ -159,6 +159,7 @@ class RasterTile:
       objs_by_layers[layer] = []
     for obj in ww:
       objs_by_layers[int(obj[1]["layer"]/100.)].append(obj)
+
     del ww
     timer.stop()
     timer = Timer("Rasterizing image")
@@ -166,10 +167,9 @@ class RasterTile:
     linejoin = {"miter":0, "round":1, "bevel":2}
 
     text_rendered_at = set([(-100,-100)])
-    
     for layer in layers:
       data = objs_by_layers[layer]
-      data.sort(lambda x,y:cmp(max([x1[1] for x1 in x[0].cs]), max([x1[1] for x1 in y[0].cs])))
+      #data.sort(lambda x,y:cmp(max([x1[1] for x1 in x[0].cs]), max([x1[1] for x1 in y[0].cs])))
 
 
 
