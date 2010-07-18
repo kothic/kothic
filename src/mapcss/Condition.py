@@ -44,13 +44,13 @@ class Condition:
       if t == 'eq':
         return tags[params[0]]==params[1]
       if t == 'ne':
-        return tags[params[0]]!=params[1]
+        return tags.get(params[0], "")!=params[1]
       if t == 'regex':
         return bool(self.regex.match(tags[params[0]]))
       if t == 'true':
         return (tags[params[0]]=='true') | (tags[params[0]]=='yes') | (tags[params[0]]=='1')
-      if t == 'untrue':
-        return (tags[params[0]]!='true') & (tags[params[0]]!='yes') & (tags[params[0]]!='1')
+      if t == 'false':
+        return (tags.get(params[0], "")=='false') | (tags.get(params[0], "")=='no') | (tags.get(params[0], "")=='')
       if t == 'set':
         if params[0] in tags:
           return tags[params[0]]!=''
