@@ -199,7 +199,7 @@ class RasterTile:
             poly(cr, obj[0].cs)
           
       # - draw line centers
-      for obj in data:
+      #for obj in data:
         if "width" in obj[1] or "color" in obj[1] and "extrude" not in obj[1]:
           cr.set_dash(obj[1].get("dashes", []))
           cr.set_line_join(linejoin.get(obj[1].get("linejoin", "round"),1))
@@ -212,7 +212,7 @@ class RasterTile:
           line(cr, obj[0].cs)
 
            # - fill polygons
-      for obj in data:
+      #for obj in data:
         if "extrude" in obj[1]:
           def face_to_poly(face, hgt):
             """
