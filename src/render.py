@@ -170,7 +170,7 @@ class RasterTile:
     for layer in layers:
       data = objs_by_layers[layer]
       #data.sort(lambda x,y:cmp(max([x1[1] for x1 in x[0].cs]), max([x1[1] for x1 in y[0].cs])))
-
+      
 
 
       # - draw casings on layer
@@ -211,8 +211,9 @@ class RasterTile:
           cr.set_line_cap(linecaps.get(obj[1].get("linecap", "butt"),0))
           line(cr, obj[0].cs)
 
-           # - fill polygons
-      #for obj in data:
+      # - extruding polygons
+      data.sort(lambda x,y:cmp(max([x1[1] for x1 in x[0].cs]), max([x1[1] for x1 in y[0].cs])))
+      for obj in data:
         if "extrude" in obj[1]:
           def face_to_poly(face, hgt):
             """
