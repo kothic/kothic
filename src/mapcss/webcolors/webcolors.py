@@ -189,7 +189,7 @@ values to normalized color names. These eight mappings are as follows:
 
 import math
 import re
-import md5
+from hashlib import md5
 
 
 def _reversedict(d):
@@ -845,8 +845,8 @@ def whatever_to_rgb(string):
     try:
       return hex_to_rgb(string)
     except ValueError:
-      a = md5.new(string)
-      return hex_to_rgb("#"+a.hexdigest()[:6])
+      #a = md5.new(string)
+      return hex_to_rgb("#"+md5(string).hexdigest()[:6])
     
 def whatever_to_cairo(string):
   a = whatever_to_rgb(string)
