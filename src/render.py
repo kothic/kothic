@@ -19,6 +19,7 @@ from debug import debug, Timer
 from twms import projections
 import cairo
 import math
+import os as os_module
 
 
 def line(cr, c):
@@ -27,7 +28,7 @@ def line(cr, c):
     cr.line_to(*k)
   cr.stroke()
 
-def poly(cr, c):
+def poly(cr, c, fill=True):
   cr.move_to(*c[0])
   for k in c:
     cr.line_to(*k)
@@ -191,16 +192,21 @@ class RasterTile:
 
       # - fill polygons
       for obj in data:
-        if "fill-color" in obj[1]:   ## TODO: fill-image
+        if "fill-color" in obj[1] or "fill-image"  in obj[1] and not "extrude" in obj[1]:   ## TODO: fill-image
           color = obj[1]["fill-color"]
           cr.set_source_rgba(color[0], color[1], color[2], obj[1].get("fill-opacity", 1))
-
-          if not "extrude" in obj[1]:
-            poly(cr, obj[0].cs)
           
+          if "fill-image" in obj[1]:
+            print obj[1]["fill-image"], os_module.path.exists(obj[1]["fill-image"])
+            if os_module.path.exists(obj[1]["fill-image"]):
+              image = cairo.ImageSurface.create_from_png (obj[1]["fill-image"]);
+              pattern = cairo.SurfacePattern(image)
+              pattern.set_extend(cairo.EXTEND_REPEAT)
+              cr.set_source(pattern)
+          poly(cr, obj[0].cs)
       # - draw line centers
       #for obj in data:
-        if "width" in obj[1] or "color" in obj[1] and "extrude" not in obj[1]:
+        if "width" in obj[1] or "color" in obj[1] or "image" in obj[1] and "extrude" not in obj[1]:
           cr.set_dash(obj[1].get("dashes", []))
           cr.set_line_join(linejoin.get(obj[1].get("linejoin", "round"),1))
           color = obj[1].get("color", (0,0,0))
@@ -209,6 +215,13 @@ class RasterTile:
                 ## Probable solution: render them (while they're of the same opacity and layer) on a temporary canvas that's merged into main later
           cr.set_line_width (obj[1].get("width", 1))
           cr.set_line_cap(linecaps.get(obj[1].get("linecap", "butt"),0))
+          if "image" in obj[1]:
+            print obj[1]["image"], os_module.path.exists(obj[1]["image"])
+            if os_module.path.exists(obj[1]["image"]):
+              image = cairo.ImageSurface.create_from_png (obj[1]["image"]);
+              pattern = cairo.SurfacePattern(image)
+              pattern.set_extend(cairo.EXTEND_REPEAT)
+              cr.set_source(pattern)
           line(cr, obj[0].cs)
 
       # - extruding polygons
