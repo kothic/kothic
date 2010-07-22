@@ -1,3 +1,5 @@
+canvas{fill-color:#a0bc92}
+
 
 /*   ----------  DEFAULTS  ----------     */
 way {
@@ -17,7 +19,7 @@ way|z16-[highway]
             any(
                metric(tag("width")),
                metric( num(tag("lanes")) * 4),
-               metric( "1m"),
+               metric("3m")
                )
 
          );
@@ -26,6 +28,14 @@ way|z16-[highway]
 
      }
      {offset: 2}
+
+way|z16-[surface=asphalt] {image: eval("styles/default/"+tag("surface")+".png")}
+way|z16-[surface=grass] {image: eval("styles/default/"+tag("surface")+".png")}
+way|z16-[surface=sand] {image: eval("styles/default/"+tag("surface")+".png")}
+way|z16-[surface=dirt] {image: eval("styles/default/"+tag("surface")+".png")}
+way|z16-[surface=granite] {color:#655}
+way|z16-[surface=paving_stones] {image: styles/default/paving_stones6s.png}
+way|z16-[landuse=field] {fill-image: styles/default/field.png}
 
 way|z17-[barrier]
     {casing-width:1; width: eval(metric(tag("width")))}
@@ -43,7 +53,7 @@ way|z-16[highway=unclassified]
 way|z-16[highway=primary],
 way|z-16[highway=motorway],
 way|z-16[highway=trunk]
-  {width: 4; color: #ff0; z-index: 11;casing-width: 1;}
+  {width: 4; color: #ff0; z-index:11;casing-width: 1;}
 
 way|z-16[highway=primary_link],
 way|z-16[highway=motorway_link],
@@ -57,7 +67,7 @@ way|z15-16[highway=track]
 {width: 3; color:#252; z-index:8;casing-width: 1;}
 
 way|z15-16[living_street=yes]
-  {width: 2;  z-index: 0;casing-width: 1;}
+  {width: 2;  z-index: 2;casing-width: 1;}
 
 
 way|z15-16[highway=footway],
@@ -65,11 +75,11 @@ way|z15-16[highway=pedestrian],
 way|z15-16[highway=path]
 {width:eval(max(2, prop("width"))); color:#655; casing-dashes: 3,1; z-index:3;casing-width: 1;}
 
-way|z15-16[highway=steps]
+way|z15-[highway=steps]
 {z-index:5;  width:eval(max(2, prop("width"))); color:#655; casing-dashes: 1,0;  linecap: butt;casing-width: 1;}
 {z-index:6; width:eval(max(2, prop("width"))); dashes: eval("1," + str( max(num(any(num(metric(tag("step:length")))/100, num(metric("0.3m"))))-1, 1) ) ); color: black;casing-width: 1;}
 
-way[highway][area=yes] {fill-color: eval(prop("color")); width:0}
+way[highway][area=yes] {fill-color: eval(prop("color")); width:0; fill-image: eval(prop("image"));}
 
 way[bridge=yes] {casing-width:eval(min(3, num(prop("width"))/2 ));casing-linecap:butt}
 
@@ -115,7 +125,7 @@ way|z13-[landuse=allotments] {fill-color: #452; opacity: 0.8}
 way|z10-[landuse=field] {fill-color: #CCCC4E; opacity: 0.8}
 /*   ----------  GRASS  ----------     */
 way|z16-[landuse=grass],
-way|z16-[natural=grass]{fill-color:  #cceecc; opacity: 0.8}
+way|z16-[natural=grass]{fill-color:  #cceecc; opacity: 0.8; fill-image: styles/default/grass.png}
 
 
 
