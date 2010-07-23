@@ -86,7 +86,7 @@ class RasterTile:
     self.bbox = bbox
     self.bbox_p = projections.from4326(bbox,self.proj)
     print self.bbox_p
-    scale = abs(self.w/(self.bbox_p[0] - self.bbox_p[2])/math.cos(math.pi*(self.bbox[0]+self.bbox[1])/2/180))
+    scale = abs(self.w/(self.bbox_p[0] - self.bbox_p[2])/math.cos(math.pi*(self.bbox[1]+self.bbox[3])/2/180))
     zscale = 0.5*scale
     cr = cairo.Context(self.surface)
     # getting and setting canvas properties
@@ -265,8 +265,17 @@ class RasterTile:
           color = obj[1].get("extrude-edge-color", obj[1].get("color", (0,0,0) ))
           cr.set_source_rgba(color[0], color[1], color[2], obj[1].get("extrude-edge-opacity", obj[1].get("opacity", 1)))
           line(cr,excoords)
-
-          
+        if "icon-image" in obj[1]:
+          print obj[1]["icon-image"], os_module.path.exists(obj[1]["icon-image"])
+          if os_module.path.exists(obj[1]["icon-image"]):
+            image = cairo.ImageSurface.create_from_png (obj[1]["icon-image"])
+            dy = image.get_height()/2
+            dx = image.get_width()/2
+            
+            where = self.lonlat2screen(projections.transform(obj[0].center,self.data.proj,self.proj))
+            print dx,dy,where
+            cr.set_source_surface(image, where[0]-dx, where[1]-dy)
+            cr.paint()
       # - render text labels
       texttimer = Timer("Text rendering")
       cr.set_line_join(1)  # setting linejoin to "round" to get less artifacts on halo render
