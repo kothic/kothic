@@ -27,7 +27,7 @@ class Eval():
     try:
       self.expr = compile (s, "MapCSS expression", "eval")
     except:
-      print "Can't compile %s" % s
+      #print "Can't compile %s" % s
       self.expr = compile ("0", "MapCSS expression", "eval")
 
 
@@ -42,10 +42,11 @@ class Eval():
       """
       for t in x:
         q = x
-      return ""
+      return " "
     tags = set([])
+
     a = eval(self.expr,{},{
-      "tag":lambda x: tags.add(x),
+      "tag":lambda x: max([tags.add(x), " "]),
       "prop": lambda x: "",
       "num": lambda x: 0,
       "metric": fake_compute,
@@ -55,6 +56,7 @@ class Eval():
       "min": fake_compute,
       "max": fake_compute,
     })
+
     return tags
 
     
