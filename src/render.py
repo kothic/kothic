@@ -20,6 +20,7 @@ from twms import projections
 import cairo
 import math
 import os as os_module
+from copy import deepcopy
 
 
 def line(cr, c):
@@ -34,7 +35,18 @@ def poly(cr, c, fill=True):
     cr.line_to(*k)
   cr.fill()
 
-
+def offset_line(line,offset):
+  a = []
+  prevcoord = line[0]
+  for coord in line:
+    if coord != prevcoord:
+      angle = - math.atan2(coord[1]-prevcoord[1],coord[0]-prevcoord[0])
+      dx = offset*math.sin(angle)
+      dy = offset*math.cos(angle)
+      a.append((prevcoord[0]+dx,prevcoord[1]+dy))
+      a.append((coord[0]+dx,coord[1]+dy))
+    prevcoord = coord
+  return a
 
 
 
@@ -133,7 +145,7 @@ class RasterTile:
       if st:
        for fpt in st:
         #debug(fpt)
-        ww.append((way, fpt))
+        ww.append([way, fpt])
     
     datatimer.stop()
     debug( "%s objects on screen (%s in dataset)"%(len(ww),len(vectors)) )
@@ -148,9 +160,26 @@ class RasterTile:
     else:
       for w in ww:
         w[0].cs = [self.lonlat2screen(coord) for coord in w[0].coords]
+    for w in ww:
+      if "offset" in w[1]:
+        offset = float(w[1]["offset"])
+        w[0] = w[0].copy()
+        w[0].cs = offset_line(w[0].cs, offset)
+      if "extrude" in w[1] and "fill-color" not in w[1] and "width" in w[1]:
+        w[1]["fill-color"] = w[1].get("color", (0,0,0))
+        w[1]["fill-opacity"] = w[1].get("opacity", 1)
+        w[0] = w[0].copy()
+        print w[0].cs
+        w[0].cs = offset_line(w[0].cs, w[1]["width"]/2)
+        print w[0].cs
+        aa = offset_line(w[0].cs, -w[1]["width"])
+        del w[1]["width"] 
+        aa.reverse()
+        w[0].cs.extend(aa)
+
 
     er.stop()
-      
+
 
     ww.sort(key=lambda x: x[1]["layer"])
     layers = list(set([int(x[1]["layer"]/100.) for x in ww]))
@@ -192,7 +221,7 @@ class RasterTile:
 
       # - fill polygons
       for obj in data:
-        if "fill-color" in obj[1] or "fill-image"  in obj[1] and not "extrude" in obj[1]:   ## TODO: fill-image
+        if ("fill-color" in obj[1] or "fill-image"  in obj[1]) and not "extrude" in obj[1]:   ## TODO: fill-image
           color = obj[1]["fill-color"]
           cr.set_source_rgba(color[0], color[1], color[2], obj[1].get("fill-opacity", 1))
           
@@ -206,7 +235,7 @@ class RasterTile:
           poly(cr, obj[0].cs)
       # - draw line centers
       #for obj in data:
-        if "width" in obj[1] or "color" in obj[1] or "image" in obj[1] and "extrude" not in obj[1]:
+        if ("width" in obj[1] or "color" in obj[1] or "image" in obj[1]) and "extrude" not in obj[1]:
           cr.set_dash(obj[1].get("dashes", []))
           cr.set_line_join(linejoin.get(obj[1].get("linejoin", "round"),1))
           color = obj[1].get("color", (0,0,0))
@@ -258,11 +287,12 @@ class RasterTile:
             cr.set_line_width (.5)
             line(cr, ply)
 
-
-          color = obj[1]["fill-color"]
-          cr.set_source_rgba(color[0], color[1], color[2], obj[1].get("fill-opacity", 1))
-          poly(cr,excoords)
-          color = obj[1].get("extrude-edge-color", obj[1].get("color", (0,0,0) ))
+          if "fill-color" in obj[1]:
+            color = obj[1]["fill-color"]
+            cr.set_source_rgba(color[0], color[1], color[2], obj[1].get("fill-opacity", 1))
+            poly(cr,excoords)
+          cr.set_line_width (obj[1].get("width", 1))
+          color = obj[1].get("color", (0,0,0) )
           cr.set_source_rgba(color[0], color[1], color[2], obj[1].get("extrude-edge-opacity", obj[1].get("opacity", 1)))
           line(cr,excoords)
         if "icon-image" in obj[1]:
@@ -273,7 +303,6 @@ class RasterTile:
             dx = image.get_width()/2
             
             where = self.lonlat2screen(projections.transform(obj[0].center,self.data.proj,self.proj))
-            print dx,dy,where
             cr.set_source_surface(image, where[0]-dx, where[1]-dy)
             cr.paint()
       # - render text labels

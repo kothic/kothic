@@ -18,10 +18,13 @@
 from debug import debug
 from twms import projections
 
+class Empty:
+  pass
+
 class Way:
   def __init__(self, tags, coords):
 
-    self.cs = None
+    self.cs = []
     #print [x.split("=") for x in tags.split(";")]
     self.tags = dict((x.split("=") for x in tags.split(";")))
     # calculating center point
@@ -34,6 +37,14 @@ class Way:
     self.center = reduce(lambda x, y: (x[0]+y[0],x[1]+y[1]), self.coords)
     self.center = (self.center[0]/len(self.coords),self.center[1]/len(self.coords))
     #debug(self.center)
+  def copy(self):
+    a = Empty()
+    a.tags = self.tags.copy()
+    a.coords = self.coords[:]
+    a.center = self.center
+    a.cs = self.cs[:]
+    return a
+
 
 class QuadTileBackend:
   """
