@@ -13,7 +13,7 @@ way {
 
 
 /*   ----------  ROADS  ----------     */
-way|z16-[highway]
+way|z16-[highway][!lanes]
     {width:
     eval(
             any(
@@ -24,10 +24,13 @@ way|z16-[highway]
 
          );
      color:white;
-     casing-width: 1;
+     casing-width: 1;  }
+way|z16-[highway][lanes]
+    {width: eval(metric(metric("3m")));
+     color:white;
+     casing-width: eval(metric(metric("10cm")));  }
 
-     }
-     {offset: 2}
+
 
 way|z16-[surface=asphalt] {image: eval("styles/default/"+tag("surface")+".png")}
 way|z16-[surface=grass] {image: eval("styles/default/"+tag("surface")+".png")}
@@ -83,6 +86,7 @@ way[highway][area=yes] {fill-color: eval(prop("color")); width:0; fill-image: ev
 
 way[bridge=yes] {casing-width:eval(min(3, num(prop("width"))/2 ));casing-linecap:butt}
 
+
 /*   ----------  FORESTS  ----------     */
 way[natural=forest],
 way[natural=wood],
@@ -128,6 +132,10 @@ way|z16-[landuse=grass],
 way|z16-[natural=grass]{fill-color:  #cceecc; opacity: 0.8; fill-image: styles/default/grass.png}
 
 
+/*   ----------  AMENITIES  ----------     */
+way[amenity=parking] {icon-image: styles/default/parking.png; fill-color:yellow}
+way[amenity=bench] {extrude: eval(zmetric("0.6m")); width:eval(metric("0.5m")); extrude-face-opacity:0;extrude-edge-color:black;color:brown;opacity:0.75}
+{offset:eval(metric("-0.25m")); extrude-face-color:brown;extrude:eval(zmetric("1.2m"));extrude-face-opacity: 0.5}
 
 /*   ----------  BORDERS  ----------     */
 way[boundary=administrative] {width: 2; color: red; dashes:5,3; z-index:15}
