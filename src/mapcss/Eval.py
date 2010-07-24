@@ -80,6 +80,8 @@ class Eval():
       "any": m_any,
       "min": m_min,
       "max": m_max,
+      "cond": m_cond,
+      "boolean": m_boolean
         }))
     except:
       return ""
@@ -87,6 +89,19 @@ class Eval():
     
   def __repr__(self):
     return "eval(%s)"%repr(self.expr)
+
+def m_boolean(expr):
+  expr = str(expr)
+  if expr in ("", "0", "no", "false", "False"):
+    return False
+  else:
+    return True
+
+def m_cond(why, yes, no):
+  if m_boolean(why):
+    return yes
+  else:
+    return no
 
 def m_min(*x):
   """
@@ -136,7 +151,12 @@ def m_metric(x, t):
     # FIXME: add ft, m and friends
     x = x.strip()
     try:
-      if x[-1] == "m":
+      if x[-2:] in ("cm", "CM", "см"):
+        print x, float(x[0:-2])*float(t)/100
+        return float(x[0:-2])*float(t)/100
+      if x[-2:] in ("mm", "MM", "мм"):
+        return float(x[0:-2])*float(t)/1000
+      if x[-1] in ("m", "M", "м"):
         return float(x[0:-1])*float(t)
     except:
       return ""
