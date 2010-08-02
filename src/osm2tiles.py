@@ -91,7 +91,10 @@ def main ():
       nodes[int(items["id"])] = (float(items["lon"]), float(items["lat"]))
       tags = {}
     elif elem.tag == "nd":
-      curway.append(nodes[int(items["ref"])])
+      try:
+        curway.append(nodes[int(items["ref"])])
+      except KeyError:
+        pass
     elif elem.tag == "tag":
       tags[sanitize(items["k"])] = sanitize(items["v"])
     elif elem.tag == "way":

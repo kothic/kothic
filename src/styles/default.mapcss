@@ -13,7 +13,7 @@ way {
 
 
 /*   ----------  ROADS  ----------     */
-way|z16-[highway][!lanes]
+way|z16-[highway]       /*[!lanes]*/
     {width:
     eval(
             any(
@@ -25,7 +25,9 @@ way|z16-[highway][!lanes]
          );
      color:white;
      casing-width: 1;  }
-way|z16-[highway][lanes]
+
+     
+/*way|z16-[highway][lanes]
     {width: eval(cond(num(tag("lanes")) >= 1, metric("3.6m")-metric("10cm"), 0));
      color:grey; linecap: round; 
      casing-width: eval(cond(num(tag("lanes")) >= 1, metric("10cm"), 0));
@@ -59,9 +61,8 @@ way|z16-[highway][lanes]
      casing-width: eval(cond(num(tag("lanes")) >= 5, metric("10cm"), 0));
      casing-color:white;casing-dashes: eval(str( metric("1m") ) +"," + str( metric("1m") )); casing-linecap:butt;
      offset: eval((cond((num(tag("lanes"))/2-int(num(tag("lanes")))/2) != 0, metric("3.6m")/2, 0)-(3-1)*metric("3.6m")));
-     }
-/*way|z16-[surface=asphalt] {image: eval("styles/default/"+tag("surface")+".png")}*/
-way|z16-[surface=asphalt] {color:grey}
+     }*/
+way|z16-[surface=asphalt] {image: eval("styles/default/asphalt.png")}
 way|z16-[surface=grass] {image: eval("styles/default/"+tag("surface")+".png")}
 way|z16-[surface=sand] {image: eval("styles/default/"+tag("surface")+".png")}
 way|z16-[surface=dirt] {image: eval("styles/default/"+tag("surface")+".png")}

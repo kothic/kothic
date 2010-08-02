@@ -15,7 +15,7 @@
 #   You should have received a copy of the GNU General Public License
 #   along with kothic.  If not, see <http://www.gnu.org/licenses/>.
 
-from debug import debug
+
 from twms import projections
 
 class Empty:
@@ -54,7 +54,7 @@ class QuadTileBackend:
 
   def __init__(self,max_zoom = 16,proj = "EPSG:4326", path = "tiles", lang = "ru"):
 
-    debug("Bakend created")
+
     self.max_zoom = max_zoom            # no better tiles available
     self.path = path                    # path to tile files
     self.lang = lang                    # map language to use
@@ -67,11 +67,11 @@ class QuadTileBackend:
   def filename(self, (z,x,y)):
     return "%s/z%s/%s/x%s/%s/y%s.vtile"%(self.path, z, x/1024, x, y/1024, y)
   def load_tile(self, k):
-    debug("loading tile: %s"% (k,))
+    #debug("loading tile: %s"% (k,))
     try:
       f = open(self.filename(k))
     except IOError:
-      debug ( "Failed open: %s" % self.filename(k) )
+      #debug ( "Failed open: %s" % self.filename(k) )
       return {}
     t = {}
     for line in f:
@@ -86,14 +86,15 @@ class QuadTileBackend:
     Cleans up some RAM by removing least accessed tiles.
     """
     if len(self.tiles) > self.keep_tiles:
-      debug("Now %s tiles cached, trying to kill %s"%(len(self.tiles),len(self.tiles)-self.keep_tiles))
+      #debug("Now %s tiles cached, trying to kill %s"%(len(self.tiles),len(self.tiles)-self.keep_tiles))
       for tile in self.tile_load_log[0:len(self.tiles)-self.keep_tiles]:
         try:
           del self.tiles[tile]
           self.tile_load_log.remove(tile)
-          debug ("killed tile: %s" % (tile,))
+          #debug ("killed tile: %s" % (tile,))
         except KeyError, ValueError:
-          debug ("tile killed not by us: %s" % (tile,))
+          pass
+          #debug ("tile killed not by us: %s" % (tile,))
 
   def get_vectors (self, bbox, zoom, sql_hint = None):
     zoom = int(zoom)

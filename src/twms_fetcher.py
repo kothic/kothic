@@ -29,8 +29,8 @@ from render import RasterTile
 from tempfile import NamedTemporaryFile
 
 style = MapCSS(1,19)
-style.parse(open("/home/kom/osm/kothic/src/styles/gisrussa.mapcss","r").read())
-
+style.parse(open("/home/kom/osm/kothic/src/styles/default.mapcss","r").read())
+os.chdir("/home/kom/osm/kothic/src/")
 
 metatiles_in_progress = {}
 
@@ -76,13 +76,14 @@ def kothic_metatile(z, x, y, this_layer):
     metatiles_in_progress[metatile_id].join()
   except RuntimeError:
     pass
-  del metatiles_in_progress[metatile_id]
+  
   
   local = config.tiles_cache + this_layer["prefix"] + "/z%s/%s/x%s/%s/y%s."%(z, x/1024, x, y/1024,y)
   ext = this_layer["ext"]
   if os.path.exists(local+ext):                     # First, look for tile in cache
     try:
         im1 = Image.open(local+ext)
+        del metatiles_in_progress[metatile_id]
         return im1
     except IOError:
         os.remove(local+ext)
@@ -118,4 +119,5 @@ def gen_metatile(metatile_id, this_layer):
       if not os.path.exists("/".join(local.split("/")[:-1])):
         os.makedirs("/".join(local.split("/")[:-1]))
       im1.save(local+ext)
+      del im1
   #renderlock.release()

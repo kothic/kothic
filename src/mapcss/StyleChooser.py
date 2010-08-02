@@ -45,7 +45,6 @@ class StyleChooser:
     self.styles = []
     self.eval_type = type(Eval())
     self.scalepair = scalepair
-    print scalepair
     self.rcpos=0
     self.stylepos=0
 

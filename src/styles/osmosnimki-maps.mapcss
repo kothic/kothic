@@ -59,6 +59,6 @@ way|z12-[building] {
   fill-color: #E7CCB4;
   color: #D29D39;
 }
-way|z12-[building != yes] {
+way|z12-[building][building != yes] {
   fill-color: #D8D1D1;
 }

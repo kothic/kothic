@@ -92,11 +92,15 @@ class RasterTile:
     
   def update_surface(self, bbox, zoom, style, lock = None):
     rendertimer = Timer("Rendering image")
+    if "image" not in style.cache:
+      style.cache["image"] = ImageLoader()
+
+    
     timer = Timer("Getting data")
     self.zoom = zoom
-    print self.zoom, self.zoomlevel
     self.bbox = bbox
     self.bbox_p = projections.from4326(bbox,self.proj)
+    
     print self.bbox_p
     scale = abs(self.w/(self.bbox_p[0] - self.bbox_p[2])/math.cos(math.pi*(self.bbox[1]+self.bbox[3])/2/180))
     zscale = 0.5*scale
@@ -134,7 +138,11 @@ class RasterTile:
       hints = style.get_sql_hints('way', self.zoom)
     else:
       hints = None
-    vectors = self.data.get_vectors(bbox,self.zoom,sql_hint = hints).values()
+    
+    # enlarge bbox by 20% to each side. results in more vectors, but makes less artifaces.
+    span_x, span_y = bbox[2]-bbox[0], bbox[3]-bbox[1]
+    bbox_expand = [bbox[0]-0.2*span_x,bbox[1]-0.2*span_y,bbox[2]+0.2*span_x,bbox[3]+0.2*span_y]
+    vectors = self.data.get_vectors(bbox_expand,self.zoom,sql_hint = hints).values()
     datatimer.stop()
     datatimer = Timer("Applying styles")
     ww = []
@@ -226,9 +234,8 @@ class RasterTile:
           cr.set_source_rgba(color[0], color[1], color[2], obj[1].get("fill-opacity", 1))
           
           if "fill-image" in obj[1]:
-            print obj[1]["fill-image"], os_module.path.exists(obj[1]["fill-image"])
-            if os_module.path.exists(obj[1]["fill-image"]):
-              image = cairo.ImageSurface.create_from_png (obj[1]["fill-image"]);
+            image = style.cache["image"][obj[1]["fill-image"]]
+            if image:
               pattern = cairo.SurfacePattern(image)
               pattern.set_extend(cairo.EXTEND_REPEAT)
               cr.set_source(pattern)
@@ -245,9 +252,8 @@ class RasterTile:
           cr.set_line_width (obj[1].get("width", 1))
           cr.set_line_cap(linecaps.get(obj[1].get("linecap", "butt"),0))
           if "image" in obj[1]:
-            print obj[1]["image"], os_module.path.exists(obj[1]["image"])
-            if os_module.path.exists(obj[1]["image"]):
-              image = cairo.ImageSurface.create_from_png (obj[1]["image"]);
+            image = style.cache["image"][obj[1]["image"]]
+            if image:
               pattern = cairo.SurfacePattern(image)
               pattern.set_extend(cairo.EXTEND_REPEAT)
               cr.set_source(pattern)
@@ -286,19 +292,17 @@ class RasterTile:
             cr.set_source_rgba(color[0], color[1], color[2], obj[1].get("extrude-edge-opacity", obj[1].get("opacity", 1)))
             cr.set_line_width (.5)
             line(cr, ply)
-
-          if "fill-color" in obj[1]:
-            color = obj[1]["fill-color"]
-            cr.set_source_rgba(color[0], color[1], color[2], obj[1].get("fill-opacity", 1))
-            poly(cr,excoords)
           cr.set_line_width (obj[1].get("width", 1))
           color = obj[1].get("color", (0,0,0) )
           cr.set_source_rgba(color[0], color[1], color[2], obj[1].get("extrude-edge-opacity", obj[1].get("opacity", 1)))
           line(cr,excoords)
+          if "fill-color" in obj[1]:
+            color = obj[1]["fill-color"]
+            cr.set_source_rgba(color[0], color[1], color[2], obj[1].get("fill-opacity", 1))
+            poly(cr,excoords)
         if "icon-image" in obj[1]:
-          print obj[1]["icon-image"], os_module.path.exists(obj[1]["icon-image"])
-          if os_module.path.exists(obj[1]["icon-image"]):
-            image = cairo.ImageSurface.create_from_png (obj[1]["icon-image"])
+          image = style.cache["image"][obj[1]["icon-image"]]
+          if image:
             dy = image.get_height()/2
             dx = image.get_width()/2
             
@@ -317,7 +321,7 @@ class RasterTile:
           if obj[1].get("text-position", "center") == "center":
             where = self.lonlat2screen(projections.transform(obj[0].center,self.data.proj,self.proj))
             for t in text_rendered_at:
-              if ((t[0]-where[0])**2+(t[1]-where[1])**2)**(0.5) < 15:
+              if ((t[0]-where[0])**2+(t[1]-where[1])**2) < 15*15:
                 break
             else:
                 text_rendered_at.add(where)
@@ -407,3 +411,18 @@ class RasterTile:
     timer.stop()
     rendertimer.stop()
     debug(self.bbox)
+
+    
+class ImageLoader:
+  def __init__(self):
+    self.cache = {}
+  def __getitem__(self, url):
+    if url in self.cache:
+      return self.cache[url]
+    else:
+      print url, os_module.path.exists(url)
+      if os_module.path.exists(url):
+        self.cache[url] = cairo.ImageSurface.create_from_png (url)
+        return self.cache[url]
+      else:
+        return False

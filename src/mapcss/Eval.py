@@ -152,7 +152,6 @@ def m_metric(x, t):
     x = x.strip()
     try:
       if x[-2:] in ("cm", "CM", "см"):
-        print x, float(x[0:-2])*float(t)/100
         return float(x[0:-2])*float(t)/100
       if x[-2:] in ("mm", "MM", "мм"):
         return float(x[0:-2])*float(t)/1000

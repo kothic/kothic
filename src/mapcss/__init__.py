@@ -17,6 +17,9 @@
 
 import re
 import logging
+from hashlib import md5
+
+
 
 from StyleChooser import StyleChooser
 from Condition import Condition
@@ -87,6 +90,8 @@ class MapCSS():
     def __init__(self,minscale=0,maxscale=19):
       """
       """
+      self.cache = {}
+      self.cache["style"] = {}
       self.minscale=minscale
       self.maxscale=maxscale
       self.scalepair = (minscale, maxscale)
@@ -112,10 +117,15 @@ class MapCSS():
       """
       Kothic styling API
       """
+      shash = md5(repr(tags)+repr(zoom)).digest()
+      if shash in self.cache["style"]:
+        return self.cache["style"][shash]
       style = []
+      
       #return [{"width": 1, "color":(0,0,0), "layer": 1}, {"width": 3, "color":(1,1,1), "layer":0}]
       for chooser in self.choosers:
         style = chooser.updateStyles(style, type, tags, zoom, scale, zscale)
+      self.cache["style"][shash] = style
       return style
 
 
