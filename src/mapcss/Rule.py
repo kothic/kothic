@@ -16,6 +16,7 @@
 #   along with kothic.  If not, see <http://www.gnu.org/licenses/>.
 
 
+
 class Rule():
   def __init__(self, s=''):
     self.conditions = []
@@ -27,27 +28,29 @@ class Rule():
     return "%s|z%s-%s %s"%(self.subject,self.minZoom,self.maxZoom, self.conditions)
 
   #public function test(obj:Entity,tags:Object):Boolean {
+
+
+  
   def test(self, obj, tags, zoom):
-    if (self.subject!='') & (obj!=self.subject):
+    if (self.subject!='') and _test_feature_compatibility(obj, self.subject, tags):
       return False
+
     if (zoom < self.minZoom) or (zoom > self.maxZoom):
       return False
-    v=True
-    i=0
+    v="a"
     for condition in self.conditions:
+      
       r = condition.test(tags)
-      if i==0:
+      if v=="a":
         v=r
       elif self.isAnd:
         v = v & r
       else:
         v = v | r
-      i += 1
-      
     return v
   def get_interesting_tags(self, obj, zoom):
     if obj:
-      if (self.subject!='') & (obj!=self.subject):
+      if (self.subject!='') and _test_feature_compatibility(obj, self.subject, tags):
         return set()
     if zoom:
       if (zoom < self.minZoom) or (zoom > self.maxZoom):
@@ -58,7 +61,7 @@ class Rule():
     return a
   def get_sql_hints(self, obj, zoom):
     if obj:
-      if (self.subject!='') & (obj!=self.subject):
+      if (self.subject!='') and _test_feature_compatibility(obj, self.subject, {":area":"yes"}):
         return set()
     if zoom:
       if (zoom < self.minZoom) or (zoom > self.maxZoom):
@@ -67,3 +70,24 @@ class Rule():
     for condition in self.conditions:
       a.add(condition.get_sql())
     return a
+
+
+
+def _test_feature_compatibility (self, f1, f2, tags={}):
+    """
+    Checks if feature of type f1 is compatible with f2.
+    """
+    if  f2 == "area" and f1 in ("way", "POLYGON"):
+      if ":area" in tags:
+        pass
+      else:
+        return False
+    elif f2 == "line" and f1 in ("way", "LINESTRING"):
+      pass
+    elif f2 == "point" and f1 in ("node", "POINT"):
+      pass
+    elif f2 == f1:
+      pass
+    else:
+      return False
+    return True
