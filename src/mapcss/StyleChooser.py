@@ -79,7 +79,7 @@ class StyleChooser:
   # // Update the current StyleList from this StyleChooser
 
   def updateStyles(self,sl,type, tags, zoom, scale, zscale):
-                  # // Are any of the ruleChains fulfilled?
+                  # Are any of the ruleChains fulfilled?
                   w = 0
                   for c in self.ruleChains:
                     if (self.testChain(c,type,tags,zoom)):
@@ -87,13 +87,13 @@ class StyleChooser:
                   else:
                     return sl
 
-                  ## // Update StyleList
+                  ## Update StyleList
                   object_id = 1
 
                   for r in self.styles:
-                    ### FIXME: here we should do all the eval()'s
                     ra = {}
                     for a,b in r.iteritems():
+                      "calculating eval()'s"
                       if __builtins__["type"](b) == self.eval_type:
                         combined_style = {}
                         for t in sl:
@@ -101,13 +101,12 @@ class StyleChooser:
                         for p,q in combined_style.iteritems():
                           if "color" in p:
                             combined_style[p] = cairo_to_hex(q)
-                        ## FIXME: properties && metrics
                         b = b.compute(tags,combined_style, scale, zscale)
                       ra[a] = b
                     r = ra
                     ra = {}
-                    
                     for a, b in r.iteritems():
+                      "checking and nicifying style table"
                       if "color" in a:
                         "parsing color value to 3-tuple"
                         ra[a] = colorparser(b)
@@ -120,17 +119,18 @@ class StyleChooser:
                       elif "dashes" in a:
                         "these things are arrays of float's or not in table at all"
                         try:
-
                           b = b.split(",")
                           b = [float(x) for x in b]
                           ra[a]= b
-
                         except ValueError:
                           pass
                       else:
                         ra[a]=b
-                    ra["layer"] = float(tags.get("layer",0))*100+ra.get("z-index",1)
-                    #print ra
+                    
+                    ra["layer"] = float(tags.get("layer",0))*100+ra.get("z-index",1) # calculating z-index
+                    for k,v in ra.items():  # if a value is empty, we don't need it - renderer will do as default.
+                      if not v:
+                        del ra[k]
                     if "object-id" not in ra:
                       ra["object-id"] = str(object_id)
                     for x in sl:
