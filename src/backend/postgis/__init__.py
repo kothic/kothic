@@ -53,7 +53,7 @@ class PostGisBackend:
   """
   
 
-  def __init__(self,database = "dbname=gis user=mapz",max_zoom = 16,proj = "EPSG:3857", path = "tiles", lang = "ru", ):
+  def __init__(self,database = "dbname=gis user=mapz host=komzpa.net",max_zoom = 16,proj = "EPSG:3857", path = "tiles", lang = "ru", ):
     
     
  #   debug("Bakend created")
@@ -92,8 +92,9 @@ class PostGisBackend:
       print req
       b.execute(req)
       names = [q[0] for q in b.description]
+
       for row in b.fetchall():
-        
+
           row_dict = dict(map(None,names,row))
           for k,v in row_dict.items():
             if not v:
@@ -120,4 +121,5 @@ class PostGisBackend:
           w = Way(row_dict, geom)
           #print row_dict
           resp[oid] = w
+
     return resp

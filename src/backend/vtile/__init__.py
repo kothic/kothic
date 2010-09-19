@@ -17,9 +17,17 @@
 
 
 from twms import projections
+import twms.bbox
 
 class Empty:
-  pass
+  def copy(self):
+    a = Empty()
+    a.tags = self.tags.copy()
+    a.coords = self.coords[:]
+    a.center = self.center
+    a.cs = self.cs[:]
+    a.bbox = self.bbox
+    return a
 
 class Way:
   def __init__(self, tags, coords):
@@ -36,6 +44,7 @@ class Way:
     #  left for the better times:
     self.center = reduce(lambda x, y: (x[0]+y[0],x[1]+y[1]), self.coords)
     self.center = (self.center[0]/len(self.coords),self.center[1]/len(self.coords))
+    self.bbox = reduce(lambda x,y: (min(x[0],y[0]),min(x[1],y[1]),max(x[2],y[0]),max(x[3],y[1])), self.coords, (9999,9999,-9999,-9999))
     #debug(self.center)
   def copy(self):
     a = Empty()
@@ -43,6 +52,7 @@ class Way:
     a.coords = self.coords[:]
     a.center = self.center
     a.cs = self.cs[:]
+    a.bbox = self.bbox
     return a
 
 
@@ -60,7 +70,7 @@ class QuadTileBackend:
     self.lang = lang                    # map language to use
     self.tiles = {}                     # loaded vector tiles go here
     self.proj = proj         # which projection used to cut map in tiles
-    self.keep_tiles = 190                # a number of tiles to cache in memory
+    self.keep_tiles = 15                # a number of tiles to cache in memory
     self.tile_load_log = []             # used when selecting which tile to unload
     
     
@@ -71,7 +81,7 @@ class QuadTileBackend:
     try:
       f = open(self.filename(k))
     except IOError:
-      #debug ( "Failed open: %s" % self.filename(k) )
+      #print ( "Failed open: '%s'" % self.filename(k) )
       return {}
     t = {}
     for line in f:
@@ -102,18 +112,31 @@ class QuadTileBackend:
     zoom = max(zoom, 0)                 ## Negative zooms are nonsense
     a,d,c,b = [int(x) for x in projections.tile_by_bbox(bbox,zoom, self.proj)]
     resp = {}
+    hint = [x[0] for x in sql_hint]
+
     for tile in set([(zoom,i,j) for i in range(a, c+1) for j in range(b, d+1)]):
+      # Loading current vector tile
       try:
-        resp.update(self.tiles[tile])
+        ti = self.tiles[tile]
       except KeyError:
         ti = self.load_tile(tile)
         self.tiles[tile] = ti
-        resp.update(ti)
       try:
         self.tile_load_log.remove(tile)
       except ValueError:
         pass
       self.tile_load_log.append(tile)
       
+      for obj in ti:
+        "filling response with interesting-tagged objects"
+        need = False
+        for tag in ti[obj].tags:
+          if tag in hint:
+            need = True
+            break
+        if need:
+          if twms.bbox.bbox_is_in(bbox, ti[obj].bbox, fully=False):
+            resp[obj] = ti[obj]
+
     self.collect_garbage()
     return resp
