@@ -21,7 +21,8 @@ import cairo
 import math
 import os as os_module
 from copy import deepcopy
-
+import pangocairo
+import pango
 
 def line(cr, c):
   cr.move_to(*c[0])
@@ -29,7 +30,7 @@ def line(cr, c):
     cr.line_to(*k)
   cr.stroke()
 
-def poly(cr, c, fill=True):
+def poly(cr, c):
   cr.move_to(*c[0])
   for k in c:
     cr.line_to(*k)
@@ -65,13 +66,10 @@ class RasterTile:
     self.proj = raster_proj
   def __del__(self):
     del self.surface
-    
   def screen2lonlat(self, x, y):
     lo1, la1, lo2, la2 = self.bbox_p
-    
     debug ("%s %s - %s %s"%(x,y,self.w, self.h))
     debug(self.bbox_p)
-    
     return projections.to4326( (1.*x/self.w*(lo2-lo1)+lo1, la2+(1.*y/(self.h)*(la1-la2))),self.proj)
   #  return (x - self.w/2)/(math.cos(self.center_coord[1]*math.pi/180)*self.zoom) + self.center_coord[0], -(y - self.h/2)/self.zoom + self.center_coord[1]
   def lonlat2screen(self, (lon, lat), epsg4326=False):
@@ -80,17 +78,17 @@ class RasterTile:
     lo1, la1, lo2, la2 = self.bbox_p
     return ((lon-lo1)*(self.w)/abs(lo2-lo1), ((la2-lat)*(self.h)/(la2-la1)))
   #  return (lon - self.center_coord[0])*self.lcc*self.zoom + self.w/2, -(lat - self.center_coord[1])*self.zoom + self.h/2
-  def update_surface_by_center(self, lonlat, zoom, style, lock = None):
+  def update_surface_by_center(self, lonlat, zoom, style):
     self.zoom = zoom
     xy = projections.from4326(lonlat, self.proj)
     xy1 = projections.to4326((xy[0]-40075016*0.5**self.zoom/256*self.w, xy[1]-40075016*0.5**self.zoom/256*self.h), self.proj)
     xy2 = projections.to4326((xy[0]+40075016*0.5**self.zoom/256*self.w, xy[1]+40075016*0.5**self.zoom/256*self.h), self.proj)
     bbox = (xy1[0],xy1[1],xy2[0],xy2[1])
     debug (bbox)
-    return self.update_surface(bbox, zoom, style, lock)
+    return self.update_surface(bbox, zoom, style)
 
     
-  def update_surface(self, bbox, zoom, style, lock = None):
+  def update_surface(self, bbox, zoom, style, callback = lambda: None):
     rendertimer = Timer("Rendering image")
     if "image" not in style.cache:
       style.cache["image"] = ImageLoader()
@@ -115,6 +113,7 @@ class RasterTile:
     color = bgs.get("fill-color",(0.7, 0.7, 0.7))
     cr.set_source_rgba(color[0], color[1], color[2], bgs.get("fill-opacity", 1))
     cr.fill()
+    callback()
 
     # canvas antialiasing
     antialias = bgs.get("antialias", "full")
@@ -153,14 +152,11 @@ class RasterTile:
       if st:
        for fpt in st:
         #debug(fpt)
-        ww.append([way, fpt])
+        ww.append([way.copy(), fpt])
     
     datatimer.stop()
     debug( "%s objects on screen (%s in dataset)"%(len(ww),len(vectors)) )
 
-    if lock is not None:
-      lock.acquire()
-      lock.release()
     er = Timer("Projecing data")
     if self.data.proj != self.proj:
       for w in ww:
@@ -173,13 +169,18 @@ class RasterTile:
         offset = float(w[1]["offset"])
         w[0] = w[0].copy()
         w[0].cs = offset_line(w[0].cs, offset)
+      if "raise" in w[1] and not "extrude" in w[1]:
+        w[0] = w[0].copy()
+        offset = float(w[1]["raise"])
+        w[0].cs_real = w[0].cs
+        w[0].cs = [(x,y-offset) for x,y in w[0].cs]
       if "extrude" in w[1] and "fill-color" not in w[1] and "width" in w[1]:
         w[1]["fill-color"] = w[1].get("color", (0,0,0))
         w[1]["fill-opacity"] = w[1].get("opacity", 1)
         w[0] = w[0].copy()
-        print w[0].cs
+        #print w[0].cs
         w[0].cs = offset_line(w[0].cs, w[1]["width"]/2)
-        print w[0].cs
+        #print w[0].cs
         aa = offset_line(w[0].cs, -w[1]["width"])
         del w[1]["width"] 
         aa.reverse()
@@ -259,8 +260,14 @@ class RasterTile:
               cr.set_source(pattern)
           line(cr, obj[0].cs)
 
+
+      callback()
+
       # - extruding polygons
-      data.sort(lambda x,y:cmp(max([x1[1] for x1 in x[0].cs]), max([x1[1] for x1 in y[0].cs])))
+      #data.sort(lambda x,y:cmp(max([x1[1] for x1 in x[0].cs]), max([x1[1] for x1 in y[0].cs])))
+      # Pass 1. Creating list of extruded polygons
+      extlist = []
+      # fromat: (coords, ("h"/"v", y,z), real_obj)
       for obj in data:
         if "extrude" in obj[1]:
           def face_to_poly(face, hgt):
@@ -269,46 +276,88 @@ class RasterTile:
             """
             return [face[0], face[1], (face[1][0], face[1][1]-hgt), (face[0][0], face[0][1]-hgt), face[0]]
           hgt = obj[1]["extrude"]
+          raised = float(obj[1].get("raise",0))
+          excoords = [(a[0],a[1]-hgt-raised) for a in obj[0].cs]
 
-          # print "extruding! %s" % hgt
+          faces = []
+          coord = obj[0].cs[-1]
+          p_coord = (coord[0],coord[1]-raised)
+          for coord in obj[0].cs:
+            c = (coord[0],coord[1]-raised)
+            extlist.append( (face_to_poly([c, p_coord],hgt), ("v", min(coord[1],p_coord[1]), hgt), obj ))
+            p_coord = c
+          extlist.append( (excoords, ("h", min(coord[1],p_coord[1]), hgt), obj ))
+          #faces.sort(lambda x,y:cmp(max([x1[1] for x1 in x]), max([x1[1] for x1 in y])))
+
+
+      # Pass 2. Sorting 
+      def compare_things(a,b):
+        """
+        Custom comparator for extlist sorting.
+        Sorts back-to-front, bottom-to-top, | > \ > _, horizontal-to-vertical.
+        """
+        t1,t2 = a[1],b[1] # 
+        if t1[1] > t2[1]: # back-to-front
+          return 1
+        if t1[1] < t2[1]:
+          return -1
+        if t1[2] > t2[2]: # bottom-to-top
+          return 1
+        if t1[2] < t2[2]:
+          return -1
+        if t1[0] < t2[0]: # h-to-v
+          return 1
+        if t1[0] > t2[0]:
+          return -1
+          
+        return cmp(math.sin(math.atan2(a[0][0][0]-a[0][1][0],a[0][0][0]-a[0][1][0])),math.sin(math.atan2(b[0][0][0]-b[0][1][0],b[0][0][0]-b[0][1][0])))
+        print t1
+        print t2
+
+      extlist.sort(compare_things)
+      
+      # Pass 3. Rendering using painter's algorythm
+      cr.set_dash([])
+      for ply, prop, obj in extlist:
+        if prop[0] == "v":
+          color = obj[1].get("extrude-face-color", obj[1].get("color", (0,0,0) ))
+          cr.set_source_rgba(color[0], color[1], color[2], obj[1].get("extrude-face-opacity", obj[1].get("opacity", 1)))
+          poly(cr, ply)
           color = obj[1].get("extrude-edge-color", obj[1].get("color", (0,0,0) ))
           cr.set_source_rgba(color[0], color[1], color[2], obj[1].get("extrude-edge-opacity", obj[1].get("opacity", 1)))
-          cr.set_line_width (1.)
-          cr.set_dash([])
-          excoords = [(a[0],a[1]-hgt) for a in obj[0].cs]
-          faces = []
-          
-          p_coord = obj[0].cs[-1]
-          for coord in obj[0].cs:
-            faces.append([coord, p_coord])
-            p_coord = coord
-          faces.sort(lambda x,y:cmp(max([x1[1] for x1 in x]), max([x1[1] for x1 in y])))
-          for face in faces:
-            ply = face_to_poly(face,hgt)
-            color = obj[1].get("extrude-face-color", obj[1].get("color", (0,0,0) ))
-            cr.set_source_rgba(color[0], color[1], color[2], obj[1].get("extrude-face-opacity", obj[1].get("opacity", 1)))
-            poly(cr, ply)
-            color = obj[1].get("extrude-edge-color", obj[1].get("color", (0,0,0) ))
-            cr.set_source_rgba(color[0], color[1], color[2], obj[1].get("extrude-edge-opacity", obj[1].get("opacity", 1)))
-            cr.set_line_width (.5)
-            line(cr, ply)
-          cr.set_line_width (obj[1].get("width", 1))
-          color = obj[1].get("color", (0,0,0) )
-          cr.set_source_rgba(color[0], color[1], color[2], obj[1].get("extrude-edge-opacity", obj[1].get("opacity", 1)))
-          line(cr,excoords)
+          cr.set_line_width (.5)
+          line(cr, ply)
+        if prop[0] == "h":
           if "fill-color" in obj[1]:
             color = obj[1]["fill-color"]
-            cr.set_source_rgba(color[0], color[1], color[2], obj[1].get("fill-opacity", 1))
-            poly(cr,excoords)
+            cr.set_source_rgba(color[0], color[1], color[2], obj[1].get("fill-opacity", obj[1].get("opacity", 1)))
+            poly(cr,ply)
+          color = obj[1].get("extrude-edge-color", obj[1].get("color", (0,0,0) ))
+          cr.set_source_rgba(color[0], color[1], color[2], obj[1].get("extrude-edge-opacity", obj[1].get("opacity", 1)))
+          cr.set_line_width (1)
+          line(cr, ply)
+
+        #cr.set_line_width (obj[1].get("width", 1))
+        #color = obj[1].get("color", (0,0,0) )
+        #cr.set_source_rgba(color[0], color[1], color[2], obj[1].get("extrude-edge-opacity", obj[1].get("opacity", 1)))
+        #line(cr,excoords)
+        #if "fill-color" in obj[1]:
+          #color = obj[1]["fill-color"]
+          #cr.set_source_rgba(color[0], color[1], color[2], obj[1].get("fill-opacity", 1))
+          #poly(cr,excoords)
+      for obj in data:
         if "icon-image" in obj[1]:
           image = style.cache["image"][obj[1]["icon-image"]]
           if image:
             dy = image.get_height()/2
             dx = image.get_width()/2
-            
+
             where = self.lonlat2screen(projections.transform(obj[0].center,self.data.proj,self.proj))
             cr.set_source_surface(image, where[0]-dx, where[1]-dy)
             cr.paint()
+
+
+      callback()
       # - render text labels
       texttimer = Timer("Text rendering")
       cr.set_line_join(1)  # setting linejoin to "round" to get less artifacts on halo render
@@ -317,7 +366,43 @@ class RasterTile:
           
           text = obj[1]["text"]
           #cr.set_line_width (obj[1].get("width", 1))
-          cr.set_font_size(float(obj[1].get("font-size", 9)))
+          #cr.set_font_size(float(obj[1].get("font-size", 9)))
+          ft_desc = pango.FontDescription()
+          
+          ft_desc.set_family(obj[1].get('font-family', 'sans'))
+          ft_desc.set_size(pango.SCALE*obj[1].get('font-size',9))
+          fontstyle = obj[1].get('font-style', 'normal')
+          if fontstyle == 'italic':
+            fontstyle = pango.STYLE_ITALIC
+          else:
+            fontstyle = pango.STYLE_NORMAL
+          ft_desc.set_style(fontstyle)
+          fontweight = obj[1].get('font-weight', 400)
+          try:
+            fontweight = int(fontweight)
+          except ValueError:
+            if fontweight == 'bold':
+              fontweight = 700
+            else:
+              fontweight = 400
+          ft_desc.set_weight(fontweight)
+          if obj[1].get('text-transform', None) == 'uppercase':
+            text = text.upper()
+          p_ctx = pangocairo.CairoContext(cr)
+          p_layout = p_ctx.create_layout()
+          p_layout.set_font_description(ft_desc)
+          p_layout.set_text(text)
+          p_attrs = pango.AttrList()
+          decoration = obj[1].get('text-decoration', 'none')
+          if decoration == 'underline':
+            p_attrs.insert(pango.AttrUnderline(pango.UNDERLINE_SINGLE,end_index=-1))
+          decoration = obj[1].get('font-variant', 'none')
+          if decoration == 'small-caps':
+              p_attrs.insert(pango.AttrVariant(pango.VARIANT_SMALL_CAPS, start_index=0, end_index=-1))
+
+          p_layout.set_attributes(p_attrs)
+          
+          
           if obj[1].get("text-position", "center") == "center":
             where = self.lonlat2screen(projections.transform(obj[0].center,self.data.proj,self.proj))
             for t in text_rendered_at:
@@ -352,6 +437,7 @@ class RasterTile:
               # - function to get (x, y, normale) from (c, length_along_c)
               def get_xy_from_len(c,length_along_c):
                 x0, y0 = c[0]
+                
                 for x,y in c:
                   seg_len = ((x-x0)**2+(y-y0)**2)**0.5
                   if length_along_c < seg_len:
@@ -376,41 +462,62 @@ class RasterTile:
                 z = length/2+cr.text_extents(text)[2]/2
               z1=z
               if "text-halo-color" in obj[1] or "text-halo-radius" in obj[1]:
-                cr.set_line_width (obj[1].get("text-halo-radius", 1))
+                cr.set_line_width (obj[1].get("text-halo-radius", 1.5)*2)
                 color = obj[1].get("text-halo-color", (1.,1.,1.))
                 cr.set_source_rgb(color[0], color[1], color[2])
-                for letter in text:
-                  cr.new_path()
-                  xy = get_xy_from_len(c,z)
-                  #print letter, cr.text_extents(letter)
-                  cr.move_to(xy[0],xy[1])
-                  cr.save()
-                  cr.rotate(xy[2]+da)
-                  cr.text_path(letter)
-                  cr.restore()
-                  cr.stroke()
-                  z += os*cr.text_extents(letter)[4]
+                xy = get_xy_from_len(c,z)
+                cr.save()
+                #cr.move_to(xy[0],xy[1])
+                p_ctx.translate(xy[0],xy[1])
+                cr.rotate(xy[2]+da)
+                #p_ctx.translate(x,y)
+                #p_ctx.show_layout(p_layout)
+                p_ctx.layout_path(p_layout)
+                
+                cr.restore()
+                cr.stroke()
+                #for letter in text:
+                  #cr.new_path()
+                  #xy = get_xy_from_len(c,z)
+                  ##print letter, cr.text_extents(letter)
+                  #cr.move_to(xy[0],xy[1])
+                  #cr.save()
+                  #cr.rotate(xy[2]+da)
+                  #cr.text_path(letter)
+                  #cr.restore()
+                  #cr.stroke()
+                  #z += os*cr.text_extents(letter)[4]
 
               color = obj[1].get("text-color", (0.,0.,0.))
               cr.set_source_rgb(color[0], color[1], color[2])
               z = z1
-              for letter in text:
-                cr.new_path()
-                xy = get_xy_from_len(c,z)
-                #print letter, cr.text_extents(letter)
-                cr.move_to(xy[0],xy[1])
-                cr.save()
-                cr.rotate(xy[2]+da)
-                cr.text_path(letter)
-                cr.restore()
-                cr.fill()
-                z += os*cr.text_extents(letter)[4]
+              xy = get_xy_from_len(c,z)
+              cr.save()
+              #cr.move_to(xy[0],xy[1])
+              p_ctx.translate(xy[0],xy[1])
+              cr.rotate(xy[2]+da)
+              #p_ctx.translate(x,y)
+              p_ctx.show_layout(p_layout)
+              cr.restore()
+              
+              #for letter in text:
+                #cr.new_path()
+                #xy = get_xy_from_len(c,z)
+                ##print letter, cr.text_extents(letter)
+                #cr.move_to(xy[0],xy[1])
+                #cr.save()
+                #cr.rotate(xy[2]+da)
+                #cr.text_path(letter)
+                #cr.restore()
+                #cr.fill()
+                #z += os*cr.text_extents(letter)[4]
 
       texttimer.stop()
 
     timer.stop()
     rendertimer.stop()
     debug(self.bbox)
+    callback()
 
     
 class ImageLoader:
