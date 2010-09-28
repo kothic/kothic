@@ -101,6 +101,35 @@ class Condition:
         return params[0], '"%s" IS NOT NULL'%(params[0])
     except KeyError:
       pass
+  def get_mapnik_filter(self):
+    params = [re.escape(x) for x in self.params]
+    t = self.type
+    try:
+      if t == 'eq':
+        return '[%s] = \'%s\''%(params[0], params[1])
+      if t == 'ne':
+        return 'not([%s] = \'%s\')'%(params[0], params[1])
+      if t == 'regex':
+        return '[%s].match(%s)'%(params[0], params[1])
+      if t == 'true':
+        return '[%s] = \'yes\''%(params[0])
+      if t == 'untrue':
+        return '[%s] = \'no\''%(params[0])
+      if t == 'set':
+        return 'not([%s] = \'\')'%(params[0])
+      if t == 'unset':
+        return '[%s] = \'\''%(params[0])
+
+      if t == '<':
+        return '"%s" &lt; %s'%(params[0], float(params[1]))
+      if t == '<=':
+        return '"%s" &lt;= %s'%(params[0], float(params[1]))
+      if t == '>':
+        return '"%s" &gt; %s'%(params[0], float(params[1]))
+      if t == '>=':
+        return '"%s" &gt;= %s'%(params[0], float(params[1]))
+    except KeyError:
+      pass
   def __repr__(self):
     return "%s %s "%(self.type, repr(self.params))
 def Number(tt):

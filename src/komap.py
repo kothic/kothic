@@ -20,6 +20,13 @@ from debug import debug, Timer
 from mapcss import MapCSS
 import sys
 from libkomapnik import *
+
+try:
+        import psyco
+        psyco.full()
+except ImportError:
+        pass
+
 minzoom = 10
 maxzoom = 11
 
@@ -67,9 +74,15 @@ for zoom, zsheet in mapniksheet.iteritems():
     mfile.write(xml_style_start())
     for entry in zsheet[zindex]:
       if entry["type"] in ("way", "area", "polygon"):
-        
-        sql.update(entry["sql"])
-        itags.update(entry["chooser"].get_interesting_tags(entry["type"], zoom))
+        if "fill-color" in entry["style"]:
+          mfile.write(xml_rule_start())
+          mfile.write(x_scale)
+          rulestring = " or ".join([rule[0].get_mapnik_filter() for rule in entry["rule"]])
+          mfile.write(xml_filter(rulestring))
+          mfile.write(xml_polygonsymbolizer(entry["style"].get("fill-color", "black"), entry["style"].get("fill-opacity", "1")))
+          sql.update(entry["sql"])
+          itags.update(entry["chooser"].get_interesting_tags(entry["type"], zoom))
+          mfile.write(xml_rule_end())
     sql = [i[1] for i in sql]
       #print sql, itags
     mfile.write(xml_style_end())

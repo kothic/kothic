@@ -28,6 +28,8 @@ db_user = "mapz"
 db_name = "gis"
 
 
+substyles = []
+
 
 last_id = 0
 
@@ -55,7 +57,8 @@ def xml_linesymbolizer(color="#000000", width="1", opacity="1", linecap="butt", 
   return """
   <LineSymbolizer>
     <CssParameter name="stroke">%s</CssParameter>
-    <CssParameter name="stroke-width">%f</CssParameter>
+    <CssParameter name="stroke-width">%s</CssParameter>
+    <CssParameter name="stroke-opacity">%s</CssParameter>
     <CssParameter name="stroke-linejoin">%s</CssParameter>
     <CssParameter name="stroke-linecap">%s</CssParameter>
   </LineSymbolizer>"""(color, float(width), float(opacity), linejoin, linecap)
@@ -63,15 +66,16 @@ def xml_linesymbolizer(color="#000000", width="1", opacity="1", linecap="butt", 
 
 def xml_polygonsymbolizer(color="#000000", opacity="1"):
   color = nicecolor(color)
-  linecap  = {"none":"butt",}.get(linecap.lower(),  linecap)
+  
   return """
-  <LineSymbolizer>
-  <CssParameter name="stroke">%s</CssParameter>
-  <CssParameter name="stroke-width">%f</CssParameter>
+  <PolygonSymbolizer>
+    <CssParameter name="fill">%s</CssParameter>
+    <CssParameter name="fill-opacity">%s</CssParameter>
+  </PolygonSymbolizer>"""%(color, float(opacity))
 
-  </LineSymbolizer>"""(color, float(width), float(opacity), linejoin, linecap)
-
-
+def xml_filter(string):
+  return """
+  <Filter>%s</Filter>"""%string
 
 def xml_scaledenominator(z1, z2=False):
   z1, z2 = zoom_to_scaledenom(z1,z2)
@@ -92,7 +96,9 @@ def xml_end():
 
 
 def xml_style_start():
+  global substyles
   layer_id = get_id(1)
+  substyles.append(layer_id)
   return """
   <Style name="s%s">"""%(layer_id)
 
@@ -101,15 +107,27 @@ def xml_style_end():
   return """
   </Style>"""
 
+def xml_rule_start():
+  return """
+  <Rule>"""
+
+def xml_rule_end():
+  return """
+  </Rule>"""
+
 
 def xml_layer(type="postgis", geom="point", interesting_tags = "*", sql = ["true","d"] ):
-  layer_id = get_id() ## increment by 0 - was incremented in style
+  layer_id = get_id(1) ## increment by 0 - was incremented in style
   interesting_tags = "\", \"".join(interesting_tags)
   interesting_tags = "\""+ interesting_tags+"\""
   sql = " OR ".join(sql)
+  global substyles
+  subs = "\n".join(["<StyleName>s%s</StyleName>"%i for i in substyles])
+  substyles = []
+  
   return """
   <Layer name="l%s" status="on" srs="%s">
-    <StyleName>s%s</StyleName>
+    %s
     <Datasource>
       <Parameter name="table">
       (select %s, way
@@ -121,4 +139,4 @@ def xml_layer(type="postgis", geom="point", interesting_tags = "*", sql = ["true
       <Parameter name="user">%s</Parameter>
       <Parameter name="dbname">%s</Parameter>
     </Datasource>
-  </Layer>"""%(layer_id, db_proj, layer_id, interesting_tags, table_prefix, geom, sql, db_user, db_name)
+  </Layer>"""%(layer_id, db_proj, subs, interesting_tags, table_prefix, geom, sql, db_user, db_name)
