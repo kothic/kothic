@@ -847,6 +847,12 @@ def whatever_to_rgb(string):
     except ValueError:
       #a = md5.new(string)
       return hex_to_rgb("#"+md5(string).hexdigest()[:6])
+
+def whatever_to_hex(string):
+  if type(string) == tuple:
+    return cairo_to_hex(string)
+  return rgb_to_hex(whatever_to_rgb(string))
+    
     
 def whatever_to_cairo(string):
   a = whatever_to_rgb(string)

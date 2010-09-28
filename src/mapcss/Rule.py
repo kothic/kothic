@@ -50,7 +50,7 @@ class Rule():
     return v
   def get_interesting_tags(self, obj, zoom):
     if obj:
-      if (self.subject!='') and _test_feature_compatibility(obj, self.subject, tags):
+      if (self.subject!='') and _test_feature_compatibility(obj, self.subject, {}):
         return set()
     if zoom:
       if (zoom < self.minZoom) or (zoom > self.maxZoom):

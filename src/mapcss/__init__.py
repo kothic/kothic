@@ -113,7 +113,7 @@ class MapCSS():
       else:
         logging.error("unparsed zoom: %s" %s)
 
-    def get_style (self, type, tags, zoom, scale, zscale):
+    def get_style (self, type, tags={}, zoom=0, scale=1, zscale=.5):
       """
       Kothic styling API
       """
