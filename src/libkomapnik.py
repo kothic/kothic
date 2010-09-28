@@ -24,7 +24,7 @@ from mapcss.webcolors.webcolors import whatever_to_hex as nicecolor
 map_proj = "+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0 +k=1.0 +units=m +nadgrids=@null +no_defs +over"
 db_proj = "+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0 +k=1.0 +units=m +nadgrids=@null +no_defs +over"
 table_prefix = "planet_osm_"
-db_user = "mapz"
+db_user = "gis"
 db_name = "gis"
 
 
@@ -48,6 +48,7 @@ def zoom_to_scaledenom(z1,z2=False):
   s = 279541132.014
   z1 = s/(2**z1-1)+100
   z2 = s/(2**z2-1)-100
+  return 100000000000000, 1
   return z1, z2
 
 
@@ -61,7 +62,7 @@ def xml_linesymbolizer(color="#000000", width="1", opacity="1", linecap="butt", 
     <CssParameter name="stroke-opacity">%s</CssParameter>
     <CssParameter name="stroke-linejoin">%s</CssParameter>
     <CssParameter name="stroke-linecap">%s</CssParameter>
-  </LineSymbolizer>"""(color, float(width), float(opacity), linejoin, linecap)
+  </LineSymbolizer>"""%(color, float(width), float(opacity), linejoin, linecap)
 
 
 def xml_polygonsymbolizer(color="#000000", opacity="1"):
@@ -80,8 +81,8 @@ def xml_filter(string):
 def xml_scaledenominator(z1, z2=False):
   z1, z2 = zoom_to_scaledenom(z1,z2)
   return """
-  <MaxScaleDenominator>%f</MaxScaleDenominator>
-  <MinScaleDenominator>%f</MinScaleDenominator>"""%(z1,z2)
+  <MaxScaleDenominator>%s</MaxScaleDenominator>
+  <MinScaleDenominator>%s</MinScaleDenominator>"""%(z1,z2)
 
 def xml_start(bgcolor="#ffffff"):
   bgcolor = nicecolor(bgcolor)
@@ -140,3 +141,7 @@ def xml_layer(type="postgis", geom="point", interesting_tags = "*", sql = ["true
       <Parameter name="dbname">%s</Parameter>
     </Datasource>
   </Layer>"""%(layer_id, db_proj, subs, interesting_tags, table_prefix, geom, sql, db_user, db_name)
+
+def xml_nolayer():
+  global substyles
+  substyles = []

@@ -43,17 +43,18 @@ for zoom in range (minzoom, maxzoom):
   mapniksheet[zoom] = {}
   zsheet = mapniksheet[zoom]
   for chooser in style.choosers:
-    styles = chooser.styles[0]
-    zindex = styles.get("z-index",0)
-    if zindex not in zsheet:
-      zsheet[zindex] = []
-    chooser_entry = {}
-    zsheet[zindex].append(chooser_entry)
-    chooser_entry["sql"] = chooser.get_sql_hints(chooser.ruleChains[0][0].subject, zoom)
-    chooser_entry["style"] = styles
-    chooser_entry["type"] = chooser.ruleChains[0][0].subject
-    chooser_entry["rule"] = [i.conditions for i in chooser.ruleChains[0]]
-    chooser_entry["chooser"] = chooser
+    if chooser.get_sql_hints(chooser.ruleChains[0][0].subject, zoom):
+      styles = chooser.styles[0]
+      zindex = styles.get("z-index",0)
+      if zindex not in zsheet:
+        zsheet[zindex] = []
+      chooser_entry = {}
+      zsheet[zindex].append(chooser_entry)
+      chooser_entry["sql"] = chooser.get_sql_hints(chooser.ruleChains[0][0].subject, zoom)
+      chooser_entry["style"] = styles
+      chooser_entry["type"] = chooser.ruleChains[0][0].subject
+      chooser_entry["rule"] = [i.conditions for i in chooser.ruleChains[0]]
+      chooser_entry["chooser"] = chooser
     
 
 #print mapniksheet
@@ -65,26 +66,55 @@ mfile.write(xml_start(style.get_style("canvas", {}, maxzoom)[0].get("fill-color"
 for zoom, zsheet in mapniksheet.iteritems():
   x_scale = xml_scaledenominator(zoom)
   ta = zsheet.keys()
-  ta.sort()
+  ta.sort(key=float)
   for zindex in ta:
-    #print zsheet[zindex]
+    ## casings pass
+    sql = set()
+    itags = set()
+    xml = xml_style_start()
+    for entry in zsheet[zindex]:
+      if entry["type"] in ("way", "line"):
+        if "casing-width" in entry["style"]:
+          xml += xml_rule_start()
+          xml += x_scale
+          rulestring = " or ".join([rule[0].get_mapnik_filter() for rule in entry["rule"]])
+          xml += xml_filter(rulestring)
+          xml += xml_linesymbolizer(color=entry["style"].get("casing-color", "black"),
+            width=entry["style"].get("casing-width", "1"),
+            opacity=entry["style"].get("casing-opacity", "1"),
+            linecap=entry["style"].get("casing-linecap", entry["style"].get("linecap","butt")),
+            linejoin=entry["style"].get("casing-linejoin", entry["style"].get("linejoin", "round")))
+          sql.update(entry["sql"])
+          itags.update(entry["chooser"].get_interesting_tags(entry["type"], zoom))
+          xml += xml_rule_end()
+    sql = [i[1] for i in sql]
+    xml += xml_style_end()
+    if sql:
+      mfile.write(xml)
+      mfile.write(xml_layer("postgis", "line", itags, sql ))
+    else:
+      xml_nolayer()
+    
     ## areas pass
     sql = set()
     itags = set()
-    mfile.write(xml_style_start())
+    xml = xml_style_start()
     for entry in zsheet[zindex]:
       if entry["type"] in ("way", "area", "polygon"):
         if "fill-color" in entry["style"]:
-          mfile.write(xml_rule_start())
-          mfile.write(x_scale)
+          xml += xml_rule_start()
+          xml += x_scale
           rulestring = " or ".join([rule[0].get_mapnik_filter() for rule in entry["rule"]])
-          mfile.write(xml_filter(rulestring))
-          mfile.write(xml_polygonsymbolizer(entry["style"].get("fill-color", "black"), entry["style"].get("fill-opacity", "1")))
+          xml += xml_filter(rulestring)
+          xml += xml_polygonsymbolizer(entry["style"].get("fill-color", "black"), entry["style"].get("fill-opacity", "1"))
           sql.update(entry["sql"])
           itags.update(entry["chooser"].get_interesting_tags(entry["type"], zoom))
-          mfile.write(xml_rule_end())
+          xml += xml_rule_end()
     sql = [i[1] for i in sql]
-      #print sql, itags
-    mfile.write(xml_style_end())
-    mfile.write(xml_layer("postgis", "polygon", itags, sql ))
+    xml += xml_style_end()
+    if sql:
+      mfile.write(xml)
+      mfile.write(xml_layer("postgis", "polygon", itags, sql ))
+    else:
+      xml_nolayer()
 mfile.write(xml_end())
