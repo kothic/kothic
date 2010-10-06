@@ -26,6 +26,9 @@ db_proj = "+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0
 table_prefix = "planet_osm_"
 db_user = "gis"
 db_name = "gis"
+db_srid = 900913
+icons_path = "/home/gis/mapnik/kosmo/icons/"
+
 
 
 substyles = []
@@ -46,15 +49,29 @@ def zoom_to_scaledenom(z1,z2=False):
   if not z2:
     z2 = z1
   s = 279541132.014
-  z1 = s/(2**z1-1)+100
-  z2 = s/(2**z2-1)-100
-  return 100000000000000, 1
+  z1 = (s/(2**(z1-1))+s/(2**(z1-2)))/2
+  z2 = (s/(2**(z2-1))+s/(2**z2))/2
+  #return 100000000000000, 1
   return z1, z2
 
+def xml_pointsymbolizer(path="", width="", height="", opacity=1, overlap="false"):
+  if width:
+    width =' width="%s" '%width
+  if height:
+    height =' height="%s" '%height
+  return """
+  <PointSymbolizer file="%s%s" %s %s opacity="%s" allow_overlap="%s" />"""\
+          %(icons_path, \
+          path, width, height, opacity, overlap)
 
-def xml_linesymbolizer(color="#000000", width="1", opacity="1", linecap="butt", linejoin="round"):
+
+def xml_linesymbolizer(color="#000000", width="1", opacity="1", linecap="butt", linejoin="round", dashes=""):
   color = nicecolor(color)
   linecap  = {"none":"butt",}.get(linecap.lower(),  linecap)
+  if dashes:
+    dashes = '<CssParameter name="stroke-dasharray">%s</CssParameter>'%(dashes)
+  else:
+    dashes = ""
   return """
   <LineSymbolizer>
     <CssParameter name="stroke">%s</CssParameter>
@@ -62,7 +79,8 @@ def xml_linesymbolizer(color="#000000", width="1", opacity="1", linecap="butt", 
     <CssParameter name="stroke-opacity">%s</CssParameter>
     <CssParameter name="stroke-linejoin">%s</CssParameter>
     <CssParameter name="stroke-linecap">%s</CssParameter>
-  </LineSymbolizer>"""%(color, float(width), float(opacity), linejoin, linecap)
+    %s
+  </LineSymbolizer>"""%(color, float(width), float(opacity), linejoin, linecap, dashes)
 
 
 def xml_polygonsymbolizer(color="#000000", opacity="1"):
@@ -73,6 +91,14 @@ def xml_polygonsymbolizer(color="#000000", opacity="1"):
     <CssParameter name="fill">%s</CssParameter>
     <CssParameter name="fill-opacity">%s</CssParameter>
   </PolygonSymbolizer>"""%(color, float(opacity))
+
+def xml_textsymbolizer(text="name",face="DejaVu Sans Book",size="10",color="#000000", halo_color="#ffffff", halo_radius="0", placement="line", offset="0"):
+  color = nicecolor(color)
+  halo_color = nicecolor(halo_color)
+  placement = {"center": "point"}.get(placement.lower(), placement)
+  return """
+  <TextSymbolizer name="%s" face_name="%s" size="%s" fill="%s" halo_fill= "%s" halo_radius="%s" placement="%s" allow_overlap="false" dy="%s"/>
+  """%(text,face,size,color,halo_color,halo_radius,placement,offset)
 
 def xml_filter(string):
   return """
@@ -117,7 +143,7 @@ def xml_rule_end():
   </Rule>"""
 
 
-def xml_layer(type="postgis", geom="point", interesting_tags = "*", sql = ["true","d"] ):
+def xml_layer(type="postgis", geom="point", interesting_tags = "*", sql = ["true"] ):
   layer_id = get_id(1) ## increment by 0 - was incremented in style
   interesting_tags = "\", \"".join(interesting_tags)
   interesting_tags = "\""+ interesting_tags+"\""
@@ -139,8 +165,12 @@ def xml_layer(type="postgis", geom="point", interesting_tags = "*", sql = ["true
       <Parameter name="type">postgis</Parameter>
       <Parameter name="user">%s</Parameter>
       <Parameter name="dbname">%s</Parameter>
+      <Parameter name="srid">%s</Parameter>
+      <Parameter name="geometry_field">way</Parameter>
+      <Parameter name="geometry_table">%s%s</Parameter>
+      <Parameter name="extent">-20037508.342789244, -20037508.342780735, 20037508.342789244, 20037508.342780709</Parameter>
     </Datasource>
-  </Layer>"""%(layer_id, db_proj, subs, interesting_tags, table_prefix, geom, sql, db_user, db_name)
+  </Layer>"""%(layer_id, db_proj, subs, interesting_tags, table_prefix, geom, sql, db_user, db_name, db_srid,  table_prefix, geom)
 
 def xml_nolayer():
   global substyles

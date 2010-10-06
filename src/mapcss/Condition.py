@@ -73,7 +73,8 @@ class Condition:
     return False;
 
   def get_sql(self):
-    params = [re.escape(x) for x in self.params]
+    #params = [re.escape(x) for x in self.params]
+    params = self.params
     t = self.type
     try:
       if t == 'eq':
@@ -102,7 +103,8 @@ class Condition:
     except KeyError:
       pass
   def get_mapnik_filter(self):
-    params = [re.escape(x) for x in self.params]
+    #params = [re.escape(x) for x in self.params]
+    params = self.params
     t = self.type
     try:
       if t == 'eq':
