@@ -183,6 +183,7 @@ for zoom, zsheet in mapniksheet.iteritems():
       ## text pass
       sql = set()
       itags = set()
+      ttext = ""
       xml = xml_style_start()
       for entry in zsheet[zindex]:
         if entry["type"] in entry_types:#, "node", "line", "point"):
@@ -195,11 +196,13 @@ for zoom, zsheet in mapniksheet.iteritems():
             thradius= entry["style"].get("text-halo-radius","0")
             tplace= entry["style"].get("text-position","center")
             toffset= entry["style"].get("text-offset","0")
+            toverlap= entry["style"].get("text-allow-overlap",entry["style"].get("allow-overlap","false"))
+            
             xml += xml_rule_start()
             xml += x_scale
             rulestring = " or ".join([ "("+ " and ".join([i.get_mapnik_filter() for i in rule]) + ")" for rule in entry["rule"]])
             xml += xml_filter(rulestring)
-            xml += xml_textsymbolizer(ttext,tface,tsize,tcolor, thcolor, thradius, tplace, toffset)
+            xml += xml_textsymbolizer(ttext,tface,tsize,tcolor, thcolor, thradius, tplace, toffset,toverlap)
             sql.update(entry["sql"])
             itags.update(entry["chooser"].get_interesting_tags(entry["type"], zoom))
             xml += xml_rule_end()
@@ -207,7 +210,17 @@ for zoom, zsheet in mapniksheet.iteritems():
       xml += xml_style_end()
       if sql:
         mfile.write(xml)
-        mfile.write(xml_layer("postgis", layer_type, itags, sql ))
+        if layer_type == "line":
+          sqlz = " OR ".join(sql)
+          itags = "\", \"".join(itags)
+          itags = "\""+ itags+"\""
+          sqlz = """with aaa as (SELECT %s, way FROM planet_osm_line where "%s" is not NULL and (%s)),
+          bbb as (SELECT %s, way from aaa where way &amp;&amp; !bbox! )
+          select %s, ST_LineMerge(ST_Union(way)) as way from bbb group by %s
+          """%(itags,ttext,sqlz,itags,itags,itags)
+          mfile.write(xml_layer("postgis-process", layer_type, itags, sqlz ))
+        else:
+          mfile.write(xml_layer("postgis", layer_type, itags, sql ))
       else:
         xml_nolayer()
 

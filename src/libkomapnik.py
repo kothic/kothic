@@ -92,13 +92,14 @@ def xml_polygonsymbolizer(color="#000000", opacity="1"):
     <CssParameter name="fill-opacity">%s</CssParameter>
   </PolygonSymbolizer>"""%(color, float(opacity))
 
-def xml_textsymbolizer(text="name",face="DejaVu Sans Book",size="10",color="#000000", halo_color="#ffffff", halo_radius="0", placement="line", offset="0"):
+def xml_textsymbolizer(text="name",face="DejaVu Sans Book",size="10",color="#000000", halo_color="#ffffff", halo_radius="0", placement="line", offset="0", overlap="false"):
   color = nicecolor(color)
   halo_color = nicecolor(halo_color)
   placement = {"center": "point"}.get(placement.lower(), placement)
+  
   return """
-  <TextSymbolizer name="%s" face_name="%s" size="%s" fill="%s" halo_fill= "%s" halo_radius="%s" placement="%s" allow_overlap="false" dy="%s"/>
-  """%(text,face,size,color,halo_color,halo_radius,placement,offset)
+  <TextSymbolizer name="%s" face_name="%s" size="%s" fill="%s" halo_fill= "%s" halo_radius="%s" placement="%s" dy="%s" max_char_angle_delta="15" allow_overlap="%s"/>
+  """%(text,face,size,color,halo_color,halo_radius,placement,offset,overlap)
 
 def xml_filter(string):
   return """
@@ -144,33 +145,51 @@ def xml_rule_end():
 
 
 def xml_layer(type="postgis", geom="point", interesting_tags = "*", sql = ["true"] ):
-  layer_id = get_id(1) ## increment by 0 - was incremented in style
-  interesting_tags = "\", \"".join(interesting_tags)
-  interesting_tags = "\""+ interesting_tags+"\""
-  sql = " OR ".join(sql)
+  layer_id = get_id(1)
   global substyles
   subs = "\n".join(["<StyleName>s%s</StyleName>"%i for i in substyles])
   substyles = []
-  
-  return """
-  <Layer name="l%s" status="on" srs="%s">
-    %s
-    <Datasource>
-      <Parameter name="table">
-      (select %s, way
-       from %s%s
-       where %s
-      ) as text
-      </Parameter>
-      <Parameter name="type">postgis</Parameter>
-      <Parameter name="user">%s</Parameter>
-      <Parameter name="dbname">%s</Parameter>
-      <Parameter name="srid">%s</Parameter>
-      <Parameter name="geometry_field">way</Parameter>
-      <Parameter name="geometry_table">%s%s</Parameter>
-      <Parameter name="extent">-20037508.342789244, -20037508.342780735, 20037508.342789244, 20037508.342780709</Parameter>
-    </Datasource>
-  </Layer>"""%(layer_id, db_proj, subs, interesting_tags, table_prefix, geom, sql, db_user, db_name, db_srid,  table_prefix, geom)
+  if type == "postgis":
+    interesting_tags = "\", \"".join(interesting_tags)
+    interesting_tags = "\""+ interesting_tags+"\""
+    sql = " OR ".join(sql)
+    return """
+    <Layer name="l%s" status="on" srs="%s">
+      %s
+      <Datasource>
+        <Parameter name="table">
+        (select %s, way
+        from %s%s
+        where %s
+        ) as text
+        </Parameter>
+        <Parameter name="type">postgis</Parameter>
+        <Parameter name="user">%s</Parameter>
+        <Parameter name="dbname">%s</Parameter>
+        <Parameter name="srid">%s</Parameter>
+        <Parameter name="geometry_field">way</Parameter>
+        <Parameter name="geometry_table">%s%s</Parameter>
+        <Parameter name="extent">-20037508.342789244, -20037508.342780735, 20037508.342789244, 20037508.342780709</Parameter>
+      </Datasource>
+    </Layer>"""%(layer_id, db_proj, subs, interesting_tags, table_prefix, geom, sql, db_user, db_name, db_srid,  table_prefix, geom)
+  elif type == "postgis-process":
+    return """
+    <Layer name="l%s" status="on" srs="%s">
+      %s
+      <Datasource>
+        <Parameter name="table">
+        (%s
+        ) as text
+        </Parameter>
+        <Parameter name="type">postgis</Parameter>
+        <Parameter name="user">%s</Parameter>
+        <Parameter name="dbname">%s</Parameter>
+        <Parameter name="srid">%s</Parameter>
+        <Parameter name="geometry_field">way</Parameter>
+        <Parameter name="geometry_table">%s%s</Parameter>
+        <Parameter name="extent">-20037508.342789244, -20037508.342780735, 20037508.342789244, 20037508.342780709</Parameter>
+      </Datasource>
+    </Layer>"""%(layer_id, db_proj, subs, sql, db_user, db_name, db_srid,  table_prefix, geom)
 
 def xml_nolayer():
   global substyles
