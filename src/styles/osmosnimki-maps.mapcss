@@ -36,30 +36,51 @@ area[landuse=garages] {fill-color: #ddd8da; z-index:7}
 
 area[landuse=cemetery] {fill-color: #e5f5dc; z-index:8}
 
-way|z-10[waterway=river] {color: #C4D4F5; width: .6; z-index:9}
-
-way|z-10[waterway=stream]{color: #C4D4F5; width: .3; z-index:9}
+way|z-10[waterway=river]   {color: #C4D4F5; width: .6; z-index:9}
+way|z-10[waterway=stream]  {color: #C4D4F5; width: .3; z-index:9}
+way|z10-11[waterway=river] {color: #C4D4F5; width: .7; z-index:9}
+way|z10-11[waterway=stream]{color: #C4D4F5; width: .5; z-index:9}
+way|z10-11[waterway=canal] {color: #abc4f5; width: .6; z-index:9}
 
 way[waterway=riverbank],
-way[natural=water] {fill-color: #C4D4F5; color: #C4D4F5; width:1; z-index:9}
+way[natural=water]
+{fill-color: #C4D4F5; color: #C4D4F5; width:1; z-index:9;}
+
+way[natural=water]{text:name; text-offset:1; font-size:9; /* font-family: DejaVu Serif Oblique;*/; text-color:#285fd1; text-allow-overlap: false }
 
 
 
-way|z-10[highway=road],
-way|z-10[highway=track]
+way|z-11[highway=road],
+way|z-11[highway=track]
         {text: name; text-position: line; width:0.2; opacity: 0.5; color: #996703; z-index:10}
+
 way|z-10[highway=secondary],
 way|z-10[highway=secondary_link]
         {text: name; text-position: line;
         width:1.2;  color: #fcffd1;
         casing-width:0.35; casing-color: #996703;
         z-index:11}
+
+way|z11[highway=secondary],
+way|z11[highway=secondary_link]
+{text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Bold; font-size:9;
+        width:1.4;  color: #fcffd1;
+        casing-width:0.35; casing-color: #996703;
+        z-index:11}
+        
 way|z-10[highway=primary],
 way|z-10[highway=primary_link]
         {text: name; text-position: line;
         width:3;  color: #fcea97;
         casing-width:.5; casing-color: #996703;
         z-index:12}
+way|z11[highway=primary],
+way|z11[highway=primary_link]
+        {text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Bold; font-size:9;
+        width:4;  color: #fcea97;
+        casing-width:.5; casing-color: #996703;
+        z-index:12}
+
 
 way|z-10[highway=trunk],
 way|z-10[highway=trunk_link],
@@ -67,6 +88,15 @@ way|z-10[highway=motorway],
 way|z-10[highway=motorway_link]
         {text: name; text-position: line;
         width:4;  color: #ffd780;
+        casing-width:1; casing-color: #996703;
+        z-index:13}
+
+way|z11[highway=trunk],
+way|z11[highway=trunk_link],
+way|z11[highway=motorway],
+way|z11[highway=motorway_link]
+{text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Bold; font-size:9;
+        width:5;  color: #ffd780;
         casing-width:1; casing-color: #996703;
         z-index:13}
 
@@ -80,6 +110,8 @@ way[railway=rail]
     {width:1.4; color: #606060;z-index:15}
 way[railway=rail]::ticks
     {width:1; color: #ffffff; dashes: 6,6;z-index:15}
+
+
 
 
 way[boundary=administrative][admin_level=2]
@@ -98,17 +130,43 @@ width: 0.5; color: #808080; dashes: 2,2; opacity:0.3; z-index:16}*/
 
 
 
-node[railway=station][transport!=subway]
-{icon-image:rw_stat_stanzii_2_blue.png;}
+node[railway=station][transport!=subway] {icon-image:rw_stat_stanzii_2_blue.png;
+text:name; text-offset:7; font-size:9; font-family: DejaVu Sans Mono Book; text-halo-radius:1; text-color:#000d6c;text-halo-color:#ffffff; text-allow-overlap: false
+}
+node[aeroway=aerodrome]
+       {icon-image:airport_world.png;
+       text:name; text-offset:12; font-size:9; font-family: DejaVu Sans Condensed Bold; text-halo-radius:1; text-color:#1e7ca5;text-halo-color:#ffffff; text-allow-overlap: false}
 
-node[place=city], node[place=town]
-{text:name; text-offset:-20; font-size:14; font-family: DejaVu Sans Bold; text-halo-radius:3; text-color:#101010;text-halo-color:#ffffff}
+
+node[place=city] {text:name; text-offset:-20; font-size:14; font-family: DejaVu Sans Bold; text-halo-radius:3; text-color:#101010;text-halo-color:#ffffff; text-allow-overlap: true}
+node[place=town]{text:name; text-offset:-20; font-size:14; font-family: DejaVu Sans Bold; text-halo-radius:3; text-color:#101010;text-halo-color:#ffffff; text-allow-overlap: false}
+
+node[place=village]{text:name; text-offset:1; font-size:9; font-family: DejaVu Sans Bold; text-halo-radius:1; text-color:#606060;text-halo-color:#ffffff; text-allow-overlap: false}
+
+node[place=hamlet]{text:name; text-offset:1; font-size:9; font-family: DejaVu Sans Bold; text-halo-radius:1; text-color:#505050;text-halo-color:#ffffff; text-allow-overlap: false}
+
+area|z11[landuse=nature_reserve],
+area|z11[leisure=park],
+{text:name;text-offset:1; font-size:9; /*font-family: DejaVu Serif Oblique*/; text-halo-radius:0; text-color:#3c8000;text-halo-color:#ffffff; text-allow-overlap: false}
 
 
 
-node[highway=milestone][pk]
-{text:pk; }
+/*
+shields!!!!
 
+*/
+
+
+way[waterway=stream], way[waterway=river]
+{text:name; font-size:9; font-family: DejaVu Sans Oblique; text-color:#547bd1;text-position: line}
+
+area|z4-[boundary=administrative][admin_level=2]
+{text:name; text-offset:0; font-size:16; font-family: DejaVu Sans Book; text-halo-radius:1; text-color:#c002a;text-halo-color:#ffffff}
+
+area|z6-[boundary=administrative][admin_level=4]
+{text:name; text-offset:17; font-size:14; font-family: DejaVu Sans ExtraLight; text-halo-radius:1; text-color:#606060;text-halo-color:#ffffff}
+area|z10-[boundary=administrative][admin_level=6]
+{text:name; text-offset:-10; font-size:12; font-family: DejaVu Sans ExtraLight; text-halo-radius:1; text-color:#7848a0;text-halo-color:#ffffff}
 
 
 
@@ -143,20 +201,14 @@ way[leisure=stadium]{fill-color: #d0ffff; casing-width: 2; casing-color: #00ccff
 
 
 
-way|z12-[building=yes] {
+area|z12-[building=yes] {
   width: .5;
-  text: addr:housenumber; text-halo-radius:1; text-position: center;
-  
   fill-color: #E7CCB4;
   color: #D29D39;
   z-index:7;
 }
-way|z12-[building][building != yes] {
-  fill-color: #D8D1D1;
-  z-index:7;
-}
+area|z12-[building][building != yes] {fill-color: #D8D1D1; z-index:7;}
+area|z15-[building=yes] {text: addr:housenumber; text-halo-radius:1; text-position: center;}
 
-/* to add:
-- railways;
-- milestones;
-*/
+
+node|z13-[highway=milestone][pk]{text:pk; }
