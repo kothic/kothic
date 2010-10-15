@@ -92,13 +92,18 @@ def xml_polygonsymbolizer(color="#000000", opacity="1"):
     <CssParameter name="fill-opacity">%s</CssParameter>
   </PolygonSymbolizer>"""%(color, float(opacity))
 
+def xml_linepatternsymbolizer(path=""):
+  return """
+  <LinePatternSymbolizer file="%s%s"/>"""%(icons_path, path)
+
+
 def xml_textsymbolizer(text="name",face="DejaVu Sans Book",size="10",color="#000000", halo_color="#ffffff", halo_radius="0", placement="line", offset="0", overlap="false"):
   color = nicecolor(color)
   halo_color = nicecolor(halo_color)
   placement = {"center": "point"}.get(placement.lower(), placement)
   
   return """
-  <TextSymbolizer name="%s" face_name="%s" size="%s" fill="%s" halo_fill= "%s" halo_radius="%s" placement="%s" dy="%s" max_char_angle_delta="15" allow_overlap="%s"/>
+  <TextSymbolizer name="%s" face_name="%s" size="%s" fill="%s" halo_fill= "%s" halo_radius="%s" placement="%s" dy="%s" max_char_angle_delta="15" allow_overlap="%s" min_distance="32" />
   """%(text,face,size,color,halo_color,halo_radius,placement,offset,overlap)
 
 def xml_filter(string):
@@ -144,7 +149,7 @@ def xml_rule_end():
   </Rule>"""
 
 
-def xml_layer(type="postgis", geom="point", interesting_tags = "*", sql = ["true"] ):
+def xml_layer(type="postgis", geom="point", interesting_tags = "*", sql = "true" ):
   layer_id = get_id(1)
   global substyles
   subs = "\n".join(["<StyleName>s%s</StyleName>"%i for i in substyles])
@@ -152,7 +157,7 @@ def xml_layer(type="postgis", geom="point", interesting_tags = "*", sql = ["true
   if type == "postgis":
     interesting_tags = "\", \"".join(interesting_tags)
     interesting_tags = "\""+ interesting_tags+"\""
-    sql = " OR ".join(sql)
+    
     return """
     <Layer name="l%s" status="on" srs="%s">
       %s
