@@ -92,6 +92,11 @@ def xml_polygonsymbolizer(color="#000000", opacity="1"):
     <CssParameter name="fill-opacity">%s</CssParameter>
   </PolygonSymbolizer>"""%(color, float(opacity))
 
+def xml_polygonpatternsymbolizer(file=""):
+  return """
+  <PolygonPatternSymbolizer file="%s%s"/>"""%(icons_path,file)
+
+
 def xml_linepatternsymbolizer(path=""):
   return """
   <LinePatternSymbolizer file="%s%s"/>"""%(icons_path, path)
@@ -103,7 +108,7 @@ def xml_textsymbolizer(text="name",face="DejaVu Sans Book",size="10",color="#000
   placement = {"center": "point"}.get(placement.lower(), placement)
   
   return """
-  <TextSymbolizer name="%s" face_name="%s" size="%s" fill="%s" halo_fill= "%s" halo_radius="%s" placement="%s" dy="%s" max_char_angle_delta="15" allow_overlap="%s" min_distance="32" />
+  <TextSymbolizer name="%s" face_name="%s" size="%s" fill="%s" halo_fill= "%s" halo_radius="%s" placement="%s" dy="%s" max_char_angle_delta="15" allow_overlap="%s" min_distance="26" />
   """%(text,face,size,color,halo_color,halo_radius,placement,offset,overlap)
 
 def xml_filter(string):
@@ -148,6 +153,32 @@ def xml_rule_end():
   return """
   </Rule>"""
 
+def xml_hardcoded_arrows():
+  return """
+  <LineSymbolizer>
+    <CssParameter name="stroke">#6c70d5</CssParameter>
+    <CssParameter name="stroke-width">1</CssParameter>
+    <CssParameter name="stroke-linejoin">bevel</CssParameter>
+    <CssParameter name="stroke-dasharray">0,12,10,152</CssParameter>
+  </LineSymbolizer>
+  <LineSymbolizer>
+    <CssParameter name="stroke">#6c70d5</CssParameter>
+    <CssParameter name="stroke-width">2</CssParameter>
+    <CssParameter name="stroke-linejoin">bevel</CssParameter>
+    <CssParameter name="stroke-dasharray">0,12,9,153</CssParameter>
+  </LineSymbolizer>
+  <LineSymbolizer>
+    <CssParameter name="stroke">#6c70d5</CssParameter>
+    <CssParameter name="stroke-width">3</CssParameter>
+    <CssParameter name="stroke-linejoin">bevel</CssParameter>
+    <CssParameter name="stroke-dasharray">0,18,2,154</CssParameter>
+  </LineSymbolizer>
+  <LineSymbolizer>
+    <CssParameter name="stroke">#6c70d5</CssParameter>
+    <CssParameter name="stroke-width">4</CssParameter>
+    <CssParameter name="stroke-linejoin">bevel</CssParameter>
+    <CssParameter name="stroke-dasharray">0,18,1,155</CssParameter>
+  </LineSymbolizer>"""
 
 def xml_layer(type="postgis", geom="point", interesting_tags = "*", sql = "true" ):
   layer_id = get_id(1)

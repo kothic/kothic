@@ -75,15 +75,20 @@ for zoom, zsheet in mapniksheet.iteritems():
     xml = xml_style_start()
     for entry in zsheet[zindex]:
       if entry["type"] in ("way", "area", "polygon"):
-        if "fill-color" in entry["style"]:
+        if "fill-color" in entry["style"] or "fill-image" in entry["style"]:
           xml += xml_rule_start()
           xml += x_scale
           rulestring = " or ".join([ "("+ " and ".join([i.get_mapnik_filter() for i in rule]) + ")" for rule in entry["rule"]])
           xml += xml_filter(rulestring)
-          xml += xml_polygonsymbolizer(entry["style"].get("fill-color", "black"), entry["style"].get("fill-opacity", "1"))
+          if "fill-color" in entry["style"]:
+            xml += xml_polygonsymbolizer(entry["style"].get("fill-color", "black"), entry["style"].get("fill-opacity", "1"))
+          if "fill-image" in entry["style"]:
+            xml += xml_polygonpatternsymbolizer(entry["style"].get("fill-image", ""))
           sql.update(entry["sql"])
           itags.update(entry["chooser"].get_interesting_tags(entry["type"], zoom))
           xml += xml_rule_end()
+
+          
     sql = [i[1] for i in sql]
     xml += xml_style_end()
     if sql:
@@ -148,7 +153,10 @@ for zoom, zsheet in mapniksheet.iteritems():
                 linejoin=entry["style"].get("linejoin", "round"),
                 dashes=entry["style"].get("dashes", ""))
             if "line-style" in entry["style"]:
-              xml += xml_linepatternsymbolizer(entry["style"]["line-style"])
+              if entry["style"]["line-style"] == "arrows":
+                xml += xml_hardcoded_arrows()
+              else:
+                xml += xml_linepatternsymbolizer(entry["style"]["line-style"])
             sql.update(entry["sql"])
             itags.update(entry["chooser"].get_interesting_tags(entry["type"], zoom))
             xml += xml_rule_end()
