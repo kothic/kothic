@@ -43,14 +43,15 @@ for zoom in range (minzoom, maxzoom):
   mapniksheet[zoom] = {}
   zsheet = mapniksheet[zoom]
   for chooser in style.choosers:
-    if chooser.get_sql_hints(chooser.ruleChains[0][0].subject, zoom):
+    if chooser.get_sql_hints(chooser.ruleChains[0][0].subject, zoom)[0]:
+      sys.stderr.write(str(chooser.get_sql_hints(chooser.ruleChains[0][0].subject, zoom)[0])+"\n")
       styles = chooser.styles[0]
       zindex = styles.get("z-index",0)
       if zindex not in zsheet:
         zsheet[zindex] = []
       chooser_entry = {}
       zsheet[zindex].append(chooser_entry)
-      chooser_entry["sql"] = chooser.get_sql_hints(chooser.ruleChains[0][0].subject, zoom)
+      chooser_entry["sql"] = "("+ chooser.get_sql_hints(chooser.ruleChains[0][0].subject,zoom)[1] +")"
       chooser_entry["style"] = styles
       chooser_entry["type"] = chooser.ruleChains[0][0].subject
       chooser_entry["rule"] = [i.conditions for i in chooser.ruleChains[0]]
@@ -84,94 +85,112 @@ for zoom, zsheet in mapniksheet.iteritems():
             xml += xml_polygonsymbolizer(entry["style"].get("fill-color", "black"), entry["style"].get("fill-opacity", "1"))
           if "fill-image" in entry["style"]:
             xml += xml_polygonpatternsymbolizer(entry["style"].get("fill-image", ""))
-          sql.update(entry["sql"])
+          sql.add(entry["sql"])
           itags.update(entry["chooser"].get_interesting_tags(entry["type"], zoom))
           xml += xml_rule_end()
 
           
-    sql = [i[1] for i in sql]
+
     xml += xml_style_end()
+    sql.discard("()")
     if sql:
       mfile.write(xml)
       sql = " OR ".join(sql)
       mfile.write(xml_layer("postgis", "polygon", itags, sql ))
     else:
       xml_nolayer()
-  for zlayer in range(-5,6):
-    for zindex in ta:
-      ## casings pass
-      sql = set()
-      itags = set()
-      xml = xml_style_start()
-      for entry in zsheet[zindex]:
-        if entry["type"] in ("way", "line"):
-          if "casing-width" in entry["style"]:
-            xml += xml_rule_start()
-            xml += x_scale
-            rulestring = " or ".join([ "("+ " and ".join([i.get_mapnik_filter() for i in rule]) + ")" for rule in entry["rule"]])
-            xml += xml_filter(rulestring)
-            xml += xml_linesymbolizer(color=entry["style"].get("casing-color", "black"),
-              width=2*float(entry["style"].get("casing-width", 1))+float(entry["style"].get("width", 0)),
-              opacity=entry["style"].get("casing-opacity", entry["style"].get("opacity","1")),
-              linecap=entry["style"].get("casing-linecap", entry["style"].get("linecap","butt")),
-              linejoin=entry["style"].get("casing-linejoin", entry["style"].get("linejoin", "round")),
-              dashes=entry["style"].get("casing-dashes",entry["style"].get("dashes", "")))
+  for layer_type, entry_types in {"line":("way", "line"), "polygon":("way","area")}.iteritems():
+    for zlayer in range(-6,7):
+      for zindex in ta:
+        ## casings pass
+        sql = set()
+        itags = set()
+        xml = xml_style_start()
+        for entry in zsheet[zindex]:
+          if entry["type"] in entry_types:
+            if "-x-mapnik-layer" in entry["style"]:
+              if zlayer != -6 and entry["style"]["-x-mapnik-layer"] == "bottom":
+                continue
+              if zlayer != 6 and entry["style"]["-x-mapnik-layer"] == "top":
+                continue
+            elif zlayer not in range(-5,6):
+              continue
+            if "casing-width" in entry["style"]:
+              xml += xml_rule_start()
+              xml += x_scale
+              rulestring = " or ".join([ "("+ " and ".join([i.get_mapnik_filter() for i in rule]) + ")" for rule in entry["rule"]])
+              xml += xml_filter(rulestring)
+              xml += xml_linesymbolizer(color=entry["style"].get("casing-color", "black"),
+                width=2*float(entry["style"].get("casing-width", 1))+float(entry["style"].get("width", 0)),
+                opacity=entry["style"].get("casing-opacity", entry["style"].get("opacity","1")),
+                linecap=entry["style"].get("casing-linecap", entry["style"].get("linecap","butt")),
+                linejoin=entry["style"].get("casing-linejoin", entry["style"].get("linejoin", "round")),
+                dashes=entry["style"].get("casing-dashes",entry["style"].get("dashes", "")))
 
-            sql.update(entry["sql"])
-            itags.update(entry["chooser"].get_interesting_tags(entry["type"], zoom))
-            xml += xml_rule_end()
-      sql = [i[1] for i in sql]
-      xml += xml_style_end()
-      if sql:
-        mfile.write(xml)
-        sql = " OR ".join(sql)
-        if zlayer != 0:
-          sql = "("+ sql +') and "layer" = \'%s\''%zlayer
-        else:
-          sql = "("+ sql +') and ("layer" not in ('+ ", ".join(['\'%s\''%i for i in range(-5,6) if i != 0])+") or \"layer\" is NULL)"
-        mfile.write(xml_layer("postgis", "line", itags, sql ))
-      else:
-        xml_nolayer()
+              sql.add(entry["sql"])
+              itags.update(entry["chooser"].get_interesting_tags(entry["type"], zoom))
+              xml += xml_rule_end()
 
-    for zindex in ta:
-      ## lines pass
-      sql = set()
-      itags = set()
-      xml = xml_style_start()
-      for entry in zsheet[zindex]:
-        if entry["type"] in ("way", "line"):
-          if "width" in entry["style"] or "line-style" in entry["style"]:
-            xml += xml_rule_start()
-            xml += x_scale
-            rulestring = " or ".join([ "("+ " and ".join([i.get_mapnik_filter() for i in rule]) + ")" for rule in entry["rule"]])
-            xml += xml_filter(rulestring)
-            if "width" in entry["style"]:
-              xml += xml_linesymbolizer(color=entry["style"].get("color", "black"),
-                width=entry["style"].get("width", "1"),
-                opacity=entry["style"].get("opacity", "1"),
-                linecap=entry["style"].get("linecap", "butt"),
-                linejoin=entry["style"].get("linejoin", "round"),
-                dashes=entry["style"].get("dashes", ""))
-            if "line-style" in entry["style"]:
-              if entry["style"]["line-style"] == "arrows":
-                xml += xml_hardcoded_arrows()
-              else:
-                xml += xml_linepatternsymbolizer(entry["style"]["line-style"])
-            sql.update(entry["sql"])
-            itags.update(entry["chooser"].get_interesting_tags(entry["type"], zoom))
-            xml += xml_rule_end()
-      sql = [i[1] for i in sql]
-      xml += xml_style_end()
-      if sql:
-        mfile.write(xml)
-        sql = " OR ".join(sql)
-        if zlayer != 0:
-          sql = "("+ sql +') and "layer" = \'%s\''%zlayer
+        xml += xml_style_end()
+        sql.discard("()")
+        if sql:
+          mfile.write(xml)
+          sql = " OR ".join(sql)
+          if zlayer == 0:
+            sql = "("+ sql +') and ("layer" not in ('+ ", ".join(['\'%s\''%i for i in range(-5,6) if i != 0])+") or \"layer\" is NULL)"
+          elif zlayer <=5 and zlayer >= -5:
+            sql = "("+ sql +') and "layer" = \'%s\''%zlayer
+          mfile.write(xml_layer("postgis", layer_type, itags, sql ))
         else:
-          sql = "("+ sql +') and ("layer" not in ('+ ", ".join(['\'%s\''%i for i in range(-5,6) if i != 0])+") or \"layer\" is NULL)"
-        mfile.write(xml_layer("postgis", "line", itags, sql ))
-      else:
-        xml_nolayer()
+          xml_nolayer()
+
+      for zindex in ta:
+        ## lines pass
+        sql = set()
+        itags = set()
+        xml = xml_style_start()
+        for entry in zsheet[zindex]:
+          if entry["type"] in entry_types:
+            if "-x-mapnik-layer" in entry["style"]:
+              if zlayer != -6 and entry["style"]["-x-mapnik-layer"] == "bottom":
+                continue
+              if zlayer != 6 and entry["style"]["-x-mapnik-layer"] == "top":
+                continue
+            elif zlayer not in range(-5,6):
+              continue
+            if "width" in entry["style"] or "line-style" in entry["style"]:
+              xml += xml_rule_start()
+              xml += x_scale
+              rulestring = " or ".join([ "("+ " and ".join([i.get_mapnik_filter() for i in rule]) + ")" for rule in entry["rule"]])
+              xml += xml_filter(rulestring)
+              if "width" in entry["style"]:
+                xml += xml_linesymbolizer(color=entry["style"].get("color", "black"),
+                  width=entry["style"].get("width", "1"),
+                  opacity=entry["style"].get("opacity", "1"),
+                  linecap=entry["style"].get("linecap", "round"),
+                  linejoin=entry["style"].get("linejoin", "round"),
+                  dashes=entry["style"].get("dashes", ""))
+              if "line-style" in entry["style"]:
+                if entry["style"]["line-style"] == "arrows":
+                  xml += xml_hardcoded_arrows()
+                else:
+                  xml += xml_linepatternsymbolizer(entry["style"]["line-style"])
+              sql.add(entry["sql"])
+              itags.update(entry["chooser"].get_interesting_tags(entry["type"], zoom))
+              xml += xml_rule_end()
+
+        xml += xml_style_end()
+        sql.discard("()")
+        if sql:
+          mfile.write(xml)
+          sql = " OR ".join(sql)
+          if zlayer == 0:
+            sql = "("+ sql +') and ("layer" not in ('+ ", ".join(['\'%s\''%i for i in range(-5,6) if i != 0])+") or \"layer\" is NULL)"
+          elif zlayer <=5 and zlayer >= -5:
+            sql = "("+ sql +') and "layer" = \'%s\''%zlayer
+          mfile.write(xml_layer("postgis", layer_type, itags, sql ))
+        else:
+          xml_nolayer()
   for layer_type, entry_types in {"line":("way", "line"), "polygon":("way","area"), "point": ("node", "point")}.iteritems():
     for zindex in ta:
       ## icons pass
@@ -192,11 +211,12 @@ for zoom, zsheet in mapniksheet.iteritems():
               
               opacity=entry["style"].get("opacity", "1"))
 
-            sql.update(entry["sql"])
+            sql.add(entry["sql"])
             itags.update(entry["chooser"].get_interesting_tags(entry["type"], zoom))
             xml += xml_rule_end()
-      sql = [i[1] for i in sql]
+
       xml += xml_style_end()
+      sql.discard("()")
       if sql:
         mfile.write(xml)
         sql = " OR ".join(sql)
@@ -228,11 +248,12 @@ for zoom, zsheet in mapniksheet.iteritems():
             rulestring = " or ".join([ "("+ " and ".join([i.get_mapnik_filter() for i in rule]) + ")" for rule in entry["rule"]])
             xml += xml_filter(rulestring)
             xml += xml_textsymbolizer(ttext,tface,tsize,tcolor, thcolor, thradius, tplace, toffset,toverlap)
-            sql.update(entry["sql"])
+            sql.add(entry["sql"])
             itags.update(entry["chooser"].get_interesting_tags(entry["type"], zoom))
             xml += xml_rule_end()
-      sql = [i[1] for i in sql]
+
       xml += xml_style_end()
+      sql.discard("()")
       if sql:
         mfile.write(xml)
         if layer_type == "line":

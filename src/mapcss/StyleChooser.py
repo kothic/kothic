@@ -71,11 +71,20 @@ class StyleChooser:
     Returns a set of tags that were used in here in form of SQL-hints.
     """
     a = set()
+    b = ""
     for c in self.ruleChains:
       for r in c:
-        a.update(r.get_sql_hints(type, zoom))
+        p = r.get_sql_hints(type, zoom)
+        q = "("+") AND (".join([t[1] for t in p]) + ")"
+        if q == "()":
+          q = ""
+        if b and q:
+          b += " OR "+ q
+        else:
+          b = q
+        a.update(p)
     # no need to check for eval's
-    return a
+    return a,b
   # // Update the current StyleList from this StyleChooser
 
   def updateStyles(self,sl,type, tags, zoom, scale, zscale):

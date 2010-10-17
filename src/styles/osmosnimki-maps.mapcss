@@ -364,7 +364,7 @@ way[railway=rail]::ticks
     {width:1; color: #ffffff; dashes: 6,6;z-index:15}
 
 way|z12-[railway=subway]
-{width:3; color: #072889;z-index:15; dashes:3,3; opacity:0.3}
+{width:3; color: #072889;z-index:15; dashes:3,3; opacity:0.3; linecap: butt;}
 
 
 node|z15-[amenity=fuel]      {icon-image:tankstelle1_10x11.png}
@@ -409,7 +409,7 @@ text:name; text-offset:7; font-size:9; font-family: DejaVu Sans Mono Book; text-
 }
 
 node|z12-[railway=station][transport=subway] {icon-image:metro_others6.png;
-text:name; text-offset:11; font-size:9; font-family: DejaVu Sans Book; text-halo-radius:2; text-color:#1300bb;text-halo-color:#ffffff; text-allow-overlap: false;z-index:17; linecap: butt;
+text:name; text-offset:11; font-size:9; font-family: DejaVu Sans Book; text-halo-radius:2; text-color:#1300bb;text-halo-color:#ffffff; text-allow-overlap: false;z-index:17;
 }
 
 
