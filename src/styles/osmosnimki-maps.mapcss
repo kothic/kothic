@@ -23,6 +23,8 @@ area[leisure=garden],
 area[landuse=orchard]
        {fill-color:#edf2c1; z-index:3}
 
+area[leisure=park] {fill-color: #c4e9a4; z-index:3}
+
 area|z16-[leisure=garden],
 area|z16-[landuse=orchard]
        {fill-image:sady10.png; z-index:3}
@@ -35,7 +37,7 @@ area[landuse=grass], area[natural=grass] {fill-color: #f4ffe5; z-index:5}
 
 area[landuse=farmland], area[landuse=farm], area[landuse=field]  {fill-color: #fcf8e4; z-index:5}
 
-area[leisure=park] {fill-color: #c4e9a4; z-index:6}
+
 
 area[landuse=industrial],area[landuse=military] {fill-color: #ddd8da; z-index:6}
 
@@ -43,7 +45,7 @@ area[landuse=garages] {fill-color: #ddd8da; z-index:7}
 
 area[landuse=cemetery] {fill-color: #e5f5dc; z-index:8; fill-image:cemetry7_2.png}
 
-area[leisure=stadium]{fill-color: #d0ffff; casing-width: 2; casing-color: #00ccff;z-index:8;}
+area[leisure=stadium]{fill-color: #e3deb1;z-index:8;}
 
 
 way|z-10[waterway=river]   {color: #C4D4F5; width: .6; z-index:9}
@@ -60,12 +62,12 @@ way[natural=water]
 way[natural=water]{text:name; text-offset:1; font-size:9; /* font-family: DejaVu Serif Oblique;*/; text-color:#285fd1; text-allow-overlap: false }
 
 way|z15-16[highway=construction]
-{text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Book; font-size:9;
+{text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Book; font-size:9; text-halo-radius: 1; text-halo-color: #ffffff; text-halo-radius: 1; text-halo-color: #ffffff;
 casing-width:0.5; casing-color:#996703;
 width:2; color: #ffffff; z-index:10; dashes:9,9}
 
 way|z17-[highway=construction]
-{text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Book; font-size:9;
+{text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Book; font-size:9; text-halo-radius: 1; text-halo-color: #ffffff; text-halo-radius: 1; text-halo-color: #ffffff;
 casing-width:0.5; casing-color:#996703;
 width:3; color: #ffffff; z-index:10; dashes:9,9}
 
@@ -73,7 +75,7 @@ way|z15-[highway=footway],
 way|z15-[highway=path],
 way|z15-[highway=cycleway],
 way|z15-[highway=pedestrian],
-{text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Book; font-size:9;
+{text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Book; font-size:9; text-halo-radius: 1; text-halo-color: #ffffff; text-halo-radius: 1; text-halo-color: #ffffff;
 casing-width:.3; casing-color:#996703;
 width:.2; color: #ffffff; z-index:10; dashes:2,2}
 
@@ -85,12 +87,12 @@ way|z-12[highway=track]
 
 way|z13[highway=road],
 way|z13[highway=track]
-{text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Book; font-size:9;
+{text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Book; font-size:9; text-halo-radius: 1; text-halo-color: #ffffff;
         width:0.6; opacity: 0.5; color: #996703; z-index:10}
 
 way|z14-16[highway=road],
 way|z14-16[highway=track]
-{text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Book; font-size:9;
+{text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Book; font-size:9; text-halo-radius: 1; text-halo-color: #ffffff;
 width:1.5;  color: #ffffff;
 casing-width:0.5; casing-color: #996703;
 z-index:9}
@@ -98,11 +100,18 @@ z-index:9}
 
 way|z16-[highway=road],
 way|z16-[highway=track]
-{text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Book; font-size:9;
+{text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Book; font-size:9; text-halo-radius: 1; text-halo-color: #ffffff;
 width:2.5;  color: #ffffff;
 casing-width:0.5; casing-color: #996703;
 z-index:9}
 
+
+
+way|z13[highway=residential]
+{text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Book; font-size:9; text-halo-radius: 1; text-halo-color: #ffffff;
+width:1.2;  color: #ffffff;
+casing-width:0.3; casing-color: #996703;
+z-index:10}
 
 
 way|z15[highway=service][living_street=yes],
@@ -111,10 +120,12 @@ way|z15[highway=service][service=parking_aisle],
 
 
 
-way|z13[highway=residential],
+
+
+
 way|z16-[highway=service][living_street=yes],
 way|z16-[highway=service][service=parking_aisle],
-{text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Book; font-size:9;
+{text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Book; font-size:9; text-halo-radius: 1; text-halo-color: #ffffff;
         width:1.2;  color: #ffffff;
         casing-width:0.3; casing-color: #996703;
         z-index:10}
@@ -122,21 +133,21 @@ way|z16-[highway=service][service=parking_aisle],
 way|z14-15[highway=residential],
 way|z14-15[highway=service][living_street!=yes][service!=parking_aisle],
 
-{text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Book; font-size:9;
+{text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Book; font-size:9; text-halo-radius: 1; text-halo-color: #ffffff;
         width:2.5;  color: #ffffff;
         casing-width:0.5; casing-color: #996703;
         z-index:10}
 
 way|z16[highway=residential],
 way|z16[highway=service][living_street!=yes][service!=parking_aisle],
-{text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Book; font-size:9;
+{text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Book; font-size:9; text-halo-radius: 1; text-halo-color: #ffffff;
         width:3.5;  color: #ffffff;
         casing-width:0.5; casing-color: #996703;
         z-index:10}
 
-way|z17[highway=residential],
-way|z17[highway=service][living_street!=yes][service!=parking_aisle],
-{text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Book; font-size:9;
+way|z17-[highway=residential],
+way|z17-[highway=service][living_street!=yes][service!=parking_aisle],
+{text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Book; font-size:9; text-halo-radius: 1; text-halo-color: #ffffff;
         width:4.5;  color: #ffffff;
         casing-width:0.5; casing-color: #996703;
         z-index:10}
@@ -152,42 +163,42 @@ way|z-10[highway=secondary_link]
 
 way|z11[highway=secondary],
 way|z11[highway=secondary_link]
-{text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Bold; font-size:9;
+{text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Bold; font-size:9; text-halo-radius: 1; text-halo-color: #ffffff; text-halo-radius: 1; text-halo-color: #ffffff;
         width:1.4;  color: #fcffd1;
         casing-width:0.35; casing-color: #996703;
         z-index:11}
 
 way|z12[highway=secondary],
 way|z12[highway=secondary_link]
-{text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Bold; font-size:9;
+{text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Bold; font-size:9; text-halo-radius: 1; text-halo-color: #ffffff; text-halo-radius: 1; text-halo-color: #ffffff;
         width:3;  color: #fcffd1;
         casing-width:0.35; casing-color: #996703;
         z-index:11}
 
 way|z13[highway=secondary],
 way|z13[highway=secondary_link]
-{text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Bold; font-size:9;
+{text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Bold; font-size:9; text-halo-radius: 1; text-halo-color: #ffffff;
         width:4;  color: #fcffd1;
         casing-width:0.35; casing-color: #996703;
         z-index:11}
 
 way|z14[highway=secondary],
 way|z14[highway=secondary_link]
-{text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Bold; font-size:9;
+{text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Bold; font-size:9; text-halo-radius: 1; text-halo-color: #ffffff;
         width:5;  color: #fcffd1;
         casing-width:0.5; casing-color: #996703;
         z-index:11}
 
 way|z15[highway=secondary],
 way|z15[highway=secondary_link]
-{text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Bold; font-size:9;
+{text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Bold; font-size:9; text-halo-radius: 1; text-halo-color: #ffffff;
         width:6;  color: #fcffd1;
         casing-width:0.5; casing-color: #996703;
         z-index:11}
 
 way|z16[highway=secondary],
 way|z16[highway=secondary_link]
-{text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Bold; font-size:9;
+{text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Bold; font-size:9; text-halo-radius: 1; text-halo-color: #ffffff;
         width:7;  color: #fcffd1;
         casing-width:0.5; casing-color: #996703;
         z-index:11}
@@ -195,7 +206,7 @@ way|z16[highway=secondary_link]
 
 way|z17[highway=secondary],
 way|z17[highway=secondary_link]
-{text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Bold; font-size:9;
+{text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Bold; font-size:9; text-halo-radius: 1; text-halo-color: #ffffff;
         width:8;  color: #fcffd1;
         casing-width:0.5; casing-color: #996703;
         z-index:11}
@@ -212,49 +223,49 @@ way|z-10[highway=primary_link]
         z-index:12}
 way|z11[highway=primary],
 way|z11[highway=primary_link]
-        {text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Bold; font-size:9;
+        {text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Bold; font-size:9; text-halo-radius: 1; text-halo-color: #ffffff;
         width:4;  color: #fcea97;
         casing-width:.5; casing-color: #996703;
         z-index:12}
 
 way|z12[highway=primary],
 way|z12[highway=primary_link]
-        {text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Bold; font-size:9;
+        {text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Bold; font-size:9; text-halo-radius: 1; text-halo-color: #ffffff;
         width:5;  color: #fcea97;
         casing-width:.5; casing-color: #996703;
         z-index:12}
 
 way|z13[highway=primary],
 way|z13[highway=primary_link]
-        {text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Bold; font-size:9;
+        {text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Bold; font-size:9; text-halo-radius: 1; text-halo-color: #ffffff;
         width:6;  color: #fcea97;
         casing-width:.5; casing-color: #996703;
         z-index:12}
 
 way|z14[highway=primary],
 way|z14[highway=primary_link]
-        {text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Bold; font-size:9;
+        {text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Bold; font-size:9; text-halo-radius: 1; text-halo-color: #ffffff;
         width:7;  color: #fcea97;
         casing-width:.5; casing-color: #996703;
         z-index:12}
 
 way|z15[highway=primary],
 way|z15[highway=primary_link]
-        {text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Bold; font-size:9;
+        {text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Bold; font-size:9; text-halo-radius: 1; text-halo-color: #ffffff;
         width:8;  color: #fcea97;
         casing-width:.5; casing-color: #996703;
         z-index:12}
 
 way|z16[highway=primary],
 way|z16[highway=primary_link]
-        {text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Bold; font-size:9;
+        {text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Bold; font-size:9; text-halo-radius: 1; text-halo-color: #ffffff;
         width:9;  color: #fcea97;
         casing-width:.5; casing-color: #996703;
         z-index:12}
 
 way|z17[highway=primary],
 way|z17[highway=primary_link]
-        {text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Bold; font-size:9;
+        {text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Bold; font-size:9; text-halo-radius: 1; text-halo-color: #ffffff;
         width:10;  color: #fcea97;
         casing-width:.5; casing-color: #996703;
         z-index:12}
@@ -274,7 +285,7 @@ way|z11[highway=trunk],
 way|z11[highway=trunk_link],
 way|z11[highway=motorway],
 way|z11[highway=motorway_link]
-{text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Bold; font-size:9;
+{text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Bold; font-size:9; text-halo-radius: 1; text-halo-color: #ffffff;
         width:5;  color: #ffd780;
         casing-width:1; casing-color: #996703;
         z-index:13}
@@ -283,7 +294,7 @@ way|z12[highway=trunk],
 way|z12[highway=trunk_link],
 way|z12[highway=motorway],
 way|z12[highway=motorway_link]
-{text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Bold; font-size:9;
+{text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Bold; font-size:9; text-halo-radius: 1; text-halo-color: #ffffff;
         width:7;  color: #ffd780;
         casing-width:1; casing-color: #996703;
         z-index:13}
@@ -292,7 +303,7 @@ way|z13[highway=trunk],
 way|z13[highway=trunk_link],
 way|z13[highway=motorway],
 way|z13[highway=motorway_link],
-{text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Bold; font-size:9;
+{text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Bold; font-size:9; text-halo-radius: 1; text-halo-color: #ffffff;
         width:8;  color: #ffd780;
         casing-width:1; casing-color: #996703;
         z-index:13}
@@ -301,7 +312,7 @@ way|z14[highway=trunk],
 way|z14[highway=trunk_link],
 way|z14[highway=motorway],
 way|z14[highway=motorway_link],
-{text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Bold; font-size:9;
+{text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Bold; font-size:9; text-halo-radius: 1; text-halo-color: #ffffff;
         width:9;  color: #ffd780;
         casing-width:1; casing-color: #996703;
         z-index:13}
@@ -311,7 +322,7 @@ way|z15[highway=trunk],
 way|z15[highway=trunk_link],
 way|z15[highway=motorway],
 way|z15[highway=motorway_link],
-{text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Bold; font-size:9;
+{text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Bold; font-size:9; text-halo-radius: 1; text-halo-color: #ffffff;
         width:10;  color: #ffd780;
         casing-width:1; casing-color: #996703;
         z-index:13}
@@ -320,7 +331,7 @@ way|z16[highway=trunk],
 way|z16[highway=trunk_link],
 way|z16[highway=motorway],
 way|z16[highway=motorway_link],
-{text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Bold; font-size:9;
+{text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Bold; font-size:9; text-halo-radius: 1; text-halo-color: #ffffff;
         width:11;  color: #ffd780;
         casing-width:1; casing-color: #996703;
         z-index:13}
@@ -329,7 +340,7 @@ way|z17[highway=trunk],
 way|z17[highway=trunk_link],
 way|z17[highway=motorway],
 way|z17[highway=motorway_link],
-{text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Bold; font-size:9;
+{text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Bold; font-size:9; text-halo-radius: 1; text-halo-color: #ffffff;
         width:12;  color: #ffd780;
         casing-width:1; casing-color: #996703;
         z-index:13}
@@ -342,7 +353,7 @@ way[highway=motorway]::centerline,
 way[highway=motorway_link]::centerline,
 way|z13-[highway=primary]::centerline,
 way|z13-[highway=primary_link]::centerline,
-        {width:.3;  color: #fa6478; z-index:14}
+        {width:.3;  color: #fa6478; z-index:14; -x-mapnik-layer: top}
 
 way|z17-[oneway=yes]{line-style:arrows;z-index:15}
 
@@ -356,16 +367,17 @@ way|z12-[railway=subway]
 {width:3; color: #072889;z-index:15; dashes:3,3; opacity:0.3}
 
 
-node|z15-[amenity=fuel]{icon-image:tankstelle1_10x11.png}
-node|z16-[amenity=pharmacy]{icon-image:med1_11x14.png}
-node|z16-[amenity=cinema]{icon-image:cinema_14x14.png}
-node|z16-[amenity=museum]{icon-image:mus_13x12.png}
-node|z16-[tourism=zoo]{icon-image:zoo4_14x14.png}
-node|z16-[amenity=сourthouse]{icon-image:sud_14x13.png}
-node|z16-[amenity=theatre]{icon-image:teater_14x14.png}
+node|z15-[amenity=fuel]      {icon-image:tankstelle1_10x11.png}
+node|z16-[amenity=pharmacy]  {icon-image:med1_11x14.png}
+node|z16-[amenity=cinema]    {icon-image:cinema_14x14.png}
+node|z16-[amenity=museum]    {icon-image:mus_13x12.png}
+node|z16-[tourism=zoo]       {icon-image:zoo4_14x14.png}
+node|z16-[amenity=courthouse]{icon-image:sud_14x13.png}
+node|z16-[amenity=theatre]   {icon-image:teater_14x14.png}
 node|z16-[amenity=university]{icon-image:univer_15x11.png}
-node|z16-[amenity=toilets]{icon-image:wc-3_13x13.png}
-node|z16-[amenity=place_of_worship][religion=christian]{icon-image:pravosl_kupol_11x15.png}
+node|z16-[amenity=toilets]   {icon-image:wc-3_13x13.png}
+node|z16-[amenity=place_of_worship][religion=christian]
+                             {icon-image:pravosl_kupol_11x15.png}
 
 node|z17-[amenity=kindergarten]{icon-image:kindergarten_14x14.png}
 node|z17-[amenity=school]{icon-image:school_13x13.png}
@@ -397,7 +409,7 @@ text:name; text-offset:7; font-size:9; font-family: DejaVu Sans Mono Book; text-
 }
 
 node|z12-[railway=station][transport=subway] {icon-image:metro_others6.png;
-text:name; text-offset:11; font-size:9; font-family: DejaVu Sans Book; text-halo-radius:2; text-color:#1300bb;text-halo-color:#ffffff; text-allow-overlap: false;z-index:17
+text:name; text-offset:11; font-size:9; font-family: DejaVu Sans Book; text-halo-radius:2; text-color:#1300bb;text-halo-color:#ffffff; text-allow-overlap: false;z-index:17; linecap: butt;
 }
 
 
@@ -411,9 +423,9 @@ node[place=town],
 node|z12-[place=city]
 {text:name; text-offset:-20; font-size:14; font-family: DejaVu Sans Bold; text-halo-radius:3; text-color:#101010;text-halo-color:#ffffff; text-allow-overlap: false}
 
-node[place=village]{text:name; text-offset:1; font-size:9; font-family: DejaVu Sans Bold; text-halo-radius:1; text-color:#606060;text-halo-color:#ffffff; text-allow-overlap: false}
+node[place=village]{text:name; text-offset:1; font-size:9; font-family: DejaVu Sans Book; text-halo-radius:1; text-color:#606060;text-halo-color:#ffffff; text-allow-overlap: false}
 
-node[place=hamlet]{text:name; text-offset:1; font-size:9; font-family: DejaVu Sans Bold; text-halo-radius:1; text-color:#505050;text-halo-color:#ffffff; text-allow-overlap: false}
+node[place=hamlet]{text:name; text-offset:1; font-size:9; font-family: DejaVu Sans Book; text-halo-radius:1; text-color:#505050;text-halo-color:#ffffff; text-allow-overlap: false}
 
 area|z11[landuse=nature_reserve],
 area|z11[leisure=park],
@@ -470,9 +482,10 @@ area|z10-[boundary=administrative][admin_level=6]
 /*way[landuse=industrial] {fill-color: #855}*/
 
 
-area|z12-[building] {width: .5;color: #D29D39; z-index:17;}
+area|z12-[building] {width: .3; color: #cca352; z-index:17;}
 area|z12-[building=yes] { fill-color: #E7CCB4;  z-index:17;}
-area|z12-[building][building != yes] {fill-color: #D8D1D1; z-index:17;}
+area|z12-[building=public] { fill-color: #edc2ba;  z-index:17;}
+area|z12-[building][building != yes][building!=public] {fill-color: #D8D1D1; z-index:17;}
 area|z15-[building] {text: addr:housenumber; text-halo-radius:1; text-position: center;}
 
 
