@@ -44,7 +44,7 @@ for zoom in range (minzoom, maxzoom):
   zsheet = mapniksheet[zoom]
   for chooser in style.choosers:
     if chooser.get_sql_hints(chooser.ruleChains[0][0].subject, zoom)[0]:
-      sys.stderr.write(str(chooser.get_sql_hints(chooser.ruleChains[0][0].subject, zoom)[0])+"\n")
+     # sys.stderr.write(str(chooser.get_sql_hints(chooser.ruleChains[0][0].subject, zoom)[0])+"\n")
       styles = chooser.styles[0]
       zindex = styles.get("z-index",0)
       if zindex not in zsheet:
@@ -54,9 +54,14 @@ for zoom in range (minzoom, maxzoom):
       chooser_entry["sql"] = "("+ chooser.get_sql_hints(chooser.ruleChains[0][0].subject,zoom)[1] +")"
       chooser_entry["style"] = styles
       chooser_entry["type"] = chooser.ruleChains[0][0].subject
-      chooser_entry["rule"] = [i.conditions for i in chooser.ruleChains[0]]
+      chooser_entry["rule"] = [i.conditions for i in chooser.ruleChains[0] if i.test_zoom(zoom)]
       chooser_entry["chooser"] = chooser
-    
+
+
+
+
+
+
 
 #print mapniksheet
 
@@ -99,7 +104,7 @@ for zoom, zsheet in mapniksheet.iteritems():
       mfile.write(xml_layer("postgis", "polygon", itags, sql ))
     else:
       xml_nolayer()
-  for layer_type, entry_types in {"line":("way", "line"), "polygon":("way","area")}.iteritems():
+  for layer_type, entry_types in [("polygon",("way","area")),("line",("way", "line"))]:
     for zlayer in range(-6,7):
       for zindex in ta:
         ## casings pass
