@@ -3,7 +3,7 @@ canvas{fill-color:#a0bc92}
 
 /*   ----------  DEFAULTS  ----------     */
 way {
-   text: name; text-position: line; text-halo-radius:2;
+  /* text: name; */text-position: line; text-halo-radius:2;
    linecap: round;
    opacity: eval( min(1, (num(any(tag("layer"),1))+5)/6) );
    casing-opacity: eval( min(1, (num(any(tag("layer"),1))+5)/6) );
@@ -24,6 +24,7 @@ way|z16-[highway]       /*[!lanes]*/
 
          );
      color:white;
+     
      casing-width: 1;  }
 
      
@@ -136,11 +137,21 @@ way[waterway=stream]{color: #009;width: eval(max(3, metric(tag("width")) ))}
 
 
 /*   ----------  BUILDINGS  ----------     */
-way|z16-[building] {fill-color: #522; text: addr:housenumber; text-halo-radius:2; z-index:100; text-position: center;
-opacity: 0.7;
-extrude:  eval( any( metric(tag("height")), metric ( num(tag("building:levels")) * 3)));
+
+way|z16-[barrier]{raise: eval(zmetric(tag("min_height")));}
+way|z16-[barrier]{extrude:  eval(  zmetric(tag("height")) - num(prop("raise")) );}
+
+
+way|z16-[building]{raise: eval( any( zmetric(tag("min_height")), zmetric ( num(tag("building:min_level")) * 3)));}
+
+way|z16-[building] {fill-color: #522;
+/*text: addr:housenumber;*/
+ text-halo-radius:2; z-index:100; text-position: center;
+opacity: 1;
+fill-opacity: 1;
+extrude:  eval( any( zmetric(tag("height")), zmetric ( num(tag("building:levels")) * 3)) - num(prop("raise")) );
 extrude-face-color: #e2e2e2;
-extrude-face-opacity: 0.7;
+extrude-face-opacity: 1;
 extrude-edge-width: 1;
 extrude-edge-color: #404040;
 }
@@ -163,9 +174,10 @@ way|z16-[natural=grass]{fill-color:  #cceecc; opacity: 0.8; fill-image: styles/d
 
 
 /*   ----------  AMENITIES  ----------     */
-way[amenity=parking] {icon-image: styles/default/parking.png; fill-color:yellow}
+way|z15-[amenity=parking] {icon-image: styles/default/parking.png; fill-color:yellow}
+
 way[amenity=bench] {extrude: eval(zmetric("0.6m")); width:eval(metric("0.5m")); extrude-face-opacity:0;extrude-edge-color:black;color:brown;opacity:0.75}
-{offset:eval(metric("-0.25m")); extrude-face-color:brown;extrude:eval(zmetric("1.2m"));extrude-face-opacity: 0.5}
+{offset:eval(metric("0.25m")); extrude-face-color:brown;extrude:eval(zmetric("1.2m"));extrude-face-opacity: 0.5}
 
 /*   ----------  BORDERS  ----------     */
 way[boundary=administrative] {width: 2; color: red; dashes:5,3; z-index:15}
