@@ -370,7 +370,7 @@ class RasterTile:
           ft_desc = pango.FontDescription()
           
           ft_desc.set_family(obj[1].get('font-family', 'sans'))
-          ft_desc.set_size(pango.SCALE*obj[1].get('font-size',9))
+          ft_desc.set_size(pango.SCALE*int(obj[1].get('font-size',9)))
           fontstyle = obj[1].get('font-style', 'normal')
           if fontstyle == 'italic':
             fontstyle = pango.STYLE_ITALIC
