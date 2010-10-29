@@ -3,17 +3,55 @@
   Osmosnimki maps style
 */
 
+/* коментарии отделяются так и могут встречаться везде, где можно поставить пробел */
+
 canvas {fill-color: #fcf8e4}
+/* 
+селектор, что рисовать.
+
+canvas - фон, считается одним большим полигоном, намного больше карты. 
+    К нему можно применять свойства заливок. 
+    Для mapnik'a нельзя выбирать разные параметры фона для разных зумов, и не поддерживаются иные параметры, кроме цвета
+
+node - точка.
+way - путь. выбирает одновременно все границы полигонов и все линейные объекты
+line - линейные объекты (обычно - незамкнутые пути, обычно к ним неприменима заливка)
+area - площадные объекты (обычно - замкнутые пути, применимы как заливки, так и линии контуров)
+
+ */
+
 
 area[place=city],
 area[place=town],
 area[place=hamlet],
 area[place=village],
 area[place=locality]
-       {fill-color:#f3eceb; z-index:1}
+/* 
+квадратные скобки после объекта - селектор по тегам.
+основные варианты: 
+тег=значение
+тег!=значение - выбрать все, кроме тег=значение
+тег - тег присутствует, значение не важно
 
+  */
+       {fill-color:#f3eceb; z-index:1}
+/*
+z-index - порядковый номер слоя, в котором будет лежать объект.
+чем меньше, тем ниже будет находиться объект (другие будут перекрывать)
+
+магия: на развязках обводки будут учитывать слои эстакад.
+Если нужно принудительно положить линию поверх всех дорог:
+-x-mapnik-layer: top;
+(к примеру, использовалось для рисования разделительных полос на primary )
+
+Если (вдруг) понадобится принудительно положить линию под все дороги (фон):
+-x-mapnik-layer: bottom;
+
+ */
 area[landuse=residential][residential!=urban]
        {fill-color:#f4d7c7; z-index:2}
+/* fill-color: - html-цвет заливки */
+
 area[landuse=residential][residential=urban]
        {fill-color:#f4fded; z-index:2}
 
@@ -24,10 +62,21 @@ area[landuse=orchard]
        {fill-color:#edf2c1; z-index:3}
 
 area[leisure=park] {fill-color: #c4e9a4; z-index:3;fill-image:parks2.png}
+/* fill-image: картинка, которой надо заполнить полигон  */
+
 
 area|z16-[leisure=garden],
 area|z16-[landuse=orchard]
        {fill-image:sady10.png; z-index:3}
+
+/*
+после селектора типа объекта можно опционально ограничить зумы:
+|zA-B, A < B
+если нам не нужна какая-то из границ ("от минимального зума до такого-то" 
+либо "от такого-то до бесконечности") - число A или B можно опустить.
+*/
+
+
 
 area[natural=forest], area[natural=wood],
 area[landuse=forest], area[landuse=wood]
@@ -55,6 +104,17 @@ area|z12-[leisure=pitch],
 
 
 way|z-10[waterway=river]   {color: #C4D4F5; width: .6; z-index:9}
+/* 
+свойства с префиксом fill- в основном относятся к заливкам, без префиксов - к линиям.
+width - ширина линии
+color - цвет линии
+opacity - прозрачность (1 - видимый полностью, 0 - совсем невидимый)
+casing-width - ширина обводки
+casing-color - цвет обводки
+casing-opacity - прозрачность обводки
+  */
+
+
 way|z-10[waterway=stream]  {color: #C4D4F5; width: .3; z-index:9}
 way|z10-14[waterway=river] {color: #C4D4F5; width: .7; z-index:9}
 way|z15-[waterway=river]    {color: #C4D4F5; width: .9; z-index:9}
@@ -67,6 +127,18 @@ area[landuse=reservoir],
 {fill-color: #C4D4F5; color: #C4D4F5; width:1; z-index:9;}
 
 area[natural=water]{text:name; text-offset:1; font-size:10; font-family: DejaVu Serif Italic; text-color:#285fd1; text-allow-overlap: false;text-halo-radius: 1; text-halo-color: #ffffff; }
+/*
+text - из какого поля брать текст
+text-offset - на сколько сдвинуть текст
+font-size - размер шрифта
+font-family - название шрифта
+text-color - цвет шрифта
+text-allow-overlap - разрешить этим надписям перекрывать другие
+text-halo-radius - радиус обводки у текста. ограничение mapnik'a - только в целых значениях пикселей
+text-halo-color - цвет обводки текста
+*/
+
+
 
 way|z15-16[highway=construction]
 {text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Book; font-size:9; text-halo-radius: 1; text-halo-color: #ffffff; text-halo-radius: 1; text-halo-color: #ffffff;
@@ -77,6 +149,13 @@ way|z17-[highway=construction]
 {text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Book; font-size:9; text-halo-radius: 1; text-halo-color: #ffffff; text-halo-radius: 1; text-halo-color: #ffffff;
 casing-width:0.5; casing-color:#996703;
 width:3; color: #ffffff; z-index:10; dashes:9,9}
+
+/*
+dashes - пунктир (длины сегментов включенных и отключенных)
+возможно, кроме этого потребуется сменить linecap c round на butt
+*/
+
+
 
 way|z15-[highway=footway],
 way|z15-[highway=path],
@@ -90,6 +169,11 @@ way|z15-[highway=steps],
 {text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Book; font-size:9; text-halo-radius: 1; text-halo-color: #ffffff; text-halo-radius: 1; text-halo-color: #ffffff;
 casing-width:.3; casing-color:#ffffff;
 width:3; color: #bf96ce; z-index:10; dashes:1,1; linecap:butt;}
+
+/*
+для отрисовки лестницы используется широкая линия с частым пунктиром, создающая впечатление перпендикулярных линий "ступенек".
+linecap:butt требуется для того, чтобы сегменты не "слипались" в одну линию.
+*/
 
 
 
@@ -245,7 +329,11 @@ way|z17[highway=tertiary_link]
         casing-width:0.5; casing-color: #996703;
         z-index:11}
 
+/*
 
+на данный момент конвертер не умеет каскадировать стили, поэтому каждый раз на каждую выбранную линию приходится писать все свойства.
+
+*/
 
 
 
@@ -389,19 +477,53 @@ way|z13-[highway=primary]::centerline,
 way|z13-[highway=primary_link]::centerline,
         {width:.3;  color: #fa6478; z-index:14; -x-mapnik-layer: top}
 
+
+
+/* 
+
+для линий можно определять subpart'ы и рисовать одну линию несколько раз _даже после появления каскадинга_ (иначе сходные правила будут объединен в одно с затиранием некоторых свойств)
+
+::subpart_name
+
+в данном примере для одной линии (например, highway=trunk) рисуется две линии: широкая жёлтая с обводкой (см. выше, без subpart) и тонкая красная по центру (с subpart centerline), рисуемая поверх всех жёлтых, даже если на развязках они должны уходить под низ.
+
+
+
+*/
+
 way|z17-[oneway=yes]{line-style:arrows;z-index:15}
+
+/*
+
+line-style - заливка линии картинкой.
+
+arrows - специальное значение для синих стрелочек, рисуемых в векторе
+
+*/
 
 
 way[railway=rail]
     {width:1.4; color: #606060;z-index:15}
 way[railway=rail]::ticks
-    {width:1; color: #ffffff; dashes: 6,6;z-index:15}
+    {width:1; color: #ffffff; dashes: 6,6;z-index:16}
+
+/*
+железная дорога рисуется в две линии:
+ - цельная широкая чёрная линия (фон)
+ - белый тонкий пунктир поверх нее
+
+*/
 
 way|z12-[railway=subway]
 {width:3; color: #072889;z-index:15; dashes:3,3; opacity:0.3; linecap: butt;}
 
 
 node|z15-[amenity=fuel]      {icon-image:tankstelle1_10x11.png}
+/*
+icon-image - картинка иконки
+
+*/
+
 node|z16-[amenity=pharmacy]  {icon-image:med1_11x14.png}
 node|z16-[amenity=cinema]    {icon-image:cinema_14x14.png}
 node|z16-[amenity=museum]    {icon-image:mus_13x12.png}
@@ -424,6 +546,11 @@ node|z17-[shop]{icon-image:superm_12x12.png}
 line[boundary=administrative][admin_level=2]
    {casing-width: 4; casing-opacity: 0.5; casing-color: #d4d4d4; casing-dashes:;
     width: 0.5; color: #202020; dashes: 6,4,1,4; opacity:0.7; z-index:16}
+
+/*
+для линии обводки отключены штриховки (casing-dashes:;), но включены для основной линии
+
+*/
 
 line[boundary=administrative][admin_level=4]
    {width: 0.7; color: #000000; dashes: 1,2; opacity:0.8; z-index:16}
