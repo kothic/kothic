@@ -42,8 +42,9 @@ class Eval():
       """
       for t in x:
         q = x
-      return " "
+      return 0
     tags = set([])
+    #print self.expr_text
 
     a = eval(self.expr,{},{
       "tag":lambda x: max([tags.add(x), " "]),
@@ -51,7 +52,7 @@ class Eval():
       "num": lambda x: 0,
       "metric": fake_compute,
       "zmetric": fake_compute,
-      "str": fake_compute,
+      "str": lambda x: "",
       "any": fake_compute,
       "min": fake_compute,
       "max": fake_compute,
