@@ -73,16 +73,21 @@ class StyleChooser:
     a = set()
     b = ""
     for c in self.ruleChains:
+      
       for r in c:
         p = r.get_sql_hints(type, zoom)
-        q = "("+") AND (".join([t[1] for t in p]) + ")"
-        if q == "()":
-          q = ""
-        if b and q:
-          b += " OR "+ q
-        else:
-          b = q
-        a.update(p)
+        if p:
+          #print p
+
+          q = "("+p[1] + ")"#[t[1] for t in p]
+          #print q
+          if q == "()":
+            q = ""
+          if b and q:
+            b += " OR "+ q
+          else:
+            b = q
+          a.update(p[0])
     # no need to check for eval's
     return a,b
   # // Update the current StyleList from this StyleChooser
@@ -243,8 +248,8 @@ class StyleChooser:
     adds into the current ruleChain (starting a new Rule)
     """
     self.ruleChains[self.rcpos].append(Rule(e))
-    self.ruleChains[self.rcpos][len(self.ruleChains[self.rcpos])-1].minZoom=float(self.scalepair[0])
-    self.ruleChains[self.rcpos][len(self.ruleChains[self.rcpos])-1].maxZoom=float(self.scalepair[1])
+    self.ruleChains[self.rcpos][-1].minZoom=float(self.scalepair[0])
+    self.ruleChains[self.rcpos][-1].maxZoom=float(self.scalepair[1])
 
 
           
