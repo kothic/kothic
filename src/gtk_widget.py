@@ -118,7 +118,9 @@ class KothicWidget(gtk.DrawingArea):
       y = event.y
       lo1, la1, lo2, la2 = projections.from4326(self.bbox, "EPSG:3857")
       print lo1, la1, lo2, la2
-      self.center_coord = projections.to4326((0.5*(self.width+self.dx)/self.width*(lo1-lo2)+lo2, la1+(0.5*(self.height+self.dy)/self.height*(la2-la1))),"EPSG:3857")
+      #self.center_coord = projections.to4326((0.5*(self.width+self.dx)/self.width*(lo1-lo2)+lo2, la1+(0.5*(self.height+self.dy)/self.height*(la2-la1))),"EPSG:3857")
+
+      self.center_coord = projections.to4326((0.5*(self.width+2*self.dx)/self.width*(lo1-lo2)+lo2, la1+(0.5*(self.height+2*self.dy)/self.height*(la2-la1))),"EPSG:3857")
       #self.rastertile.screen2lonlat(self.rastertile.w/2 - self.dx, self.rastertile.h/2 - self.dy);
       self.dx = 0
       self.dy = 0
@@ -156,25 +158,29 @@ class KothicWidget(gtk.DrawingArea):
     if self.old_center_coord != self.center_coord or self.old_zoom != self.zoom:
       #print "Recentered!"
       xy = projections.from4326(self.center_coord,"EPSG:3857")
-      xy1 = projections.to4326((xy[0]-40075016.*(0.5**(self.zoom))/256*self.width, xy[1]-40075016.*(0.5**(self.zoom))/256*self.height), "EPSG:3857")
-      xy2 = projections.to4326((xy[0]+40075016.*(0.5**(self.zoom))/256*self.width, xy[1]+40075016.*(0.5**(self.zoom))/256*self.height), "EPSG:3857")
+      xy1 = projections.to4326((xy[0]-40075016.*(0.5**(self.zoom))/self.tiles.tilewidth*self.width, xy[1]-40075016.*(0.5**(self.zoom))/self.tiles.tileheight*self.height), "EPSG:3857")
+      xy2 = projections.to4326((xy[0]+40075016.*(0.5**(self.zoom))/self.tiles.tilewidth*self.width, xy[1]+40075016.*(0.5**(self.zoom))/self.tiles.tileheight*self.height), "EPSG:3857")
       self.bbox = (xy1[0],xy1[1],xy2[0],xy2[1])
       self.tilebox = projections.tile_by_bbox(self.bbox, self.zoom, "EPSG:3857")
       self.old_center_coord = self.center_coord
       self.old_zoom = self.zoom
     from_tile_x, from_tile_y, to_tile_x, to_tile_y = self.tilebox
-    dx = (from_tile_x - int(from_tile_x))*self.tiles.tilewidth
-    dy = (from_tile_y - int(from_tile_y))*self.tiles.tileheight
+    dx = 1.*(from_tile_x - int(from_tile_x))*self.tiles.tilewidth
+    dy = 1.*(from_tile_y - int(from_tile_y))*self.tiles.tileheight
     print dx,dy
-    print self.dx, self.dy
-    
+    #print self.dx, self.dy
+    onscreen_tiles = set()
     for x in range (int(from_tile_x), int(to_tile_x)+1):
       for y in range (int(to_tile_y), int(from_tile_y)+1):
-        tile = self.tiles[(self.zoom,x,y)]
-        #print dx+(x-from_tile_x)*self.tiles.tilewidth-self.width
-        #print dy+(y-from_tile_y)*self.tiles.tileheight-self.height
-        cr.set_source_surface(tile, int(self.dx-dx+(x-int(from_tile_x))*self.tiles.tilewidth-self.width), int(self.dy-dy-(int(from_tile_y)-y)*self.tiles.tileheight+self.height))
-        cr.paint()
+        onscreen_tiles.add((self.zoom,x,y))
+    self.tiles.onscreen = onscreen_tiles
+    for z,x,y in onscreen_tiles:
+      tile = self.tiles[(self.zoom,x,y)]
+      #print dx+(x-from_tile_x)*self.tiles.tilewidth-self.width
+      #print dy+(y-from_tile_y)*self.tiles.tileheight-self.height
+      #cr.set_source_surface(tile, int(self.dx-dx+(x-int(from_tile_x))*self.tiles.tilewidth-self.width), int(self.dy-dy-(int(from_tile_y)-y)*self.tiles.tileheight+self.height))
+      cr.set_source_surface(tile, int(self.dx-dx+(x-int(from_tile_x))*self.tiles.tilewidth), int(self.dy-dy-(int(from_tile_y)-y)*self.tiles.tileheight+self.height))
+      cr.paint()
     #cr.set_source_surface(self.rastertile.surface, self.dx-self.width + self.rastertile.offset_x, self.dy - self.height + self.rastertile.offset_y)
     
     #self.comm[3].release()
@@ -185,23 +191,56 @@ class TileSource:
     self.tiles = {}
     self.tilewidth = 512
     self.tileheight = 512
+    self.max_tiles = 50
     self.data_backend = data
     self.style_backend = style
     self.callback = callback
-  def __getitem__(self,(z,x,y)):
+    self.onscreen = set()
+  def __getitem__(self,(z,x,y),wait=False):
     try:
       return self.tiles[(z,x,y)]["surface"]
     except:
       self.tiles[(z,x,y)] = {"tile": RasterTile(self.tilewidth, self.tileheight, z, self.data_backend)}
       self.tiles[(z,x,y)]["surface"] = self.tiles[(z,x,y)]["tile"].surface.create_similar(cairo.CONTENT_COLOR_ALPHA, self.tilewidth, self.tileheight)
-      self.tiles[(z,x,y)]["thread"] = threading.Thread(None, self.tiles[(z,x,y)]["tile"].update_surface,None, (projections.bbox_by_tile(z,x,y,"EPSG:3857"), z, self.style_backend, lambda: self._callback((z,x,y))))
+      self.tiles[(z,x,y)]["thread"] = threading.Thread(None, self.tiles[(z,x,y)]["tile"].update_surface,None, (projections.bbox_by_tile(z,x,y,"EPSG:3857"), z, self.style_backend, lambda p=False: self._callback((z,x,y),p)))
       self.tiles[(z,x,y)]["thread"].start()
+      if wait:
+        self.tiles[(z,x,y)]["thread"].join()
       return self.tiles[(z,x,y)]["surface"]
-  def _callback (self, (z,x,y)):
-    cr = cairo.Context(self.tiles[(z,x,y)]["surface"])
-    cr.set_source_surface(self.tiles[(z,x,y)]["tile"].surface,0,0)
-    cr.paint()
-    gobject.idle_add(self.callback)
+  def _callback (self, (z,x,y),last):
+    #if last:
+    #  print last, "dddddddddddddddddd" 
+
+    if (z,x,y) in self.onscreen or last:
+      cr = cairo.Context(self.tiles[(z,x,y)]["surface"])
+      cr.set_source_surface(self.tiles[(z,x,y)]["tile"].surface,0,0)
+      cr.paint()
+      gobject.idle_add(self.callback)
+    if last:
+      del self.tiles[(z,x,y)]["thread"]
+      del self.tiles[(z,x,y)]["tile"]
+    #if False:
+      if (z,x,y) in self.onscreen:
+        a = self.__getitem__((z-1,x/2,y/2),True)
+      if (z,x,y) in self.onscreen:
+        a = self.__getitem__((z+1,x*2,y*2),True)
+      if (z,x,y) in self.onscreen:
+        a = self.__getitem__((z+1,x*2+1,y*2),True)
+      if (z,x,y) in self.onscreen:
+        a = self.__getitem__((z+1,x*2,y*2+1),True)
+      if (z,x,y) in self.onscreen:
+        a = self.__getitem__((z+1,x*2+1,y*2+1),True)
+      if (z,x,y) in self.onscreen:
+        a = self.__getitem__((z,x+1,y),True)
+      if (z,x,y) in self.onscreen:
+        a = self.__getitem__((z,x,y+1),True)
+      if (z,x,y) in self.onscreen:
+        a = self.__getitem__((z,x-1,y),True)
+      if (z,x,y) in self.onscreen:
+        a = self.__getitem__((z,x,y-1),True)
+  #def collect_grabage (self):
+  #  if len(self.tiles)> self.max_tiles:
+      
   #def screen2lonlat(self, x, y):
     #lo1, la1, lo2, la2 = self.bbox_p
 
