@@ -17,6 +17,14 @@
 
 import re
 
+INVERSIONS = {"eq":"ne",  "true":"false", "set":"unset", "<":">=", ">":"<="}
+in2 = {}
+for a,b in INVERSIONS.iteritems():
+  in2[b] = a
+INVERSIONS.update(in2)
+del in2
+
+
 class Condition:
   def __init__(self, typez, params):
     self.type=typez         # eq, regex, lt, gt etc.
@@ -37,9 +45,13 @@ class Condition:
     Test a hash against this condition
     """
     
+    
 
     t = self.type
     params = self.params
+    if t == 'eq':   # don't compare tags against sublayers
+      if params[0][:2] == "::":
+        return True
     try:
       if t == 'eq':
         return tags[params[0]]==params[1]
@@ -71,11 +83,31 @@ class Condition:
     except KeyError:
       pass
     return False;
+  def inverse(self):
+    """
+    Get a not-A for condition A
+    """
+    t = self.type
+    params = self.params
+    try:
+      return Condition(INVERSIONS[t], params)
+      if t == 'regex':
+        ### FIXME: learn how to invert regexes
+        return Condition("regex", params)
+    except KeyError:
+      pass
+    return self;
+
+
+
 
   def get_sql(self):
     #params = [re.escape(x) for x in self.params]
     params = self.params
     t = self.type
+    if t == 'eq':   # don't compare tags against sublayers
+      if params[0][:2] == "::":
+        return ("","")
     try:
       if t == 'eq':
         return params[0], '"%s" = \'%s\''%(params[0], params[1])
@@ -106,6 +138,9 @@ class Condition:
     #params = [re.escape(x) for x in self.params]
     params = self.params
     t = self.type
+    if t == 'eq':   # don't compare tags against sublayers
+      if params[0][:2] == "::":
+        return ("","")
     try:
       if t == 'eq':
         return '[%s] = \'%s\''%(params[0], params[1])
@@ -134,6 +169,51 @@ class Condition:
       pass
   def __repr__(self):
     return "%s %s "%(self.type, repr(self.params))
+  def __eq__(self, a):
+    return (self.params == a.params) and (self.type == a.type)
+
+  def and_with(self, c2):
+    """
+    merges two rules with AND. 
+    """
+    #TODO: possible other minimizations
+    if c2.params[0] == self.params[0]:
+      if c2.params == self.params:
+        if c2.type == INVERSIONS[self.type]:  # for example,  eq AND ne = 0
+          return False
+        if c2.type == self.type:
+          return (self,)
+
+
+        if self.type == ">=" and c2.type == "<=": # a<=2 and a>=2 --> a=2
+          return (Condition ("eq", self.params),)
+        if self.type == "<=" and c2.type == ">=":
+          return (Condition ("eq", self.params),)
+        if self.type == ">" and c2.type == "<":
+          return False
+        if self.type == "<" and c2.type == ">":
+          return False
+
+      if c2.type == "eq" and self.type in ("ne", "<", ">"):
+        if c2.params[1] != self.params[1]:
+          return (c2,)
+      if self.type == "eq" and c2.type in ("ne", "<", ">"):
+        if c2.params[1] != self.params[1]:
+          return (self,)
+      if self.type == "eq" and c2.type == "eq":
+        if c2.params[1] != self.params[1]:
+          return False
+      if c2.type == "set" and self.type in ("eq","ne","regex", "<", "<=", ">", ">="): # a is set and a == b -> a == b
+        return (self,)
+      if c2.type == "unset" and self.type in ("eq","ne","regex", "<", "<=", ">", ">="): # a is unset and a == b -> impossible
+        return False
+      if self.type == "set" and c2.type in ("eq","ne","regex", "<", "<=", ">", ">="):
+        return (c2,)
+      if self.type == "unset" and c2.type in ("eq","ne","regex", "<", "<=", ">", ">="):
+        return False
+
+
+    return self, c2
 def Number(tt):
   """
   Wrap float() not to produce exceptions
