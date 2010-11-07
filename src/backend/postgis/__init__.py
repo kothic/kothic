@@ -20,7 +20,14 @@ from twms import projections
 import psycopg2
 import shapely.wkb
 class Empty:
-  pass
+  def copy(self):
+    a = Empty()
+    a.tags = self.tags.copy()
+    a.coords = self.coords[:]
+    a.center = self.center
+    a.cs = self.cs[:]
+    return a
+  
 
 class Way:
   def __init__(self, tags, geom):
@@ -66,10 +73,10 @@ class PostGisBackend:
     self.keep_tiles = 190                # a number of tiles to cache in memory
     self.tile_load_log = []             # used when selecting which tile to unload
     
-  def get_vectors (self, bbox, zoom, sql_hint = None):
+  def get_vectors (self, bbox, zoom, sql_hint = None, tags_hint = None):
     """
     Fetches vectors for given bbox.
-    sql_hint is a set of (key, sql_for_key)
+    sql_hint is a list of sets of (key, sql_for_key)
     """
     a = psycopg2.connect(self.database)
     b = a.cursor()
@@ -79,16 +86,33 @@ class PostGisBackend:
     resp = {}
     for table in tables:
       add = ""
+      taghint = "*"
       if sql_hint:
-        add = []
-        b.execute("SELECT * FROM %s LIMIT 1;"%table)
-        names = [q[0] for q in b.description]
-        for t,v in sql_hint:
-          if t in names:
-            add.append(v)
-        add = " OR ".join(add)
-        add = "("+add+") AND"
-      req = "SELECT * FROM %s WHERE %s way && SetSRID('BOX3D(%s %s,%s %s)'::box3d,900913);"%(table,add,bbox[0],bbox[1],bbox[2],bbox[3])
+        adp = []
+
+        for tp in sql_hint:
+          add = []
+          b.execute("SELECT * FROM %s LIMIT 1;"%table)
+          names = [q[0] for q in b.description]
+
+          for j in tp[0]:
+            if j not in names:
+              break
+          else:
+            add.append(tp[1])
+          if add:
+            add = " OR ".join(add)
+            add = "("+add+")"
+            adp.append(add)
+
+          if tags_hint:
+            taghint = ", ".join(['"'+j+'"' for j in tags_hint if j in names])+ ", way, osm_id"
+
+
+        adp = " OR ".join(adp)
+
+
+      req = "SELECT %s FROM %s WHERE (%s) and way && SetSRID('BOX3D(%s %s,%s %s)'::box3d,900913);"%(taghint,table,adp,bbox[0],bbox[1],bbox[2],bbox[3])
       print req
       b.execute(req)
       names = [q[0] for q in b.description]
@@ -121,5 +145,7 @@ class PostGisBackend:
           w = Way(row_dict, geom)
           #print row_dict
           resp[oid] = w
-
+    a.close()
+    del a
+    
     return resp
