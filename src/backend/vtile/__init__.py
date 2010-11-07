@@ -106,7 +106,7 @@ class QuadTileBackend:
           pass
           #debug ("tile killed not by us: %s" % (tile,))
 
-  def get_vectors (self, bbox, zoom, sql_hint = None):
+  def get_vectors (self, bbox, zoom, sql_hint = None, itags = None):
     zoom = int(zoom)
     zoom = min(zoom, self.max_zoom)     ## If requested zoom is better than the best, take the best
     zoom = max(zoom, 0)                 ## Negative zooms are nonsense
