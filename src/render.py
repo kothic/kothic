@@ -137,11 +137,15 @@ class RasterTile:
       hints = style.get_sql_hints('way', self.zoom)
     else:
       hints = None
-    
+    if "get_interesting_tags" in dir(style):
+      itags = style.get_interesting_tags(zoom=self.zoom)
+    else:
+      itags = None
+
     # enlarge bbox by 20% to each side. results in more vectors, but makes less artifaces.
     span_x, span_y = bbox[2]-bbox[0], bbox[3]-bbox[1]
     bbox_expand = [bbox[0]-0.2*span_x,bbox[1]-0.2*span_y,bbox[2]+0.2*span_x,bbox[3]+0.2*span_y]
-    vectors = self.data.get_vectors(bbox_expand,self.zoom,sql_hint = hints).values()
+    vectors = self.data.get_vectors(bbox_expand,self.zoom,hints,itags).values()
     datatimer.stop()
     datatimer = Timer("Applying styles")
     ww = []
@@ -174,6 +178,9 @@ class RasterTile:
         offset = float(w[1]["raise"])
         w[0].cs_real = w[0].cs
         w[0].cs = [(x,y-offset) for x,y in w[0].cs]
+      if "extrude" in w[1]:
+        if w[1]["extrude"]<2:
+          del w[1]["extrude"]
       if "extrude" in w[1] and "fill-color" not in w[1] and "width" in w[1]:
         w[1]["fill-color"] = w[1].get("color", (0,0,0))
         w[1]["fill-opacity"] = w[1].get("opacity", 1)
@@ -212,6 +219,21 @@ class RasterTile:
       
 
 
+
+      # - fill polygons
+      for obj in data:
+        if ("fill-color" in obj[1] or "fill-image"  in obj[1]) and not "extrude" in obj[1]:   ## TODO: fill-image
+          color = obj[1].get("fill-color", (0,0,0))
+          cr.set_source_rgba(color[0], color[1], color[2], obj[1].get("fill-opacity", 1))
+
+          if "fill-image" in obj[1]:
+            image = style.cache["image"][obj[1]["fill-image"]]
+            if image:
+              pattern = cairo.SurfacePattern(image)
+              pattern.set_extend(cairo.EXTEND_REPEAT)
+              cr.set_source(pattern)
+          poly(cr, obj[0].cs)
+
       # - draw casings on layer
       for obj in data:
         ### Extras: casing-linecap, casing-linejoin
@@ -228,21 +250,8 @@ class RasterTile:
           cr.set_line_cap(linecaps.get(obj[1].get("casing-linecap", obj[1].get("linecap", "butt")),0))
           line(cr, obj[0].cs)
 
-      # - fill polygons
-      for obj in data:
-        if ("fill-color" in obj[1] or "fill-image"  in obj[1]) and not "extrude" in obj[1]:   ## TODO: fill-image
-          color = obj[1]["fill-color"]
-          cr.set_source_rgba(color[0], color[1], color[2], obj[1].get("fill-opacity", 1))
-          
-          if "fill-image" in obj[1]:
-            image = style.cache["image"][obj[1]["fill-image"]]
-            if image:
-              pattern = cairo.SurfacePattern(image)
-              pattern.set_extend(cairo.EXTEND_REPEAT)
-              cr.set_source(pattern)
-          poly(cr, obj[0].cs)
       # - draw line centers
-      #for obj in data:
+      for obj in data:
         if ("width" in obj[1] or "color" in obj[1] or "image" in obj[1]) and "extrude" not in obj[1]:
           cr.set_dash(obj[1].get("dashes", []))
           cr.set_line_join(linejoin.get(obj[1].get("linejoin", "round"),1))
@@ -281,11 +290,14 @@ class RasterTile:
 
           faces = []
           coord = obj[0].cs[-1]
-          p_coord = (coord[0],coord[1]-raised)
+          #p_coord = (coord[0],coord[1]-raised)
+          p_coord = False
           for coord in obj[0].cs:
             c = (coord[0],coord[1]-raised)
-            extlist.append( (face_to_poly([c, p_coord],hgt), ("v", min(coord[1],p_coord[1]), hgt), obj ))
+            if p_coord:
+              extlist.append( (face_to_poly([c, p_coord],hgt), ("v", min(coord[1],p_coord[1]), hgt), obj ))
             p_coord = c
+          
           extlist.append( (excoords, ("h", min(coord[1],p_coord[1]), hgt), obj ))
           #faces.sort(lambda x,y:cmp(max([x1[1] for x1 in x]), max([x1[1] for x1 in y])))
 
@@ -513,11 +525,13 @@ class RasterTile:
                 #z += os*cr.text_extents(letter)[4]
 
       texttimer.stop()
+      del data
+    del layers
 
     timer.stop()
     rendertimer.stop()
     debug(self.bbox)
-    callback()
+    callback(True)
 
     
 class ImageLoader:
