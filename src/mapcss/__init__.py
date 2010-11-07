@@ -28,7 +28,7 @@ from Condition import Condition
 WHITESPACE = re.compile(r'^ \s+ ', re.S | re.X)
 
 COMMENT = re.compile(r'^ \/\* .+? \*\/ \s* ', re.S | re.X)
-CLASS = re.compile(r'^ ([\.:]\w+) \s* ', re.S | re.X)
+CLASS = re.compile(r'^ ([\.:]:?\w+) \s* ', re.S | re.X)
 NOT_CLASS = re.compile(r'^ !([\.:]\w+) \s* ', re.S | re.X)
 ZOOM = re.compile(r'^ \| \s* z([\d\-]+) \s* ', re.I | re.S | re.X)
 GROUP = re.compile(r'^ , \s* ', re.I | re.S | re.X)
@@ -66,6 +66,7 @@ oGROUP=3
 oCONDITION=4
 oOBJECT=5
 oDECLARATION=6
+oSUBPART=7
 
 DASH = re.compile(r'\-/g')
 COLOR = re.compile(r'color$/')
@@ -128,8 +129,6 @@ class MapCSS():
       self.cache["style"][shash] = style
       return style
 
-
-
     def get_interesting_tags(self, type=None, zoom=None):
       """
       Get set of interesting tags.
@@ -142,9 +141,16 @@ class MapCSS():
       """
       Get set of interesting tags.
       """
-      hints = set()
+      hints = []
       for chooser in self.choosers:
-        hints.update(chooser.get_sql_hints(type, zoom))
+        
+        p = chooser.get_sql_hints(type, zoom)
+        if p:
+          if p[0] and p[1]:
+           # print chooser.get_sql_hints(type, zoom)
+          
+            hints.append(p)
+      #print hints
       return hints
 
 
@@ -158,9 +164,6 @@ class MapCSS():
       previous = 0  # what was the previous CSS word?
       sc=StyleChooser(self.scalepair) #currently being assembled
       #choosers=[]
-      
-        
-
       #o = []
       while (css): 
 
@@ -186,7 +189,7 @@ class MapCSS():
                 
 
                       
-                sc.addCondition(Condition('set',cond));
+                sc.addCondition(Condition('eq',("::class",cond)))
                 previous=oCONDITION;
 
               #// Not class - !.motorway, !.builtup, !:hover
@@ -198,7 +201,7 @@ class MapCSS():
                 cond = NOT_CLASS.match(css).groups()[0]
                 log.debug("not_class found: %s"% (cond))
                 css = NOT_CLASS.sub("", css)
-                sc.addCondition(Condition('unset',cond));
+                sc.addCondition(Condition('ne',("::class",cond)))
                 previous=oCONDITION;
                       #css=css.replace(NOT_CLASS,'');
                       #sc.addCondition(new Condition('unset',o[1]));
@@ -310,11 +313,26 @@ def parseCondition(s):
               log.debug("condition NE: %s = %s"%(a[0], a[1]))
               return  Condition('ne'     ,a)
               ## FIXME: convert other conditions to python
-
-              #else if ((o=CONDITION_GT.exec(s)))    { return new Condition('>'        ,o[1],o[2]); }
-              #else if ((o=CONDITION_GE.exec(s)))    { return new Condition('>='       ,o[1],o[2]); }
-              #else if ((o=CONDITION_LT.exec(s)))    { return new Condition('<'        ,o[1],o[2]); }
-              #else if ((o=CONDITION_LE.exec(s)))    { return new Condition('<='       ,o[1],o[2]); }
+            if      CONDITION_GT.match(s):
+              a = CONDITION_GT.match(s).groups()
+              log.debug("condition GT: %s > %s"%(a[0], a[1]))
+              return  Condition('>'     ,a)
+            if      CONDITION_GE.match(s):
+              a = CONDITION_GE.match(s).groups()
+              log.debug("condition GE: %s >= %s"%(a[0], a[1]))
+              return  Condition('>='     ,a)
+            if      CONDITION_LT.match(s):
+              a = CONDITION_LT.match(s).groups()
+              log.debug("condition LT: %s < %s"%(a[0], a[1]))
+              return  Condition('<'     ,a)
+            if      CONDITION_LE.match(s):
+              a = CONDITION_LE.match(s).groups()
+              log.debug("condition LE: %s <= %s"%(a[0], a[1]))
+              return  Condition('<='     ,a)
+            if      CONDITION_REGEX.match(s):
+              a = CONDITION_REGEX.match(s).groups()
+              log.debug("condition REGEX: %s = %s"%(a[0], a[1]))
+              return  Condition('regex'     ,a)
               #else if ((o=CONDITION_REGEX.exec(s))) { return new Condition('regex',o[1],o[2]); }
 
             if      CONDITION_EQ.match(s):
@@ -347,7 +365,8 @@ def parseDeclaration(s):
                           #if ((o=ASSIGNMENT_EVAL.exec(a)))   { t[o[1].replace(DASH,'_')]=new Eval(o[2]); }
                           if ASSIGNMENT.match(a):
                             tzz = ASSIGNMENT.match(a).groups()
-                            t[tzz[0]]=tzz[1]
+                            
+                            t[tzz[0]]=tzz[1].strip().strip('"')
                             logging.debug("%s == %s" % (tzz[0],tzz[1]) )
                           else:
                             logging.debug("unknown %s" % (a) )
@@ -421,168 +440,3 @@ def parseDeclaration(s):
 if __name__ == "__main__":
   logging.basicConfig(level=logging.WARNING)
   mc = MapCSS(0,19)
-  mc.parse("""
-     
-  /*
-  
-  Stylesheet that mimicks, to a certain extent, potlatch 1.x
-  Andy Allan, November 2009
-  
-  Based heavily on:
-  MapCSS demonstration stylesheet
-  Richard Fairhurst, October 2009
-  
-  */
-
-  canvas   {antialiasing: full;}
-  
-  /* This rule applies to all areas (closed ways). Note that rules are applied in the order
-  they appear in the file, so later rules may replace this one for some ways.
-  This is used as a debugger for finding unstyled areas; it's obviously oversimplistic since
-  it picks up closed-loop highways. */
-  
-  way :area { color: red; width: 1; fill-color: red; fill-opacity: 0.5; }
-  
-  /* A set of fairly standard rules.
-  We use z-index to make sure high-priority roads appear above minor ones.
-  The default z-index is 5. If an object matches multiple rules with the same
-  z-index then the rules are "merged" (but individual properties become one or the other)  */
-  
-  way[highway=motorway],way[highway=motorway_link],
-  way[highway=trunk],way[highway=trunk_link],
-  way[highway=primary],way[highway=primary_link],
-  way[highway=secondary],way[highway=secondary_link],
-  way[highway=tertiary],way[highway=tertiary_link],
-  way[highway=residential]                             { text: name; text-color: black; font-size: 7; text-position: line;}
-  way[highway=motorway],way[highway=motorway_link]    { z-index: 9; color: #809BC0; width: 7; casing-color: black; casing-width: 8; }
-  way[highway=trunk],way[highway=trunk_link]          { z-index: 9; color: #7FC97F; width: 7; casing-color: black; casing-width: 8; }
-  way[highway=primary],way[highway=primary_link]      { z-index: 8; color: #E46D71; width: 7; casing-color: black; casing-width: 8; }
-  way[highway=secondary],way[highway=secondary_link]  { z-index: 7; color: #FDBF6F; width: 7; casing-width: 8; }
-  way[highway=tertiary],way[highway=unclassified]     { z-index: 6; color: #FEFECB; width: 5; casing-width: 7; }
-  way[highway=residential]                            { z-index: 5; color: #E8E8E8; width: 5; casing-color: gray; casing-width: 7; }
-  way[highway=service]                                { color: white; width: 3; casing-width: 5; }
-  
-  /* Pedestrian precincts need to be treated carefully. Only closed-loops with an explicit
-  area=yes tag should be filled. The below doesn't yet work as intended. */
-  way[highway=pedestrian] !:area { color: #ddddee; width: 5; casing-color: #555555; casing-width: 6; }
-  way[highway=pedestrian] :area  { color: #555555; width: 1; fill-color: #ddddee; fill-opacity: 0.8; }
-  
-  way[highway=steps]     { color: #FF6644; width: 2; dashes: 4, 2; }
-  way[highway=footway]   { color: #FF6644; width: 2; dashes: 6, 3; }
-  way[highway=bridleway] { z-index:9; color: #996644; width: 2; dashes: 4, 2, 2, 2; }
-  way[highway=track]     { color: #996644; width: 2; dashes: 4, 2; }
-  way[highway=path]      { color: lightgreen; width: 2; dashes: 2, 2; }
-  
-  way[waterway=river], way[waterway=canal] { color: blue; width: 2; text:name; text-color:blue; font-size:9; text-position: offset; text-offset: 7;}
-  
-  way[barrier] {color: #000000; width: 1}
-  
-  /* Fills can be solid colour or bitmap images */
-  
-  
-  way[natural] :area                          { color: #ADD6A5; width: 1; fill-color: #ADD6A5; fill-opacity: 0.2; }
-  way[landuse] :area                          { color: #444444; width: 2; fill-color: #444444; fill-opacity: 0.3; }
-  way[amenity],way[shop] :area                { color: #ADCEB5; width: 1; fill-color: #ADCEB5; fill-opacity: 0.2; }
-  way[leisure],way[sport] :area               { color: #8CD6B5; width: 1; fill-color: #8CD6B5; fill-opacity: 0.2; }
-  way[tourism] :area                          { color: #F7CECE; width: 1; fill-color: #F7CECE; fill-opacity: 0.2; }
-  way[historic],way[ruins] :area              { color: #F7F7DE; width: 1; fill-color: #F7F7DE; fill-opacity: 0.2; }
-  way[military] :area                         { color: #D6D6D6; width: 1; fill-color: #D6D6D6; fill-opacity: 0.2; }
-  way[building] :area                         { color: #ff6ec7; width: 1; fill-color: #ff6ec7; fill-opacity: 0.2; }
-  way[natural=water],
-  way[waterway] :area               { color: blue;    width: 2; fill-color: blue;    fill-opacity: 0.2; }
-  way[landuse=forest],way[natural=wood] :area { color: green;   width: 2; fill-color: green;   fill-opacity: 0.2; }
-  way[leisure=pitch],way[leisure=park]        { color: #44ff44; width: 1; fill-color: #44ff44; fill-opacity: 0.2; }
-  way[amenity=parking] :area                  { color: gray;    width: 1; fill-color: gray;    fill-opacity: 0.2; }
-  way[public_transport=pay_scale_area] :area  { color: gray;    width: 1; fill-color: gray;    fill-opacity: 0.1; }
-  
-  /* Addressing. Nodes with addresses *and* match POIs should have a poi icon, so we put addressing first */
-  
-  node[addr:housenumber],
-  node[addr:housename] { icon-image: circle; icon-width: 4; color: #B0E0E6; casing-color:blue; casing-width: 1; }
-  way[addr:interpolation] { color: #B0E0E6; width: 3; dashes: 3,3;}
-  
-  /* POIs, too, can have bitmap icons - they can even be transparent */
-  
-  node[amenity=pub] { icon-image: icons/pub.png; text-offset: 15; font-family: DejaVu; text: name; font-size: 9; }
-  node[place] { icon-image: icons/place.png; text-offset: 17; font-family: DejaVu; text: name; font-size: 9; font-weight: bold; text-decoration: underline; }
-  node[railway=station] { icon-image: icons/station.png; text-offset: 13; font-family: DejaVu; text: name; font-size: 9; font-weight: bold; }
-  node[aeroway=aerodrome] { icon-image: icons/airport.png; text-offset: 13; font-family: DejaVu; text: name; font-size: 10; }
-  node[amenity=atm] { icon-image: icons/atm.png; }
-  node[amenity=bank] { icon-image: icons/bank.png; text-offset: 15; text: name; }
-  node[highway=bus_stop] { icon-image: icons/bus_stop.png; }
-  node[amenity=cafe] { icon-image: icons/cafe.png; text-offset: 15; text: name; }
-  node[shop=convenience] { icon-image: icons/convenience.png; text-offset:15; text:name; }
-  node[shop=supermarket] { icon-image: icons/supermarket.png; text-offset:15; text:name; }
-  node[amenity=fast_food] { icon-image: icons/fast_food.png; text-offset:15; text: name; }
-  node[amenity=fire_station] { icon-image: icons/fire_station.png; }
-  node[amenity=hospital] { icon-image: icons/hospital.png; }
-  node[tourism=hotel] { icon-image: icons/hotel.png; }
-  node[amenity=parking] { icon-image: icons/parking.png; }
-  node[amenity=bicycle_parking] { icon-image: icons/parking_cycle.png; text-offset: 15; text: capacity; }
-  node[amenity=pharmacy] { icon-image: icons/pharmacy.png; }
-  node[amenity=pharmacy][dispensing=yes] { icon-image: icons/pharmacy_dispensing.png; }
-  node[amenity=police] { icon-image: icons/police.png; }
-  node[amenity=post_box] { icon-image: icons/post_box.png; }
-  node[amenity=recycling] { icon-image: icons/recycling.png; }
-  node[amenity=restaurant] { icon-image: icons/restaurant.png; }
-  node[amenity=school] { icon-image: icons/school.png; }
-  node[amenity=taxi] { icon-image: icons/taxi.png; }
-  node[amenity=telephone] { icon-image: icons/telephone.png; }
-  way node[barrier=gate], way node[highway=gate] { icon-image: icons/gate.png; }
-  way node[barrier=bollard] { icon-image: icons/bollard.png; }
-  node[barrier=cattle_grid] { icon-image: icons/cattle_grid.png; }
-  
-  /* We can stack styles at different z-index (depth) */
-  
-  way[railway=rail]
-  { z-index: 6; color: black; width: 5; }
-  { z-index: 7; color: white; width: 3; dashes: 12,12; }
-  way[railway=platform] { color:black; width: 2; }
-  way[railway=subway]
-  { z-index: 6; color: #444444; width: 5; }
-  { z-index: 7; color: white; width: 3; dashes: 8,8; }
-  
-  /* Bridge */
-  way[bridge=yes], way[bridge=viaduct], way[bridge=suspension]
-  { z-index: 4; color: white; width: eval('_width+3'); }
-  { z-index: 3; color: black; width: eval('_width+6'); }
-  
-  /* Tunnel */
-  way[tunnel=yes]
-  { z-index: 4; color: white; width: eval('_width+2'); }
-  { z-index: 3; color: black; width: eval('_width+6'); dashes: 4,4; }
-  
-  /* Oneway */
-  way[oneway=yes] { z-index: 10; color: #444444; width: 3; dashes: 15,25; line-style: arrows; }
-  
-  
-  /* Change the road colour based on dynamically set "highlighted" tag (see earlier) */
-  
-  way|z1-12 .highlighted { color: pink; }
-  
-  /* Interactive editors may choose different behaviour when a user mouses-over or selects
-  an object. Potlatch 2 supports these but the stand-alone Halcyon viewer does not */
-  
-  way :hover      { z-index: 2; width: eval('_width+10'); color: #ffff99; }
-  way :selected { z-index: 2; width: eval('_width+10'); color: yellow; opacity: 0.7;}
-  way !:drawn { z-index:10; width: 0.5; color: gray; }
-  
-  node :selectedway { z-index: 9; icon-image: square; icon-width: 8; color: red; }
-  node :hoverway { z-index: 9; icon-image: square; icon-width: 7; color: blue; }
-  node !:drawn :poi { z-index: 2; icon-image: circle; icon-width: 4; color: green; casing-color: black; casing-width: 1; }
-  node :selected { z-index: 1; icon-image: square; icon-width: eval('_width+10'); color: yellow; }
-  node :junction :selectedway { z-index: 8; icon-image: square; icon-width: 12; casing-color: black; casing-width: 1; }
-  
-  /* Descendant selectors provide an easy way to style relations: this example means "any way
-  which is part of a relation whose type=route". */
-  
-  relation[type=route] way { z-index: 1; width: 17; color: blue; opacity: 0.3; }
-  relation[type=route][route=bicycle][network=ncn] way { z-index: 1; width: 12; color: red; opacity: 0.3; }
-  relation[type=route][route=bicycle][network=rcn] way { z-index: 1; width: 12; color: cyan; opacity: 0.3; }
-  relation[type=route][route=bicycle][network=lcn] way { z-index: 1; width: 12; color: blue; opacity: 0.3; }
-  relation[type=route][route=foot] way { z-index: 1; width: 10; color: #80ff80; opacity: 0.6; }
-  
-  
-
-  """)
-  print mc.get_interesting_tags()
