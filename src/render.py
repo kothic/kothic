@@ -76,7 +76,7 @@ class RasterTile:
     if epsg4326:
       lon, lat = projections.from4326((lon,lat),self.proj)
     lo1, la1, lo2, la2 = self.bbox_p
-    return ((lon-lo1)*(self.w)/abs(lo2-lo1), ((la2-lat)*(self.h)/(la2-la1)))
+    return ((lon-lo1)*(self.w-1)/abs(lo2-lo1), ((la2-lat)*(self.h-1)/(la2-la1)))
   #  return (lon - self.center_coord[0])*self.lcc*self.zoom + self.w/2, -(lat - self.center_coord[1])*self.zoom + self.h/2
   def update_surface_by_center(self, lonlat, zoom, style):
     self.zoom = zoom
@@ -88,7 +88,7 @@ class RasterTile:
     return self.update_surface(bbox, zoom, style)
 
     
-  def update_surface(self, bbox, zoom, style, callback = lambda: None):
+  def update_surface(self, bbox, zoom, style, callback = lambda x=None: None):
     rendertimer = Timer("Rendering image")
     if "image" not in style.cache:
       style.cache["image"] = ImageLoader()
