@@ -22,6 +22,7 @@ import cairo
 import math
 import string
 import threading
+import datetime
 import time
 import Queue
 import os
@@ -189,37 +190,57 @@ class KothicWidget(gtk.DrawingArea):
 class TileSource:
   def __init__(self,data,style, callback = lambda: None):
     self.tiles = {}
-    self.tilewidth = 512
-    self.tileheight = 512
-    self.max_tiles = 50
+    self.tilewidth = 2048
+    self.tileheight = 2048
+    self.max_tiles = 32
     self.data_backend = data
     self.style_backend = style
     self.callback = callback
     self.onscreen = set()
+    self._singlethread = False
+    self._prerender = True
   def __getitem__(self,(z,x,y),wait=False):
+
     try:
+      #if "surface" in self.tiles[(z,x,y)] and not wait:
+      #  self._callback((z,x,y), True)
+      print "Tiles count:", len(self.tiles)
       return self.tiles[(z,x,y)]["surface"]
     except:
       self.tiles[(z,x,y)] = {"tile": RasterTile(self.tilewidth, self.tileheight, z, self.data_backend)}
-      self.tiles[(z,x,y)]["surface"] = self.tiles[(z,x,y)]["tile"].surface.create_similar(cairo.CONTENT_COLOR_ALPHA, self.tilewidth, self.tileheight)
-      self.tiles[(z,x,y)]["thread"] = threading.Thread(None, self.tiles[(z,x,y)]["tile"].update_surface,None, (projections.bbox_by_tile(z,x,y,"EPSG:3857"), z, self.style_backend, lambda p=False: self._callback((z,x,y),p)))
-      self.tiles[(z,x,y)]["thread"].start()
-      if wait:
-        self.tiles[(z,x,y)]["thread"].join()
+      self.tiles[(z,x,y)]["start_time"] = datetime.datetime.now()
+      if self._singlethread:
+        
+        self.tiles[(z,x,y)]["surface"] = self.tiles[(z,x,y)]["tile"].surface
+        self.tiles[(z,x,y)]["tile"].update_surface(projections.bbox_by_tile(z,x,y,"EPSG:3857"), z, self.style_backend, lambda p=False: self._callback((z,x,y),p))
+        
+        del self.tiles[(z,x,y)]["tile"]
+      else:
+        self.tiles[(z,x,y)]["surface"] = self.tiles[(z,x,y)]["tile"].surface.create_similar(cairo.CONTENT_COLOR_ALPHA, self.tilewidth, self.tileheight)
+        self.tiles[(z,x,y)]["thread"] = threading.Thread(None, self.tiles[(z,x,y)]["tile"].update_surface,None, (projections.bbox_by_tile(z,x,y,"EPSG:3857"), z, self.style_backend, lambda p=False: self._callback((z,x,y),p)))
+        self.tiles[(z,x,y)]["thread"].start()
+        if wait:
+          self.tiles[(z,x,y)]["thread"].join()
       return self.tiles[(z,x,y)]["surface"]
   def _callback (self, (z,x,y),last):
     #if last:
     #  print last, "dddddddddddddddddd" 
-
-    if (z,x,y) in self.onscreen or last:
-      cr = cairo.Context(self.tiles[(z,x,y)]["surface"])
-      cr.set_source_surface(self.tiles[(z,x,y)]["tile"].surface,0,0)
-      cr.paint()
-      gobject.idle_add(self.callback)
-    if last:
-      del self.tiles[(z,x,y)]["thread"]
-      del self.tiles[(z,x,y)]["tile"]
-    #if False:
+    if not self._singlethread:
+      if ((z,x,y) in self.onscreen or last) and "tile" in self.tiles[(z,x,y)]:
+        cr = cairo.Context(self.tiles[(z,x,y)]["surface"])
+        cr.set_source_surface(self.tiles[(z,x,y)]["tile"].surface,0,0)
+        cr.paint()
+        
+      if last:
+        try:
+          del self.tiles[(z,x,y)]["thread"]
+          del self.tiles[(z,x,y)]["tile"]
+        except KeyError:
+          pass
+        self.tiles[(z,x,y)]["finish_time"] = datetime.datetime.now() - self.tiles[(z,x,y)]["start_time"]
+    gobject.idle_add(self.callback)
+    self.collect_grabage()
+    if last and self._prerender:
       if (z,x,y) in self.onscreen:
         a = self.__getitem__((z-1,x/2,y/2),True)
       if (z,x,y) in self.onscreen:
@@ -238,16 +259,25 @@ class TileSource:
         a = self.__getitem__((z,x-1,y),True)
       if (z,x,y) in self.onscreen:
         a = self.__getitem__((z,x,y-1),True)
-  #def collect_grabage (self):
-  #  if len(self.tiles)> self.max_tiles:
-      
-  #def screen2lonlat(self, x, y):
-    #lo1, la1, lo2, la2 = self.bbox_p
+  def collect_grabage (self):
+    if len(self.tiles)> self.max_tiles:
+      # let's kick out the fastest rendered tiles - it's easy to rerender those
+      # don't touch onscreen tiles
+      cand = set(self.tiles.keys())
+      cand.difference_update(self.onscreen)
+      cand = [i for i in cand if "finish_time" in self.tiles[i]]
+      cand.sort(lambda i,j: self.tiles[i]["finish_time"]<self.tiles[i]["finish_time"])
+      while cand:
+       if (len(self.tiles)> self.max_tiles):
+        c = cand.pop()
+        try:
+          print "Killed tile ", c, " - finished in ",str(self.tiles[c]["finish_time"]), ", ago:", str(datetime.datetime.now()-self.tiles[c]["start_time"])
+          del self.tiles[c]
+        except KeyError:
+          pass
+       else:
+         break
 
-    #debug ("%s %s - %s %s"%(x,y,self.w, self.h))
-    #debug(self.bbox_p)
-
-    #return projections.to4326( (1.*x/self.w*(lo2-lo1)+lo1, la2+(1.*y/(self.h)*(la1-la2))),self.proj)
 
 
 if __name__ == "__main__":
