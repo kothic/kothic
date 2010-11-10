@@ -65,8 +65,8 @@ for zoom in range (minzoom, maxzoom):
 
 #print mapniksheet
 
+mfile = open("mapnik.xml","w")
 mfile = sys.stdout
-
 
 mfile.write(xml_start(style.get_style("canvas", {}, maxzoom)[0].get("fill-color", "#ffffff")))
 for zoom, zsheet in mapniksheet.iteritems():
@@ -230,50 +230,64 @@ for zoom, zsheet in mapniksheet.iteritems():
         xml_nolayer()
   for layer_type, entry_types in {"line":("way", "line"), "polygon":("way","area"), "point": ("node", "point")}.iteritems():
     for zindex in ta:
-      ## text pass
-      sql = set()
-      itags = set()
-      ttext = ""
-      xml = xml_style_start()
-      for entry in zsheet[zindex]:
-        if entry["type"] in entry_types:#, "node", "line", "point"):
-          if "text" in entry["style"]:
-            ttext = entry["style"]["text"].extract_tags().pop()
-            tface = entry["style"].get("font-family","DejaVu Sans Book")
-            tsize = entry["style"].get("font-size","10")
-            tcolor = entry["style"].get("text-color","#000000")
-            thcolor= entry["style"].get("text-halo-color","#ffffff")
-            thradius= entry["style"].get("text-halo-radius","0")
-            tplace= entry["style"].get("text-position","center")
-            toffset= entry["style"].get("text-offset","0")
-            toverlap= entry["style"].get("text-allow-overlap",entry["style"].get("allow-overlap","false"))
-            
-            xml += xml_rule_start()
-            xml += x_scale
-            rulestring = " or ".join([ "("+ " and ".join([i.get_mapnik_filter() for i in rule]) + ")" for rule in entry["rule"]])
-            xml += xml_filter(rulestring)
-            xml += xml_textsymbolizer(ttext,tface,tsize,tcolor, thcolor, thradius, tplace, toffset,toverlap)
-            sql.add(entry["sql"])
-            itags.update(entry["chooser"].get_interesting_tags(entry["type"], zoom))
-            xml += xml_rule_end()
+      for placement in ("line", "center"):
+        ## text pass
+        sql = set()
+        itags = set()
+        
+        texttags = set()
+        xml = xml_style_start()
+        for entry in zsheet[zindex]:
+          if entry["type"] in entry_types:#, "node", "line", "point"):
+            if "text" in entry["style"] and entry["style"].get("text-position","center")==placement:
+              ttext = entry["style"]["text"].extract_tags().pop()
+              texttags.add(ttext)
+              tface = entry["style"].get("font-family","DejaVu Sans Book")
+              tsize = entry["style"].get("font-size","10")
+              tcolor = entry["style"].get("text-color","#000000")
+              thcolor= entry["style"].get("text-halo-color","#ffffff")
+              thradius= entry["style"].get("text-halo-radius","0")
+              tplace= entry["style"].get("text-position","center")
+              toffset= entry["style"].get("text-offset","0")
+              toverlap= entry["style"].get("text-allow-overlap",entry["style"].get("allow-overlap","false"))
 
-      xml += xml_style_end()
-      sql.discard("()")
-      if sql:
-        mfile.write(xml)
-        if layer_type == "line":
-          sqlz = " OR ".join(sql)
-          itags = "\", \"".join(itags)
-          itags = "\""+ itags+"\""
-          sqlz = """with aaa as (SELECT %s, way FROM planet_osm_line where "%s" is not NULL and (%s)),
-          bbb as (SELECT %s, way from aaa where way &amp;&amp; !bbox! )
-          select %s, ST_LineMerge(ST_Union(way)) as way from bbb group by %s
-          """%(itags,ttext,sqlz,itags,itags,itags)
-          mfile.write(xml_layer("postgis-process", layer_type, itags, sqlz ))
+              xml += xml_rule_start()
+              xml += x_scale
+              
+              rulestring = " or ".join([ "("+ " and ".join([i.get_mapnik_filter() for i in rule]) + ")" for rule in entry["rule"]])
+              xml += xml_filter(rulestring)
+              xml += xml_textsymbolizer(ttext,tface,tsize,tcolor, thcolor, thradius, tplace, toffset,toverlap)
+              sql.add(entry["sql"])
+              itags.update(entry["chooser"].get_interesting_tags(entry["type"], zoom))
+              xml += xml_rule_end()
+
+        xml += xml_style_end()
+        sql.discard("()")
+        if sql:
+          mfile.write(xml)
+          ttext = " OR ".join(['"'+i+ "\" is not NULL " for i in texttags])
+          if placement == "center" and layer_type == "polygon":
+            sqlz = " OR ".join(sql)
+            itags = "\", \"".join(itags)
+            itags = "\""+ itags+"\""
+            sqlz = """select %s, ST_PointOnSurface(ST_Buffer(p.way,0)) as way
+            from planet_osm_%s p
+            where (%s) and p.way &amp;&amp; !bbox! and (%s)
+            """%(itags,layer_type,ttext,sqlz)
+            mfile.write(xml_layer("postgis-process", layer_type, itags, sqlz ))
+          elif layer_type == "line":
+            sqlz = " OR ".join(sql)
+            itags = "\", \"".join(itags)
+            itags = "\""+ itags+"\""
+            sqlz = """with aaa as (SELECT %s, way FROM planet_osm_line where (%s) and (%s)),
+            bbb as (SELECT %s, way from aaa where way &amp;&amp; !bbox! )
+            select %s, ST_LineMerge(ST_Union(way)) as way from bbb group by %s
+            """%(itags,sqlz,ttext,itags,itags,itags)
+            mfile.write(xml_layer("postgis-process", layer_type, itags, sqlz ))
+          else:
+            sql = " OR ".join(sql)
+            mfile.write(xml_layer("postgis", layer_type, itags, sql ))
         else:
-          sql = " OR ".join(sql)
-          mfile.write(xml_layer("postgis", layer_type, itags, sql ))
-      else:
-        xml_nolayer()
+          xml_nolayer()
 
 mfile.write(xml_end())
