@@ -37,8 +37,9 @@ class Condition:
     self.compiled_regex = ""
     
   def get_interesting_tags(self):
-
-     return set([self.params[0]])
+    if self.params[0][:2] == "::":
+      return []
+    return set([self.params[0]])
     
   def test(self, tags):
     """
@@ -140,7 +141,7 @@ class Condition:
     t = self.type
     if t == 'eq':   # don't compare tags against sublayers
       if params[0][:2] == "::":
-        return ("","")
+        return ''
     try:
       if t == 'eq':
         return '[%s] = \'%s\''%(params[0], params[1])
