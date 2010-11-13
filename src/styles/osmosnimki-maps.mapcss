@@ -178,7 +178,11 @@ linecap:butt требуется для того, чтобы сегменты н�
 
 
 way|z-12[highway=road],
-way|z-12[highway=track]
+way|z-12[highway=track],
+way|z-9[highway=secondary],
+way|z-9[highway=secondary_link],
+way|z-9[highway=tertiary],
+way|z-9[highway=tertiary_link]
         {text: name; text-position: line; width:0.2; opacity: 0.5; color: #996703; z-index:10}
 
 
@@ -213,7 +217,7 @@ z-index:10}
 
 way|z15[highway=service][living_street=yes],
 way|z15[highway=service][service=parking_aisle],
-{text: name; text-position: line; width:0.2; opacity: 0.5; color: #996703; z-index:10}
+{width:0.2; opacity: 0.5; color: #996703; z-index:10}
 
 
 
@@ -256,10 +260,10 @@ way|z17-[highway=service][living_street!=yes][service!=parking_aisle],
 
 
 
-way|z-10[highway=secondary],
-way|z-10[highway=secondary_link],
-way|z-10[highway=tertiary],
-way|z-10[highway=tertiary_link]
+way|z10[highway=secondary],
+way|z10[highway=secondary_link],
+way|z10[highway=tertiary],
+way|z10[highway=tertiary_link]
         {text: name; text-position: line;
         width:1.2;  color: #fcffd1;
         casing-width:0.35; casing-color: #996703;
@@ -336,9 +340,15 @@ way|z17[highway=tertiary_link]
 */
 
 
+way|z-9[highway=primary],
+way|z-9[highway=primary_link]
+{text: name; text-position: line;
+width:2;  color: #fcea97;
+casing-width:.5; casing-color: #996703;
+z-index:12}
 
-way|z-10[highway=primary],
-way|z-10[highway=primary_link]
+way|z10[highway=primary],
+way|z10[highway=primary_link]
         {text: name; text-position: line;
         width:3;  color: #fcea97;
         casing-width:.5; casing-color: #996703;
@@ -394,10 +404,20 @@ way|z17[highway=primary_link]
 
 
 
-way|z-10[highway=trunk],
-way|z-10[highway=trunk_link],
-way|z-10[highway=motorway],
-way|z-10[highway=motorway_link]
+way|z-9[highway=trunk],
+way|z-9[highway=trunk_link],
+way|z-9[highway=motorway],
+way|z-9[highway=motorway_link]
+{text: name; text-position: line;
+width:3;  color: #ffd780;
+casing-width:1; casing-color: #996703;
+z-index:13}
+
+
+way|z10[highway=trunk],
+way|z10[highway=trunk_link],
+way|z10[highway=motorway],
+way|z10[highway=motorway_link]
         {text: name; text-position: line;
         width:4;  color: #ffd780;
         casing-width:1; casing-color: #996703;
@@ -565,7 +585,7 @@ width: 0.5; color: #808080; dashes: 2,2; opacity:0.3; z-index:16}*/
 way|z12-[railway=tram]{line-style:rway44.png;z-index:17}
 
 
-node[railway=station][transport!=subway] {icon-image:rw_stat_stanzii_2_blue.png;
+node|z9-[railway=station][transport!=subway] {icon-image:rw_stat_stanzii_2_blue.png;
 text:name; text-offset:7; font-size:9; font-family: DejaVu Sans Mono Book; text-halo-radius:1; text-color:#000d6c;text-halo-color:#ffffff; text-allow-overlap: false;z-index:17
 }
 
@@ -579,8 +599,11 @@ node[aeroway=aerodrome]
        text:name; text-offset:12; font-size:9; font-family: DejaVu Sans Condensed Bold; text-halo-radius:1; text-color:#1e7ca5;text-halo-color:#ffffff; text-allow-overlap: false;z-index:17}
 
 
-node|z8-12[place=city] {text:name; text-offset:-10; font-size:11; font-family: DejaVu Sans Bold; text-halo-radius:2; text-color:#101010;text-halo-color:#ffffff; text-allow-overlap: false}
-node|z8-12[place=city] {text:name; text-offset:-20; font-size:14; font-family: DejaVu Sans Bold; text-halo-radius:3; text-color:#101010;text-halo-color:#ffffff; text-allow-overlap: true}
+node|z-8[place=city] {text:name; text-offset:-10; font-size:11; font-family: DejaVu Sans Bold; text-halo-radius:2; text-color:#101010;text-halo-color:#ffffff; text-allow-overlap: false}
+
+node|z8-12[place=city][capital=yes] {text:name; text-offset:-20; font-size:14; font-family: DejaVu Sans Bold; text-halo-radius:3; text-color:#101010;text-halo-color:#ffffff; text-allow-overlap: true}
+node|z8-12[place=city][capital!=yes] {text:name; text-offset:-20; font-size:14; font-family: DejaVu Sans Bold; text-halo-radius:2; text-color:#101010;text-halo-color:#ffffff; text-allow-overlap: false}
+
 node[place=town],
 node|z12-[place=city]
 {text:name; text-offset:-20; font-size:14; font-family: DejaVu Sans Bold; text-halo-radius:3; text-color:#101010;text-halo-color:#ffffff; text-allow-overlap: false}
@@ -648,7 +671,7 @@ area|z12-[building] {width: .3; color: #cca352; z-index:17;}
 area|z14-[building=yes] { fill-color: #E7CCB4;  z-index:17;}
 area|z14-[building=public] { fill-color: #edc2ba;  z-index:17;}
 area|z14-[building][building != yes][building!=public] {fill-color: #D8D1D1; z-index:17;}
-area|z15-[building] {text: addr:housenumber; text-halo-radius:1; text-position: center;}
+area|z15-[building] {text: addr:housenumber; text-halo-radius:1; text-position: center; font-size:9;}
 
 
 node|z13-[highway=milestone][pk]{text:pk; text-halo-radius:5}
