@@ -104,13 +104,13 @@ class MapCSS():
     def parseZoom(self, s):
 
       if ZOOM_MINMAX.match(s):
-        return ZOOM_MINMAX.match(s).groups()
+        return tuple([float(i) for i in ZOOM_MINMAX.match(s).groups()])
       elif ZOOM_MIN.match(s):
-        return ZOOM_MIN.match(s).groups()[0], self.maxscale
+        return float(ZOOM_MIN.match(s).groups()[0]), self.maxscale
       elif ZOOM_MAX.match(s):
-        return self.minscale,ZOOM_MAX.match(s).groups()[0]
+        return float(self.minscale),float(ZOOM_MAX.match(s).groups()[0])
       elif ZOOM_SINGLE.match(s):
-        return ZOOM_SINGLE.match(s).groups()[0],ZOOM_SINGLE.match(s).groups()[0]
+        return float(ZOOM_SINGLE.match(s).groups()[0]),float(ZOOM_SINGLE.match(s).groups()[0])
       else:
         logging.error("unparsed zoom: %s" %s)
 
