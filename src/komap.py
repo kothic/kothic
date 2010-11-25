@@ -27,7 +27,7 @@ try:
 except ImportError:
         pass
 
-minzoom = 1
+minzoom = 0
 maxzoom = 19
 
 
@@ -38,25 +38,28 @@ mapniksheet = {}
 
 # {zoom: {z-index: [{sql:sql_hint, cond: mapnikfiltercondition, subject: subj, style: {a:b,c:d..}},{r2}...]...}...}
 
-
+coast = {}
 for zoom in range (minzoom, maxzoom):
   mapniksheet[zoom] = {}
   zsheet = mapniksheet[zoom]
   for chooser in style.choosers:
-    if chooser.get_sql_hints(chooser.ruleChains[0][0].subject, zoom)[0]:
-     # sys.stderr.write(str(chooser.get_sql_hints(chooser.ruleChains[0][0].subject, zoom)[0])+"\n")
+    if chooser.get_sql_hints(chooser.ruleChains[0][0].subject, zoom)[1]:
+      sys.stderr.write(str(chooser.get_sql_hints(chooser.ruleChains[0][0].subject, zoom)[1])+"\n")
       styles = chooser.styles[0]
       zindex = styles.get("z-index",0)
       if zindex not in zsheet:
         zsheet[zindex] = []
       chooser_entry = {}
-      zsheet[zindex].append(chooser_entry)
       chooser_entry["sql"] = "("+ chooser.get_sql_hints(chooser.ruleChains[0][0].subject,zoom)[1] +")"
       chooser_entry["style"] = styles
       chooser_entry["type"] = chooser.ruleChains[0][0].subject
       chooser_entry["rule"] = [i.conditions for i in chooser.ruleChains[0] if i.test_zoom(zoom)]
+      chooser_entry["rulestring"] = " or ".join([ "("+ " and ".join([i.get_mapnik_filter() for i in rule if i.get_mapnik_filter()!='']) + ")" for rule in chooser_entry["rule"]])
       chooser_entry["chooser"] = chooser
-
+      if chooser_entry["type"] == "area" and "[natural] = 'coastline'" in chooser_entry["rulestring"]:
+          coast[zoom] = chooser_entry["style"]
+      else:
+        zsheet[zindex].append(chooser_entry)
 
 
 
@@ -68,11 +71,23 @@ for zoom in range (minzoom, maxzoom):
 mfile = open("mapnik.xml","w")
 mfile = sys.stdout
 
-mfile.write(xml_start(style.get_style("canvas", {}, maxzoom)[0].get("fill-color", "#ffffff")))
+mfile.write(xml_start(style.get_style("canvas", {}, maxzoom)[0].get("fill-color", "#000000")))
 for zoom, zsheet in mapniksheet.iteritems():
   x_scale = xml_scaledenominator(zoom)
   ta = zsheet.keys()
   ta.sort(key=float)
+  if zoom in coast:
+    xml = xml_style_start()
+    xml += xml_rule_start()
+    xml += x_scale
+    if "fill-color" in coast[zoom]:
+      xml += xml_polygonsymbolizer(coast[zoom].get("fill-color", "#ffffff"), coast[zoom].get("fill-opacity", "1"))
+    if "fill-image" in coast[zoom]:
+      xml += xml_polygonpatternsymbolizer(coast[zoom].get("fill-image", ""))
+    xml += xml_rule_end()
+    xml += xml_style_end()
+    xml += xml_layer("coast", zoom=zoom)
+    mfile.write(xml)
 
   for zindex in ta:    
     ## areas pass
@@ -84,8 +99,8 @@ for zoom, zsheet in mapniksheet.iteritems():
         if "fill-color" in entry["style"] or "fill-image" in entry["style"]:
           xml += xml_rule_start()
           xml += x_scale
-          rulestring = " or ".join([ "("+ " and ".join([i.get_mapnik_filter() for i in rule]) + ")" for rule in entry["rule"]])
-          xml += xml_filter(rulestring)
+
+          xml += xml_filter(entry["rulestring"])
           if "fill-color" in entry["style"]:
             xml += xml_polygonsymbolizer(entry["style"].get("fill-color", "black"), entry["style"].get("fill-opacity", "1"))
           if "fill-image" in entry["style"]:
@@ -123,8 +138,7 @@ for zoom, zsheet in mapniksheet.iteritems():
             if "casing-width" in entry["style"]:
               xml += xml_rule_start()
               xml += x_scale
-              rulestring = " or ".join([ "("+ " and ".join([i.get_mapnik_filter() for i in rule]) + ")" for rule in entry["rule"]])
-              xml += xml_filter(rulestring)
+              xml += xml_filter(entry["rulestring"])
               xml += xml_linesymbolizer(color=entry["style"].get("casing-color", "black"),
                 width=2*float(entry["style"].get("casing-width", 1))+float(entry["style"].get("width", 0)),
                 opacity=entry["style"].get("casing-opacity", entry["style"].get("opacity","1")),
@@ -166,8 +180,7 @@ for zoom, zsheet in mapniksheet.iteritems():
             if "width" in entry["style"] or "line-style" in entry["style"]:
               xml += xml_rule_start()
               xml += x_scale
-              rulestring = " or ".join([ "("+ " and ".join([i.get_mapnik_filter() for i in rule]) + ")" for rule in entry["rule"]])
-              xml += xml_filter(rulestring)
+              xml += xml_filter(entry["rulestring"])
               if "width" in entry["style"]:
                 xml += xml_linesymbolizer(color=entry["style"].get("color", "black"),
                   width=entry["style"].get("width", "1"),
@@ -196,7 +209,7 @@ for zoom, zsheet in mapniksheet.iteritems():
           mfile.write(xml_layer("postgis", layer_type, itags, sql ))
         else:
           xml_nolayer()
-  for layer_type, entry_types in {"line":("way", "line"), "polygon":("way","area"), "point": ("node", "point")}.iteritems():
+  for layer_type, entry_types in [("point", ("node", "point")),("line",("way", "line")), ("polygon",("way","area"))]:
     for zindex in ta:
       ## icons pass
       sql = set()
@@ -207,8 +220,7 @@ for zoom, zsheet in mapniksheet.iteritems():
           if "icon-image" in entry["style"]:
             xml += xml_rule_start()
             xml += x_scale
-            rulestring = " or ".join([ "("+ " and ".join([i.get_mapnik_filter() for i in rule]) + ")" for rule in entry["rule"]])
-            xml += xml_filter(rulestring)
+            xml += xml_filter(entry["rulestring"])
             xml += xml_pointsymbolizer(
               path=entry["style"].get("icon-image", ""),
               width=entry["style"].get("icon-width", ""),
@@ -228,9 +240,10 @@ for zoom, zsheet in mapniksheet.iteritems():
         mfile.write(xml_layer("postgis", layer_type, itags, sql ))
       else:
         xml_nolayer()
-  for layer_type, entry_types in {"line":("way", "line"), "polygon":("way","area"), "point": ("node", "point")}.iteritems():
-    for zindex in ta:
-      for placement in ("line", "center"):
+  
+  for zindex in ta:
+    for layer_type, entry_types in [ ("polygon",("way","area")),("point", ("node", "point")),("line",("way", "line"))]:
+      for placement in ("center","line"):
         ## text pass
         sql = set()
         itags = set()
@@ -250,13 +263,15 @@ for zoom, zsheet in mapniksheet.iteritems():
               tplace= entry["style"].get("text-position","center")
               toffset= entry["style"].get("text-offset","0")
               toverlap= entry["style"].get("text-allow-overlap",entry["style"].get("allow-overlap","false"))
+              tdistance= entry["style"].get("-x-mapnik-min-distance","26")
+              twrap= entry["style"].get("max-width",256)
+              talign= entry["style"].get("text-align","center")
 
               xml += xml_rule_start()
               xml += x_scale
               
-              rulestring = " or ".join([ "("+ " and ".join([i.get_mapnik_filter() for i in rule]) + ")" for rule in entry["rule"]])
-              xml += xml_filter(rulestring)
-              xml += xml_textsymbolizer(ttext,tface,tsize,tcolor, thcolor, thradius, tplace, toffset,toverlap)
+              xml += xml_filter(entry["rulestring"])
+              xml += xml_textsymbolizer(ttext,tface,tsize,tcolor, thcolor, thradius, tplace, toffset,toverlap,tdistance,twrap,talign)
               sql.add(entry["sql"])
               itags.update(entry["chooser"].get_interesting_tags(entry["type"], zoom))
               xml += xml_rule_end()
@@ -272,7 +287,7 @@ for zoom, zsheet in mapniksheet.iteritems():
             itags = "\""+ itags+"\""
             sqlz = """select %s, ST_PointOnSurface(ST_Buffer(p.way,0)) as way
             from planet_osm_%s p
-            where (%s) and p.way &amp;&amp; !bbox! and (%s)
+            where (%s) and p.way &amp;&amp; !bbox! and (%s) order by way_area
             """%(itags,layer_type,ttext,sqlz)
             mfile.write(xml_layer("postgis-process", layer_type, itags, sqlz ))
           elif layer_type == "line":
