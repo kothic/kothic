@@ -25,7 +25,7 @@ import web
 import StringIO
 
 style = MapCSS(1, 26)     #zoom levels
-style.parse(open("styles/osmosnimki-maps.mapcss","r").read())
+style.parse(open("styles/landuses.mapcss","r").read())
 
 
 #bbox = (27.115768874532,53.740327031764,28.028320754378,54.067187302158)
