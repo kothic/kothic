@@ -28,6 +28,7 @@ db_user = "gis"
 db_name = "gis"
 db_srid = 900913
 icons_path = "/home/gis/mapnik/kosmo/icons/"
+world_bnd_path = "/home/gis/mapnik/world_boundaries/"
 
 
 
@@ -102,24 +103,25 @@ def xml_linepatternsymbolizer(path=""):
   <LinePatternSymbolizer file="%s%s"/>"""%(icons_path, path)
 
 
-def xml_textsymbolizer(text="name",face="DejaVu Sans Book",size="10",color="#000000", halo_color="#ffffff", halo_radius="0", placement="line", offset="0", overlap="false"):
+def xml_textsymbolizer(text="name",face="DejaVu Sans Book",size="10",color="#000000", halo_color="#ffffff", halo_radius="0", placement="line", offset="0", overlap="false", distance="26", wrap_width=256, align="center"):
   color = nicecolor(color)
   halo_color = nicecolor(halo_color)
   placement = {"center": "point"}.get(placement.lower(), placement)
+  align = {"center": "middle"}.get(align.lower(), align)
   
   return """
-  <TextSymbolizer name="%s" face_name="%s" size="%s" fill="%s" halo_fill= "%s" halo_radius="%s" placement="%s" dy="%s" max_char_angle_delta="15" allow_overlap="%s" min_distance="26" />
-  """%(text,face,size,color,halo_color,halo_radius,placement,offset,overlap)
+  <TextSymbolizer name="%s" face_name="%s" size="%s" fill="%s" halo_fill= "%s" halo_radius="%s" placement="%s" dy="%s" max_char_angle_delta="15" allow_overlap="%s" wrap_width="%s" min_distance="%s" horizontal_alignment="%s" />
+  """%(text,face,int(float(size)),color,halo_color,halo_radius,placement,offset,overlap,wrap_width,distance,align)
 
 def xml_filter(string):
   return """
   <Filter>%s</Filter>"""%string
 
 def xml_scaledenominator(z1, z2=False):
-  z1, z2 = zoom_to_scaledenom(z1,z2)
+  zz1, zz2 = zoom_to_scaledenom(z1,z2)
   return """
   <MaxScaleDenominator>%s</MaxScaleDenominator>
-  <MinScaleDenominator>%s</MinScaleDenominator>"""%(z1,z2)
+  <MinScaleDenominator>%s</MinScaleDenominator><!-- z%s-%s -->"""%(zz1,zz2,z1,z2)
 
 def xml_start(bgcolor="#ffffff"):
   bgcolor = nicecolor(bgcolor)
@@ -180,7 +182,7 @@ def xml_hardcoded_arrows():
     <CssParameter name="stroke-dasharray">0,18,1,155</CssParameter>
   </LineSymbolizer>"""
 
-def xml_layer(type="postgis", geom="point", interesting_tags = "*", sql = "true" ):
+def xml_layer(type="postgis", geom="point", interesting_tags = "*", sql = "true", zoom=0 ):
   layer_id = get_id(1)
   global substyles
   subs = "\n".join(["<StyleName>s%s</StyleName>"%i for i in substyles])
@@ -228,7 +230,25 @@ def xml_layer(type="postgis", geom="point", interesting_tags = "*", sql = "true"
         <Parameter name="extent">-20037508.342789244, -20037508.342780735, 20037508.342789244, 20037508.342780709</Parameter>
       </Datasource>
     </Layer>"""%(layer_id, db_proj, subs, sql, db_user, db_name, db_srid,  table_prefix, geom)
-
+  elif type == "coast":
+    if zoom < 9:
+      return """
+      <Layer name="l%s" status="on" srs="%s">
+        %s
+        <Datasource>
+        <Parameter name="type">shape</Parameter>
+        <Parameter name="file">%sshoreline_300</Parameter>
+        </Datasource>
+      </Layer>"""%(layer_id, db_proj, subs, world_bnd_path)
+    else:
+      return """
+      <Layer name="l%s" status="on" srs="%s">
+        %s
+        <Datasource>
+        <Parameter name="type">shape</Parameter>
+        <Parameter name="file">%sprocessed_p</Parameter>
+        </Datasource>
+      </Layer>"""%(layer_id, db_proj, subs, world_bnd_path)
 def xml_nolayer():
   global substyles
   substyles = []
