@@ -159,13 +159,14 @@ class Condition:
         return '[%s] = \'\''%(params[0])
 
       if t == '<':
-        return '"%s" &lt; %s'%(params[0], float(params[1]))
+        return '[%s] &lt; %s'%(params[0], float(params[1]))
       if t == '<=':
-        return '"%s" &lt;= %s'%(params[0], float(params[1]))
+        return '[%s] &lt;= %s'%(params[0], float(params[1]))
       if t == '>':
-        return '"%s" &gt; %s'%(params[0], float(params[1]))
+        return '[%s] &gt; %s'%(params[0], float(params[1]))
       if t == '>=':
-        return '"%s" &gt;= %s'%(params[0], float(params[1]))
+        return '[%s] &gt;= %s'%(params[0], float(params[1]))
+      #return ""
     except KeyError:
       pass
   def __repr__(self):
