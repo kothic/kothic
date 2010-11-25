@@ -55,8 +55,7 @@ class Rule():
     if obj:
       if (self.subject!='') and not _test_feature_compatibility(obj, self.subject, {}):
         return set()
-    if zoom:
-      if (zoom < self.minZoom) or (zoom > self.maxZoom):
+    if not self.test_zoom(zoom):
         return set()
     a = set()
     for condition in self.conditions:
@@ -67,8 +66,8 @@ class Rule():
     if obj:
       if (self.subject!='') and not _test_feature_compatibility(obj, self.subject, {":area":"yes"}):
         return set()
-    if zoom:
-      if (zoom < self.minZoom) or (zoom > self.maxZoom):
+    
+    if not self.test_zoom(zoom):
         return set()
     a = set()
     b = set()
@@ -88,6 +87,10 @@ def _test_feature_compatibility (f1, f2, tags={}):
     """
     
     if f2 == f1:
+      return True
+    elif f2 == "way"  and f1 == "line":
+      return True
+    elif f2 == "way"  and f1 == "area":
       return True
     elif f2 == "area" and f1 in ("way", "area", "POLYGON"):
       if ":area" in tags:
