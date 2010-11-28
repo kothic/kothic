@@ -313,10 +313,10 @@ def parseCondition(s):
               log.debug("condition NE: %s = %s"%(a[0], a[1]))
               return  Condition('ne'     ,a)
               ## FIXME: convert other conditions to python
-            if      CONDITION_GT.match(s):
-              a = CONDITION_GT.match(s).groups()
-              log.debug("condition GT: %s > %s"%(a[0], a[1]))
-              return  Condition('>'     ,a)
+            if      CONDITION_LE.match(s):
+              a = CONDITION_LE.match(s).groups()
+              log.debug("condition LE: %s <= %s"%(a[0], a[1]))
+              return  Condition('<='     ,a)
             if      CONDITION_GE.match(s):
               a = CONDITION_GE.match(s).groups()
               log.debug("condition GE: %s >= %s"%(a[0], a[1]))
@@ -325,10 +325,11 @@ def parseCondition(s):
               a = CONDITION_LT.match(s).groups()
               log.debug("condition LT: %s < %s"%(a[0], a[1]))
               return  Condition('<'     ,a)
-            if      CONDITION_LE.match(s):
-              a = CONDITION_LE.match(s).groups()
-              log.debug("condition LE: %s <= %s"%(a[0], a[1]))
-              return  Condition('<='     ,a)
+            if      CONDITION_GT.match(s):
+              a = CONDITION_GT.match(s).groups()
+              log.debug("condition GT: %s > %s"%(a[0], a[1]))
+              return  Condition('>'     ,a)
+
             if      CONDITION_REGEX.match(s):
               a = CONDITION_REGEX.match(s).groups()
               log.debug("condition REGEX: %s = %s"%(a[0], a[1]))

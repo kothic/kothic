@@ -49,6 +49,17 @@ class StyleChooser:
     self.stylepos=0
 
 
+  def get_numerics(self):
+    """
+    Returns a set of number-compared values.
+    """
+    a = set()
+    for c in self.ruleChains:
+      for r in c:
+        a.update(r.get_numerics())
+    a.discard(False)
+    return a
+
   def get_interesting_tags(self, type, zoom):
     """
     Returns a set of tags that were used in here.
@@ -77,10 +88,7 @@ class StyleChooser:
       for r in c:
         p = r.get_sql_hints(type, zoom)
         if p:
-          #print p
-
           q = "("+p[1] + ")"#[t[1] for t in p]
-          #print q
           if q == "()":
             q = ""
           if b and q:

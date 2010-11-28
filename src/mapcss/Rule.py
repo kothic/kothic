@@ -61,7 +61,12 @@ class Rule():
     for condition in self.conditions:
       a.update(condition.get_interesting_tags())
     return a
-
+  def get_numerics(self):
+    a = set()
+    for condition in self.conditions:
+      a.add(condition.get_numerics())
+    a.discard(False)
+    return a
   def get_sql_hints(self, obj, zoom):
     if obj:
       if (self.subject!='') and not _test_feature_compatibility(obj, self.subject, {":area":"yes"}):

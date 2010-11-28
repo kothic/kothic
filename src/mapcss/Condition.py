@@ -40,7 +40,11 @@ class Condition:
     if self.params[0][:2] == "::":
       return []
     return set([self.params[0]])
-    
+  def get_numerics(self):
+    if self.type in ("<", ">", ">=", "<="):
+      return self.params[0]
+    else:
+      return False
   def test(self, tags):
     """
     Test a hash against this condition
@@ -126,13 +130,13 @@ class Condition:
         return params[0], '"%s" IS NULL'%(params[0])
         
       if t == '<':
-        return params[0], """(CASE WHEN "%s"  ~  E'^[[:digit:]]+(\.[[:digit:]]+)?$' THEN CAST ("%s" AS FLOAT) ELSE 0 END) < %s"""%(params[0],params[0],params[1])
+        return params[0], """(CASE WHEN "%s"  ~  E'^[[:digit:]]+([.][[:digit:]]+)?$' THEN CAST ("%s" AS FLOAT) ELSE 0 END) &lt; %s"""%(params[0],params[0],params[1])
       if t == '<=':
-        return params[0], """(CASE WHEN "%s"  ~  E'^[[:digit:]]+(\.[[:digit:]]+)?$' THEN CAST ("%s" AS FLOAT) ELSE 0 END) <= %s"""%(params[0],params[0],params[1])
+        return params[0], """(CASE WHEN "%s"  ~  E'^[[:digit:]]+([.][[:digit:]]+)?$' THEN CAST ("%s" AS FLOAT) ELSE 0 END) &lt;= %s"""%(params[0],params[0],params[1])
       if t == '>':
-        return params[0], """(CASE WHEN "%s"  ~  E'^[[:digit:]]+(\.[[:digit:]]+)?$' THEN CAST ("%s" AS FLOAT) ELSE 0 END) > %s"""%(params[0],params[0],params[1])
+        return params[0], """(CASE WHEN "%s"  ~  E'^[[:digit:]]+([.][[:digit:]]+)?$' THEN CAST ("%s" AS FLOAT) ELSE 0 END) > %s"""%(params[0],params[0],params[1])
       if t == '>=':
-        return params[0], """(CASE WHEN "%s"  ~  E'^[[:digit:]]+(\.[[:digit:]]+)?$' THEN CAST ("%s" AS FLOAT) ELSE 0 END) >= %s"""%(params[0],params[0],params[1])
+        return params[0], """(CASE WHEN "%s"  ~  E'^[[:digit:]]+([.][[:digit:]]+)?$' THEN CAST ("%s" AS FLOAT) ELSE 0 END) >= %s"""%(params[0],params[0],params[1])
     except KeyError:
       pass
   def get_mapnik_filter(self):
@@ -159,13 +163,13 @@ class Condition:
         return '[%s] = \'\''%(params[0])
 
       if t == '<':
-        return '[%s] &lt; %s'%(params[0], float(params[1]))
+        return '[%s__num] &lt; %s'%(params[0], float(params[1]))
       if t == '<=':
-        return '[%s] &lt;= %s'%(params[0], float(params[1]))
+        return '[%s__num] &lt;= %s'%(params[0], float(params[1]))
       if t == '>':
-        return '[%s] &gt; %s'%(params[0], float(params[1]))
+        return '[%s__num] &gt; %s'%(params[0], float(params[1]))
       if t == '>=':
-        return '[%s] &gt;= %s'%(params[0], float(params[1]))
+        return '[%s__num] &gt;= %s'%(params[0], float(params[1]))
       #return ""
     except KeyError:
       pass
