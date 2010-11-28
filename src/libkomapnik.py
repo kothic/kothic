@@ -188,8 +188,13 @@ def xml_layer(type="postgis", geom="point", interesting_tags = "*", sql = "true"
   subs = "\n".join(["<StyleName>s%s</StyleName>"%i for i in substyles])
   substyles = []
   if type == "postgis":
-    interesting_tags = "\", \"".join(interesting_tags)
-    interesting_tags = "\""+ interesting_tags+"\""
+    interesting_tags = list(interesting_tags)
+    if '"' not in "".join(interesting_tags):
+      interesting_tags = "\", \"".join(interesting_tags)
+      interesting_tags = "\""+ interesting_tags+"\""
+    else:
+      interesting_tags = ", ".join(interesting_tags)
+    
     
     return """
     <Layer name="l%s" status="on" srs="%s">
