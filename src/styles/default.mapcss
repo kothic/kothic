@@ -16,7 +16,7 @@ way {
 way|z16-[highway]       /*[!lanes]*/
     {color:white;
 
-     casing-width: 1;  }
+     /*casing-width: 1; */ }
 
      
 /*way|z16-[highway][lanes]
@@ -84,7 +84,7 @@ way|z16-[highway=steps],
 }
 
 
-way[lanes]{width:eval(metric( num(tag("lanes")) * 4));}
+way[highway][lanes]{width:eval(metric( num(tag("lanes")) * 4));}
 way[width]{width:eval(metric(tag("width")));}
 
 way|z16-[highway=motorway],

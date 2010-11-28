@@ -82,6 +82,9 @@ area|z16-[leisure=garden],
 area|z16-[landuse=orchard]
        {fill-image:sady10.png; z-index:3}
 
+area|z4-[natural=desert] {fill-image: desert22.png}
+
+
 /*
 после селектора типа объекта можно опционально ограничить зумы:
 |zA-B, A < B
@@ -91,8 +94,8 @@ area|z16-[landuse=orchard]
 
 
 
-area|z6-[natural=forest], area|z6-[natural=wood],
-area|z6-[landuse=forest], area|z6-[landuse=wood]
+area|z4-[natural=forest], area|z4-[natural=wood],
+area|z4-[landuse=forest], area|z4-[landuse=wood]
        {fill-color: #d6f4c6; z-index:4}
 
 area|z12-[landuse=grass],
@@ -112,7 +115,7 @@ area|z12-[leisure=pitch],
 {fill-color: #e3deb1;z-index:8;}
 
 
-way|z9-10[waterway=river]   {color: #C4D4F5; width: .6; z-index:9}
+way|z7-10[waterway=river]   {color: #C4D4F5; width: .6; z-index:9}
 /* 
 свойства с префиксом fill- в основном относятся к заливкам, без префиксов - к линиям.
 width - ширина линии
@@ -130,10 +133,10 @@ way|z15-[waterway=river]    {color: #C4D4F5; width: .9; z-index:9}
 way|z10-[waterway=stream]{color: #C4D4F5; width: .5; z-index:9}
 way|z10-[waterway=canal] {color: #abc4f5; width: .6; z-index:9}
 
-area|z10-[waterway=riverbank],
-area|z10-[natural=water],
+area|z5-[waterway=riverbank],
+area|z5-[natural=water],
 area|z10-[landuse=reservoir],
-{fill-color: #C4D4F5; color: #C4D4F5; width:1; z-index:9;}
+{fill-color: #C4D4F5; color: #C4D4F5; width:.1; z-index:9;}
 
 area|z10-[natural=water]{text:name; text-offset:1; font-size:10; font-family: DejaVu Serif Italic; text-color:#285fd1; text-allow-overlap: false;text-halo-radius: 1; text-halo-color: #ffffff; }
 /*
@@ -342,6 +345,15 @@ way|z17[highway=tertiary_link]
         casing-width:0.5; casing-color: #996703;
         z-index:11}
 
+way|z18[highway=secondary],
+way|z18[highway=secondary_link],
+way|z18[highway=tertiary],
+way|z18[highway=tertiary_link]
+{text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Bold; font-size:9; text-halo-radius: 1; text-halo-color: #ffffff;
+        width:9;  color: #fcffd1;
+        casing-width:0.5; casing-color: #996703;
+        z-index:11}
+
 /*
 
 на данный момент конвертер не умеет каскадировать стили, поэтому каждый раз на каждую выбранную линию приходится писать все свойства.
@@ -414,6 +426,13 @@ way|z17[highway=primary],
 way|z17[highway=primary_link]
         {text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Bold; font-size:9; text-halo-radius: 1; text-halo-color: #ffffff;
         width:10;  color: #fcea97;
+        casing-width:.5; casing-color: #996703;
+        z-index:12}
+
+way|z18[highway=primary],
+way|z18[highway=primary_link]
+        {text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Bold; font-size:9; text-halo-radius: 1; text-halo-color: #ffffff;
+        width:11;  color: #fcea97;
         casing-width:.5; casing-color: #996703;
         z-index:12}
 
@@ -498,6 +517,14 @@ way|z17[highway=motorway_link],
         casing-width:1; casing-color: #996703;
         z-index:13}
 
+way|z18[highway=trunk],
+way|z18[highway=trunk_link],
+way|z18[highway=motorway],
+way|z18[highway=motorway_link],
+{text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Bold; font-size:9; text-halo-radius: 1; text-halo-color: #ffffff;
+        width:13;  color: #ffd780;
+        casing-width:1; casing-color: #996703;
+        z-index:13}
 
 
 way|z8-[highway=trunk]::centerline,
@@ -577,11 +604,14 @@ node|z17-[shop]{icon-image:superm_12x12.png}
 
 
 line[boundary=administrative][admin_level=2]
-   {casing-width: 4; casing-opacity: 0.5; casing-color: #d4d4d4; casing-dashes:;
-    width: 0.5; color: #202020; dashes: 6,4,1,4; opacity:0.7; z-index:16}
 
-line|z3-4[boundary=administrative][admin_level=3]
+   {width: 0.5; color: #202020; dashes: 6,4; opacity:0.7; z-index:16}
+   /* casing-width: 4; casing-opacity: 0.5; casing-color: #d4d4d4; casing-dashes:; */
+
+line|z3[boundary=administrative][admin_level=3]
 {width: 0.4; color: #7e0156; dashes: 3,3; opacity:0.5; z-index:16}
+line|z4-5[boundary=administrative][admin_level=3]
+{width: 1.3; color: #ff99cc; opacity:0.5; z-index:16}
 
 /*
 для линии обводки отключены штриховки (casing-dashes:;), но включены для основной линии
@@ -619,16 +649,25 @@ node|z10-[aeroway=aerodrome]
 
 
 
-node|z3-5[capital=yes][admin_level=2] {
-  icon-image: adm_5.png; text-offset:4; 
-  text:name; font-size:8; font-family: DejaVu Sans Bold; text-halo-radius:1; text-color:#505050;text-halo-color:#ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0; text-align: left;}
+node|z3-6[capital=yes][population>5000000] { icon-image: adm_5.png;allow-overlap:true}
+node|z3[capital=yes][population>5000000] {text-offset:4; text:name; font-size:8; font-family: DejaVu Sans Bold; text-halo-radius:1; text-color:#505050;text-halo-color:#ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0; text-align: left;}
+node|z4-6[capital=yes][population>5000000] {text-offset:6; text:name; font-size:10; font-family: DejaVu Sans Bold; text-halo-radius:1; text-color:#303030;text-halo-color:#ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0; text-align: left;}
 
+node|z4-5[place][population<100000][capital][admin_level<5] { icon-image:adm_4.png;
+  text-offset:5; text:name; font-size: 7; font-family: DejaVu Sans Bold; text-halo-radius:1; text-color:#404040;text-halo-color:#ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0;}
+  
+node|z4-5[place][population>=100000][population<=5000000][capital][admin_level<5] {icon-image:adm_5.png;
+  text-offset:5; text:name; font-size: 8; font-family: DejaVu Sans Bold; text-halo-radius:1; text-color:#404040;text-halo-color:#ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0;}
 
-node|z6-7[place=city][capital=yes] {text:name; font-size:11; font-family: DejaVu Sans Bold; text-halo-radius:2; text-color:#101010;text-halo-color:#ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0;z-index:-1}
+node|z5-[place=town][capital]{icon-image:town_4.png}
+
+node|z6-7[place=city][capital=yes] {text:name; font-size:11; font-family: DejaVu Sans Bold; text-halo-radius:2; text-color:#101010;text-halo-color:#ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0;z-index:1}
 node|z6-7[place=city][capital!=yes] {text:name; font-size:11; font-family: DejaVu Sans Bold; text-halo-radius:2; text-color:#101010;text-halo-color:#ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0}
 
 node|z8-12[place=city][capital=yes] {text:name; text-offset:-20; font-size:14; font-family: DejaVu Sans Bold; text-halo-radius:3; text-color:#101010;text-halo-color:#ffffff; text-allow-overlap: true; -x-mapnik-min-distance:5}
 node|z8-12[place=city][capital!=yes] {text:name; text-offset:-20; font-size:14; font-family: DejaVu Sans Bold; text-halo-radius:2; text-color:#101010;text-halo-color:#ffffff; text-allow-overlap: false; -x-mapnik-min-distance:2}
+
+
 
 node|z6-[place=town],
 {text:name; font-size:10; font-family: DejaVu Sans Bold; text-halo-radius:2; text-color:#101010;text-halo-color:#ffffff; text-allow-overlap: false; -x-mapnik-min-distance:3}
@@ -656,22 +695,31 @@ shields!!!!
 way|z10-[waterway=stream], way|z10-[waterway=river]
 {text:name; font-size:9; font-family: DejaVu Sans Oblique; text-color:#547bd1;text-position: line}
 
-node|z-1[place=continent]
+node|z-3[place=continent]
 {text:name; text-offset:-10; font-size:10; font-family: DejaVu Sans ExtraLight; text-halo-radius:1; text-color:#202020;text-halo-color:#ffffff;z-index:-1;-x-mapnik-min-distance:0}
-node|z2[place=continent]
+node|z2-3[place=continent]
 {text:name; text-offset:-10; font-size:8; font-family: DejaVu Sans ExtraLight; text-halo-radius:1; text-color:#202020;text-halo-color:#ffffff;z-index:-1;-x-mapnik-min-distance:0}
 
-node|z-1[place=ocean]
-{text:name; text-offset:0; font-size:7.5; font-family: DejaVu Sans Oblique; text-halo-radius:1; text-color:#202020;text-halo-color:#ffffff;z-index:-1;-x-mapnik-min-distance:0}
+node[place=ocean]
+{text:name; text-offset:0; font-size:8; font-family: DejaVu Sans Oblique; text-halo-radius:1; text-color:#202020;text-halo-color:#ffffff;z-index:-1;-x-mapnik-min-distance:0}
+
+node[place=sea]
+{text:name; text-offset:0; font-size:8; font-family: DejaVu Sans Oblique; text-halo-radius:1; text-color:#4976d1;text-halo-color:#ffffff;-x-mapnik-min-distance:0}
+
+
+node|z3-5[natural=peak][ele>4500]
+{icon-image: mountain_peak6.png; 
+text:ele; text-offset:3; font-size:7; font-family: DejaVu Sans Mono Book; text-halo-radius:0; text-color:#664229;text-halo-color:#ffffff;-x-mapnik-min-distance:0;
+}
 
 node|z2-3[place=country]
-{text:name; text-offset:0; font-size:10; font-family: DejaVu Sans Book; text-halo-radius:1; text-color:#dd5875;text-halo-color:#ffffff;z-index:-1;-x-mapnik-min-distance:0;}
+{text:name; text-offset:0; font-size:10; font-family: DejaVu Sans Book; text-halo-radius:1; text-color:#dd5875;text-halo-color:#ffffff;z-index:1;-x-mapnik-min-distance:0;}
 
 node|z4-8[place=country]
-{text:name; text-offset:0; font-size:10; font-family: DejaVu Sans Book; text-halo-radius:1; text-color:red;text-halo-color:#ffffff;z-index:-1;-x-mapnik-min-distance:0}
+{text:name; text-offset:0; font-size:10; font-family: DejaVu Sans Book; text-halo-radius:1; text-color:red;text-halo-color:#ffffff;z-index:1;-x-mapnik-min-distance:0}
 
 node|z8-10[place=country]
-{text:name; text-offset:0; font-size:16; font-family: DejaVu Sans Book; text-halo-radius:1; text-color:red;text-halo-color:#ffffff;z-index:-1;-x-mapnik-min-distance:0}
+{text:name; text-offset:0; font-size:16; font-family: DejaVu Sans Book; text-halo-radius:1; text-color:red;text-halo-color:#ffffff;z-index:1;-x-mapnik-min-distance:0}
 
 area|z3-5[boundary=administrative][admin_level=3]
 {text:name; text-offset:-5; font-size:8; font-family: DejaVu Sans ExtraLight; text-halo-radius:0; text-color:#101010;text-halo-color:#ffffff;-x-mapnik-min-distance:0;max-width:50}
