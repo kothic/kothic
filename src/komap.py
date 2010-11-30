@@ -336,12 +336,13 @@ for zoom, zsheet in mapniksheet.iteritems():
               tdistance= entry["style"].get("-x-mapnik-min-distance","26")
               twrap= entry["style"].get("max-width",256)
               talign= entry["style"].get("text-align","center")
+              topacity= entry["style"].get("text-opacity",entry["style"].get("opacity","1"))
 
               xml += xml_rule_start()
               xml += x_scale
               
               xml += xml_filter(entry["rulestring"])
-              xml += xml_textsymbolizer(ttext,tface,tsize,tcolor, thcolor, thradius, tplace, toffset,toverlap,tdistance,twrap,talign)
+              xml += xml_textsymbolizer(ttext,tface,tsize,tcolor, thcolor, thradius, tplace, toffset,toverlap,tdistance,twrap,talign,topacity)
               sql.add(entry["sql"])
               itags.update(entry["chooser"].get_interesting_tags(entry["type"], zoom))
               xml += xml_rule_end()
