@@ -63,7 +63,7 @@ columnmap = {}
 if locale == "en":
   columnmap["name"] = ("""(CASE WHEN "name:en" IS NOT NULL THEN "name:en" ELSE CASE WHEN "int_name" IS NOT NULL THEN "int_name" ELSE replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(translate("name",'абвгдезиклмнопрстуфьАБВГДЕЗИКЛМНОПРСТУФЬ','abvgdeziklmnoprstuf’ABVGDEZIKLMNOPRSTUF’'),'х','kh'),'Х','Kh'),'ц','ts'),'Ц','Ts'),'ч','ch'),'Ч','Ch'),'ш','sh'),'Ш','Sh'),'щ','shch'),'Щ','Shch'),'ъ','”'),'Ъ','”'),'ё','yo'),'Ё','Yo'),'ы','y'),'Ы','Y'),'э','·e'),'Э','E'),'ю','yu'),'Ю','Yu'),'й','y'),'Й','Y'),'я','ya'),'Я','Ya'),'ж','zh'),'Ж','Zh') END END) AS name""",('name:en','int_name',))
 elif locale:
-  columnmap["name"] =  ('(CASE WHEN "name:'+loacle+' IS NOT NULL THEN "name:'+locale+'" ELSE name END) AS name',('name:'+locale,))
+  columnmap["name"] =  ('(CASE WHEN "name:'+locale+'" IS NOT NULL THEN "name:'+locale+'" ELSE name END) AS name',('name:'+locale,))
   
 numerics = set()  # set of number-compared things, like "population<10000" needs population as number, not text
 mapniksheet = {}
@@ -215,6 +215,7 @@ for zoom, zsheet in mapniksheet.iteritems():
       for zindex in ta:
         ## lines pass
         sql = set()
+        there_are_dashed_lines = False
         itags = set()
         xml = xml_style_start()
         for entry in zsheet[zindex]:
@@ -237,6 +238,9 @@ for zoom, zsheet in mapniksheet.iteritems():
                   linecap=entry["style"].get("linecap", "round"),
                   linejoin=entry["style"].get("linejoin", "round"),
                   dashes=entry["style"].get("dashes", ""))
+                if entry["style"].get("dashes", ""):
+                  there_are_dashed_lines = True
+                  #print "dashes!!!"
               if "line-style" in entry["style"]:
                 if entry["style"]["line-style"] == "arrows":
                   xml += xml_hardcoded_arrows()
@@ -255,8 +259,23 @@ for zoom, zsheet in mapniksheet.iteritems():
             sql = "("+ sql +') and ("layer" not in ('+ ", ".join(['\'%s\''%i for i in range(-5,6) if i != 0])+") or \"layer\" is NULL)"
           elif zlayer <=5 and zlayer >= -5:
             sql = "("+ sql +') and "layer" = \'%s\''%zlayer
+          oitags = itags
           itags = add_numerics_to_itags(itags)
-          mfile.write(xml_layer("postgis", layer_type, itags, sql ))
+          #if there_are_dashed_lines:
+
+          if layer_type == "polygon" and there_are_dashed_lines:
+            itags = ", ".join(itags)
+            oitags = '"'+ "\", \"".join(oitags) +'"'
+            sqlz = """select %s, ST_LineMerge(ST_Union(way)) as way from (SELECT %s, ST_Boundary(way) as way from planet_osm_polygon where way &amp;&amp; !bbox! and (%s)) as tex
+              group by %s
+              """%(itags,oitags,sql,oitags)
+            #elif layer_type == "line" and there_are_dashed_lines:
+            #  sqlz = """select %s, ST_Union(way) as way from (SELECT * from planet_osm_line where way &amp;&amp; !bbox! #and (%s)) as tex
+            #  group by %s
+            #  """%(itags,sql,oitags)
+            mfile.write(xml_layer("postgis-process", layer_type, itags, sqlz ))
+          else:
+            mfile.write(xml_layer("postgis", layer_type, itags, sql ))
         else:
           xml_nolayer()
   for layer_type, entry_types in [("point", ("node", "point")),("line",("way", "line")), ("polygon",("way","area"))]:
