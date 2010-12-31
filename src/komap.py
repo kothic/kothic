@@ -162,7 +162,7 @@ for zoom, zsheet in mapniksheet.iteritems():
     sql.discard("()")
     if sql:
       mfile.write(xml)
-      sql = " OR ".join(sql)
+      sql = "(" + " OR ".join(sql) + ") and way &amp;&amp; !bbox!" 
       itags = add_numerics_to_itags(itags)
       mfile.write(xml_layer("postgis", "polygon", itags, sql ))
     else:
@@ -202,7 +202,7 @@ for zoom, zsheet in mapniksheet.iteritems():
         sql.discard("()")
         if sql:
           mfile.write(xml)
-          sql = " OR ".join(sql)
+          sql = "(" + " OR ".join(sql) + ") and way &amp;&amp; !bbox!" 
           if zlayer == 0:
             sql = "("+ sql +') and ("layer" not in ('+ ", ".join(['\'%s\''%i for i in range(-5,6) if i != 0])+") or \"layer\" is NULL)"
           elif zlayer <=5 and zlayer >= -5:
@@ -254,7 +254,7 @@ for zoom, zsheet in mapniksheet.iteritems():
         sql.discard("()")
         if sql:
           mfile.write(xml)
-          sql = " OR ".join(sql)
+          sql = "(" + " OR ".join(sql) + ") and way &amp;&amp; !bbox!" 
           if zlayer == 0:
             sql = "("+ sql +') and ("layer" not in ('+ ", ".join(['\'%s\''%i for i in range(-5,6) if i != 0])+") or \"layer\" is NULL)"
           elif zlayer <=5 and zlayer >= -5:
@@ -305,7 +305,7 @@ for zoom, zsheet in mapniksheet.iteritems():
       sql.discard("()")
       if sql:
         mfile.write(xml)
-        sql = " OR ".join(sql)
+        sql = "(" + " OR ".join(sql) + ") and way &amp;&amp; !bbox!" 
         itags = add_numerics_to_itags(itags)
         mfile.write(xml_layer("postgis", layer_type, itags, sql ))
       else:
@@ -378,12 +378,12 @@ for zoom, zsheet in mapniksheet.iteritems():
             sqlz = " OR ".join(sql)
             itags = ", ".join(itags)
             #itags = "\""+ itags+"\""
-            sqlz = """select %s, ST_LineMerge(ST_Union(way)) as way from (SELECT * from planet_osm_line where way &amp;&amp; !bbox! and (%s) and (%s)) as tex
+            sqlz = """select %s, ST_LineMerge(ST_Union(way)) as way from (SELECT * from planet_osm_line where way &amp;&amp; ST_Expand(!bbox!,500) and (%s) and (%s)) as tex
             group by %s
             """%(itags,ttext,sqlz,oitags)
             mfile.write(xml_layer("postgis-process", layer_type, itags, sqlz ))
           else:
-            sql = " OR ".join(sql)
+            sql = "(" + " OR ".join(sql) + ") and way &amp;&amp; !bbox!" 
             mfile.write(xml_layer("postgis", layer_type, itags, sql ))
         else:
           xml_nolayer()
