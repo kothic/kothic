@@ -266,7 +266,7 @@ for zoom, zsheet in mapniksheet.iteritems():
           if layer_type == "polygon" and there_are_dashed_lines:
             itags = ", ".join(itags)
             oitags = '"'+ "\", \"".join(oitags) +'"'
-            sqlz = """select %s, ST_LineMerge(ST_Union(way)) as way from (SELECT %s, ST_Buffer(ST_Boundary(way),0) as way from planet_osm_polygon where way &amp;&amp; !bbox! and (%s)) as tex
+            sqlz = """select %s, ST_LineMerge(ST_Union(way)) as way from (SELECT %s, ST_Boundary(ST_Buffer(way,0)) as way from planet_osm_polygon where way &amp;&amp; !bbox! and (%s)) as tex
               group by %s
               """%(itags,oitags,sql,oitags)
             #elif layer_type == "line" and there_are_dashed_lines:
