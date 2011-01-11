@@ -130,13 +130,13 @@ class Condition:
         return params[0], '"%s" IS NULL'%(params[0])
         
       if t == '<':
-        return params[0], """(CASE WHEN "%s"  ~  E'^[[:digit:]]+([.][[:digit:]]+)?$' THEN CAST ("%s" AS FLOAT) ELSE 0 END) &lt; %s"""%(params[0],params[0],params[1])
+        return params[0], """(CASE WHEN "%s"  ~  E'^[-]?[[:digit:]]+([.][[:digit:]]+)?$' THEN CAST ("%s" AS FLOAT) &lt; %s ELSE false END) """%(params[0],params[0],params[1])
       if t == '<=':
-        return params[0], """(CASE WHEN "%s"  ~  E'^[[:digit:]]+([.][[:digit:]]+)?$' THEN CAST ("%s" AS FLOAT) ELSE 0 END) &lt;= %s"""%(params[0],params[0],params[1])
+        return params[0], """(CASE WHEN "%s"  ~  E'^[-]?[[:digit:]]+([.][[:digit:]]+)?$' THEN CAST ("%s" AS FLOAT) &lt;= %s ELSE false END)"""%(params[0],params[0],params[1])
       if t == '>':
-        return params[0], """(CASE WHEN "%s"  ~  E'^[[:digit:]]+([.][[:digit:]]+)?$' THEN CAST ("%s" AS FLOAT) ELSE 0 END) > %s"""%(params[0],params[0],params[1])
+        return params[0], """(CASE WHEN "%s"  ~  E'^[-]?[[:digit:]]+([.][[:digit:]]+)?$' THEN CAST ("%s" AS FLOAT) > %s ELSE false END) """%(params[0],params[0],params[1])
       if t == '>=':
-        return params[0], """(CASE WHEN "%s"  ~  E'^[[:digit:]]+([.][[:digit:]]+)?$' THEN CAST ("%s" AS FLOAT) ELSE 0 END) >= %s"""%(params[0],params[0],params[1])
+        return params[0], """(CASE WHEN "%s"  ~  E'^[-]?[[:digit:]]+([.][[:digit:]]+)?$' THEN CAST ("%s" AS FLOAT) >= %s ELSE false END) """%(params[0],params[0],params[1])
     except KeyError:
       pass
   def get_mapnik_filter(self):
