@@ -136,7 +136,7 @@ for zoom, zsheet in mapniksheet.iteritems():
     xml += xml_layer("coast", zoom=zoom)
     mfile.write(xml)
 
-  for zindex in ta:    
+  for zindex in ta:
     ## areas pass
     sql = set()
     itags = set()
@@ -155,9 +155,6 @@ for zoom, zsheet in mapniksheet.iteritems():
           sql.add(entry["sql"])
           itags.update(entry["chooser"].get_interesting_tags(entry["type"], zoom))
           xml += xml_rule_end()
-
-          
-
     xml += xml_style_end()
     sql.discard("()")
     if sql:
@@ -168,7 +165,12 @@ for zoom, zsheet in mapniksheet.iteritems():
     else:
       xml_nolayer()
   for layer_type, entry_types in [("polygon",("way","area")),("line",("way", "line"))]:
-    for zlayer in range(-6,7):
+    index_range = range(-6,7)
+    full_layering = True
+    if zoom < 9:
+      index_range = (-6,0,6)
+      full_layering = False
+    for zlayer in index_range:
       for zindex in ta:
         ## casings pass
         sql = set()
@@ -203,9 +205,9 @@ for zoom, zsheet in mapniksheet.iteritems():
         if sql:
           mfile.write(xml)
           sql = "(" + " OR ".join(sql) + ") and way &amp;&amp; !bbox!" 
-          if zlayer == 0:
+          if zlayer == 0 and full_layering:
             sql = "("+ sql +') and ("layer" not in ('+ ", ".join(['\'%s\''%i for i in range(-5,6) if i != 0])+") or \"layer\" is NULL)"
-          elif zlayer <=5 and zlayer >= -5:
+          elif zlayer <=5 and zlayer >= -5 and full_layering:
             sql = "("+ sql +') and "layer" = \'%s\''%zlayer
           itags = add_numerics_to_itags(itags)
           mfile.write(xml_layer("postgis", layer_type, itags, sql ))
@@ -255,27 +257,30 @@ for zoom, zsheet in mapniksheet.iteritems():
         if sql:
           mfile.write(xml)
           sql = "(" + " OR ".join(sql) + ") and way &amp;&amp; !bbox!" 
-          if zlayer == 0:
+          if zlayer == 0 and full_layering:
             sql = "("+ sql +') and ("layer" not in ('+ ", ".join(['\'%s\''%i for i in range(-5,6) if i != 0])+") or \"layer\" is NULL)"
-          elif zlayer <=5 and zlayer >= -5:
+          elif zlayer <=5 and zlayer >= -5 and full_layering:
             sql = "("+ sql +') and "layer" = \'%s\''%zlayer
           oitags = itags
           itags = add_numerics_to_itags(itags)
-          #if there_are_dashed_lines:
-
-          if layer_type == "polygon" and there_are_dashed_lines:
-            itags = ", ".join(itags)
-            oitags = '"'+ "\", \"".join(oitags) +'"'
-            sqlz = """select %s, ST_LineMerge(ST_Union(way)) as way from (SELECT %s, ST_Boundary(ST_Buffer(way,0)) as way from planet_osm_polygon where way &amp;&amp; !bbox! and (%s)) as tex
-              group by %s
-              """%(itags,oitags,sql,oitags)
-            #elif layer_type == "line" and there_are_dashed_lines:
-            #  sqlz = """select %s, ST_Union(way) as way from (SELECT * from planet_osm_line where way &amp;&amp; !bbox! #and (%s)) as tex
-            #  group by %s
-            #  """%(itags,sql,oitags)
-            mfile.write(xml_layer("postgis-process", layer_type, itags, sqlz ))
-          else:
-            mfile.write(xml_layer("postgis", layer_type, itags, sql ))
+          
+          #### FIXME: Performance degrades painfully on large lines ST_Union. Gotta find workaround :(
+          #if layer_type == "polygon" and there_are_dashed_lines:
+            #itags = ", ".join(itags)
+            #oitags = '"'+ "\", \"".join(oitags) +'"'
+            #sqlz = """select %s, ST_LineMerge(ST_Union(way)) as way from
+                        #(SELECT %s, ST_Boundary(ST_Buffer(way,0)) as way from
+                            #(SELECT %s,  way from planet_osm_polygon where (%s)) tex
+                        #) p
+              #group by %s
+              #"""%(itags,oitags,sql,oitags)
+            ##elif layer_type == "line" and there_are_dashed_lines:
+            ##  sqlz = """select %s, ST_Union(way) as way from (SELECT * from planet_osm_line where way &amp;&amp; !bbox! #and (%s)) as tex
+            ##  group by %s
+            ##  """%(itags,sql,oitags)
+            #mfile.write(xml_layer("postgis-process", layer_type, itags, sqlz ))
+          #else:
+          mfile.write(xml_layer("postgis", layer_type, itags, sql ))
         else:
           xml_nolayer()
   for layer_type, entry_types in [("point", ("node", "point")),("line",("way", "line")), ("polygon",("way","area"))]:
