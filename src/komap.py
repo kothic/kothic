@@ -378,11 +378,11 @@ for zoom, zsheet in mapniksheet.iteritems():
             from (
                select (ST_Dump(ST_Multi(ST_Buffer(ST_Collect(p.way),0)))).geom as way, %s
                  from (
-                   select ST_Buffer(way, 16) as way, %s
+                   select ST_Buffer(way, %s) as way, %s
                      from planet_osm_%s p
                      where (%s) and p.way &amp;&amp; ST_Expand(!bbox!,500) and (%s)) p
                    group by %s) p order by ST_Area(p.way)
-            """%(itags,oitags,oitags,layer_type,ttext,sqlz,oitags)
+            """%(itags,oitags,pixel_size_at_zoom(zoom,10),oitags,layer_type,ttext,sqlz,oitags)
             mfile.write(xml_layer("postgis-process", layer_type, itags, sqlz, oitags ))
           elif layer_type == "line":
             sqlz = " OR ".join(sql)

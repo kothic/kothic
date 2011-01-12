@@ -55,6 +55,13 @@ def zoom_to_scaledenom(z1,z2=False):
   #return 100000000000000, 1
   return z1, z2
 
+def pixel_size_at_zoom(z, l):
+  """
+  Converts l pixels on tiles into length on zoom z
+  """
+  return l* 20037508.342789244 / 256 * 2 / (2**z)
+  
+
 def xml_pointsymbolizer(path="", width="", height="", opacity=1, overlap="false"):
   if width:
     width =' width="%s" '%width
