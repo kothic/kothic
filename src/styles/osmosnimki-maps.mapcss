@@ -714,7 +714,7 @@ shields!!!!
 
 
 way|z10-[waterway=stream], way|z10-[waterway=river]
-{text:name; font-size:9; font-family: DejaVu Sans Oblique; text-color:#547bd1;text-position: line}
+{text:name; font-size:9; font-family: DejaVu Sans Oblique; text-color:#547bd1; text-halo-radius:1; text-halo-color:#ffffff; text-position: line}
 
 node|z-3[place=continent]
 {text:name; text-offset:-10; font-size:10; font-family: DejaVu Sans ExtraLight; text-halo-radius:1; text-color:#202020;text-halo-color:#ffffff;z-index:-1;-x-mapnik-min-distance:0}
