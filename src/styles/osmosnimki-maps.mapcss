@@ -82,7 +82,7 @@ area|z16-[leisure=garden],
 area|z16-[landuse=orchard]
        {fill-image:sady10.png; z-index:3}
        
-area|z16-[natural=scrub]
+area|z12-[natural=scrub]
        {fill-color: e5f5dc;fill-image:kust1.png; z-index:3}
 
 area|z10-[landuse=industrial],area|z10-[landuse=military] {fill-color: #ddd8da; z-index:3}
@@ -109,6 +109,8 @@ area|z10-[landuse=forest], area|z10-[landuse=wood]{text:name; text-offset:0; fon
 
 area|z12-[landuse=grass],
 area|z12-[natural=grass] {fill-color: #f4ffe5; z-index:4}
+
+area|z10-[natural=wetland] {fill-image:swamp_world2.png; z-index:4}
 
 area|z10-[landuse=farmland], area|z10-[landuse=farm], area|z10-[landuse=field]  {fill-color: #fff5c4; z-index:5}
 
