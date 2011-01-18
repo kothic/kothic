@@ -81,6 +81,9 @@ area|z10-[leisure=park] {fill-color: #c4e9a4; z-index:3;fill-image:parks2.png}
 area|z16-[leisure=garden],
 area|z16-[landuse=orchard]
        {fill-image:sady10.png; z-index:3}
+       
+area|z16-[natural=scrub]
+       {fill-color: e5f5dc;fill-image:kust1.png; z-index:3}
 
 area|z10-[landuse=industrial],area|z10-[landuse=military] {fill-color: #ddd8da; z-index:3}
 area|z4-[natural=desert] {fill-image: desert22.png}
@@ -111,6 +114,8 @@ area|z10-[landuse=farmland], area|z10-[landuse=farm], area|z10-[landuse=field]  
 
 
 area|z10-[landuse=cemetery] {fill-color: #e5f5dc; z-index:5; fill-image:cemetry7_2.png}
+
+area|z13-[aeroway=aerodrome] {color: #008ac6; width: 0.8; z-index:5; fill-image:bull2.png}
 
 area|z12-[leisure=stadium],
 area|z12-[leisure=pitch],
@@ -677,7 +682,7 @@ node|z8-12[place=city][capital!=yes] {text:name; text-offset:-20; font-size:14; 
 
 
 
-node|z6-[place=town],
+node|z6-12[place=town],
 {text:name; font-size:10; font-family: DejaVu Sans Bold; text-halo-radius:2; text-color:#101010;text-halo-color:#ffffff; text-allow-overlap: false; -x-mapnik-min-distance:3}
 
 node|z13-[place=town],

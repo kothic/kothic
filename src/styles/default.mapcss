@@ -256,5 +256,5 @@ way[amenity=bench] {extrude: eval(zmetric("0.6m")); width:eval(metric("0.5m")); 
 {offset:eval(metric("0.25m")); extrude-face-color:brown;extrude:eval(zmetric("1.2m"));extrude-face-opacity: 0.5}
 
 /*   ----------  BORDERS  ----------     */
-line[boundary=administrative] {width: 2; color: red; dashes:5,3; z-index:15}
-area|z-17[boundary=administrative] {text: name; text-position:center}
+/*line[boundary=administrative] {width: 2; color: red; dashes:5,3; z-index:15}
+area|z-17[boundary=administrative] {text: name; text-position:center}*/
