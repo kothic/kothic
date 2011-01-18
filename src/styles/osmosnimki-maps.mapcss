@@ -83,9 +83,9 @@ area|z16-[landuse=orchard]
        {fill-image:sady10.png; z-index:3}
        
 area|z12-[natural=scrub]
-       {fill-color: e5f5dc;fill-image:kust1.png; z-index:3}
+       {fill-color: #e5f5dc;fill-image:kust1.png; z-index:3}
 area|z12-[natural=heath]
-       {fill-color: faf7f7; z-index:3}
+       {fill-color: #faf7f7; z-index:3}
        
 
 area|z10-[landuse=industrial],area|z10-[landuse=military] {fill-color: #ddd8da; z-index:3}
