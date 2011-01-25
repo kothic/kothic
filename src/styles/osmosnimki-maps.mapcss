@@ -456,6 +456,15 @@ way|z18[highway=primary_link]
         z-index:12}
 
 
+way|z6[highway=trunk]
+{width:2;  color: #fbcd40;
+z-index:13}
+
+way|z6[highway=motorway]
+{width:2;  color: #fc9265;
+z-index:13}
+
+
 way|z8[highway=trunk],
 way|z8[highway=motorway],
 {text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Bold; font-size:9; text-halo-radius: 1; text-halo-color: #ffffff;
@@ -686,14 +695,19 @@ node|z4-5[place][population>=100000][population<=5000000][capital][admin_level<5
 
 
 
-node|z5-[place=town][capital]{icon-image:town_4.png}
+node|z5[place=town][capital]{icon-image:town_4.png}
 
 
-node|z6[place][population<100000] {icon-image:adm1_4_6.png; text-offset:4; text:name; font-size:8; font-family: DejaVu Sans Bold; text-halo-radius:1; text-color:#202020;text-halo-color:#ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0;}
+node|z6[place=city][population<100000][admin_level],
+node|z6[place=town][population<100000][admin_level]
+{icon-image:adm1_4_6.png; text-offset:4; text:name; font-size:8; font-family: DejaVu Sans Bold; text-halo-radius:1; text-color:#202020;text-halo-color:#ffffff; text-allow-overlap: false; -x-mapnik-min-distance:10;}
 
-node|z6[place][population>=100000][population<=1000000] {icon-image:adm1_5.png; text-offset:4; text:name; font-size:9; font-family: DejaVu Sans Bold; text-halo-radius:1; text-color:#303030;text-halo-color:#ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0;}
+node|z6[place=city][population>=100000][population<=1000000][admin_level],
+node|z6[place=town][population>=100000][population<=1000000][admin_level]
+{icon-image:adm1_5.png; text-offset:4; text:name; font-size:9; font-family: DejaVu Sans Bold; text-halo-radius:1; text-color:#303030;text-halo-color:#ffffff; text-allow-overlap: false; -x-mapnik-min-distance:10;}
 
-node|z6[place][population>1000000] {icon-image:adm1_6_test2.png; text-offset:5; text:name; font-size: 10; font-family: DejaVu Sans Bold; text-halo-radius:1; text-color:#404040;text-halo-color:#ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0;}
+node|z6[place=city][population>1000000][admin_level]
+{icon-image:adm1_6_test2.png; text-offset:5; text:name; font-size: 10; font-family: DejaVu Sans Bold; text-halo-radius:1; text-color:#404040;text-halo-color:#ffffff; text-allow-overlap: false; -x-mapnik-min-distance:10;}
 
 
 /*node|z6-7[place=city][capital=yes] {text:name; font-size:11; font-family: DejaVu Sans Bold; text-halo-radius:2; text-color:#101010;text-halo-color:#ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0;z-index:1}
