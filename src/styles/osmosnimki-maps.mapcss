@@ -292,18 +292,14 @@ way|z17-[highway=service][living_street!=yes][service!=parking_aisle],
 
 
 way|z10[highway=secondary],
-way|z10[highway=secondary_link],
-way|z10[highway=tertiary],
-way|z10[highway=tertiary_link]
+way|z10[highway=tertiary]
         {text: name; text-position: line;
         width:1.2;  color: #fcffd1;
         casing-width:0.35; casing-color: #996703;
         z-index:11}
 
 way|z11[highway=secondary],
-way|z11[highway=secondary_link],
-way|z11[highway=tertiary],
-way|z11[highway=tertiary_link]
+way|z11[highway=tertiary]
 {text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Bold; font-size:9; text-halo-radius: 1; text-halo-color: #ffffff; text-halo-radius: 1; text-halo-color: #ffffff;
         width:1.4;  color: #fcffd1;
         casing-width:0.35; casing-color: #996703;
@@ -381,7 +377,6 @@ way|z18[highway=tertiary_link]
 
 
 way|z7-8[highway=primary],
-way|z7-8[highway=primary_link]
 {text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Bold; font-size:9; text-halo-radius: 1; text-halo-color: #ffffff;
 width:2;  color: #fcea97;
 z-index:12}
@@ -457,11 +452,11 @@ way|z18[highway=primary_link]
 
 
 way|z6[highway=trunk]
-{width:2;  color: #fbcd40;
+{width:0.9;  color: #fbcd40;
 z-index:13}
 
 way|z6[highway=motorway]
-{width:2;  color: #fc9265;
+{width:1;  color: #fc9265;
 z-index:13}
 
 
@@ -588,10 +583,17 @@ arrows - специальное значение для синих стрело�
 */
 
 
+way|z7-8[railway=rail]
+{width:.5; color: #303030;z-index:15}
+way|z7-8[railway=rail]::ticks
+{width:.3; color: #505050; dashes: 3,3;z-index:16}
+
 way|z9-[railway=rail]
     {width:1.4; color: #606060;z-index:15}
 way|z9-[railway=rail]::ticks
     {width:1; color: #ffffff; dashes: 6,6;z-index:16}
+
+
 
 /*
 железная дорога рисуется в две линии:
@@ -691,7 +693,7 @@ node|z4-5[place][population<100000][capital][admin_level<5] { icon-image:adm_4.p
   text-offset:5; text:name; font-size: 7; font-family: DejaVu Sans Bold; text-halo-radius:1; text-color:#404040;text-halo-color:#ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0;}
   
 node|z4-5[place][population>=100000][population<=5000000][capital][admin_level<5] {icon-image:adm_5.png;
-  text-offset:5; text:name; font-size: 8; font-family: DejaVu Sans Bold; text-halo-radius:1; text-color:#404040;text-halo-color:#ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0;}
+text-offset:5; text:name; font-size: 8; font-family: DejaVu Sans Bold; text-halo-radius:1; text-color:#404040;text-halo-color:#ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0;z-index:1}
 
 
 
@@ -702,19 +704,38 @@ node|z6[place=city][population<100000],
 node|z6[place=town][population<100000][admin_level]
 {icon-image:adm1_4_6.png; text-offset:5; text:name; font-size:8; font-family: DejaVu Sans Bold; text-halo-radius:1; text-color:#202020;text-halo-color:#ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0;}
 
+node|z7[place=city][population<100000],
+node|z7[place=town][population<100000],
+{icon-image:adm1_4_6.png; text-offset:5; text:name; font-size:9; font-family: DejaVu Sans Bold; text-halo-radius:1; text-color:#202020;text-halo-color:#ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0;}
+
+node|z7[place=town][!population],
+node|z7[place=city][!population],
+{icon-image:town_6.png; text-offset:5; text:name; font-size:8; font-family: DejaVu Sans Bold; text-halo-radius:1; text-color:#202020;text-halo-color:#ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0;}
+
+
 node|z6[place=city][population>=100000][population<=1000000],
 node|z6[place=town][population>=100000][population<=1000000][admin_level]
 {icon-image:adm1_5.png; text-offset:5; text:name; font-size:9; font-family: DejaVu Sans Bold; text-halo-radius:1; text-color:#303030;text-halo-color:#ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0;}
 
+node|z7[place=city][population>=100000][population<=1000000],
+node|z7[place=town][population>=100000][population<=1000000]
+{icon-image:adm1_5.png; text-offset:5; text:name; font-size:10; font-family: DejaVu Sans Bold; text-halo-radius:1; text-color:#303030;text-halo-color:#ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0;}
+
 node|z6[place=city][population>1000000]
-{icon-image:adm1_6_test2.png; text-offset:5; text:name; font-size: 10; font-family: DejaVu Sans Bold; text-halo-radius:1; text-color:#404040;text-halo-color:#ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0;}
+{icon-image:adm1_6_test2.png; text-offset:5; text:name; font-size: 10; font-family: DejaVu Sans Bold; text-halo-radius:1; text-color:#404040;text-halo-color:#ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0;z-index:1}
+
+node|z7[place=city][population>1000000][population<5000000]
+{icon-image:adm1_6_test2.png; text-offset:5; text:name; font-size: 11; font-family: DejaVu Sans Bold; text-halo-radius:1; text-color:#404040;text-halo-color:#ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0;z-index:1}
+
+node|z7[place=city]][population>=5000000]
+{icon-image:adm_6.png; text-offset:5; text:name; font-size: 12; font-family: DejaVu Sans Bold; text-halo-radius:1; text-color:#404040;text-halo-color:#ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0;z-index:1}
 
 
 /*node|z6-7[place=city][capital=yes] {text:name; font-size:11; font-family: DejaVu Sans Bold; text-halo-radius:2; text-color:#101010;text-halo-color:#ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0;z-index:1}
 node|z6-7[place=city][capital!=yes] {text:name; font-size:11; font-family: DejaVu Sans Bold; text-halo-radius:2; text-color:#101010;text-halo-color:#ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0}*/
 
-node|z8-12[place=city][capital=yes] {text:name; text-offset:-20; font-size:14; font-family: DejaVu Sans Bold; text-halo-radius:3; text-color:#101010;text-halo-color:#ffffff; text-allow-overlap: true; -x-mapnik-min-distance:5}
-node|z8-12[place=city][capital!=yes] {text:name; text-offset:-20; font-size:14; font-family: DejaVu Sans Bold; text-halo-radius:2; text-color:#101010;text-halo-color:#ffffff; text-allow-overlap: false; -x-mapnik-min-distance:2}
+node|z8-12[place=city][capital=yes] {text:name; text-offset:-20; font-size:14; font-family: DejaVu Sans Bold; text-halo-radius:3; text-color:#101010;text-halo-color:#ffffff; text-allow-overlap: true; -x-mapnik-min-distance:5;z-index:1}
+node|z8-12[place=city][capital!=yes] {text:name; text-offset:-20; font-size:14; font-family: DejaVu Sans Bold; text-halo-radius:2; text-color:#101010;text-halo-color:#ffffff; text-allow-overlap: false; -x-mapnik-min-distance:2;z-index:1}
 
 
 
@@ -723,7 +744,7 @@ node|z8-12[place=city][capital!=yes] {text:name; text-offset:-20; font-size:14; 
 
 node|z13-[place=town],
 node|z13-[place=city]
-{text:name; text-offset:-20; font-size:12; font-family: DejaVu Sans Bold; text-halo-radius:2; text-color:#101010;text-halo-color:#ffffff; text-allow-overlap: false; -x-mapnik-min-distance:3}
+{text:name; text-offset:-20; font-size:12; font-family: DejaVu Sans Bold; text-halo-radius:2; text-color:#101010;text-halo-color:#ffffff; text-allow-overlap: false; -x-mapnik-min-distance:3;z-index:1}
 
 node|z10-[place=village]{text:name; text-offset:1; font-size:9; font-family: DejaVu Sans Book; text-halo-radius:1; text-color:#606060;text-halo-color:#ffffff; text-allow-overlap: false}
 
@@ -749,12 +770,16 @@ node|z-3[place=continent]
 node|z2-3[place=continent]
 {text:name; text-offset:-10; font-size:8; font-family: DejaVu Sans ExtraLight; text-halo-radius:1; text-color:#202020;text-halo-color:#ffffff;z-index:-1;-x-mapnik-min-distance:0}
 
-node[place=ocean]
+node|z-6[place=ocean]
 {text:name; text-offset:0; font-size:8; font-family: DejaVu Sans Oblique; text-halo-radius:1; text-color:#202020;text-halo-color:#ffffff;z-index:-1;-x-mapnik-min-distance:0}
+node|z7-[place=ocean]
+{text:name; text-offset:0; font-size:11; font-family: DejaVu Sans Oblique; text-halo-radius:1; text-color:#202020;text-halo-color:#ffffff;z-index:-1;-x-mapnik-min-distance:0}
 
-node[place=sea]
+node|z-6[place=sea]
 {text:name; text-offset:0; font-size:8; font-family: DejaVu Sans Oblique; text-halo-radius:1; text-color:#4976d1;text-halo-color:#ffffff;-x-mapnik-min-distance:0}
 
+node|z7-[place=sea]
+{text:name; text-offset:0; font-size:10; font-family: DejaVu Sans Oblique; text-halo-radius:1; text-color:#4976d1;text-halo-color:#ffffff;-x-mapnik-min-distance:0}
 
 node|z3-4[natural=peak][ele>4500]
 {icon-image: mountain_peak6.png; 
@@ -770,7 +795,7 @@ node|z2-3[place=country]
 {text:name; text-offset:0; font-size:10; font-family: DejaVu Sans Book; text-halo-radius:1; text-color:#dd5875;text-halo-color:#ffffff;z-index:1;-x-mapnik-min-distance:0;}
 
 node|z4-8[place=country]
-{text:name; text-offset:0; font-size:10; font-family: DejaVu Sans Book; text-halo-radius:1; text-color:red;text-halo-color:#ffffff;z-index:1;-x-mapnik-min-distance:0}
+{text:name; text-offset:0; font-size:13; font-family: DejaVu Sans Book; text-halo-radius:1; text-color:red;text-halo-color:#ffffff;z-index:1;-x-mapnik-min-distance:0}
 
 node|z8-10[place=country]
 {text:name; text-offset:0; font-size:16; font-family: DejaVu Sans Book; text-halo-radius:1; text-color:red;text-halo-color:#ffffff;z-index:1;-x-mapnik-min-distance:0}
