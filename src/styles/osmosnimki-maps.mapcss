@@ -640,14 +640,23 @@ icon-image - картинка иконки
 
 node|z16-[amenity=pharmacy]    {icon-image:med1_11x14.png}
 node|z16-[amenity=cinema]      {icon-image:cinema_14x14.png}
-node|z16-[amenity=museum]      {icon-image:mus_13x12.png}
+node|z15-[amenity=museum]      {icon-image:mus_13x12.png}
 node|z16-[tourism=zoo]         {icon-image:zoo4_14x14.png}
 node|z16-[amenity=courthouse]  {icon-image:sud_14x13.png}
 node|z16-[amenity=theatre]     {icon-image:teater_14x14.png}
 node|z16-[amenity=university]  {icon-image:univer_15x11.png}
 node|z16-[amenity=toilets]     {icon-image:wc-3_13x13.png}
 node|z16-[amenity=place_of_worship][religion=christian]
-                               {icon-image:pravosl_kupol_11x15.png}
+			      {icon-image:pravosl_kupol_11x15.png;}
+area|z16-[amenity=place_of_worship][religion=christian]
+			      {icon-image:pravosl_kupol_11x15.png;}
+node|z12-[amenity=place_of_worship]
+{text: name; text-color: #623f00; font-family: DejaVu Serif Italic; font-size:9; text-halo-radius: 1; text-halo-color: #ffffff;text-offset:3;max-width:70}
+area|z14-[amenity=place_of_worship]
+{text: name; text-color: #623f00; font-family: DejaVu Serif Italic; font-size:9; text-halo-radius: 1; text-halo-color: #ffffff;text-offset:3;max-width:70;z-index:16;
+width:0.1; color: #111111; opacity: 0.5; fill-color: #777777; fill-opacity: 0.5; }
+
+
 
 node|z17-[amenity=kindergarten]{icon-image:kindergarten_14x14.png}
 node|z17-[amenity=school]      {icon-image:school_13x13.png}
@@ -784,7 +793,7 @@ shields!!!!
 */
 
 
-way|z10-[waterway=stream], way|z10-[waterway=river]
+way|z10-[waterway=stream], way|z10-[waterway=river], way|z13-[waterway=canal]
 {text:name; font-size:9; font-family: DejaVu Sans Oblique; text-color:#547bd1; text-halo-radius:1; text-halo-color:#ffffff; text-position: line}
 
 node|z-3[place=continent]
@@ -810,6 +819,14 @@ text:ele; text-offset:3; font-size:7; font-family: DejaVu Sans Mono Book; text-h
 node|z5-6[natural=peak][ele>3500]
 {icon-image: mountain_peak6.png;
 text:ele; text-offset:3; font-size:7; font-family: DejaVu Sans Mono Book; text-halo-radius:0; text-color:#664229;text-halo-color:#ffffff;-x-mapnik-min-distance:0;
+}
+node|z7-12[natural=peak][ele>2500]
+{icon-image: mountain_peak6.png;
+text:ele; text-offset:3; font-size:7; font-family: DejaVu Sans Mono Book; text-halo-radius:0; text-color:#664229;text-halo-color:#ffffff;-x-mapnik-min-distance:0;
+}
+node|z12-[natural=peak]
+{icon-image: mountain_peak6.png;
+text:name; text-offset:3; font-size:7; font-family: DejaVu Sans Mono Book; text-halo-radius:0; text-color:#664229;text-halo-color:#ffffff;-x-mapnik-min-distance:0;
 }
 
 
