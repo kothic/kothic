@@ -291,7 +291,7 @@ for zoom, zsheet in mapniksheet.iteritems():
       xml = xml_style_start()
       for entry in zsheet[zindex]:
         if entry["type"] in entry_types:
-          if "icon-image" in entry["style"]:
+          if "icon-image" in entry["style"] and "text" not in entry["style"] and entry["style"].get("text-position","center")!='center':
             xml += xml_rule_start()
             xml += x_scale
             xml += xml_filter(entry["rulestring"])
@@ -347,7 +347,15 @@ for zoom, zsheet in mapniksheet.iteritems():
               xml += x_scale
               
               xml += xml_filter(entry["rulestring"])
-              xml += xml_textsymbolizer(ttext,tface,tsize,tcolor, thcolor, thradius, tplace, toffset,toverlap,tdistance,twrap,talign,topacity)
+              if "icon-image" in entry["style"] and entry["style"].get("text-position","center")=='center':
+                xml += xml_shieldsymbolizer(
+                            entry["style"].get("icon-image", ""),
+                            entry["style"].get("icon-width", ""),
+                            entry["style"].get("icon-height", ""),
+                            ttext,tface,tsize,tcolor, thcolor, thradius, tplace,
+                            toffset,toverlap,tdistance,twrap,talign,topacity)
+              else:
+                xml += xml_textsymbolizer(ttext,tface,tsize,tcolor, thcolor, thradius, tplace, toffset,toverlap,tdistance,twrap,talign,topacity)
               sql.add(entry["sql"])
               itags.update(entry["chooser"].get_interesting_tags(entry["type"], zoom))
               xml += xml_rule_end()
