@@ -291,7 +291,7 @@ for zoom, zsheet in mapniksheet.iteritems():
       xml = xml_style_start()
       for entry in zsheet[zindex]:
         if entry["type"] in entry_types:
-          if "icon-image" in entry["style"] and "text" not in entry["style"] and entry["style"].get("text-position","center")!='center':
+          if "icon-image" in entry["style"] and ("text" not in entry["style"] or ("text" not in entry["style"] and entry["style"].get("text-position","center")!='center')):
             xml += xml_rule_start()
             xml += x_scale
             xml += xml_filter(entry["rulestring"])
