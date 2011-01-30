@@ -157,7 +157,7 @@ area|z5-[natural=water],
 area|z10-[landuse=reservoir],
 {fill-color: #C4D4F5; color: #C4D4F5; width:.1; z-index:9;}
 
-area|z10-[natural=water]{text:name; text-offset:1; font-size:10; font-family: DejaVu Serif Italic; text-color:#285fd1; text-allow-overlap: false;text-halo-radius: 1; text-halo-color: #ffffff; }
+area|z9-[natural=water]{text:name; text-offset:1; font-size:10; font-family: DejaVu Serif Italic; text-color:#285fd1; text-allow-overlap: false;text-halo-radius: 1; text-halo-color: #ffffff; }
 /*
 text - из какого поля брать текст
 text-offset - на сколько сдвинуть текст
@@ -778,12 +778,12 @@ node|z13-[place=town],
 node|z13-[place=city]
 {text:name; text-offset:-20; font-size:12; font-family: DejaVu Sans Bold; text-halo-radius:2; text-color:#101010;text-halo-color:#ffffff; text-allow-overlap: false; -x-mapnik-min-distance:3;z-index:1}
 
-node|z10-[place=village]{text:name; text-offset:1; font-size:9; font-family: DejaVu Sans Book; text-halo-radius:1; text-color:#606060;text-halo-color:#ffffff; text-allow-overlap: false}
+node|z9-[place=village]{text:name; text-offset:1; font-size:9; font-family: DejaVu Sans Book; text-halo-radius:1; text-color:#606060;text-halo-color:#ffffff; text-allow-overlap: false}
 
-node|z10-[place=hamlet]{text:name; text-offset:1; font-size:8; font-family: DejaVu Sans Book; text-halo-radius:1; text-color:#505050;text-halo-color:#ffffff; text-allow-overlap: false}
+node|z9-[place=hamlet]{text:name; text-offset:1; font-size:8; font-family: DejaVu Sans Book; text-halo-radius:1; text-color:#505050;text-halo-color:#ffffff; text-allow-overlap: false}
 
-area|z11[landuse=nature_reserve],
-area|z11[leisure=park],
+area|z9-[landuse=nature_reserve],
+area|z11-[leisure=park],
 {text:name;text-offset:1; font-size:10;font-family: DejaVu Serif Italic; text-halo-radius:0; text-color:#3c8000;text-halo-color:#ffffff; text-allow-overlap: false}
 
 
@@ -794,7 +794,7 @@ shields!!!!
 */
 
 
-way|z10-[waterway=stream], way|z10-[waterway=river], way|z13-[waterway=canal]
+way|z10-[waterway=stream], way|z9-[waterway=river], way|z13-[waterway=canal]
 {text:name; font-size:9; font-family: DejaVu Sans Oblique; text-color:#547bd1; text-halo-radius:1; text-halo-color:#ffffff; text-position: line}
 
 node|z-3[place=continent]

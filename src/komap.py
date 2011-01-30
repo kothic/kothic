@@ -167,7 +167,7 @@ for zoom, zsheet in mapniksheet.iteritems():
   for layer_type, entry_types in [("polygon",("way","area")),("line",("way", "line"))]:
     index_range = range(-6,7)
     full_layering = True
-    if zoom < 9:
+    if zoom < 11:
       index_range = (-6,0,6)
       full_layering = False
     for zlayer in index_range:
