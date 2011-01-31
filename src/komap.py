@@ -338,7 +338,7 @@ for zoom, zsheet in mapniksheet.iteritems():
               tplace= entry["style"].get("text-position","center")
               toffset= entry["style"].get("text-offset","0")
               toverlap= entry["style"].get("text-allow-overlap",entry["style"].get("allow-overlap","false"))
-              tdistance= entry["style"].get("-x-mapnik-min-distance","26")
+              tdistance= entry["style"].get("-x-mapnik-min-distance","20")
               twrap= entry["style"].get("max-width",256)
               talign= entry["style"].get("text-align","center")
               topacity= entry["style"].get("text-opacity",entry["style"].get("opacity","1"))

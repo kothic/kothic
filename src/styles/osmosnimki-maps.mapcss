@@ -108,7 +108,7 @@ area|z4-[landuse=forest], area|z4-[landuse=wood]
 area|z10-[landuse=garages] {fill-color: #ddd8da; z-index:3}
 
 area|z10-[natural=forest], area|z10-[natural=wood],
-area|z10-[landuse=forest], area|z10-[landuse=wood]{text:name; text-offset:0; font-size:10; font-family: DejaVu Serif Italic; text-color:green; text-allow-overlap: false;text-halo-radius: 1; text-halo-color: #ffffff; }
+area|z10-[landuse=forest], area|z10-[landuse=wood]{text:name; text-offset:0; font-size:10; font-family: DejaVu Serif Italic; text-color:green; text-allow-overlap: false;text-halo-radius: 1; text-halo-color: #ffffff;  -x-mapnik-min-distance: 0 }
 
 area|z12-[landuse=grass],
 area|z12-[natural=grass],
@@ -650,7 +650,7 @@ node|z16-[amenity=place_of_worship][religion=christian]
 			      {icon-image:pravosl_kupol_11x15.png;}
 area|z16-[amenity=place_of_worship][religion=christian]
 			      {icon-image:pravosl_kupol_11x15.png;}
-node|z12-[amenity=place_of_worship]
+node|z14-[amenity=place_of_worship]
 {text: name; text-color: #623f00; font-family: DejaVu Serif Italic; font-size:9; text-halo-radius: 1; text-halo-color: #ffffff;text-offset:3;max-width:70}
 area|z14-[amenity=place_of_worship]
 {text: name; text-color: #623f00; font-family: DejaVu Serif Italic; font-size:9; text-halo-radius: 1; text-halo-color: #ffffff;text-offset:3;max-width:70;z-index:16;
