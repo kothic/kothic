@@ -401,8 +401,8 @@ for zoom, zsheet in mapniksheet.iteritems():
             """%(itags,max(pixel_size_at_zoom(zoom,20),1000),ttext,sqlz,oitags)
             mfile.write(xml_layer("postgis-process", layer_type, itags, sqlz ))
           else:
-            sql = "(" + " OR ".join(sql) + ") and way &amp;&amp; ST_Expand(!bbox!,%s)" 
-            mfile.write(xml_layer("postgis", layer_type, itags, sql,max(pixel_size_at_zoom(zoom,20),1000) ))
+            sql = "(" + " OR ".join(sql) + ") and way &amp;&amp; ST_Expand(!bbox!,%s)"%(max(pixel_size_at_zoom(zoom,20),1000),)
+            mfile.write(xml_layer("postgis", layer_type, itags, sql ))
         else:
           xml_nolayer()
 
