@@ -167,7 +167,7 @@ for zoom, zsheet in mapniksheet.iteritems():
   for layer_type, entry_types in [("polygon",("way","area")),("line",("way", "line"))]:
     index_range = range(-6,7)
     full_layering = True
-    if zoom < 11:
+    if zoom < 9:
       index_range = (-6,0,6)
       full_layering = False
     for zlayer in index_range:
@@ -388,21 +388,21 @@ for zoom, zsheet in mapniksheet.iteritems():
                  from (
                    select ST_Buffer(way, %s) as way, %s
                      from planet_osm_%s p
-                     where (%s) and p.way &amp;&amp; ST_Expand(!bbox!,500) and (%s)) p
+                     where (%s) and p.way &amp;&amp; ST_Expand(!bbox!,%s) and (%s)) p
                    group by %s) p order by ST_Area(p.way)
-            """%(itags,oitags,pixel_size_at_zoom(zoom,10),oitags,layer_type,ttext,sqlz,oitags)
+            """%(itags,oitags,pixel_size_at_zoom(zoom,10),oitags,layer_type,ttext,max(pixel_size_at_zoom(zoom,20),1000),sqlz,oitags)
             mfile.write(xml_layer("postgis-process", layer_type, itags, sqlz, oitags ))
           elif layer_type == "line":
             sqlz = " OR ".join(sql)
             itags = ", ".join(itags)
             #itags = "\""+ itags+"\""
-            sqlz = """select %s, ST_LineMerge(ST_Union(way)) as way from (SELECT * from planet_osm_line where way &amp;&amp; ST_Expand(!bbox!,500) and (%s) and (%s)) as tex
+            sqlz = """select %s, ST_LineMerge(ST_Union(way)) as way from (SELECT * from planet_osm_line where way &amp;&amp; ST_Expand(!bbox!,%s) and (%s) and (%s)) as tex
             group by %s
-            """%(itags,ttext,sqlz,oitags)
+            """%(itags,max(pixel_size_at_zoom(zoom,20),1000),ttext,sqlz,oitags)
             mfile.write(xml_layer("postgis-process", layer_type, itags, sqlz ))
           else:
-            sql = "(" + " OR ".join(sql) + ") and way &amp;&amp; !bbox!" 
-            mfile.write(xml_layer("postgis", layer_type, itags, sql ))
+            sql = "(" + " OR ".join(sql) + ") and way &amp;&amp; ST_Expand(!bbox!,%s)" 
+            mfile.write(xml_layer("postgis", layer_type, itags, sql,max(pixel_size_at_zoom(zoom,20),1000) ))
         else:
           xml_nolayer()
 
