@@ -114,6 +114,7 @@ area|z12-[landuse=grass],
 area|z12-[natural=grass],
 area|z12-[natural=meadow],
 area|z12-[landuse=meadow],
+area|z12-[landuse=recreation_ground],
 {fill-color: #f4ffe5; z-index:4}
 
 area|z10-[natural=wetland] {fill-image:swamp_world2.png; z-index:4}
