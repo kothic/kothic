@@ -631,11 +631,11 @@ way|z16-[barrier=wall] {width:.5; color: black;z-index:16}
 way|z16-[marking=sport][!colour][!color],
         {width:.5; color: #a0a0a0;z-index:16}
 way|z16-[marking=sport][colour=white],
-way|z16-[marking=sport][color=white]    {width:.5; color: white;z-index:16; casing-width: .3; casing-color: #46960C}
+way|z16-[marking=sport][color=white]    {width:.6; color: white;z-index:16; casing-width: .1; casing-color: #46960C}
 way|z16-[marking=sport][colour=red],
-way|z16-[marking=sport][color=red]    {width:.5; color: #c00000;z-index:16; casing-width: .3; casing-color: #46960C}
+way|z16-[marking=sport][color=red]    {width:.6; color: #c00000;z-index:16; casing-width: .1; casing-color: #46960C}
 way|z16-[marking=sport][colour=black],
-way|z16-[marking=sport][color=black]    {width:.5; color: black;z-index:16; casing-width: .3; casing-color: #46960C}
+way|z16-[marking=sport][color=black]    {width:.6; color: black;z-index:16; casing-width: .1; casing-color: #46960C}
 
 
 node|z15-[amenity=bus_station] {icon-image:aut2_16x16_park.png}
