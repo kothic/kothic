@@ -629,13 +629,13 @@ way|z16-[barrier=fence] {width:.3; color: black;z-index:16}
 way|z16-[barrier=wall] {width:.5; color: black;z-index:16}
 
 way|z16-[marking=sport][!colour][!color],
-        {width:.4; color: #a0a0a0;z-index:16}
+        {width:.5; color: #a0a0a0;z-index:16}
 way|z16-[marking=sport][colour=white],
-way|z16-[marking=sport][color=white]    {width:.4; color: white;z-index:16}
+way|z16-[marking=sport][color=white]    {width:.5; color: white;z-index:16; casing-width: .3; casing-color: #46960C}
 way|z16-[marking=sport][colour=red],
-way|z16-[marking=sport][color=red]    {width:.4; color: #c00000;z-index:16}
+way|z16-[marking=sport][color=red]    {width:.5; color: #c00000;z-index:16; casing-width: .3; casing-color: #46960C}
 way|z16-[marking=sport][colour=black],
-way|z16-[marking=sport][color=black]    {width:.4; color: black;z-index:16}
+way|z16-[marking=sport][color=black]    {width:.5; color: black;z-index:16; casing-width: .3; casing-color: #46960C}
 
 
 node|z15-[amenity=bus_station] {icon-image:aut2_16x16_park.png}
