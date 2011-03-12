@@ -628,6 +628,15 @@ way|z12-[railway=subway]
 way|z16-[barrier=fence] {width:.3; color: black;z-index:16}
 way|z16-[barrier=wall] {width:.5; color: black;z-index:16}
 
+way|z16-[marking=sport][!colour][!color],
+        {width:.4; color: #a0a0a0;z-index:16}
+way|z16-[marking=sport][colour=white],
+way|z16-[marking=sport][color=white]    {width:.4; color: white;z-index:16}
+way|z16-[marking=sport][colour=red],
+way|z16-[marking=sport][color=red]    {width:.4; color: #c00000;z-index:16}
+way|z16-[marking=sport][colour=black],
+way|z16-[marking=sport][color=black]    {width:.4; color: black;z-index:16}
+
 
 node|z15-[amenity=bus_station] {icon-image:aut2_16x16_park.png}
 node|z16-[highway=bus_stop]    {icon-image:autobus_stop_14x10.png}
