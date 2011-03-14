@@ -85,10 +85,13 @@ area|z16-[landuse=orchard]
 area|z12-[natural=scrub]
        {fill-color: #e5f5dc;fill-image:kust1.png; z-index:3}
 area|z12-[natural=heath]
-       {fill-color: #faf7f7; z-index:3}
+       {fill-color: #ecffe5; z-index:3}
        
 
 area|z10-[landuse=industrial],area|z10-[landuse=military] {fill-color: #ddd8da; z-index:3}
+
+area|z15-[amenity=parking]{fill-color: #ecedf4; z-index:3}
+
 area|z4-[natural=desert] {fill-image: desert22.png}
 
 
@@ -628,14 +631,14 @@ way|z12-[railway=subway]
 way|z16-[barrier=fence] {width:.3; color: black;z-index:16}
 way|z16-[barrier=wall] {width:.5; color: black;z-index:16}
 
-way|z16-[marking=sport][!colour][!color],
+way|z15-[marking=sport][!colour][!color],
         {width:.5; color: #a0a0a0;z-index:16}
-way|z16-[marking=sport][colour=white],
-way|z16-[marking=sport][color=white]    {width:1; color: white;z-index:16}
-way|z16-[marking=sport][colour=red],
-way|z16-[marking=sport][color=red]    {width:1; color: #c00000;z-index:16}
-way|z16-[marking=sport][colour=black],
-way|z16-[marking=sport][color=black]    {width:1; color: black;z-index:16}
+way|z15-[marking=sport][colour=white],
+way|z15-[marking=sport][color=white]    {width:1; color: white;z-index:16}
+way|z15-[marking=sport][colour=red],
+way|z15-[marking=sport][color=red]    {width:1; color: #c00000;z-index:16}
+way|z15-[marking=sport][colour=black],
+way|z15-[marking=sport][color=black]    {width:1; color: black;z-index:16}
 
 
 node|z15-[amenity=bus_station] {icon-image:aut2_16x16_park.png}
