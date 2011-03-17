@@ -71,6 +71,7 @@ mapniksheet = {}
 # {zoom: {z-index: [{sql:sql_hint, cond: mapnikfiltercondition, subject: subj, style: {a:b,c:d..}},{r2}...]...}...}
 
 coast = {}
+fonts = set()
 for zoom in range (minzoom, maxzoom):
   mapniksheet[zoom] = {}
   zsheet = mapniksheet[zoom]
@@ -84,6 +85,7 @@ for zoom in range (minzoom, maxzoom):
       chooser_entry = {}
       chooser_entry["sql"] = "("+ chooser.get_sql_hints(chooser.ruleChains[0][0].subject,zoom)[1] +")"
       chooser_entry["style"] = styles
+      fonts.add(styles.get("font-family","DejaVu Sans Book"))
       chooser_entry["type"] = chooser.ruleChains[0][0].subject
       chooser_entry["rule"] = [i.conditions for i in chooser.ruleChains[0] if i.test_zoom(zoom)]
       numerics.update(chooser.get_numerics())
@@ -119,6 +121,9 @@ def add_numerics_to_itags(itags):
 
 
 mfile.write(xml_start(style.get_style("canvas", {}, maxzoom)[0].get("fill-color", "#000000")))
+for font in fonts:
+   mfile.write(xml_fontset(font, True))
+
 for zoom, zsheet in mapniksheet.iteritems():
   x_scale = xml_scaledenominator(zoom)
   ta = zsheet.keys()

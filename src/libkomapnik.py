@@ -60,6 +60,16 @@ def pixel_size_at_zoom(z, l):
   Converts l pixels on tiles into length on zoom z
   """
   return l* 20037508.342789244 / 256 * 2 / (2**z)
+
+
+def xml_fontset(name, unicode=True):
+  if unicode:
+    unicode = '<Font face_name="unifont Medium" />'
+  return """
+  <FontSet name="%s">
+        <Font face_name="%s" />
+        %s
+  </FontSet>"""%(name, name, unicode)
   
 
 def xml_pointsymbolizer(path="", width="", height="", opacity=1, overlap="false"):
@@ -117,7 +127,7 @@ def xml_textsymbolizer(text="name",face="DejaVu Sans Book",size="10",color="#000
   align = {"center": "middle"}.get(align.lower(), align)
   
   return """
-  <TextSymbolizer name="%s" face_name="%s" size="%s" fill="%s" halo_fill= "%s" halo_radius="%s" placement="%s" dy="%s" max_char_angle_delta="15" allow_overlap="%s" wrap_width="%s" min_distance="%s" horizontal_alignment="%s" opacity="%s" />
+  <TextSymbolizer name="%s" fontset_name="%s" size="%s" fill="%s" halo_fill= "%s" halo_radius="%s" placement="%s" dy="%s" max_char_angle_delta="15" allow_overlap="%s" wrap_width="%s" min_distance="%s" horizontal_alignment="%s" opacity="%s" />
   """%(text,face,int(float(size)),color,halo_color,halo_radius,placement,offset,overlap,wrap_width,distance,align,opacity)
 
 def xml_shieldsymbolizer(path="", width="", height="",text="name",face="DejaVu Sans Book",size="10",color="#000000", halo_color="#ffffff", halo_radius="0", placement="line", offset="0", overlap="false", distance="26", wrap_width=256, align="center", opacity="1"):
@@ -130,10 +140,15 @@ def xml_shieldsymbolizer(path="", width="", height="",text="name",face="DejaVu S
     width =' width="%s" '%width
   if height:
     height =' height="%s" '%height
+  vertical_alignment = "middle"
+  if float(offset) > 0:
+    vertical_alignment = "bottom"
+  if float(offset) < 0:
+    vertical_alignment = "top"
   return """
-  <ShieldSymbolizer file="%s%s" %s %s name="%s" face_name="%s" size="%s" fill="%s" halo_fill= "%s" halo_radius="%s" placement="%s" dy="%s" allow_overlap="%s" wrap_width="%s" min_distance="%s" horizontal_alignment="%s" opacity="%s" />
+    <ShieldSymbolizer file="%s%s" %s %s name="%s" fontset_name="%s" size="%s" fill="%s" halo_fill= "%s" halo_radius="%s" placement="%s" dy="%s" allow_overlap="%s" wrap_width="%s" min_distance="%s" horizontal_alignment="%s" vertical_alignment="%s" opacity="%s" />
   """%(icons_path, \
-  path, width, height,text,face,int(float(size)),color,halo_color,halo_radius,placement,offset,overlap,wrap_width,distance,align,opacity)
+    path, width, height,text,face,int(float(size)),color,halo_color,halo_radius,placement,offset,overlap,wrap_width,distance,align,vertical_alignment,opacity)
 
 def xml_filter(string):
   return """
