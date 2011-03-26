@@ -866,7 +866,7 @@ area|z6-10[boundary=administrative][admin_level=4]
 area|z10-[boundary=administrative][admin_level=6]
 {text:name; text-offset:-10; font-size:12; font-family: DejaVu Sans ExtraLight; text-halo-radius:1; text-color:#7848a0;text-halo-color:#ffffff}
 
-node|z12-[palce=suburb]
+node|z12-[place=suburb]
 {text:name; font-size:12; font-family: DejaVu Sans ExtraLight; text-color:#7848a0}
 
 
