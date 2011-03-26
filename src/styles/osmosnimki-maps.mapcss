@@ -217,7 +217,7 @@ linecap:butt требуется для того, чтобы сегменты н�
 way|z12[highway=road],
 way|z12[highway=track],
 way|z9[highway=secondary],
-way|z9[highway=tertiary],
+way|z9-10[highway=tertiary],
         {text: name; text-position: line; width:0.2; opacity: 0.5; color: #996703; z-index:10}
 
 
@@ -295,8 +295,8 @@ way|z17-[highway=service][living_street!=yes][service!=parking_aisle],
 
 
 
-way|z10[highway=secondary],
-way|z10[highway=tertiary]
+/* way|z10[highway=tertiary] */
+way|z10[highway=secondary]
         {text: name; text-position: line;
         width:1.2;  color: #fcffd1;
         casing-width:0.35; casing-color: #996703;
