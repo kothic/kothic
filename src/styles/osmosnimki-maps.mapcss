@@ -219,6 +219,7 @@ way|z12[highway=track],
 way|z12[highway=residential],
 way|z9[highway=secondary],
 way|z9-10[highway=tertiary],
+way|z14[highway=service][living_street!=yes][service!=parking_aisle],
         {width:0.3; opacity: 0.6; color: #996703; z-index:10}
 
 
@@ -253,7 +254,6 @@ z-index:10}
 
 way|z15[highway=service][living_street=yes],
 way|z15[highway=service][service=parking_aisle],
-way|z14[highway=service][living_street!=yes][service!=parking_aisle],
 {width:0.2; opacity: 0.5; color: #996703; z-index:10}
 
 
