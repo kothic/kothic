@@ -625,7 +625,7 @@ line|z9-[railway=rail]::ticks
 */
 
 way|z12-[railway=subway]
-{width:3; color: #072889;z-index:15; dashes:3,3; opacity:0.3; linecap: butt;}
+{width:3; color: #072889;z-index:15; dashes:3,3; opacity:0.3; linecap: butt; -x-mapnik-layer: top;}
 
 
 way|z16-[barrier=fence] {width:.3; color: black;z-index:16}
@@ -781,7 +781,7 @@ node|z7-8[place=city][population>=5000000]
 /*node|z6-7[place=city][capital=yes] {text:name; font-size:11; font-family: DejaVu Sans Bold; text-halo-radius:2; text-color:#101010;text-halo-color:#ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0;z-index:1}
 node|z6-7[place=city][capital!=yes] {text:name; font-size:11; font-family: DejaVu Sans Bold; text-halo-radius:2; text-color:#101010;text-halo-color:#ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0}*/
 
-node|z9-12[place=city][capital=yes] {text:name; text-offset:-20; font-size:14; font-family: DejaVu Sans Bold; text-halo-radius:4; text-color:#101010;text-halo-color:#ffffff; text-allow-overlap: false; -x-mapnik-min-distance:30; z-index:20}
+node|z9-12[place=city][capital=yes] {text:name; text-offset:-20; font-size:14; font-family: DejaVu Sans Bold; text-halo-radius:4; text-color:#101010;text-halo-color:#ffffff; text-allow-overlap: false; -x-mapnik-min-distance:50; z-index:20}
 node|z9-12[place=city][capital!=yes] {text:name; text-offset:-20; font-size:14; font-family: DejaVu Sans Bold; text-halo-radius:2; text-color:#101010;text-halo-color:#ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0;z-index:1}
 
 
