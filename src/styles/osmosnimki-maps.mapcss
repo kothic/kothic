@@ -253,6 +253,7 @@ z-index:10}
 
 way|z15[highway=service][living_street=yes],
 way|z15[highway=service][service=parking_aisle],
+way|z14[highway=service][living_street!=yes][service!=parking_aisle],
 {width:0.2; opacity: 0.5; color: #996703; z-index:10}
 
 
@@ -269,7 +270,7 @@ way|z16-[highway=service][service=parking_aisle],
 
 way|z14-15[highway=residential],
 way|z14-15[highway=unclassified],
-way|z14-15[highway=service][living_street!=yes][service!=parking_aisle],
+way|z15[highway=service][living_street!=yes][service!=parking_aisle],
 
 {text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Book; font-size:9; text-halo-radius: 1; text-halo-color: #ffffff;
         width:2.5;  color: #ffffff;
