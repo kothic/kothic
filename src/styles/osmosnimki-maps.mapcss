@@ -863,10 +863,11 @@ area|z3-5[boundary=administrative][admin_level=3]
 
 area|z6-10[boundary=administrative][admin_level=4]
 {text:name; text-offset:17; font-size:14; font-family: DejaVu Sans ExtraLight; text-halo-radius:1; text-color:#606060;text-halo-color:#ffffff;-x-mapnik-min-distance:0}
-area|z10-11[boundary=administrative][admin_level=6]
+area|z10-[boundary=administrative][admin_level=6]
 {text:name; text-offset:-10; font-size:12; font-family: DejaVu Sans ExtraLight; text-halo-radius:1; text-color:#7848a0;text-halo-color:#ffffff}
-area|z12-[boundary=administrative][admin_level=8]
-{text:name; text-offset:-10; font-size:12; font-family: DejaVu Sans ExtraLight; text-color:#7848a0}
+
+node|z12-[palce=suburb]
+{text:name; font-size:12; font-family: DejaVu Sans ExtraLight; text-color:#7848a0}
 
 
 
