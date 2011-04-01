@@ -220,13 +220,13 @@ way|z12[highway=residential],
 way|z9[highway=secondary],
 way|z9-10[highway=tertiary],
 way|z14[highway=service][living_street!=yes][service!=parking_aisle]
-        {width:0.3; opacity: 0.6; color: #996703; z-index:10}
+        {width:0.3; opacity: 0.6; color: #996703; z-index:10; -x-mapnik-layer: bottom;}
 
 
 way|z13[highway=road],
 way|z13[highway=track]
 {text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Book; font-size:9; text-halo-radius: 1; text-halo-color: #ffffff;
-        width:0.6; opacity: 0.5; color: #996703; z-index:10}
+        width:0.6; opacity: 0.5; color: #996703; z-index:10; -x-mapnik-layer: bottom;}
 
 way|z14-16[highway=road],
 way|z14-16[highway=track]
@@ -591,7 +591,7 @@ way|z13-[highway=primary_link]::centerline,
 
 */
 
-way|z17-[oneway=yes]{line-style:arrows;z-index:15}
+way|z17-[oneway=yes]{line-style:arrows;z-index:15; -x-mapnik-layer: top;}
 
 /*
 
@@ -630,17 +630,17 @@ way|z12-[railway=subway]
 {width:3; color: #072889;z-index:15; dashes:3,3; opacity:0.3; linecap: butt; -x-mapnik-layer: top;}
 
 
-way|z16-[barrier=fence] {width:.3; color: black;z-index:16}
-way|z16-[barrier=wall] {width:.5; color: black;z-index:16}
+way|z16-[barrier=fence] {width:.3; color: black;z-index:16; -x-mapnik-layer: top;}
+way|z16-[barrier=wall] {width:.5; color: black;z-index:16; -x-mapnik-layer: top;}
 
 way|z15-[marking=sport][!colour][!color],
-        {width:.5; color: #a0a0a0;z-index:16}
+        {width:.5; color: #a0a0a0;z-index:16; -x-mapnik-layer: top;}
 way|z15-[marking=sport][colour=white],
-way|z15-[marking=sport][color=white]    {width:1; color: white;z-index:16}
+way|z15-[marking=sport][color=white]    {width:1; color: white;z-index:16; -x-mapnik-layer: top;}
 way|z15-[marking=sport][colour=red],
-way|z15-[marking=sport][color=red]    {width:1; color: #c00000;z-index:16}
+way|z15-[marking=sport][color=red]    {width:1; color: #c00000;z-index:16; -x-mapnik-layer: top;}
 way|z15-[marking=sport][colour=black],
-way|z15-[marking=sport][color=black]    {width:1; color: black;z-index:16}
+way|z15-[marking=sport][color=black]    {width:1; color: black;z-index:16; -x-mapnik-layer: top;}
 
 
 node|z15-[amenity=bus_station] {icon-image:aut2_16x16_park.png}
