@@ -233,7 +233,7 @@ for zoom, zsheet in mapniksheet.iteritems():
       sql = sql_g
       itags = itags_g
       if sql:
-        mfile.write(xml)
+        mfile.write(xml_g)
         sql = "(" + " OR ".join(sql) + ") and way &amp;&amp; !bbox!"
         if zlayer == 0 and full_layering:
           sql = "("+ sql +') and ("layer" not in ('+ ", ".join(['\'%s\''%i for i in range(-5,6) if i != 0])+") or \"layer\" is NULL)"
