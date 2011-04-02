@@ -46,21 +46,21 @@ way|z13[highway=track]
 way|z14-16[highway=road],
 way|z14-16[highway=track]
 {text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Book; font-size:9; text-halo-radius: 1; text-halo-color: #ffffff;
-width:1.5;  color: #ffffff;
+width:1.5;  color: #ffffff;opacity: 0.5;
 z-index:9}
 
 
 way|z16-[highway=road],
 way|z16-[highway=track]
 {text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Book; font-size:9; text-halo-radius: 1; text-halo-color: #ffffff;
-width:2.5;  color: #ffffff;
+width:2.5;  color: #ffffff;opacity: 0.5;
 z-index:9}
 
 
 
 way|z13[highway=residential]
 {text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Book; font-size:9; text-halo-radius: 1; text-halo-color: #ffffff;
-width:1.2;  color: #ffffff;
+width:1.2;  color: #ffffff;opacity: 0.5;
 z-index:10}
 
 
@@ -76,7 +76,7 @@ way|z15[highway=service][service=parking_aisle],
 way|z16-[highway=service][living_street=yes],
 way|z16-[highway=service][service=parking_aisle],
 {text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Book; font-size:9; text-halo-radius: 1; text-halo-color: #ffffff;
-        width:1.2;  color: #ffffff;
+        width:1.2;  color: #ffffff;opacity: 0.5;
         z-index:10}
 
 way|z14-15[highway=residential],
@@ -84,7 +84,7 @@ way|z14-15[highway=unclassified],
 way|z15[highway=service][living_street!=yes][service!=parking_aisle],
 
 {text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Book; font-size:9; text-halo-radius: 1; text-halo-color: #ffffff;
-        width:2.5;  color: #ffffff;
+        width:2.5;  color: #ffffff;opacity: 0.5;
         z-index:10}
 
 way|z16[highway=residential],
@@ -92,7 +92,7 @@ way|z16[highway=unclassified],
 way|z16[highway=living_street],
 way|z16[highway=service][living_street!=yes][service!=parking_aisle],
 {text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Book; font-size:9; text-halo-radius: 1; text-halo-color: #ffffff;
-        width:3.5;  color: #ffffff;
+        width:3.5;  color: #ffffff;opacity: 0.5;
         z-index:10}
 
 way|z17-[highway=residential],
@@ -100,7 +100,7 @@ way|z17-[highway=unclassified],
 way|z17-[highway=living_street],
 way|z17-[highway=service][living_street!=yes][service!=parking_aisle],
 {text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Book; font-size:9; text-halo-radius: 1; text-halo-color: #ffffff;
-        width:4.5;  color: #ffffff;
+        width:4.5;  color: #ffffff;opacity: 0.5;
         z-index:10}
 
 
@@ -108,13 +108,13 @@ way|z17-[highway=service][living_street!=yes][service!=parking_aisle],
 /* way|z10[highway=tertiary] */
 way|z10[highway=secondary]
         {text: name; text-position: line;
-        width:1.2;  color: #fcffd1;
+        width:1.2;  color: #fcffd1;opacity: 0.5;
         z-index:11}
 
 way|z11[highway=secondary],
 way|z11[highway=tertiary]
 {text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Book; font-size:9; text-halo-radius: 1; text-halo-color: #ffffff; text-halo-radius: 1; text-halo-color: #ffffff;
-        width:1.4;  color: #fcffd1;
+        width:1.4;  color: #fcffd1;opacity: 0.5;
         z-index:11}
 
 way|z12[highway=secondary],
@@ -122,7 +122,7 @@ way|z12[highway=secondary_link],
 way|z12[highway=tertiary],
 way|z12[highway=tertiary_link]
 {text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Book; font-size:9; text-halo-radius: 1; text-halo-color: #ffffff; text-halo-radius: 1; text-halo-color: #ffffff;
-        width:3;  color: #fcffd1;
+        width:3;  color: #fcffd1;opacity: 0.5;
         z-index:11}
 
 way|z13[highway=secondary],
@@ -130,7 +130,7 @@ way|z13[highway=secondary_link],
 way|z13[highway=tertiary],
 way|z13[highway=tertiary_link]
 {text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Book; font-size:9; text-halo-radius: 1; text-halo-color: #ffffff;
-        width:4;  color: #fcffd1;
+        width:4;  color: #fcffd1;opacity: 0.5;
         z-index:11}
 
 way|z14[highway=secondary],
@@ -138,7 +138,7 @@ way|z14[highway=secondary_link],
 way|z14[highway=tertiary],
 way|z14[highway=tertiary_link]
 {text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Bold; font-size:9; text-halo-radius: 1; text-halo-color: #ffffff;
-        width:5;  color: #fcffd1;
+        width:5;  color: #fcffd1;opacity: 0.5;
         z-index:11}
 
 way|z15[highway=secondary],
@@ -146,7 +146,7 @@ way|z15[highway=secondary_link],
 way|z15[highway=tertiary],
 way|z15[highway=tertiary_link]
 {text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Bold; font-size:9; text-halo-radius: 1; text-halo-color: #ffffff;
-        width:6;  color: #fcffd1;
+        width:6;  color: #fcffd1;opacity: 0.5;
         z-index:11}
 
 way|z16[highway=secondary],
@@ -154,7 +154,7 @@ way|z16[highway=secondary_link],
 way|z16[highway=tertiary],
 way|z16[highway=tertiary_link]
 {text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Bold; font-size:9; text-halo-radius: 1; text-halo-color: #ffffff;
-        width:7;  color: #fcffd1;
+        width:7;  color: #fcffd1;opacity: 0.5;
         z-index:11}
 
 
@@ -163,7 +163,7 @@ way|z17[highway=secondary_link],
 way|z17[highway=tertiary],
 way|z17[highway=tertiary_link]
 {text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Bold; font-size:9; text-halo-radius: 1; text-halo-color: #ffffff;
-        width:8;  color: #fcffd1;
+        width:8;  color: #fcffd1;opacity: 0.5;
         z-index:11}
 
 way|z18[highway=secondary],
@@ -171,7 +171,7 @@ way|z18[highway=secondary_link],
 way|z18[highway=tertiary],
 way|z18[highway=tertiary_link]
 {text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Bold; font-size:9; text-halo-radius: 1; text-halo-color: #ffffff;
-        width:9;  color: #fcffd1;
+        width:9;  color: #fcffd1;opacity: 0.5;
         z-index:11}
 
 /*
@@ -182,128 +182,128 @@ way|z18[highway=tertiary_link]
 
 
 way|z7[highway=primary],
-{width:1;  color: #fcea97;
+{width:1;  color: #fcea97;opacity: 0.5;
 z-index:12}
 
 way|z8[highway=primary],
-{width:2;  color: #fcea97;
+{width:2;  color: #fcea97;opacity: 0.5;
 z-index:12}
 
 way|z9[highway=primary],
 way|z9[highway=primary_link]
 {text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Bold; font-size:9; text-halo-radius: 1; text-halo-color: #ffffff;
-width:2;  color: #fcea97;
+width:2;  color: #fcea97;opacity: 0.5;
 z-index:12}
 
 way|z10[highway=primary],
 way|z10[highway=primary_link]
 {text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Bold; font-size:9; text-halo-radius: 1; text-halo-color: #ffffff;
-        width:3;  color: #fcea97;
+        width:3;  color: #fcea97;opacity: 0.5;
         z-index:12}
 way|z11[highway=primary],
 way|z11[highway=primary_link]
         {text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Bold; font-size:9; text-halo-radius: 1; text-halo-color: #ffffff;
-        width:4;  color: #fcea97;
+        width:4;  color: #fcea97;opacity: 0.5;
         z-index:12}
 
 way|z12[highway=primary],
 way|z12[highway=primary_link]
         {text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Bold; font-size:9; text-halo-radius: 1; text-halo-color: #ffffff;
-        width:5;  color: #fcea97;
+        width:5;  color: #fcea97;opacity: 0.5;
         z-index:12}
 
 way|z13[highway=primary],
 way|z13[highway=primary_link]
         {text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Bold; font-size:9; text-halo-radius: 1; text-halo-color: #ffffff;
-        width:6;  color: #fcea97;
+        width:6;  color: #fcea97;opacity: 0.5;
         z-index:12}
 
 way|z14[highway=primary],
 way|z14[highway=primary_link]
         {text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Bold; font-size:9; text-halo-radius: 1; text-halo-color: #ffffff;
-        width:7;  color: #fcea97;
+        width:7;  color: #fcea97;opacity: 0.5;
         z-index:12}
 
 way|z15[highway=primary],
 way|z15[highway=primary_link]
         {text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Bold; font-size:9; text-halo-radius: 1; text-halo-color: #ffffff;
-        width:8;  color: #fcea97;
+        width:8;  color: #fcea97;opacity: 0.5;
         z-index:12}
 
 way|z16[highway=primary],
 way|z16[highway=primary_link]
         {text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Bold; font-size:9; text-halo-radius: 1; text-halo-color: #ffffff;
-        width:9;  color: #fcea97;
+        width:9;  color: #fcea97;opacity: 0.5;
         z-index:12}
 
 way|z17[highway=primary],
 way|z17[highway=primary_link]
         {text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Bold; font-size:9; text-halo-radius: 1; text-halo-color: #ffffff;
-        width:10;  color: #fcea97;
+        width:10;  color: #fcea97;opacity: 0.5;
         z-index:12}
 
 way|z18[highway=primary],
 way|z18[highway=primary_link]
         {text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Bold; font-size:9; text-halo-radius: 1; text-halo-color: #ffffff;
-        width:11;  color: #fcea97;
+        width:11;  color: #fcea97;opacity: 0.5;
         z-index:12}
 
 
 way|z6[highway=trunk]
-{width:0.9;  color: #fbcd40;
+{width:0.9;  color: #fbcd40;opacity: 0.5;
 z-index:13}
 
 way|z6[highway=motorway]
-{width:1;  color: #fc9265;
+{width:1;  color: #fc9265;opacity: 0.5;
 z-index:13}
 
 way|z7[highway=trunk]
-{width:1;  color: #fbcd40;
+{width:1;  color: #fbcd40;opacity: 0.5;
 z-index:13}
 
 way|z7[highway=motorway]
-{width:1.2;  color: #fc9265;
+{width:1.2;  color: #fc9265;opacity: 0.5;
 z-index:13}
 
 
 way|z8[highway=trunk],
-{width:2;  color: #fbcd40;
+{width:2;  color: #fbcd40;opacity: 0.5;
 z-index:13}
 
 way|z8[highway=motorway],
-{width:2;  color: #fc9265;
+{width:2;  color: #fc9265;opacity: 0.5;
 z-index:13}
 
 
 way|z9[highway=trunk],
 way|z9[highway=motorway],
 {text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Bold; font-size:9; text-halo-radius: 1; text-halo-color: #ffffff;
-width:3;  color: #ffd780;
+width:3;  color: #ffd780;opacity: 0.5;
 z-index:13}
 
 
 way|z10[highway=trunk],
 way|z10[highway=motorway],
 {text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Bold; font-size:9; text-halo-radius: 1; text-halo-color: #ffffff;
-        width:4;  color: #ffd780;
+        width:4;  color: #ffd780;opacity: 0.5;
         z-index:13}
 
 way|z11[highway=trunk],
 way|z11[highway=motorway],
 {text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Bold; font-size:9; text-halo-radius: 1; text-halo-color: #ffffff;
-        width:5;  color: #ffd780;
+        width:5;  color: #ffd780;opacity: 0.5;
         z-index:13}
 
 way|z12[highway=trunk],
 way|z12[highway=motorway],
 {text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Bold; font-size:9; text-halo-radius: 1; text-halo-color: #ffffff;
-        width:7;  color: #ffd780;
+        width:7;  color: #ffd780;opacity: 0.5;
         z-index:13}
 
 way|z13[highway=trunk],
 way|z13[highway=motorway],
 {text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Bold; font-size:9; text-halo-radius: 1; text-halo-color: #ffffff;
-        width:8;  color: #ffd780;
+        width:8;  color: #ffd780;opacity: 0.5;
         z-index:13}
 
 way|z14[highway=trunk],
@@ -311,7 +311,7 @@ way|z14[highway=trunk_link],
 way|z14[highway=motorway],
 way|z14[highway=motorway_link],
 {text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Bold; font-size:9; text-halo-radius: 1; text-halo-color: #ffffff;
-        width:9;  color: #ffd780;
+        width:9;  color: #ffd780;opacity: 0.5;
         z-index:13}
 
 
@@ -320,7 +320,7 @@ way|z15[highway=trunk_link],
 way|z15[highway=motorway],
 way|z15[highway=motorway_link],
 {text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Bold; font-size:9; text-halo-radius: 1; text-halo-color: #ffffff;
-        width:10;  color: #ffd780;
+        width:10;  color: #ffd780;opacity: 0.5;
         z-index:13}
 
 way|z16[highway=trunk],
@@ -328,7 +328,7 @@ way|z16[highway=trunk_link],
 way|z16[highway=motorway],
 way|z16[highway=motorway_link],
 {text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Bold; font-size:9; text-halo-radius: 1; text-halo-color: #ffffff;
-        width:11;  color: #ffd780;
+        width:11;  color: #ffd780;opacity: 0.5;
         z-index:13}
 
 way|z17[highway=trunk],
@@ -336,7 +336,7 @@ way|z17[highway=trunk_link],
 way|z17[highway=motorway],
 way|z17[highway=motorway_link],
 {text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Bold; font-size:9; text-halo-radius: 1; text-halo-color: #ffffff;
-        width:12;  color: #ffd780;
+        width:12;  color: #ffd780;opacity: 0.5;
         z-index:13}
 
 way|z18[highway=trunk],
@@ -344,7 +344,7 @@ way|z18[highway=trunk_link],
 way|z18[highway=motorway],
 way|z18[highway=motorway_link],
 {text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Bold; font-size:9; text-halo-radius: 1; text-halo-color: #ffffff;
-        width:13;  color: #ffd780;
+        width:13;  color: #ffd780;opacity: 0.5;
         z-index:13}
 
 
@@ -354,32 +354,7 @@ way|z9-[highway=motorway]::centerline,
 way|z9-[highway=motorway_link]::centerline,
 way|z13-[highway=primary]::centerline,
 way|z13-[highway=primary_link]::centerline,
-        {width:.3;  color: #fa6478; z-index:14; -x-mapnik-layer: top}
-
-
-
-/* 
-
-для линий можно определять subpart'ы и рисовать одну линию несколько раз _даже после появления каскадинга_ (иначе сходные правила будут объединен в одно с затиранием некоторых свойств)
-
-::subpart_name
-
-в данном примере для одной линии (например, highway=trunk) рисуется две линии: широкая жёлтая с обводкой (см. выше, без subpart) и тонкая красная по центру (с subpart centerline), рисуемая поверх всех жёлтых, даже если на развязках они должны уходить под низ.
-
-
-
-*/
-
-way|z17-[oneway=yes]{line-style:arrows;z-index:15; -x-mapnik-layer: top;}
-
-/*
-
-line-style - заливка линии картинкой.
-
-arrows - специальное значение для синих стрелочек, рисуемых в векторе
-
-*/
-
+        {width:.3;  color: #fa6478; z-index:14;opacity: 0.5; -x-mapnik-layer: top}
 
 line|z7[railway=rail]
 {width:.5; color: #303030;z-index:15}
@@ -633,7 +608,7 @@ area|z10-[boundary=administrative][admin_level=6]
 node|z12-[place=suburb]
 {text:name; font-size:12; font-family: DejaVu Sans ExtraLight; text-color:#7848a0;z-index:20}
 
-area|z15-[building] {text: addr:housenumber; text-halo-radius:1; text-halo-color: black; text-color: #fbcd40; text-position: center; font-size:8; -x-mapnik-min-distance:10; opacity:0.8}
+area|z15-[building] {text: addr:housenumber; text-halo-radius:1; text-halo-color: black; text-color: #fbdd50; text-position: center; font-size:9; -x-mapnik-min-distance:10; opacity:0.8}
 
 
 node|z13-[highway=milestone][pk]{text:pk; font-size:7; text-halo-radius:5;-x-mapnik-min-distance:0}
