@@ -793,8 +793,10 @@ node|z9-11[place=city][capital!=yes] {text:name; text-offset:-20; font-size:14; 
 /*node|z6-12[place=town],
 {text:name; font-size:10; font-family: DejaVu Sans Bold; text-halo-radius:2; text-color:#101010;text-halo-color:#ffffff; text-allow-overlap: false; -x-mapnik-min-distance:3}*/
 
-node|z12-13[place=town] {text:name; font-size:40; font-family: DejaVu Sans Book; text-color:#101010; text-opacity:0.2; text-allow-overlap: true; z-index:20}
-node|z12-13[place=city] {text:name; font-size:50; font-family: DejaVu Sans Book; text-color:#101010; text-opacity:0.3; text-allow-overlap: true; z-index:20}
+node|z12[place=town] {text:name; font-size:20; font-family: DejaVu Sans Book; text-color:#101010; text-opacity:0.2; text-allow-overlap: true; z-index:20}
+node|z12[place=city] {text:name; font-size:25; font-family: DejaVu Sans Book; text-color:#101010; text-opacity:0.3; text-allow-overlap: true; z-index:20}
+node|z13[place=town] {text:name; font-size:40; font-family: DejaVu Sans Book; text-color:#101010; text-opacity:0.2; text-allow-overlap: true; z-index:20}
+node|z13[place=city] {text:name; font-size:50; font-family: DejaVu Sans Book; text-color:#101010; text-opacity:0.3; text-allow-overlap: true; z-index:20}
 node|z14-[place=town] {text:name; font-size:80; font-family: DejaVu Sans Book; text-color:#101010; text-opacity:0.2; text-allow-overlap: true; z-index:20}
 node|z14-[place=city] {text:name; font-size:100; font-family: DejaVu Sans Book; text-color:#101010; text-opacity:0.3; text-allow-overlap: true; z-index:20}
 
