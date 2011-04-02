@@ -395,7 +395,7 @@ for zoom, zsheet in mapniksheet.iteritems():
                      from planet_osm_%s p
                      where (%s) and p.way &amp;&amp; ST_Expand(!bbox!,%s) and (%s)) p
                    group by %s) p order by ST_Area(p.way)
-            """%(itags,oitags,pixel_size_at_zoom(zoom,10),oitags,layer_type,ttext,max(pixel_size_at_zoom(zoom,20),1000),sqlz,oitags)
+            """%(itags,oitags,pixel_size_at_zoom(zoom,10),oitags,layer_type,ttext,max(pixel_size_at_zoom(zoom,20),3000),sqlz,oitags)
             mfile.write(xml_layer("postgis-process", layer_type, itags, sqlz, oitags ))
           elif layer_type == "line":
             sqlz = " OR ".join(sql)
@@ -403,10 +403,10 @@ for zoom, zsheet in mapniksheet.iteritems():
             #itags = "\""+ itags+"\""
             sqlz = """select %s, ST_LineMerge(ST_Union(way)) as way from (SELECT * from planet_osm_line where way &amp;&amp; ST_Expand(!bbox!,%s) and (%s) and (%s)) as tex
             group by %s
-            """%(itags,max(pixel_size_at_zoom(zoom,20),1000),ttext,sqlz,oitags)
+            """%(itags,max(pixel_size_at_zoom(zoom,20),3000),ttext,sqlz,oitags)
             mfile.write(xml_layer("postgis-process", layer_type, itags, sqlz ))
           else:
-            sql = "(" + " OR ".join(sql) + ") and way &amp;&amp; ST_Expand(!bbox!,%s)"%(max(pixel_size_at_zoom(zoom,20),1000),)
+            sql = "(" + " OR ".join(sql) + ") and way &amp;&amp; ST_Expand(!bbox!,%s)"%(max(pixel_size_at_zoom(zoom,20),3000),)
             mfile.write(xml_layer("postgis", layer_type, itags, sql ))
         else:
           xml_nolayer()
