@@ -774,10 +774,10 @@ node|z6[place=city][population>1000000]
 {icon-image:adm1_6_test2.png; text-offset:5; text:name; font-size: 10; font-family: DejaVu Sans Bold; text-halo-radius:1; text-color:#404040;text-halo-color:#ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0;z-index:1}
 
 node|z7-8[place=city][population>1000000][population<5000000]
-{icon-image:adm1_6_test2.png; text-offset:5; text:name; font-size: 11; font-family: DejaVu Sans Bold; text-halo-radius:1; text-color:#404040;text-halo-color:#ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0;z-index:1}
+{icon-image:adm1_6_test2.png; text-offset:5; text:name; font-size: 11; font-family: DejaVu Sans Bold; text-halo-radius:1; text-color:#404040;text-halo-color:#ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0;z-index:2}
 
 node|z7-8[place=city][population>=5000000]
-{icon-image:adm_6.png; text-offset:5; text:name; font-size: 12; font-family: DejaVu Sans Bold; text-halo-radius:1; text-color:#404040;text-halo-color:#ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0;z-index:1}
+{icon-image:adm_6.png; text-offset:5; text:name; font-size: 12; font-family: DejaVu Sans Bold; text-halo-radius:1; text-color:#404040;text-halo-color:#ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0;z-index:3}
 
 
 /*node|z6-7[place=city][capital=yes] {text:name; font-size:11; font-family: DejaVu Sans Bold; text-halo-radius:2; text-color:#101010;text-halo-color:#ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0;z-index:1}
@@ -793,9 +793,12 @@ node|z9-12[place=city][capital!=yes] {text:name; text-offset:-20; font-size:14; 
 /*node|z6-12[place=town],
 {text:name; font-size:10; font-family: DejaVu Sans Bold; text-halo-radius:2; text-color:#101010;text-halo-color:#ffffff; text-allow-overlap: false; -x-mapnik-min-distance:3}*/
 
-node|z13-[place=town],
-node|z13-[place=city]
+node|z13[place=town],
+node|z13[place=city]
 {text:name; text-offset:-20; font-size:50; font-family: DejaVu Sans Book; text-color:#101010; text-opacity:0.3; text-allow-overlap: true; z-index:20}
+node|z14-[place=town],
+node|z14-[place=city]
+{text:name; text-offset:-20; font-size:100; font-family: DejaVu Sans Book; text-color:#101010; text-opacity:0.3; text-allow-overlap: true; z-index:20}
 
 node|z9-[place=village]{text:name; text-offset:1; font-size:9; font-family: DejaVu Sans Book; text-halo-radius:1; text-color:#606060;text-halo-color:#ffffff; text-allow-overlap: false}
 
