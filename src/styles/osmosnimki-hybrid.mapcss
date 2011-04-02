@@ -16,11 +16,6 @@ way|z15-[waterway=river]    {color: #C4D4F5; width: .9; z-index:9}
 way|z10-[waterway=stream]{color: #C4D4F5; width: .5; z-index:9}
 way|z10-[waterway=canal] {color: #abc4f5; width: .6; z-index:9}
 
-area|z5-[waterway=riverbank],
-area|z5-[natural=water],
-area|z10-[landuse=reservoir],
-{fill-color: #C4D4F5; color: #C4D4F5; width:.1; z-index:9;}
-
 area|z9-[natural=water]{text:name; text-offset:1; font-size:10; font-family: DejaVu Serif Italic; text-color:#285fd1; text-allow-overlap: false;text-halo-radius: 1; text-halo-color: #ffffff; }
 
 
@@ -33,28 +28,6 @@ way|z17-[highway=construction]
 {text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Book; font-size:9; text-halo-radius: 1; text-halo-color: #ffffff; text-halo-radius: 1; text-halo-color: #ffffff;
 casing-width:0.5; casing-color:#996703;
 width:3; color: #ffffff; z-index:10; dashes:9,9}
-
-
-
-way|z15-[highway=footway],
-way|z15-[highway=path],
-way|z15-[highway=cycleway],
-way|z15-[highway=pedestrian],
-{text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Book; font-size:9; text-halo-radius: 1; text-halo-color: #ffffff; text-halo-radius: 1; text-halo-color: #ffffff;
-casing-width:.3; casing-color:#bf96ce;
-width:.2; color: #ffffff; z-index:10; dashes:2,2}
-
-way|z15-[highway=steps],
-{text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Book; font-size:9; text-halo-radius: 1; text-halo-color: #ffffff; text-halo-radius: 1; text-halo-color: #ffffff;
-casing-width:.3; casing-color:#ffffff;
-width:3; color: #bf96ce; z-index:10; dashes:1,1; linecap:butt;}
-
-/*
-для отрисовки лестницы используется широкая линия с частым пунктиром, создающая впечатление перпендикулярных линий "ступенек".
-linecap:butt требуется для того, чтобы сегменты не "слипались" в одну линию.
-*/
-
-
 
 
 
@@ -474,19 +447,6 @@ way|z12-[railway=subway]
 {width:3; color: #072889;z-index:15; dashes:3,3; opacity:0.3; linecap: butt; -x-mapnik-layer: top;}
 
 
-way|z16-[barrier=fence] {width:.3; color: black;z-index:16; -x-mapnik-layer: top;}
-way|z16-[barrier=wall] {width:.5; color: black;z-index:16; -x-mapnik-layer: top;}
-
-way|z15-[marking=sport][!colour][!color],
-        {width:.5; color: #a0a0a0;z-index:16; -x-mapnik-layer: top;}
-way|z15-[marking=sport][colour=white],
-way|z15-[marking=sport][color=white]    {width:1; color: white;z-index:16; -x-mapnik-layer: top;}
-way|z15-[marking=sport][colour=red],
-way|z15-[marking=sport][color=red]    {width:1; color: #c00000;z-index:16; -x-mapnik-layer: top;}
-way|z15-[marking=sport][colour=black],
-way|z15-[marking=sport][color=black]    {width:1; color: black;z-index:16; -x-mapnik-layer: top;}
-
-
 node|z15-[amenity=bus_station] {icon-image:aut2_16x16_park.png}
 node|z16-[highway=bus_stop]    {icon-image:autobus_stop_14x10.png}
 node|z16-[railway=tram_stop]   {icon-image:tramway_14x13.png}
@@ -718,12 +678,6 @@ area|z10-[boundary=administrative][admin_level=6]
 node|z12-[place=suburb]
 {text:name; font-size:12; font-family: DejaVu Sans ExtraLight; text-color:#7848a0;z-index:20}
 
-
-
-area|z13-[building] {width: .3; color: #cca352; z-index:17;}
-area|z15-[building=yes] { fill-color: #E7CCB4;  z-index:17;}
-area|z15-[building=public] { fill-color: #edc2ba;  z-index:17;}
-area|z15-[building][building != yes][building!=public] {fill-color: #D8D1D1; z-index:17;}
 area|z15-[building] {text: addr:housenumber; text-halo-radius:1; text-position: center; font-size:7; -x-mapnik-min-distance:10; opacity:0.8}
 
 
