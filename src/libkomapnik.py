@@ -295,3 +295,6 @@ def xml_layer(type="postgis", geom="point", interesting_tags = "*", sql = "true"
 def xml_nolayer():
   global substyles
   substyles = []
+def xml_nosubstyle():
+  global substyles
+  substyles = substyles[:-1]
