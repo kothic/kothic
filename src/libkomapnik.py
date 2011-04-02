@@ -160,8 +160,9 @@ def xml_scaledenominator(z1, z2=False):
   <MaxScaleDenominator>%s</MaxScaleDenominator>
   <MinScaleDenominator>%s</MinScaleDenominator><!-- z%s-%s -->"""%(zz1,zz2,z1,z2)
 
-def xml_start(bgcolor="#ffffff"):
-  bgcolor = nicecolor(bgcolor)
+def xml_start(bgcolor="transparent"):
+  if bgcolor != "transparent":
+    bgcolor = nicecolor(bgcolor)
   return """<?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE Map>
 <Map bgcolor="%s" srs="%s" minimum_version="0.7.1">

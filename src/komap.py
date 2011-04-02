@@ -119,8 +119,18 @@ def add_numerics_to_itags(itags):
     
 
 
+bgcolor = style.get_style("canvas", {}, maxzoom)[0].get("fill-color", "")
+opacity = style.get_style("canvas", {}, maxzoom)[0].get("opacity", 1)
 
-mfile.write(xml_start(style.get_style("canvas", {}, maxzoom)[0].get("fill-color", "#000000")))
+if (opacity == 1) and bgcolor:
+  mfile.write(xml_start(bgcolor))
+else:
+  mfile.write(xml_start("transparent"))
+
+
+conf_full_layering = style.get_style("canvas", {}, maxzoom)[0].get("-x-mapnik-true-layers", "true").lower() == 'true'
+
+
 for font in fonts:
    mfile.write(xml_fontset(font, True))
 
@@ -171,7 +181,7 @@ for zoom, zsheet in mapniksheet.iteritems():
       xml_nolayer()
   for layer_type, entry_types in [("polygon",("way","area")),("line",("way", "line"))]:
     index_range = range(-6,7)
-    full_layering = True
+    full_layering = conf_full_layering
     if zoom < 9:
       index_range = (-6,0,6)
       full_layering = False
