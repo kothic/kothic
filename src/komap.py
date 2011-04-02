@@ -185,9 +185,15 @@ for zoom, zsheet in mapniksheet.iteritems():
     if (zoom < 9) or not conf_full_layering :
       index_range = (-6,0,6)
       full_layering = False
+
+    
     for zlayer in index_range:
+      sql_g = set()
+      there_are_dashed_lines = False
+      itags_g = set()
+      xml_g = ""
+      ## casings pass
       for zindex in ta:
-        ## casings pass
         sql = set()
         itags = set()
         xml = xml_style_start()
@@ -218,16 +224,25 @@ for zoom, zsheet in mapniksheet.iteritems():
         xml += xml_style_end()
         sql.discard("()")
         if sql:
-          mfile.write(xml)
-          sql = "(" + " OR ".join(sql) + ") and way &amp;&amp; !bbox!" 
-          if zlayer == 0 and full_layering:
-            sql = "("+ sql +') and ("layer" not in ('+ ", ".join(['\'%s\''%i for i in range(-5,6) if i != 0])+") or \"layer\" is NULL)"
-          elif zlayer <=5 and zlayer >= -5 and full_layering:
-            sql = "("+ sql +') and "layer" = \'%s\''%zlayer
-          itags = add_numerics_to_itags(itags)
-          mfile.write(xml_layer("postgis", layer_type, itags, sql ))
+          sql_g.update(sql)
+          xml_g += xml
+          itags_g.update(itags)
         else:
-          xml_nolayer()
+          xml_nosubstyle()
+
+      sql = sql_g
+      itags = itags_g
+      if sql:
+        mfile.write(xml)
+        sql = "(" + " OR ".join(sql) + ") and way &amp;&amp; !bbox!"
+        if zlayer == 0 and full_layering:
+          sql = "("+ sql +') and ("layer" not in ('+ ", ".join(['\'%s\''%i for i in range(-5,6) if i != 0])+") or \"layer\" is NULL)"
+        elif zlayer <=5 and zlayer >= -5 and full_layering:
+          sql = "("+ sql +') and "layer" = \'%s\''%zlayer
+        itags = add_numerics_to_itags(itags)
+        mfile.write(xml_layer("postgis", layer_type, itags, sql ))
+      else:
+        xml_nolayer()
 
 
       ## lines pass
@@ -280,6 +295,7 @@ for zoom, zsheet in mapniksheet.iteritems():
         else:
           xml_nosubstyle()
       sql = sql_g
+      itags = itags_g
       if sql:
         mfile.write(xml_g)
         sql = "(" + " OR ".join(sql) + ") and way &amp;&amp; !bbox!"
