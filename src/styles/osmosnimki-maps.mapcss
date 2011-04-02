@@ -795,10 +795,10 @@ node|z9-12[place=city][capital!=yes] {text:name; text-offset:-20; font-size:14; 
 
 node|z13[place=town],
 node|z13[place=city]
-{text:name; text-offset:-20; font-size:50; font-family: DejaVu Sans Book; text-color:#101010; text-opacity:0.3; text-allow-overlap: true; z-index:20}
+{text:name; font-size:50; font-family: DejaVu Sans Book; text-color:#101010; text-opacity:0.3; text-allow-overlap: true; z-index:20}
 node|z14-[place=town],
 node|z14-[place=city]
-{text:name; text-offset:-20; font-size:100; font-family: DejaVu Sans Book; text-color:#101010; text-opacity:0.3; text-allow-overlap: true; z-index:20}
+{text:name; font-size:100; font-family: DejaVu Sans Book; text-color:#101010; text-opacity:0.3; text-allow-overlap: true; z-index:20}
 
 node|z9-[place=village]{text:name; text-offset:1; font-size:9; font-family: DejaVu Sans Book; text-halo-radius:1; text-color:#606060;text-halo-color:#ffffff; text-allow-overlap: false}
 
