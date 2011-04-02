@@ -669,7 +669,7 @@ node|z14-[amenity=place_of_worship]
 {text: name; text-color: #623f00; font-family: DejaVu Serif Italic; font-size:9; text-halo-radius: 1; text-halo-color: #ffffff;text-offset:3;max-width:70}
 area|z14-[amenity=place_of_worship]
 {text: name; text-color: #623f00; font-family: DejaVu Serif Italic; font-size:9; text-halo-radius: 1; text-halo-color: #ffffff;text-offset:3;max-width:70;z-index:16;
-width:0.1; color: #111111; opacity: 0.5; fill-color: #777777; fill-opacity: 0.5; }
+width:0.1; color: #111111; text-opacity: 1; fill-color: #777777; fill-opacity: 0.5; }
 
 
 
@@ -795,7 +795,7 @@ node|z9-12[place=city][capital!=yes] {text:name; text-offset:-20; font-size:14; 
 
 node|z13-[place=town],
 node|z13-[place=city]
-{text:name; text-offset:-20; font-size:12; font-family: DejaVu Sans Bold; text-halo-radius:2; text-color:#101010;text-halo-color:#ffffff; text-allow-overlap: false; -x-mapnik-min-distance:3;z-index:1}
+{text:name; text-offset:-20; font-size:42; font-family: DejaVu Sans Bold; text-halo-radius:2; text-color:#101010;text-halo-color:#ffffff; text-opacity:0.3; text-allow-overlap: true; z-index:20}
 
 node|z9-[place=village]{text:name; text-offset:1; font-size:9; font-family: DejaVu Sans Book; text-halo-radius:1; text-color:#606060;text-halo-color:#ffffff; text-allow-overlap: false}
 
