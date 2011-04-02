@@ -793,12 +793,10 @@ node|z9-11[place=city][capital!=yes] {text:name; text-offset:-20; font-size:14; 
 /*node|z6-12[place=town],
 {text:name; font-size:10; font-family: DejaVu Sans Bold; text-halo-radius:2; text-color:#101010;text-halo-color:#ffffff; text-allow-overlap: false; -x-mapnik-min-distance:3}*/
 
-node|z12-13[place=town],
-node|z12-13[place=city]
-{text:name; font-size:50; font-family: DejaVu Sans Book; text-color:#101010; text-opacity:0.3; text-allow-overlap: true; z-index:20}
-node|z14-[place=town],
-node|z14-[place=city]
-{text:name; font-size:100; font-family: DejaVu Sans Book; text-color:#101010; text-opacity:0.3; text-allow-overlap: true; z-index:20}
+node|z12-13[place=town] {text:name; font-size:40; font-family: DejaVu Sans Book; text-color:#101010; text-opacity:0.2; text-allow-overlap: true; z-index:20}
+node|z12-13[place=city] {text:name; font-size:50; font-family: DejaVu Sans Book; text-color:#101010; text-opacity:0.3; text-allow-overlap: true; z-index:20}
+node|z14-[place=town] {text:name; font-size:80; font-family: DejaVu Sans Book; text-color:#101010; text-opacity:0.2; text-allow-overlap: true; z-index:20}
+node|z14-[place=city] {text:name; font-size:100; font-family: DejaVu Sans Book; text-color:#101010; text-opacity:0.3; text-allow-overlap: true; z-index:20}
 
 node|z9-[place=village]{text:name; text-offset:1; font-size:9; font-family: DejaVu Sans Book; text-halo-radius:1; text-color:#606060;text-halo-color:#ffffff; text-allow-overlap: false}
 
@@ -908,7 +906,7 @@ area|z13-[building] {width: .3; color: #cca352; z-index:17;}
 area|z15-[building=yes] { fill-color: #E7CCB4;  z-index:17;}
 area|z15-[building=public] { fill-color: #edc2ba;  z-index:17;}
 area|z15-[building][building != yes][building!=public] {fill-color: #D8D1D1; z-index:17;}
-area|z15-[building] {text: addr:housenumber; text-halo-radius:1; text-position: center; font-size:7;-x-mapnik-min-distance:10;opacity:0.8}
+area|z15-[building] {text: addr:housenumber; text-halo-radius:1; text-position: center; font-size:7; -x-mapnik-min-distance:10; opacity:0.8}
 
 
 node|z13-[highway=milestone][pk]{text:pk; font-size:7; text-halo-radius:5;-x-mapnik-min-distance:0}
