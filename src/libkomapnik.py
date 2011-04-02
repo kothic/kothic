@@ -165,7 +165,7 @@ def xml_start(bgcolor="transparent"):
     bgcolor = nicecolor(bgcolor)
   return """<?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE Map>
-<Map bgcolor="%s" srs="%s" minimum_version="0.7.1">
+<Map bgcolor="%s" srs="%s" minimum_version="0.7.1" buffer_size="256" >
 """%(bgcolor, map_proj)
 
 def xml_end():
