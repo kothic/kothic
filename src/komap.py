@@ -151,6 +151,10 @@ for zoom, zsheet in mapniksheet.iteritems():
     xml += xml_layer("coast", zoom=zoom)
     mfile.write(xml)
 
+  sql_g = set()
+  there_are_dashed_lines = False
+  itags_g = set()
+  xml_g = ""
   for zindex in ta:
     ## areas pass
     sql = set()
@@ -173,12 +177,19 @@ for zoom, zsheet in mapniksheet.iteritems():
     xml += xml_style_end()
     sql.discard("()")
     if sql:
-      mfile.write(xml)
-      sql = "(" + " OR ".join(sql) + ") and way &amp;&amp; !bbox!" 
-      itags = add_numerics_to_itags(itags)
-      mfile.write(xml_layer("postgis", "polygon", itags, sql ))
+      sql_g.update(sql)
+      xml_g += xml
+      itags_g.update(itags)
     else:
-      xml_nolayer()
+      xml_nosubstyle()
+
+  if sql:
+    mfile.write(xml_g)
+    sql = "(" + " OR ".join(sql) + ") and way &amp;&amp; !bbox!"
+    itags = add_numerics_to_itags(itags)
+    mfile.write(xml_layer("postgis", "polygon", itags, sql ))
+  else:
+    xml_nolayer()
   for layer_type, entry_types in [("polygon",("way","area")),("line",("way", "line"))]:
     index_range = range(-6,7)
     full_layering = conf_full_layering
