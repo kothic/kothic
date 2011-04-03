@@ -182,7 +182,8 @@ for zoom, zsheet in mapniksheet.iteritems():
       itags_g.update(itags)
     else:
       xml_nosubstyle()
-
+  sql = sql_g
+  itags = itags_g
   if sql:
     mfile.write(xml_g)
     sql = "(" + " OR ".join(sql) + ") and way &amp;&amp; !bbox!"
