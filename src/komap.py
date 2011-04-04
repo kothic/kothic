@@ -463,7 +463,7 @@ for zoom, zsheet in mapniksheet.iteritems():
                    group by %s) p order by ST_Area(p.way)
             """%(itags,oitags,pixel_size_at_zoom(zoom,10),oitags,layer_type,ttext,max(pixel_size_at_zoom(zoom,20),3000),sqlz,oitags)
             mfile.write(xml_layer("postgis-process", layer_type, itags, sqlz, oitags ))
-          elif layer_type == "line":
+          elif layer_type == "line" and zoom < 15:
             sqlz = " OR ".join(sql)
             itags = ", ".join(itags)
             #itags = "\""+ itags+"\""
