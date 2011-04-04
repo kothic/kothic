@@ -158,9 +158,9 @@ class Condition:
       if t == 'untrue':
         return '[%s] = \'no\''%(params[0])
       if t == 'set':
-        return 'not([%s] = \'\')'%(params[0])
+        return '[%s] != \'\''%(params[0])
       if t == 'unset':
-        return '[%s] = \'\''%(params[0])
+        return 'not([%s] != \'\')'%(params[0])
 
       if t == '<':
         return '[%s__num] &lt; %s'%(params[0], float(params[1]))
