@@ -83,19 +83,21 @@ class StyleChooser:
     """
     a = set()
     b = ""
-    for c in self.ruleChains:
-      
-      for r in c:
-        p = r.get_sql_hints(type, zoom)
-        if p:
-          q = "("+p[1] + ")"#[t[1] for t in p]
-          if q == "()":
-            q = ""
-          if b and q:
-            b += " OR "+ q
-          else:
-            b = q
-          a.update(p[0])
+    needed = set(["width", "casing-width", "fill-color", "fill-image", "icon-image", "text", "extrude"])
+    
+    if not needed.isdisjoint(set(self.styles[0].keys())):
+      for c in self.ruleChains:
+        for r in c:
+          p = r.get_sql_hints(type, zoom)
+          if p:
+            q = "("+p[1] + ")"#[t[1] for t in p]
+            if q == "()":
+              q = ""
+            if b and q:
+              b += " OR "+ q
+            else:
+              b = q
+            a.update(p[0])
     # no need to check for eval's
     return a,b
   # // Update the current StyleList from this StyleChooser
