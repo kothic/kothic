@@ -55,7 +55,7 @@ def zoom_to_scaledenom(z1,z2=False):
   #return 100000000000000, 1
   return z1, z2
 
-def pixel_size_at_zoom(z, l):
+def pixel_size_at_zoom(z, l=1):
   """
   Converts l pixels on tiles into length on zoom z
   """
