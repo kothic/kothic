@@ -5,12 +5,12 @@ draw = function () {
 
   var start = new Date().getTime();
   var ctxa = document.getElementById('canvas');
-  ctxa.width = ctxa.width;
-  ctxa.height = ctxa.height;
+  ctxa.width = 2*ctxa.width;
+  ctxa.height = 2*ctxa.height;
   var ctx = ctxa.getContext('2d');
   var ws = ctxa.width/data.granularity;
   var hs = ctxa.height/data.granularity;
-  var zoom = 12;
+  var zoom = 13;
   var style = restyle({}, zoom, "canvas")["default"];
   if ("fill-color" in style){ctx.fillStyle = style["fill-color"];};
   if ("opacity" in style){ctx.globalAlpha = style["opacity"];};
@@ -173,7 +173,7 @@ draw = function () {
     $.each(dat, function(key, val) { // text pass
      ctx.save()
      style = val.style;
-     if ("text" in style && !("icon-image" in style)) {
+     if ("text" in style && !("icon-image" in style) && style["text"]!="") {
       var offset = 0;
       var opacity = 1;
       var mindistance = 0;
@@ -188,7 +188,7 @@ draw = function () {
       var point;
       if (val.type == "Point"){ point = [ws*val.coordinates[0],hs*(data.granularity-val.coordinates[1])]};
       if (val.type == "Polygon"){ point = [ws*val.reprpoint[0],hs*(data.granularity-val.reprpoint[1])]};
-      if (val.type == "LineString"){return; point = [ws*val.coordinates[0][0],hs*(data.granularity-val.coordinates[0][1])]};
+      if (val.type == "LineString"){ point = [ws*val.coordinates[0][0],hs*(data.granularity-val.coordinates[0][1])]};
       if (style["text"]){ctx.font = fontString(style["font-family"],style["font-size"]);};
       textwidth = ctx.measureText(style["text"]).width;
       if (!(style["text-allow-overlap"]=="true")&&collides.checkPointWH([point[0],point[1]+offset], textwidth, 5)) return;
@@ -200,18 +200,23 @@ draw = function () {
       
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
-      if ("text-halo-radius" in style)
-        ctx.strokeText(style["text"], point[0],point[1]+offset);
-      ctx.fillText(style["text"], point[0],point[1]+offset);
-      
-      collides.addPointWH([point[0],point[1]+offset], textwidth, 10, mindistance);
+      if (val.type=="Polygon" || val.type == "Point"){
+        if ("text-halo-radius" in style)
+          ctx.strokeText(style["text"], point[0],point[1]+offset);
+        ctx.fillText(style["text"], point[0],point[1]+offset);
+        collides.addPointWH([point[0],point[1]+offset], textwidth, 10, mindistance);
+      }
+      else{//Linestring
+        textOnGeoJSON(ctx, val, ws, hs, data.granularity, ("text-halo-radius" in style), collides, style["text"])
+      };
      };
      ctx.restore();
     });
-    /*for (poly in collides.buffer){
+    collides.buffer = new Array();
+    for (poly in collides.buffer){
       poly = collides.buffer[poly];
       ctx.fillRect(poly[0],poly[1],poly[2]-poly[0],poly[3]-poly[1])
-    }*/
+    }
   });
   var elapsed = new Date().getTime()-start;
   alert(elapsed);
@@ -227,6 +232,7 @@ fontString = function(name, size){
   name = name.toLowerCase();
   if (name.indexOf("italic")>=0) italic = "italic";
   if (name.indexOf("oblique")>=0) italic = "italic";
+  if (name.indexOf("bold")>=0) weight = "700";
   //alert(name);
   if (name.indexOf("serif")>=0) family = "sans-serif";
   if (name.indexOf("dejavu sans")>=0) family = '"DejaVu Sans", Arial, sans';
