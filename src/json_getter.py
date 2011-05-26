@@ -184,4 +184,11 @@ aaaa = get_vectors(bbox,zoom,style,"polygon")
 aaaa["features"].extend(get_vectors(bbox,zoom,style,"line")["features"])
 aaaa["features"].extend(get_vectors(bbox,zoom,style,"point")["features"])
 
-print callback+"("+json.dumps(aaaa,True,False,separators=(',', ':'))+");"
+aaaa = callback+"("+json.dumps(aaaa,True,False,separators=(',', ':'))+");"
+print aaaa
+
+file = open("/var/www/vtile/%s/%s/%s.js"%(z,x,y),"w")
+file.write(aaaa)
+file.flush()
+file.close()
+
