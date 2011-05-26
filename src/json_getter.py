@@ -23,7 +23,7 @@ def get_vectors(bbox, zoom, style, vec = "polygon"):
   database = "dbname=gis"
   pxtolerance = 1.5
   intscalefactor = 10000
-  ignore_columns = set(["way_area", "osm_id", geomcolumn, "tags"])
+  ignore_columns = set(["way_area", "osm_id", geomcolumn, "tags", "z_order"])
   table = {"polygon":"planet_osm_polygon", "line":"planet_osm_line","point":"planet_osm_point"}
   a = psycopg2.connect(database)
   b = a.cursor()
@@ -151,7 +151,17 @@ def get_vectors(bbox, zoom, style, vec = "polygon"):
     if "reprpoint" in geom:
       geojson["reprpoint"] = json.loads(geom["reprpoint"])["coordinates"]
       del geom["reprpoint"]
-    geojson["properties"] = geom
+    prop = {}
+    for k,v in geom.iteritems():
+      prop[k] = v
+      try:
+        if int(v) == float(v):
+          prop[k] = int(v)
+        else:
+          prop[k] = float(v)
+      except:
+        pass
+    geojson["properties"] = prop
     polygons.append(geojson)
   return {"bbox": bbox, "granularity":intscalefactor, "features":polygons}
 
