@@ -182,7 +182,7 @@ bbox = projections.bbox_by_tile(z+1,x,y,"EPSG:3857")
 
 style = MapCSS(0,30)
 style.parse(open("styles/osmosnimki-maps.mapcss","r").read())
-zoom = z+3
+zoom = z+2
 aaaa = get_vectors(bbox,zoom,style,"polygon")
 aaaa["features"].extend(get_vectors(bbox,zoom,style,"line")["features"])
 aaaa["features"].extend(get_vectors(bbox,zoom,style,"point")["features"])
