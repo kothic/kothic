@@ -5,6 +5,7 @@ import json
 import psycopg2
 from mapcss import MapCSS
 import cgi
+import os
 import sys
 reload(sys)
 sys.setdefaultencoding("utf-8")          # a hack to support UTF-8 
@@ -187,7 +188,16 @@ aaaa["features"].extend(get_vectors(bbox,zoom,style,"point")["features"])
 aaaa = callback+"("+json.dumps(aaaa,True,False,separators=(',', ':'))+");"
 print aaaa
 
-file = open("/var/www/vtile/%s/%s/%s.js"%(z,x,y),"w")
+dir = "/var/www/vtile/%s/%s/"%(z,x)
+file = "%s.js"%y
+
+try:
+  if not os.path.exists(dir):
+    os.makedirs(dir)
+except:
+  pass
+
+file = open(dir+file,"w")
 file.write(aaaa)
 file.flush()
 file.close()
