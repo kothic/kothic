@@ -12,7 +12,7 @@ try:
   import psyco
   psyco.full()
 except ImportError:
-  debug("Psyco import failed. Program may run slower. If you run it on i386 machine, please install Psyco to get best performance.")
+  print >>sys.stderr, "Psyco import failed. Program may run slower. If you run it on i386 machine, please install Psyco to get best performance."
 
 def get_vectors(bbox, zoom, style, vec = "polygon"):
   bbox_p = projections.from4326(bbox, "EPSG:3857")
@@ -20,7 +20,7 @@ def get_vectors(bbox, zoom, style, vec = "polygon"):
   database = "dbname=gis"
   pxtolerance = 1.5
   intscalefactor = 10000
-  ignore_columns = set(["way_area", "osm_id", geomcolumn])
+  ignore_columns = set(["way_area", "osm_id", geomcolumn, "tags"])
   table = {"polygon":"planet_osm_polygon", "line":"planet_osm_line","point":"planet_osm_point"}
   a = psycopg2.connect(database)
   b = a.cursor()
@@ -59,7 +59,7 @@ def get_vectors(bbox, zoom, style, vec = "polygon"):
     query = """select ST_AsGeoJSON(ST_TransScale(ST_ForceRHR(ST_Intersection(way,SetSRID('BOX3D(%s %s,%s %s)'::box3d,900913))),%s,%s,%s,%s),0) as %s,
                       ST_AsGeoJSON(ST_TransScale(ST_ForceRHR(ST_PointOnSurface(way)),%s,%s,%s,%s),0) as reprpoint, %s from
               (select (ST_Dump(ST_Multi(ST_SimplifyPreserveTopology(ST_Buffer(way,-%s),%s)))).geom as %s, %s from
-                (select ST_Union(way) as %s, %s from
+                (select ST_Collect(way) as %s, %s from
                   (select ST_Buffer(way, %s) as %s, %s from
                      %s
                      where (%s)
