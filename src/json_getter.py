@@ -146,6 +146,8 @@ def get_vectors(bbox, zoom, style, vec = "polygon"):
         del geom[t]
     geojson = json.loads(geom[geomcolumn])
     del geom[geomcolumn]
+    if geojson["type"] = "GeometryCollection":
+      continue
     if "reprpoint" in geom:
       geojson["reprpoint"] = json.loads(geom["reprpoint"])["coordinates"]
       del geom["reprpoint"]
