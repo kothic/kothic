@@ -259,8 +259,6 @@ way|z15[highway=service][service=parking_aisle],
 
 
 
-
-
 way|z16-[highway=service][living_street=yes],
 way|z16-[highway=service][service=parking_aisle],
 {text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Book; font-size:9; text-halo-radius: 1; text-halo-color: #ffffff;
@@ -720,7 +718,7 @@ node|z9-[railway=station][transport!=subway]
 text:name; text-offset:7; font-size:9; font-family: DejaVu Sans Mono Book; text-halo-radius:1; text-color:#000d6c;text-halo-color:#ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0}
 
 node|z12-15[railway=station][transport=subway] {icon-image:metro_others6.png;z-index:17;}
-node|z12-15[railway=station][transport=subway] {text:name; text-offset:11; font-size:9; font-family: DejaVu Sans Book; text-halo-radius:2; text-color:#1300bb;text-halo-color:#ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0}
+node|z12-15[railway=station][transport=subway]::label {text:name; text-offset:11; font-size:9; font-family: DejaVu Sans Book; text-halo-radius:2; text-color:#1300bb;text-halo-color:#ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0}
 node|z16-[railway=subway_entrance] {icon-image:metro_others6.png;z-index:17;}
 node|z16-[railway=subway_entrance][name] {text:name; text-offset:11; font-size:9; font-family: DejaVu Sans Book; text-halo-radius:2; text-color:#1300bb;text-halo-color:#ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0}
 
