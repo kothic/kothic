@@ -4,6 +4,7 @@ from libkomapnik import pixel_size_at_zoom
 import json
 import psycopg2
 from mapcss import MapCSS
+import cgi
 import sys
 reload(sys)
 sys.setdefaultencoding("utf-8")          # a hack to support UTF-8 
@@ -12,7 +13,8 @@ try:
   import psyco
   psyco.full()
 except ImportError:
-  print >>sys.stderr, "Psyco import failed. Program may run slower. If you run it on i386 machine, please install Psyco to get best performance."
+  pass
+  #print >>sys.stderr, "Psyco import failed. Program may run slower. If you run it on i386 machine, please install Psyco to get best performance."
 
 def get_vectors(bbox, zoom, style, vec = "polygon"):
   bbox_p = projections.from4326(bbox, "EPSG:3857")
@@ -150,14 +152,36 @@ def get_vectors(bbox, zoom, style, vec = "polygon"):
     polygons.append(geojson)
   return {"bbox": bbox, "granularity":intscalefactor, "features":polygons}
 
-style = MapCSS(0,20)
-style.parse(open("styles/osmosnimki-maps.mapcss","r").read())  
-bbox = (27.287430251477,53.80586321025,27.809624160147,53.99519870090)
-bbox = (27.421874999999986, 53.748710796882726, 28.125, 54.162433968051523)
 
-zoom = 12
+
+
+print "Content-Type: text/html"
+print
+
+form = cgi.FieldStorage()
+if "z" not in form:
+  print "need z"
+  exit()
+if "x" not in form:
+  print "need x"
+  exit()
+if "y" not in form:
+  print "need y"
+  exit()
+z = int(form["z"].value)
+x = int(form["x"].value)
+y = int(form["y"].value)
+if z>22:
+  exit
+callback = "onKothicDataResponse"
+
+bbox = projections.bbox_by_tile(z+1,x,y,"EPSG:3857")
+
+style = MapCSS(0,30)
+style.parse(open("styles/osmosnimki-maps.mapcss","r").read())
+zoom = z+3
 aaaa = get_vectors(bbox,zoom,style,"polygon")
 aaaa["features"].extend(get_vectors(bbox,zoom,style,"line")["features"])
 aaaa["features"].extend(get_vectors(bbox,zoom,style,"point")["features"])
 
-print json.dumps(aaaa,True,False,separators=(',', ':'))
+print callback+"("+json.dumps(aaaa,True,False,separators=(',', ':'))+");"
