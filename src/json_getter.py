@@ -187,7 +187,7 @@ aaaa = get_vectors(bbox,zoom,style,"polygon")
 aaaa["features"].extend(get_vectors(bbox,zoom,style,"line")["features"])
 aaaa["features"].extend(get_vectors(bbox,zoom,style,"point")["features"])
 
-aaaa = callback+"("+json.dumps(aaaa,True,False,separators=(',', ':'))+");"
+aaaa = callback+"("+json.dumps(aaaa,True,False,separators=(',', ':'))+",%s,%s,%s);"%(z,x,y)
 print aaaa
 
 dir = "/var/www/vtile/%s/%s/"%(z,x)
