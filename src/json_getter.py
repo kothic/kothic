@@ -159,6 +159,8 @@ def get_vectors(bbox, zoom, style, vec = "polygon"):
           prop[k] = int(v)
         else:
           prop[k] = float(v)
+        if str(prop[k]) != v:  # leading zeros etc.. should be saved
+          prop[k] = v
       except:
         pass
     geojson["properties"] = prop
