@@ -21,42 +21,44 @@ def get_vectors(bbox, zoom, style, vec = "polygon"):
   bbox_p = projections.from4326(bbox, "EPSG:3857")
   geomcolumn = "way"
   
-  database = "dbname=gis"
+  database = "dbname=gis user=gis"
   pxtolerance = 1.5
   intscalefactor = 10000
   ignore_columns = set(["way_area", "osm_id", geomcolumn, "tags", "z_order"])
   table = {"polygon":"planet_osm_polygon", "line":"planet_osm_line","point":"planet_osm_point", "coastline": "coastlines"}
+  
   a = psycopg2.connect(database)
   b = a.cursor()
-  b.execute("SELECT * FROM %s LIMIT 1;" % table[vec])
-  names = [q[0] for q in b.description]
-  for i in ignore_columns:
-    if i in names:
-      names.remove(i)
-  names = ",".join(['"'+i+'"' for i in names])
+  if vec != "coastline"
+    b.execute("SELECT * FROM %s LIMIT 1;" % table[vec])
+    names = [q[0] for q in b.description]
+    for i in ignore_columns:
+      if i in names:
+        names.remove(i)
+    names = ",".join(['"'+i+'"' for i in names])
 
 
-  taghint = "*"
-  types = {"line":"line","polygon":"area", "point":"node"}
-  adp = ""
-  if "get_sql_hints" in dir(style):
-    sql_hint = style.get_sql_hints(types[vec], zoom)
-    adp = []
-    for tp in sql_hint:
-      add = []
-      for j in tp[0]:
-        if j not in names:
-          break
-      else:
-        add.append(tp[1])
-      if add:
-        add = " OR ".join(add)
-        add = "("+add+")"
-        adp.append(add)
-    adp = " OR ".join(adp)
-    if adp:
-      adp = adp.replace("&lt;", "<")
-      adp = adp.replace("&gt;", ">")
+    taghint = "*"
+    types = {"line":"line","polygon":"area", "point":"node"}
+    adp = ""
+    if "get_sql_hints" in dir(style):
+      sql_hint = style.get_sql_hints(types[vec], zoom)
+      adp = []
+      for tp in sql_hint:
+        add = []
+        for j in tp[0]:
+          if j not in names:
+            break
+        else:
+          add.append(tp[1])
+        if add:
+          add = " OR ".join(add)
+          add = "("+add+")"
+          adp.append(add)
+      adp = " OR ".join(adp)
+      if adp:
+        adp = adp.replace("&lt;", "<")
+        adp = adp.replace("&gt;", ">")
 
 
   if vec == "polygon":
