@@ -136,7 +136,7 @@ def get_vectors(bbox, zoom, style, vec = "polygon"):
     query = """select ST_AsGeoJSON(ST_TransScale(ST_ForceRHR(ST_Intersection(way,SetSRID('BOX3D(%s %s,%s %s)'::box3d,900913))),%s,%s,%s,%s),0) as %s, 'coastline' as "natural" from
               (select (ST_Dump(ST_Multi(ST_SimplifyPreserveTopology(ST_Buffer(way,-%s),%s)))).geom as %s from
                 (select ST_Union(way) as %s from
-                  (select ST_Buffer(way, %s) as %s from
+                  (select ST_Buffer(the_geom, %s) as %s from
                      %s
                      where 
                         way && SetSRID('BOX3D(%s %s,%s %s)'::box3d,900913)
