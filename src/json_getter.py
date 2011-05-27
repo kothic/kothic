@@ -139,7 +139,7 @@ def get_vectors(bbox, zoom, style, vec = "polygon"):
                   (select ST_Buffer(the_geom, %s) as %s from
                      %s
                      where 
-                        way && SetSRID('BOX3D(%s %s,%s %s)'::box3d,900913)
+                        the_geom && SetSRID('BOX3D(%s %s,%s %s)'::box3d,900913)
                   ) p
                 ) p
                 where ST_Area(way) > %s
