@@ -29,7 +29,7 @@ def get_vectors(bbox, zoom, style, vec = "polygon"):
   
   a = psycopg2.connect(database)
   b = a.cursor()
-  if vec != "coastline"
+  if vec != "coastline":
     b.execute("SELECT * FROM %s LIMIT 1;" % table[vec])
     names = [q[0] for q in b.description]
     for i in ignore_columns:
