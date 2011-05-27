@@ -214,7 +214,7 @@ z = int(form["z"].value)
 x = int(form["x"].value)
 y = int(form["y"].value)
 if z>22:
-  exit
+  exit()
 callback = "onKothicDataResponse"
 
 bbox = projections.bbox_by_tile(z+1,x,y,"EPSG:3857")
