@@ -15,59 +15,60 @@ way { text-color: black; font-weight: normal; font-size: 8; }
 node { text-color: black; font-weight: normal; font-size: 6; text-position: center; text-offset: 10; z-index: 1; }
 
 /* Places on small zoomlevels */
-way|z8-10[place]
+area|z8-10[place]
 { fill-color : #FFFACD; text-position: center; text: name; }
 
 /* Places on large zoomlevels */
-way|z11-12[landuse=residential]
+area|z11-12[landuse=residential]
 { fill-color : #FFE4C4; text-position: center; text: name; }
 
 /* Parkings */
-way|z12-[amenity=parking]
+area|z12-[amenity=parking]
 { fill-color : #F0F0F0; text-position: center; text: name; }
 
 /* Retail area */
-way|z12-[landuse=retail]
+area|z12-[landuse=retail]
 { fill-color : #F8B880; text-position: center; text: name; }
 
 /* Schools, colleges, universities */
-way|z12-[amenity=school],way[amenity=university]
+area|z12-[amenity=school],
+area|z12-[amenity=university]
 { fill-color : #F8B880; text-position: center; text: name; }
 
 /* Hospitals */
-way[amenity=doctors],way[amenity=hospital]
+area[amenity=doctors],area[amenity=hospital]
 { fill-color : #F8B880; text-position: center; text: name; }
 
 /* Industrial area */
-way|z11-[landuse=industrial]
+area|z11-[landuse=industrial]
 { fill-color : #E8E8E8; text-position: center; text: name; }
 
 /* Buildings */
-way|z13-[building][building!=garages]
+area|z13-[building][building!=garages]
 { fill-color : #969696; text-position: center; text: addr:housenumber; }
 
 /* Garages */
-way|z13-[building=garages]
+area|z13-[building=garages]
 { fill-color : #E2E2E2; text-position: center; text: name; }
 
 /* Parks */
-way|z12-[leisure=park]
+area|z12-[leisure=park]
 { fill-color : #90BE00; text-position: center; text: name; }
 
 /* Stadiums, leisures */
-way|z12-:closed[leisure]
+area|z12-[leisure]
 { fill-color : #F8B880; text-position: center; text: name; }
 
 /* Water */
-way|z9-[natural=water],way[waterway=riverbank]
+area|z9-[natural=water],way[waterway=riverbank]
 { fill-color : #0080FF; text-position: center; text: name; }
 
 /* Forests and woods */
-way|z9-[natural=wood],way[landuse=forest]
+area|z9-[natural=wood],way[landuse=forest]
 { fill-color : #B7E999; text-position: center; text: name; }
 
 /* Wetlands */
-way|z10-[natural=wetland]
+area|z10-[natural=wetland]
 { fill-color : #4ACA4A; text-position: center; text: name; }
 
 /* =============== Ways =============== */
