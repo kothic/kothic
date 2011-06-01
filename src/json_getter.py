@@ -124,7 +124,7 @@ def get_vectors(bbox, zoom, style, vec = "polygon"):
                 from planet_osm_point where
                 (%s)
                 and way && SetSRID('BOX3D(%s %s,%s %s)'::box3d,900913)
-               limit 3000
+               limit 10000
              """%(
              -bbox_p[0],-bbox_p[1],intscalefactor/(bbox_p[2]-bbox_p[0]),intscalefactor/(bbox_p[3]-bbox_p[1]),
              geomcolumn, names,
