@@ -8,7 +8,7 @@ import cgi
 import os
 import sys
 reload(sys)
-sys.setdefaultencoding("utf-8")          # a hack to support UTF-8 
+sys.setdefaultencoding("utf-8")          # a hack to support UTF-8
 
 try:
   import psyco
@@ -20,13 +20,13 @@ except ImportError:
 def get_vectors(bbox, zoom, style, vec = "polygon"):
   bbox_p = projections.from4326(bbox, "EPSG:3857")
   geomcolumn = "way"
-  
+
   database = "dbname=gis user=gis"
-  pxtolerance = 1.5
+  pxtolerance = 1.8
   intscalefactor = 10000
   ignore_columns = set(["way_area", "osm_id", geomcolumn, "tags", "z_order"])
   table = {"polygon":"planet_osm_polygon", "line":"planet_osm_line","point":"planet_osm_point", "coastline": "coastlines"}
-  
+
   a = psycopg2.connect(database)
   b = a.cursor()
   if vec != "coastline":
@@ -101,10 +101,10 @@ def get_vectors(bbox, zoom, style, vec = "polygon"):
                      %s
                      where (%s)
                        and way && SetSRID('BOX3D(%s %s,%s %s)'::box3d,900913)
-                      
+
                  group by %s
                 ) p
-                
+
               ) p
       """%(bbox_p[0],bbox_p[1],bbox_p[2],bbox_p[3],
           -bbox_p[0],-bbox_p[1],intscalefactor/(bbox_p[2]-bbox_p[0]),intscalefactor/(bbox_p[3]-bbox_p[1]),
@@ -115,19 +115,20 @@ def get_vectors(bbox, zoom, style, vec = "polygon"):
           table[vec],
           adp,
           bbox_p[0],bbox_p[1],bbox_p[2],bbox_p[3],
-          
+
           names,
-          
+
           )
   elif vec == "point":
     query = """select ST_AsGeoJSON(ST_TransScale(way,%s,%s,%s,%s),0) as %s, %s
-                from planet_osm_point where
+                from %s where
                 (%s)
                 and way && SetSRID('BOX3D(%s %s,%s %s)'::box3d,900913)
                limit 10000
              """%(
              -bbox_p[0],-bbox_p[1],intscalefactor/(bbox_p[2]-bbox_p[0]),intscalefactor/(bbox_p[3]-bbox_p[1]),
              geomcolumn, names,
+             table[vec],
              adp,
              bbox_p[0],bbox_p[1],bbox_p[2],bbox_p[3],
 
@@ -138,7 +139,7 @@ def get_vectors(bbox, zoom, style, vec = "polygon"):
                 (select ST_Union(way) as %s from
                   (select ST_Buffer(SetSRID(the_geom,900913), %s) as %s from
                      %s
-                     where 
+                     where
                         SetSRID(the_geom,900913) && SetSRID('BOX3D(%s %s,%s %s)'::box3d,900913)
                   ) p
                 ) p
