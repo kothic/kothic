@@ -513,12 +513,12 @@ if options.renderer == "mapnik":
               itags = ", ".join(itags)
               #itags = "\""+ itags+"\""
               if zoom >= 10:
-                sqlz = """select %s, ST_PointOnSurface(way) as way
+                sqlz = """select %s, ST_PointOnSurface(ST_Buffer(way,0)) as way
                        from planet_osm_%s
                        where (%s) and (%s) and way &amp;&amp; ST_Expand(!bbox!,3000) order by way_area
               """%(itags,layer_type,ttext,sqlz)
               else:
-                sqlz = """select %s, ST_PointOnSurface(way) as way
+                sqlz = """select %s, ST_PointOnSurface(ST_Buffer(way,0)) as way
               from (
                  select (ST_Dump(ST_Multi(ST_Buffer(ST_Collect(p.way),0)))).geom as way, %s
                    from (
