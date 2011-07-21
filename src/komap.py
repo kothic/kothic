@@ -388,9 +388,7 @@ if options.renderer == "mapnik":
             itags = ", ".join(itags)
             oitags = '"'+ "\", \"".join(oitags) +'"'
             sqlz = """select %s, ST_LineMerge(ST_Union(way)) as way from
-                        (SELECT %s, ST_Boundary(way) as way from
-                            (SELECT %s,  way from planet_osm_polygon where (%s) and ST_IsValid(way) ) tex
-                        ) p
+                            (SELECT %s, ST_Boundary(way) as way from planet_osm_polygon where (%s) and ST_IsValid(way) ) tex
               group by %s
               """%(itags,itags,oitags,sql,oitags)
             #elif layer_type == "line" and there_are_dashed_lines:
