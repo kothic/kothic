@@ -388,8 +388,8 @@ if options.renderer == "mapnik":
             itags = ", ".join(itags)
             oitags = '"'+ "\", \"".join(oitags) +'"'
             sqlz = """select %s, ST_LineMerge(ST_Union(way)) as way from
-                        (SELECT %s, ST_Boundary(ST_Buffer(way,0)) as way from
-                            (SELECT %s,  way from planet_osm_polygon where (%s)) tex
+                        (SELECT %s, ST_Boundary(way) as way from
+                            (SELECT %s,  way from planet_osm_polygon where (%s) and ST_IsValid(way) ) tex
                         ) p
               group by %s
               """%(itags,itags,oitags,sql,oitags)
