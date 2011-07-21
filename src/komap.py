@@ -392,7 +392,7 @@ if options.renderer == "mapnik":
                             (SELECT %s,  way from planet_osm_polygon where (%s)) tex
                         ) p
               group by %s
-              """%(itags,oitags,sql,oitags)
+              """%(itags,itags,oitags,sql,oitags)
             #elif layer_type == "line" and there_are_dashed_lines:
             #  sqlz = """select %s, ST_Union(way) as way from (SELECT * from planet_osm_line where way &amp;&amp; !bbox! #and (%s)) as tex
             #  group by %s
