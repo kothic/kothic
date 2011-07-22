@@ -161,7 +161,7 @@ area|z5-[natural=water],
 area|z10-[landuse=reservoir],
 {fill-color: #C4D4F5; color: #C4D4F5; width:.1; z-index:9;}
 
-area|z9-[natural=water]{text:name; text-offset:1; font-size:10; font-family: DejaVu Serif Italic; text-color:#285fd1; text-allow-overlap: false;text-halo-radius: 1; text-halo-color: #ffffff; }
+area|z9-[natural=water]{text:name; text-offset:1; font-size:10; font-family: DejaVu Serif Italic; text-color:#285fd1; text-allow-overlap: false }
 /*
 text - из какого поля брать текст
 text-offset - на сколько сдвинуть текст
@@ -814,7 +814,7 @@ shields!!!!
 
 
 way|z10-[waterway=stream], way|z9-[waterway=river], way|z13-[waterway=canal]
-{text:name; font-size:9; font-family: DejaVu Sans Oblique; text-color:#547bd1; text-halo-radius:1; text-halo-color:#ffffff; text-position: line}
+{text:name; font-size:9; font-family: DejaVu Sans Oblique; text-color:#547bd1; text-position: line}
 
 node|z-3[place=continent]
 {text:name; text-offset:-10; font-size:10; font-family: DejaVu Sans ExtraLight; text-halo-radius:1; text-color:#202020;text-halo-color:#ffffff;z-index:-1;-x-mapnik-min-distance:0}
