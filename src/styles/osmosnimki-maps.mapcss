@@ -645,6 +645,9 @@ node|z15-[amenity=bus_station] {icon-image:aut2_16x16_park.png}
 node|z16-[highway=bus_stop]    {icon-image:autobus_stop_14x10.png}
 node|z16-[railway=tram_stop]   {icon-image:tramway_14x13.png}
 
+area|z11-[building=train_station] {icon-image:rw_vokzal_new23.png}
+
+
 node|z15-[amenity=fuel]        {icon-image:tankstelle1_10x11.png}
 /*
 icon-image - картинка иконки
@@ -837,10 +840,12 @@ node|z5-6[natural=peak][ele>3500]
 {icon-image: mountain_peak6.png;
 text:ele; text-offset:3; font-size:7; font-family: DejaVu Sans Mono Book; text-halo-radius:0; text-color:#664229;text-halo-color:#ffffff;-x-mapnik-min-distance:0;
 }
+
 node|z7-12[natural=peak][ele>2500]
 {icon-image: mountain_peak6.png;
 text:ele; text-offset:3; font-size:7; font-family: DejaVu Sans Mono Book; text-halo-radius:0; text-color:#664229;text-halo-color:#ffffff;-x-mapnik-min-distance:0;
 }
+
 node|z12-[natural=peak]
 {icon-image: mountain_peak6.png;
 text:name; text-offset:3; font-size:7; font-family: DejaVu Sans Mono Book; text-halo-radius:0; text-color:#664229;text-halo-color:#ffffff;-x-mapnik-min-distance:0;
@@ -885,10 +890,6 @@ node|z12-[place=suburb]
 
 /* With this eval, if bridge is applied to invisible line, no bridge renders */
 /*way[bridge=yes] {casing-width:eval(min(3, num(prop("width"))/2 ));}*/
-
-
-
-
 
 
 
