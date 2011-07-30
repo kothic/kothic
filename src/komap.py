@@ -470,6 +470,7 @@ if options.renderer == "mapnik":
                 twrap= entry["style"].get("max-width",256)
                 talign= entry["style"].get("text-align","center")
                 topacity= entry["style"].get("text-opacity",entry["style"].get("opacity","1"))
+                tpos = entry["style"].get("text-placement","X")
 
                 xml += xml_rule_start()
                 xml += x_scale
@@ -483,7 +484,7 @@ if options.renderer == "mapnik":
                               ttext,tface,tsize,tcolor, thcolor, thradius, tplace,
                               toffset,toverlap,tdistance,twrap,talign,topacity)
                 else:
-                  xml += xml_textsymbolizer(ttext,tface,tsize,tcolor, thcolor, thradius, tplace, toffset,toverlap,tdistance,twrap,talign,topacity)
+                  xml += xml_textsymbolizer(ttext,tface,tsize,tcolor, thcolor, thradius, tplace, toffset,toverlap,tdistance,twrap,talign,topacity,tpos)
                 sql.add(entry["sql"])
                 itags.update(entry["chooser"].get_interesting_tags(entry["type"], zoom))
                 xml += xml_rule_end()

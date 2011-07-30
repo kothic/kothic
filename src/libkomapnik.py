@@ -120,31 +120,31 @@ def xml_linepatternsymbolizer(path=""):
   <LinePatternSymbolizer file="%s%s"/>"""%(icons_path, path)
 
 
-def xml_textsymbolizer(text="name",face="DejaVu Sans Book",size="10",color="#000000", halo_color="#ffffff", halo_radius="0", placement="line", offset="0", overlap="false", distance="26", wrap_width=256, align="center", opacity="1"):
+def xml_textsymbolizer(text="name",face="DejaVu Sans Book",size="10",color="#000000", halo_color="#ffffff", halo_radius="0", placement="line", offset="0", overlap="false", distance="26", wrap_width=256, align="center", opacity="1", pos="X"):
   color = nicecolor(color)
   halo_color = nicecolor(halo_color)
+  pos = pos.replace("exact", "X").replace("any","X, S, E, N, W, NE, SE, NW, SW").split(",")
+  pos.extend(size.split(","))
+  pos = ",".join(pos)
+  size = size.split(",")[0]
+  
   placement = {"center": "point"}.get(placement.lower(), placement)
   align = {"center": "middle"}.get(align.lower(), align)
   
   return """
-  <TextSymbolizer name="%s" fontset_name="%s" size="%s" fill="%s" halo_fill= "%s" halo_radius="%s" placement="%s" dy="%s" max_char_angle_delta="15" allow_overlap="%s" wrap_width="%s" min_distance="%s" horizontal_alignment="%s" opacity="%s" />
-  """%(text,face,int(float(size)),color,halo_color,halo_radius,placement,offset,overlap,wrap_width,distance,align,opacity)
+  <TextSymbolizer name="%s" fontset_name="%s" size="%s" fill="%s" halo_fill= "%s" halo_radius="%s" placement="%s" dy="%s" max_char_angle_delta="15" allow_overlap="%s" wrap_width="%s" min_distance="%s" horizontal_alignment="%s" opacity="%s" placement-type="simple" placements="%s" />
+  """%(text,face,int(float(size)),color,halo_color,halo_radius,placement,offset,overlap,wrap_width,distance,align,opacity,pos)
 
 def xml_shieldsymbolizer(path="", width="", height="",text="name",face="DejaVu Sans Book",size="10",color="#000000", halo_color="#ffffff", halo_radius="0", placement="line", offset="0", overlap="false", distance="26", wrap_width=256, align="center", opacity="1"):
-	  
   color = nicecolor(color)
   halo_color = nicecolor(halo_color)
   placement = {"center": "point"}.get(placement.lower(), placement)
   align = {"center": "middle"}.get(align.lower(), align)
+  size = size.split(",")[0]
   if width:
     width =' width="%s" '%width
   if height:
     height =' height="%s" '%height
-  vertical_alignment = "middle"
-  if float(offset) > 0:
-    vertical_alignment = "bottom"
-  if float(offset) < 0:
-    vertical_alignment = "top"
   return """
     <ShieldSymbolizer file="%s%s" %s %s name="%s" fontset_name="%s" size="%s" fill="%s" halo_fill= "%s" halo_radius="%s" placement="%s" dy="%s" allow_overlap="%s" wrap_width="%s" min_distance="%s" horizontal_alignment="%s" vertical_alignment="%s" opacity="%s" />
   """%(icons_path, \
