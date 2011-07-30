@@ -146,9 +146,9 @@ def xml_shieldsymbolizer(path="", width="", height="",text="name",face="DejaVu S
   if height:
     height =' height="%s" '%height
   return """
-    <ShieldSymbolizer file="%s%s" %s %s name="%s" fontset_name="%s" size="%s" fill="%s" halo_fill= "%s" halo_radius="%s" placement="%s" dy="%s" allow_overlap="%s" wrap_width="%s" min_distance="%s" horizontal_alignment="%s" vertical_alignment="%s" opacity="%s" />
+    <ShieldSymbolizer file="%s%s" %s %s name="%s" fontset_name="%s" size="%s" fill="%s" halo_fill= "%s" halo_radius="%s" placement="%s" dy="%s" allow_overlap="%s" wrap_width="%s" min_distance="%s" horizontal_alignment="%s" opacity="%s" />
   """%(icons_path, \
-    path, width, height,text,face,int(float(size)),color,halo_color,halo_radius,placement,offset,overlap,wrap_width,distance,align,vertical_alignment,opacity)
+    path, width, height,text,face,int(float(size)),color,halo_color,halo_radius,placement,offset,overlap,wrap_width,distance,align,opacity)
 
 def xml_filter(string):
   return """
