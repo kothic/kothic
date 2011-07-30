@@ -853,13 +853,13 @@ text:name; text-offset:3; font-size:7; font-family: DejaVu Sans Mono Book; text-
 
 
 node|z2-3[place=country]
-{text:name; text-offset:0; font-size:10; font-family: DejaVu Sans Book; text-halo-radius:1; text-color:#dd5875;text-halo-color:#ffffff;z-index:1;-x-mapnik-min-distance:0;}
+{text:name; text-offset:0; font-size:10,9,8,7,6; font-family: DejaVu Sans Book; text-halo-radius:1; text-color:#dd5875;text-halo-color:#ffffff;z-index:1;-x-mapnik-min-distance:0;}
 
 node|z4-8[place=country]
-{text:name; text-offset:0; font-size:13; font-family: DejaVu Sans Book; text-halo-radius:1; text-color:red;text-halo-color:#ffffff;z-index:1;-x-mapnik-min-distance:0}
+{text:name; text-offset:0; font-size:13,12,11,10,9,8,7,6; font-family: DejaVu Sans Book; text-halo-radius:1; text-color:red;text-halo-color:#ffffff;z-index:1;-x-mapnik-min-distance:0}
 
 node|z8-10[place=country]
-{text:name; text-offset:0; font-size:16; font-family: DejaVu Sans Book; text-halo-radius:1; text-color:red;text-halo-color:#ffffff;z-index:1;-x-mapnik-min-distance:0}
+{text:name; text-offset:0; font-size:16,15,14,13,12,11,10,9,8,7,6; font-family: DejaVu Sans Book; text-halo-radius:1; text-color:red;text-halo-color:#ffffff;z-index:1;-x-mapnik-min-distance:0}
 
 area|z3-5[boundary=administrative][admin_level=3]
 {text:name; text-offset:-5; font-size:8; font-family: DejaVu Sans ExtraLight; text-halo-radius:0; text-color:#101010;text-halo-color:#ffffff;-x-mapnik-min-distance:0;max-width:50}
