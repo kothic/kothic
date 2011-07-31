@@ -624,9 +624,9 @@ line|z9-[railway=rail]::ticks
 
 */
 
-way|z12-[railway=subway]
-{width:3; color: #072889;z-index:15; dashes:3,3; opacity:0.3; linecap: butt; -x-mapnik-layer: top;}
-
+way|z12-[railway=subway][colour=red]  {width:3; color: #892807;z-index:15; dashes:3,3; opacity:0.3; linecap: butt; -x-mapnik-layer: top;}
+way|z12-[railway=subway][colour=blue] {width:3; color: #072889;z-index:15; dashes:3,3; opacity:0.3; linecap: butt; -x-mapnik-layer: top;}
+way|z12-[railway=subway][!colour] {width:3; color: #072889;z-index:15; dashes:3,3; opacity:0.3; linecap: butt; -x-mapnik-layer: top;}
 
 way|z16-[barrier=fence] {width:.3; color: black;z-index:16; -x-mapnik-layer: top;}
 way|z16-[barrier=wall] {width:.5; color: black;z-index:16; -x-mapnik-layer: top;}
