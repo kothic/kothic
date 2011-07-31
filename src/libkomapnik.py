@@ -123,7 +123,7 @@ def xml_linepatternsymbolizer(path=""):
 def xml_textsymbolizer(text="name",face="DejaVu Sans Book",size="10",color="#000000", halo_color="#ffffff", halo_radius="0", placement="line", offset="0", overlap="false", distance="26", wrap_width=256, align="center", opacity="1", pos="X"):
   color = nicecolor(color)
   halo_color = nicecolor(halo_color)
-  pos = pos.replace("exact", "X").replace("any","X, S, E, N, W, NE, SE, NW, SW").split(",")
+  pos = pos.replace("exact", "X").replace("any","S, E, X, N, W, NE, SE, NW, SW").split(",")
   pos.extend(size.split(","))
   pos = ",".join(pos)
   size = size.split(",")[0]
