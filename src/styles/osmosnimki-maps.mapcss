@@ -721,12 +721,12 @@ node|z11-[railway=station][transport!=subway]
 text:name; text-offset:7; font-size:9; font-family: DejaVu Sans Mono Book; text-halo-radius:1; text-color:#000d6c;text-halo-color:#ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0}
 
 node|z12-15[railway=station][transport=subway] {icon-image:metro_others6.png;z-index:17;}
-node|z12-15[railway=station][transport=subway]::label {text:name; text-offset:11; font-size:9; font-family: DejaVu Sans Book; text-halo-radius:2; text-color:#1300bb;text-halo-color:#ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0; text-placement:any;}
+node|z12-15[railway=station][transport=subway]::label {text:name; text-offset:12; font-size:9; font-family: DejaVu Sans Book; text-halo-radius:2; text-color:#1300bb;text-halo-color:#ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0; text-placement:any;}
 node|z16-[railway=subway_entrance] {icon-image:metro_others6.png;z-index:17;}
-node|z16-[railway=subway_entrance][name] {text:name; text-offset:11; font-size:9; font-family: DejaVu Sans Book; text-halo-radius:2; text-color:#1300bb;text-halo-color:#ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0}
+node|z16-[railway=subway_entrance][name] {text:name; text-offset:12; font-size:9; font-family: DejaVu Sans Book; text-halo-radius:2; text-color:#1300bb;text-halo-color:#ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0}
 
 area|z11-[building=train_station] {icon-image:rw_vokzal_new23.png;}
-area|z11-[building=train_station] {text:name; text-offset:7; font-size:9; font-family: DejaVu Sans Mono Book; text-halo-radius:1; text-color:#000d6c;text-halo-color:#ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0; text-placement:any;}
+area|z11-[building=train_station] {text:name; text-offset:11; font-size:9; font-family: DejaVu Sans Mono Book; text-halo-radius:1; text-color:#000d6c;text-halo-color:#ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0; text-placement:any;}
 
 
 node|z10-[aeroway=aerodrome]
