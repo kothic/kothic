@@ -624,8 +624,13 @@ line|z9-[railway=rail]::ticks
 
 */
 
-way|z12-[railway=subway][colour=red]  {width:3; color: #892807;z-index:15; dashes:3,3; opacity:0.3; linecap: butt; -x-mapnik-layer: top;}
-way|z12-[railway=subway][colour=blue] {width:3; color: #072889;z-index:15; dashes:3,3; opacity:0.3; linecap: butt; -x-mapnik-layer: top;}
+way|z12-[railway=subway][colour=red]    {width:3; color: #DD0000;z-index:15; dashes:3,3; opacity:0.3; linecap: butt; -x-mapnik-layer: top;}
+way|z12-[railway=subway][colour=blue]   {width:3; color: #072889;z-index:15; dashes:3,3; opacity:0.3; linecap: butt; -x-mapnik-layer: top;}
+way|z12-[railway=subway][colour=purple] {width:3; color: #8B509C;z-index:15; dashes:3,3; opacity:0.3; linecap: butt; -x-mapnik-layer: top;}
+way|z12-[railway=subway][colour=orange] {width:3; color: #FF7700;z-index:15; dashes:3,3; opacity:0.3; linecap: butt; -x-mapnik-layer: top;}
+way|z12-[railway=subway][colour=green]  {width:3; color: #006600;z-index:15; dashes:3,3; opacity:0.3; linecap: butt; -x-mapnik-layer: top;}
+way|z12-[railway=subway][colour=brown]  {width:3; color: #BB7700;z-index:15; dashes:3,3; opacity:0.3; linecap: butt; -x-mapnik-layer: top;}
+
 way|z12-[railway=subway][!colour] {width:3; color: #072889;z-index:15; dashes:3,3; opacity:0.3; linecap: butt; -x-mapnik-layer: top;}
 
 way|z16-[barrier=fence] {width:.3; color: black;z-index:16; -x-mapnik-layer: top;}
@@ -720,9 +725,20 @@ node|z11-[railway=station][transport!=subway]
 {icon-image:rw_stat_stanzii_2_blue.png;
 text:name; text-offset:7; font-size:9; font-family: DejaVu Sans Mono Book; text-halo-radius:1; text-color:#000d6c;text-halo-color:#ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0}
 
-
+/*     Minsk        */
 node|z12-15[railway=station][transport=subway][colour=red][operator=Минский метрополитен] {icon-image:minsk_metro_red.png; z-index:17;}
-node|z12-15[railway=station][transport=subway][colour=blue][operator=Минский метрополитен] {icon-image:minsk_metro_blue.png; z-index:17;}
+node|z12-15[railway=station][transport=subway][colour=blue][operator=Минский метрополитен]{icon-image:minsk_metro_blue.png; z-index:17;}
+
+
+/*     Vienna       */
+node|z12-15[railway=station][transport=subway][colour=red][operator=Wiener Linien]{icon-image:vienna-ubahn-red.png;z-index:17;}
+node|z12-15[railway=station][transport=subway][colour=orange][operator=Wiener Linien]{icon-image:vienna-ubahn-orange.png;z-index:17;}
+node|z12-15[railway=station][transport=subway][colour=purple][operator=Wiener Linien]{icon-image:vienna-ubahn-purple.png;z-index:17;}
+node|z12-15[railway=station][transport=subway][colour=green][operator=Wiener Linien]{icon-image:vienna-ubahn-green.png;z-index:17;}
+node|z12-15[railway=station][transport=subway][colour=brown][operator=Wiener Linien]{icon-image:vienna-ubahn-brown.png;z-index:17;}
+node|z12-15[railway=station][transport=subway][!colour][operator=Wiener Linien]{icon-image:vienna-ubahn-blue.png;z-index:17;}
+
+/*  Others  */
 node|z12-15[railway=station][transport=subway][!colour] {icon-image:metro_others6.png;z-index:17;}
 
 node|z12-15[railway=station][transport=subway]::label {text:name; text-offset:13; font-size:9; font-family: DejaVu Sans Book; text-halo-radius:2; text-color:#1300bb;text-halo-color:#ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0; text-placement:any;}
