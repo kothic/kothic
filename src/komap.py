@@ -221,21 +221,21 @@ if options.renderer == "mapnik":
     itags_g = set()
     xml_g = ""
     for zindex in ta:
-      ## areas pass
+      ## background areas pass
       sql = set()
       itags = set()
       xml = xml_style_start()
       for entry in zsheet[zindex]:
         if entry["type"] in ("way", "area", "polygon"):
-          if "fill-color" in entry["style"] or "fill-image" in entry["style"]:
+          if "background-color" in entry["style"] or "background-image" in entry["style"]:
             xml += xml_rule_start()
             xml += x_scale
 
             xml += xml_filter(entry["rulestring"])
-            if "fill-color" in entry["style"]:
-              xml += xml_polygonsymbolizer(entry["style"].get("fill-color", "black"), entry["style"].get("fill-opacity", "1"))
-            if "fill-image" in entry["style"]:
-              xml += xml_polygonpatternsymbolizer(entry["style"].get("fill-image", ""))
+            if "background-color" in entry["style"]:
+              xml += xml_polygonsymbolizer(entry["style"].get("background-color", "black"), entry["style"].get("background-opacity", "1"))
+            if "background-image" in entry["style"]:
+              xml += xml_polygonpatternsymbolizer(entry["style"].get("background-image", ""))
             sql.add(entry["sql"])
             itags.update(entry["chooser"].get_interesting_tags(entry["type"], zoom))
             xml += xml_rule_end()
@@ -322,7 +322,7 @@ if options.renderer == "mapnik":
           xml_nolayer()
 
 
-        ## lines pass
+        ## lines and polygons pass
         sql_g = set()
         there_are_dashed_lines = False
         itags_g = set()
@@ -340,6 +340,18 @@ if options.renderer == "mapnik":
                   continue
               elif zlayer not in range(-5,6):
                 continue
+              if entry["type"] in ("way", "area", "polygon"):
+                if "fill-color" in entry["style"] or "fill-image" in entry["style"]:
+                  xml += xml_rule_start()
+                  xml += x_scale
+                  xml += xml_filter(entry["rulestring"])
+                  if "fill-color" in entry["style"]:
+                    xml += xml_polygonsymbolizer(entry["style"].get("fill-color", "black"), entry["style"].get("fill-opacity", "1"))
+                  if "fill-image" in entry["style"]:
+                    xml += xml_polygonpatternsymbolizer(entry["style"].get("fill-image", ""))
+                  sql.add(entry["sql"])
+                  itags.update(entry["chooser"].get_interesting_tags(entry["type"], zoom))
+                  xml += xml_rule_end()
               if "width" in entry["style"] or "line-style" in entry["style"]:
                 xml += xml_rule_start()
                 xml += x_scale
@@ -400,6 +412,7 @@ if options.renderer == "mapnik":
           mfile.write(xml_layer("postgis", layer_type, itags, sql ))
         else:
           xml_nolayer()
+          
     for layer_type, entry_types in [("point", ("node", "point")),("line",("way", "line")), ("polygon",("way","area"))]:
         ## icons pass
         sql_g = set()
