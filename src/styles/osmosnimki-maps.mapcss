@@ -32,7 +32,7 @@ area|z3-[natural=glacier]{background-color: #fcfeff; background-image: glacier.p
 
 area|z10-[place=city],
 area|z10-[place=town],
-{background-color:#FAF7F7; background-opacity: 0.6; z-index:1}
+{background-color:#FAF7F7; z-index:1}
 
 area|z10-[place=hamlet],
 area|z10-[place=village],
@@ -45,7 +45,7 @@ area|z10-[place=locality]
 тег - тег присутствует, значение не важно
 
   */
-       {background-color:#f3eceb; background-opacity: 0.6; z-index:1}
+       {background-color:#f3eceb; z-index:1}
 /*
 z-index - порядковый номер слоя, в котором будет лежать объект.
 чем меньше, тем ниже будет находиться объект (другие будут перекрывать)
@@ -128,7 +128,7 @@ area|z10-[landuse=farmland], area|z10-[landuse=farm], area|z10-[landuse=field]  
 
 area|z6-9[place=city],
 area|z6-9[place=town]
-     {background-color: #ffe1d0; background-opacity: 0.6; z-index:5}
+     {background-color: #ffe1d0; z-index:5}
 
 
 area|z10-[landuse=cemetery] {background-color: #e5f5dc; z-index:5; background-image:cemetry7_2.png}
