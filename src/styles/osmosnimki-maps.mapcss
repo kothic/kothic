@@ -22,7 +22,7 @@ area - площадные объекты (обычно - замкнутые пу
 
 area[natural=coastline] {fill-color: #fcf8e4;-x-mapnik-layer: bottom}
 
-area[natural=ocean] {fill-color: #C4D4F5;z-index:18}
+area[natural=ocean] {fill-color: #C4D4F5;z-index:10}
 
 
 area|z3-[natural=glacier]{background-color: #fcfeff; background-image: glacier.png}
@@ -694,13 +694,13 @@ node|z17-[shop]                {icon-image:superm_12x12.png}
 
 area[boundary=administrative][admin_level=2]
 
-   {width: 0.35; color: #202020; opacity:0.8; z-index:16} /*  dashes: 6,4; */
+   {width: 0.35; color: #202020; opacity:0.8; z-index:9} /*  dashes: 6,4; */
    /* casing-width: 4; casing-opacity: 0.5; casing-color: #d4d4d4; casing-dashes:; */
 
 area|z3[boundary=administrative][admin_level=3]
-{width: 0.4; color: #7e0156;  opacity:0.5; z-index:16} /* dashes: 3,3; */
+{width: 0.4; color: #7e0156;  opacity:0.5; z-index:9} /* dashes: 3,3; */
 area|z4-[boundary=administrative][admin_level=3]
-{width: 1.3; color: #ff99cc; opacity:0.3; z-index:16}
+{width: 1.3; color: #ff99cc; opacity:0.3; z-index:9}
 
 /*
 для линии обводки отключены штриховки (casing-dashes:;), но включены для основной линии
@@ -708,13 +708,13 @@ area|z4-[boundary=administrative][admin_level=3]
 */
 
 area|z10-[boundary=administrative][admin_level=6]
-{width: 0.4; color: #101010; opacity:0.6; z-index:16} /*  dashes: 1,2; */
+{width: 0.4; color: #101010; opacity:0.6; z-index:9} /*  dashes: 1,2; */
 
 
 area|z4-5[boundary=administrative][admin_level=4]
-{width: 0.3; color: #000000; opacity:0.8; z-index:16} /*  dashes: 1,2; */
+{width: 0.3; color: #000000; opacity:0.8; z-index:9} /*  dashes: 1,2; */
 area|z6-[boundary=administrative][admin_level=4]
-{width: 0.4; color: #000000; opacity:0.8; z-index:16} /*  dashes: 1,2; */
+{width: 0.4; color: #000000; opacity:0.8; z-index:9} /*  dashes: 1,2; */
 
 /*way[boundary=administrative][admin_level=8]
 {casing-width: 1; casing-opacity: 0.3; casing-color: #808080; casing-dashes:;
@@ -840,17 +840,17 @@ shields!!!!
 way|z10-[waterway=stream], way|z9-[waterway=river], way|z13-[waterway=canal]
 {text:name; font-size:9; font-family: DejaVu Sans Oblique; text-color:#547bd1; text-position: line}
 
-node|z-3[place=continent]
+node|z1-3[place=continent]
 {text:name; text-offset:-10; font-size:10; font-family: DejaVu Sans ExtraLight; text-halo-radius:1; text-color:#202020;text-halo-color:#ffffff;z-index:-1;-x-mapnik-min-distance:0}
 node|z2-3[place=continent]
 {text:name; text-offset:-10; font-size:8; font-family: DejaVu Sans ExtraLight; text-halo-radius:1; text-color:#202020;text-halo-color:#ffffff;z-index:-1;-x-mapnik-min-distance:0}
 
-node|z-6[place=ocean]
+node|z2-6[place=ocean]
 {text:name; font-size:8; font-family: DejaVu Sans Oblique; text-halo-radius:1; text-color:#202020;text-halo-color:#ffffff;z-index:-1;-x-mapnik-min-distance:0}
 node|z7-[place=ocean]
 {text:name; text-offset:0; font-size:11; font-family: DejaVu Sans Oblique; text-halo-radius:1; text-color:#202020;text-halo-color:#ffffff;z-index:-1;-x-mapnik-min-distance:0}
 
-node|z-6[place=sea]
+node|z3-6[place=sea]
 {text:name; text-offset:0; font-size:8; font-family: DejaVu Sans Oblique; text-halo-radius:1; text-color:#4976d1;text-halo-color:#ffffff;-x-mapnik-min-distance:0}
 
 node|z7-9[place=sea]
