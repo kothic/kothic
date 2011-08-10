@@ -342,11 +342,11 @@ if options.renderer == "mapnik":
                 continue
 
 
-              if "width" in entry["style"] or "line-style" in entry["style"]:
+              if "width" in entry["style"] or "line-style" in entry["style"] or (("fill-color" in entry["style"] or "fill-image" in entry["style"]) and layer_type == "polygon"):
                 xml += xml_rule_start()
                 xml += x_scale
                 xml += xml_filter(entry["rulestring"])
-                if entry["type"] in ("way", "area", "polygon"):
+                if layer_type == "polygon":
                   if "fill-color" in entry["style"]:
                     xml += xml_polygonsymbolizer(entry["style"].get("fill-color", "black"), entry["style"].get("fill-opacity", "1"))
                   if "fill-image" in entry["style"]:
