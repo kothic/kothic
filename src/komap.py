@@ -29,6 +29,12 @@ except ImportError:
         pass
 
 
+def relaxedFloat(x):
+  try:
+    return float(x)
+  except ValueError:
+    return float(str(x).replace(",", "."))
+
 parser = OptionParser()
 parser.add_option("-r", "--renderer", dest="renderer", default="mapnik",
      help="which renderer stylesheet to generate", metavar="ENGINE")
@@ -208,7 +214,7 @@ if options.renderer == "mapnik":
       xml += xml_rule_start()
       xml += x_scale
       if "fill-color" in coast[zoom]:
-        xml += xml_polygonsymbolizer(coast[zoom].get("fill-color", "#ffffff"), coast[zoom].get("fill-opacity", "1"))
+        xml += xml_polygonsymbolizer(coast[zoom].get("fill-color", "#ffffff"), relaxedFloat(coast[zoom].get("fill-opacity", "1")))
       if "fill-image" in coast[zoom]:
         xml += xml_polygonpatternsymbolizer(coast[zoom].get("fill-image", ""))
       xml += xml_rule_end()
@@ -289,7 +295,7 @@ if options.renderer == "mapnik":
                 xml += xml_filter(entry["rulestring"])
                 xml += xml_linesymbolizer(color=entry["style"].get("casing-color", "black"),
                   width=2*float(entry["style"].get("casing-width", 1))+float(entry["style"].get("width", 0)),
-                  opacity=entry["style"].get("casing-opacity", entry["style"].get("opacity","1")),
+                  opacity=relaxedFloat(entry["style"].get("casing-opacity", entry["style"].get("opacity","1"))),
                   linecap=entry["style"].get("casing-linecap", entry["style"].get("linecap","butt")),
                   linejoin=entry["style"].get("casing-linejoin", entry["style"].get("linejoin", "round")),
                   dashes=entry["style"].get("casing-dashes",entry["style"].get("dashes", "")))
@@ -353,8 +359,8 @@ if options.renderer == "mapnik":
                     xml += xml_polygonpatternsymbolizer(entry["style"].get("fill-image", ""))
                 if "width" in entry["style"]:
                   xml += xml_linesymbolizer(color=entry["style"].get("color", "black"),
-                    width=entry["style"].get("width", "1"),
-                    opacity=entry["style"].get("opacity", "1"),
+                    width=relaxedFloat(entry["style"].get("width", "1")),
+                    opacity=relaxedFloat(entry["style"].get("opacity", "1")),
                     linecap=entry["style"].get("linecap", "round"),
                     linejoin=entry["style"].get("linejoin", "round"),
                     dashes=entry["style"].get("dashes", ""))
@@ -427,8 +433,7 @@ if options.renderer == "mapnik":
                   path=entry["style"].get("icon-image", ""),
                   width=entry["style"].get("icon-width", ""),
                   height=entry["style"].get("icon-height", ""),
-
-                  opacity=entry["style"].get("opacity", "1"))
+                  relaxedFloat(opacity=entry["style"].get("opacity", "1")))
 
                 sql.add(entry["sql"])
                 itags.update(entry["chooser"].get_interesting_tags(entry["type"], zoom))
@@ -477,14 +482,14 @@ if options.renderer == "mapnik":
                   tsize = entry["style"].get("font-size","10")
                   tcolor = entry["style"].get("text-color","#000000")
                   thcolor= entry["style"].get("text-halo-color","#ffffff")
-                  thradius= entry["style"].get("text-halo-radius","0")
+                  thradius= relaxedFloat(entry["style"].get("text-halo-radius","0"))
                   tplace= entry["style"].get("text-position","center")
-                  toffset= entry["style"].get("text-offset","0")
+                  toffset= relaxedFloat(entry["style"].get("text-offset","0"))
                   toverlap= entry["style"].get("text-allow-overlap",entry["style"].get("allow-overlap","false"))
-                  tdistance= entry["style"].get("-x-mapnik-min-distance","20")
-                  twrap= entry["style"].get("max-width",256)
+                  tdistance= relaxedFloat(entry["style"].get("-x-mapnik-min-distance","20"))
+                  twrap= relaxedFloat(entry["style"].get("max-width",256))
                   talign= entry["style"].get("text-align","center")
-                  topacity= entry["style"].get("text-opacity",entry["style"].get("opacity","1"))
+                  topacity= relaxedFloat(entry["style"].get("text-opacity",entry["style"].get("opacity","1")))
                   tpos = entry["style"].get("text-placement","X")
 
                   xml += xml_rule_start()
