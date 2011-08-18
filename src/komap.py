@@ -15,7 +15,6 @@
 #   You should have received a copy of the GNU General Public License
 #   along with kothic.  If not, see <http://www.gnu.org/licenses/>.
 
-
 from debug import debug, Timer
 from mapcss import MapCSS
 import sys
@@ -23,10 +22,10 @@ from libkomapnik import *
 from optparse import OptionParser
 
 try:
-        import psyco
-        psyco.full()
+  import psyco
+  psyco.full()
 except ImportError:
-        pass
+  pass
 
 
 def relaxedFloat(x):
@@ -148,7 +147,7 @@ if options.renderer == "mapnik":
     zsheet = mapniksheet[zoom]
     for chooser in style.choosers:
       if chooser.get_sql_hints(chooser.ruleChains[0][0].subject, zoom)[1]:
-        sys.stderr.write(str(chooser.get_sql_hints(chooser.ruleChains[0][0].subject, zoom)[1])+"\n")
+        #sys.stderr.write(str(chooser.get_sql_hints(chooser.ruleChains[0][0].subject, zoom)[1])+"\n")
         styles = chooser.styles[0]
         zindex = styles.get("z-index",0)
         if zindex not in zsheet:
@@ -171,7 +170,7 @@ if options.renderer == "mapnik":
 
 
 
-  sys.stderr.write(str(numerics)+"\n")
+  #sys.stderr.write(str(numerics)+"\n")
   #print mapniksheet
 
   def add_numerics_to_itags(itags):
@@ -433,7 +432,7 @@ if options.renderer == "mapnik":
                   path=entry["style"].get("icon-image", ""),
                   width=entry["style"].get("icon-width", ""),
                   height=entry["style"].get("icon-height", ""),
-                  relaxedFloat(opacity=entry["style"].get("opacity", "1")))
+                  opacity=relaxedFloat(entry["style"].get("opacity", "1")))
 
                 sql.add(entry["sql"])
                 itags.update(entry["chooser"].get_interesting_tags(entry["type"], zoom))
