@@ -30,7 +30,8 @@ except ImportError:
 
 def relaxedFloat(x):
   try:
-    return float(x)
+    return float(x) if int(float(x)) != float(x) else int(x)
+
   except ValueError:
     return float(str(x).replace(",", "."))
 
