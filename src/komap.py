@@ -543,8 +543,8 @@ if options.renderer == "mapnik":
                 if zoom >= 10:
                   sqlz = """select %s, ST_PointOnSurface(ST_Buffer(way,0)) as way
                         from planet_osm_%s
-                        where (%s) and (%s) and way &amp;&amp; ST_Expand(!bbox!,3000) %s way_area
-                """%(itags,layer_type,ttext,sqlz, order)
+                        where (%s) and (%s) and (way_area > %s) and way &amp;&amp; ST_Expand(!bbox!,3000) %s way_area
+                """%(itags,layer_type,ttext,sqlz,pixel_size_at_zoom(zoom,5)**2, order)
                 else:
                   sqlz = """select %s, ST_PointOnSurface(ST_Buffer(way,0)) as way
                 from (
@@ -552,9 +552,9 @@ if options.renderer == "mapnik":
                     from (
                       select ST_Buffer(way, %s) as way, %s
                         from planet_osm_%s p
-                        where (%s) and p.way &amp;&amp; ST_Expand(!bbox!,%s) and (%s)) p
+                        where (%s) and way_area > %s and p.way &amp;&amp; ST_Expand(!bbox!,%s) and (%s)) p
                       group by %s) p %s ST_Area(p.way)
-                """%(itags,oitags,pixel_size_at_zoom(zoom,10),oitags,layer_type,ttext,max(pixel_size_at_zoom(zoom,20),3000),sqlz,oitags,order)
+                """%(itags,oitags,pixel_size_at_zoom(zoom,10),oitags,layer_type,ttext,pixel_size_at_zoom(zoom,5)**2,max(pixel_size_at_zoom(zoom,20),3000),sqlz,oitags,order)
                 mfile.write(xml_layer("postgis-process", layer_type, itags, sqlz, oitags ))
               elif layer_type == "line" and zoom < 15:
                 sqlz = " OR ".join(sql)
