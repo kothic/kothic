@@ -18,6 +18,7 @@
 from debug import debug, Timer
 from mapcss import MapCSS
 import sys
+import os
 import Image
 from libkomapnik import *
 from optparse import OptionParser
