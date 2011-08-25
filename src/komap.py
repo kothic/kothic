@@ -380,11 +380,11 @@ if options.renderer == "mapnik":
                       fname = "f"+fname
                       if "pattern-rotate" in entry["style"]:
                         im = im.rotate(relaxedFloat(entry["style"]["pattern-rotate"]))
-                        fname = "r"+relaxedFloat(entry["style"]["pattern-rotate"])+fname
+                        fname = "r"+str(relaxedFloat(entry["style"]["pattern-rotate"]))+fname
                       if "pattern-spacing" in entry["style"]:
                         im2 = Image.new("RGBA", (im.size[0]+int(relaxedFloat(entry["style"]["pattern-spacing"])),im.size[1]))
                         im = im2.paste(im,(0,0))
-                        fname = "s"+int(relaxedFloat(entry["style"]["pattern-spacing"]))+fname
+                        fname = "s"+str(int(relaxedFloat(entry["style"]["pattern-spacing"])))+fname
                       try:
                         if not os.path.exists(icons_path+"komap/"):
                           os.makedirs(icons_path+"komap/")
