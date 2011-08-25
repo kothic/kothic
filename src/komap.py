@@ -383,7 +383,7 @@ if options.renderer == "mapnik":
                         im = im.rotate(relaxedFloat(entry["style"]["pattern-rotate"]))
                         fname = "r"+str(relaxedFloat(entry["style"]["pattern-rotate"]))+fname
                       if "pattern-scale" in entry["style"]:
-                        sc = relaxedFloat(entry["style"]["pattern-rotate"])*1.
+                        sc = relaxedFloat(entry["style"]["pattern-scale"])*1.
                         ns = (max(int(round(im.size[0]*sc)),1), max(int(round(im.size[1]*sc)),1))
                         im = im.resize(ns, Image.BILINEAR)
                         fname = "z"+str(sc)+fname
