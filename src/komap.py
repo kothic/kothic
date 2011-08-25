@@ -400,7 +400,7 @@ if options.renderer == "mapnik":
           if layer_type == "polygon" and there_are_line_patterns:
             itags = ", ".join(itags)
             oitags = '"'+ "\", \"".join(oitags) +'"'
-            sqlz = """SELECT %s, ST_ForceRHR(way) from planet_osm_polygon where (%s) and way &amp;&amp; !bbox! and ST_IsValid(way)"""%(itags,sql)
+            sqlz = """SELECT %s, ST_ForceRHR(way) as way from planet_osm_polygon where (%s) and way &amp;&amp; !bbox! and ST_IsValid(way)"""%(itags,sql)
             mfile.write(xml_layer("postgis-process", layer_type, itags, sqlz ))
 
 
