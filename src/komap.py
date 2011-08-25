@@ -386,7 +386,7 @@ if options.renderer == "mapnik":
                         sc = relaxedFloat(entry["style"]["pattern-rotate"])*1.
                         ns = (max(int(round(im.size[0]*sc)),1), max(int(round(im.size[1]*sc)),1))
                         im = im.resize(ns, Image.BILINEAR)
-                        fname = z+str(sc)+fname
+                        fname = "z"+str(sc)+fname
                       if "pattern-spacing" in entry["style"]:
                         im2 = Image.new("RGBA", (im.size[0]+int(relaxedFloat(entry["style"]["pattern-spacing"])),im.size[1]))
                         im2.paste(im,(0,0))
