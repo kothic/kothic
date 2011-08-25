@@ -382,6 +382,11 @@ if options.renderer == "mapnik":
                       if "pattern-rotate" in entry["style"]:
                         im = im.rotate(relaxedFloat(entry["style"]["pattern-rotate"]))
                         fname = "r"+str(relaxedFloat(entry["style"]["pattern-rotate"]))+fname
+                      if "pattern-scale" in entry["style"]:
+                        sc = relaxedFloat(entry["style"]["pattern-rotate"])
+                        ns = (int(round(im.size[0]*sc)), int(round(im.size[1]*sc)))
+                        im = im.resize(ns, Image.ANTIALIAS)
+                        fname = z+str(sc)+fname
                       if "pattern-spacing" in entry["style"]:
                         im2 = Image.new("RGBA", (im.size[0]+int(relaxedFloat(entry["style"]["pattern-spacing"])),im.size[1]))
                         im2.paste(im,(0,0))
@@ -393,6 +398,7 @@ if options.renderer == "mapnik":
                         if not os.path.exists(icons_path+"komap/"+fname):
                           im.save(icons_path+"komap/"+fname, "PNG")
                         xml += xml_linepatternsymbolizer("komap/"+fname)
+                        
                       except OSError, IOError:
                         print >> sys.stderr, "Error writing to ", icons_path+"komap/"+fname
                     else:
