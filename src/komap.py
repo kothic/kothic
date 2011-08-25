@@ -331,6 +331,7 @@ if options.renderer == "mapnik":
         ## lines and polygons pass
         sql_g = set()
         there_are_dashed_lines = False
+        there_are_line_patterns = False
         itags_g = set()
         xml_g = ""
         for zindex in ta:
@@ -348,7 +349,7 @@ if options.renderer == "mapnik":
                 continue
 
 
-              if "width" in entry["style"] or "line-style" in entry["style"] or (("fill-color" in entry["style"] or "fill-image" in entry["style"]) and layer_type == "polygon"):
+              if "width" in entry["style"] or "pattern-image" in entry["style"] or (("fill-color" in entry["style"] or "fill-image" in entry["style"]) and layer_type == "polygon"):
                 xml += xml_rule_start()
                 xml += x_scale
                 xml += xml_filter(entry["rulestring"])
@@ -367,11 +368,12 @@ if options.renderer == "mapnik":
                   if entry["style"].get("dashes", ""):
                     there_are_dashed_lines = True
                     #print "dashes!!!"
-                if "line-style" in entry["style"]:
-                  if entry["style"]["line-style"] == "arrows":
+                if "pattern-image" in entry["style"]:
+                  there_are_line_patterns = True
+                  if entry["style"]["pattern-image"] == "arrows":
                     xml += xml_hardcoded_arrows()
                   else:
-                    xml += xml_linepatternsymbolizer(entry["style"]["line-style"])
+                    xml += xml_linepatternsymbolizer(entry["style"]["pattern-image"])
                 sql.add(entry["sql"])
                 itags.update(entry["chooser"].get_interesting_tags(entry["type"], zoom))
                 xml += xml_rule_end()
@@ -395,6 +397,12 @@ if options.renderer == "mapnik":
             sql = "("+ sql +') and "layer" = \'%s\''%zlayer
           oitags = itags
           itags = add_numerics_to_itags(itags)
+          if layer_type == "polygon" and there_are_line_patterns:
+            itags = ", ".join(itags)
+            oitags = '"'+ "\", \"".join(oitags) +'"'
+            sqlz = """SELECT %s, ST_ForceRHR(way) from planet_osm_polygon where (%s) and way &amp;&amp; !bbox! and ST_IsValid(way)"""%(itags,sql)
+            mfile.write(xml_layer("postgis-process", layer_type, itags, sqlz ))
+
 
           #### FIXME: Performance degrades painfully on large lines ST_Union. Gotta find workaround :(
           #if layer_type == "polygon" and there_are_dashed_lines:
@@ -409,8 +417,8 @@ if options.renderer == "mapnik":
             ##  group by %s
             ##  """%(itags,sql,oitags)
             #mfile.write(xml_layer("postgis-process", layer_type, itags, sqlz ))
-          #else:
-          mfile.write(xml_layer("postgis", layer_type, itags, sql ))
+          else:
+            mfile.write(xml_layer("postgis", layer_type, itags, sql ))
         else:
           xml_nolayer()
           
