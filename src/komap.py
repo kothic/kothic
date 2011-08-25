@@ -392,7 +392,7 @@ if options.renderer == "mapnik":
                           os.makedirs(icons_path+"komap/")
                         if not os.path.exists(icons_path+"komap/"+fname):
                           im.save(icons_path+"komap/"+fname, "PNG")
-                        xml += xml_linepatternsymbolizer(icons_path+"komap/"+fname)
+                        xml += xml_linepatternsymbolizer("komap/"+fname)
                       except OSError, IOError:
                         print >> sys.stderr, "Error writing to ", icons_path+"komap/"+fname
                     else:
