@@ -366,10 +366,10 @@ way|z17[highway=tertiary_link]
         casing-width:0.5; casing-color: #996703;
         z-index:11}
 
-way|z18[highway=secondary],
-way|z18[highway=secondary_link],
-way|z18[highway=tertiary],
-way|z18[highway=tertiary_link]
+way|z18-[highway=secondary],
+way|z18-[highway=secondary_link],
+way|z18-[highway=tertiary],
+way|z18-[highway=tertiary_link]
 {text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Bold; font-size:9; text-halo-radius: 1; text-halo-color: #ffffff;
         width:9;  color: #fcffd1;
         casing-width:0.5; casing-color: #996703;
@@ -452,8 +452,8 @@ way|z17[highway=primary_link]
         casing-width:.5; casing-color: #996703;
         z-index:12}
 
-way|z18[highway=primary],
-way|z18[highway=primary_link]
+way|z18-[highway=primary],
+way|z18-[highway=primary_link]
         {text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Bold; font-size:9; text-halo-radius: 1; text-halo-color: #ffffff;
         width:11;  color: #fcea97;
         casing-width:.5; casing-color: #996703;
@@ -559,10 +559,10 @@ way|z17[highway=motorway_link],
         casing-width:1; casing-color: #996703;
         z-index:13}
 
-way|z18[highway=trunk],
-way|z18[highway=trunk_link],
-way|z18[highway=motorway],
-way|z18[highway=motorway_link],
+way|z18-[highway=trunk],
+way|z18-[highway=trunk_link],
+way|z18-[highway=motorway],
+way|z18-[highway=motorway_link],
 {text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Bold; font-size:9; text-halo-radius: 1; text-halo-color: #ffffff;
         width:13;  color: #ffd780;
         casing-width:1; casing-color: #996703;
@@ -591,11 +591,11 @@ way|z13-[highway=primary_link]::centerline,
 
 */
 
-way|z17-[oneway=yes]{line-style:arrows;z-index:15; -x-mapnik-layer: top;}
+way|z17-[oneway=yes]{pattern-image:arrows;z-index:15; -x-mapnik-layer: top;}
 
 /*
 
-line-style - заливка линии картинкой.
+pattern-image - заливка линии картинкой.
 
 arrows - специальное значение для синих стрелочек, рисуемых в векторе
 
@@ -720,7 +720,7 @@ area|z6-[boundary=administrative][admin_level=4]
 {casing-width: 1; casing-opacity: 0.3; casing-color: #808080; casing-dashes:;
 width: 0.5; color: #808080; dashes: 2,2; opacity:0.3; z-index:16}*/
 
-way|z12-[railway=tram]{line-style:rway44.png;z-index:17}
+way|z12-[railway=tram]{pattern-image:rway44.png;z-index:17}
 
 
 node|z11-[railway=station][transport!=subway]
@@ -930,7 +930,7 @@ node|z12-[place=suburb]
 area|z13-[building] {width: .3; color: #cca352; z-index:17;}
 area|z15-[building=yes] { fill-color: #E7CCB4;  z-index:17;}
 area|z15-[building=public] { fill-color: #edc2ba;  z-index:17;}
-area|z15-[building][building != yes][building!=public] {fill-color: #D8D1D1; z-index:17;}
+area|z15-[building][building!=yes][building!=public] {fill-color: #D8D1D1; z-index:17;}
 area|z15-16[building] {text: addr:housenumber; text-halo-radius:1; text-position: center; font-size:7; -x-mapnik-min-distance:10; opacity:0.8}
 node|z15-16[addr:housenumber][!amenity][!shop] {text: addr:housenumber; text-halo-radius:1; text-position: center; font-size:7; -x-mapnik-min-distance:10; opacity:0.8} /* used in cities like Vienna */
 
