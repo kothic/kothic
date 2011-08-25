@@ -18,6 +18,7 @@
 from debug import debug, Timer
 from mapcss import MapCSS
 import sys
+import Image
 from libkomapnik import *
 from optparse import OptionParser
 
@@ -373,7 +374,27 @@ if options.renderer == "mapnik":
                   if entry["style"]["pattern-image"] == "arrows":
                     xml += xml_hardcoded_arrows()
                   else:
-                    xml += xml_linepatternsymbolizer(entry["style"]["pattern-image"])
+                    if "pattern-rotate" in entry["style"] or "pattern-spacing" in entry["style"]:
+                      fname = entry["style"]["pattern-image"]
+                      im = Image.open(icons_path + fname).convert("RGBA")
+                      fname = "f"+fname
+                      if "pattern-rotate" in entry["style"]:
+                        im = im.rotate(relaxedFloat(entry["style"]["pattern-rotate"]))
+                        fname = "r"+relaxedFloat(entry["style"]["pattern-rotate"])+fname
+                      if "pattern-spacing" in entry["style"]:
+                        im2 = Image.new("RGBA", (im.size[0]+int(relaxedFloat(entry["style"]["pattern-rotate"])),im.size[1]))
+                        im = im2.paste(im,(0,0))
+                        fname = "s"+int(relaxedFloat(entry["style"]["pattern-rotate"]))+fname
+                      try:
+                        if not os.path.exists(icons_path+"komap/"):
+                          os.makedirs(icons_path+"komap/")
+                        if not os.path.exists(icons_path+"komap/"+fname):
+                          im.save(icons_path+"komap/"+fname, "PNG")
+                        xml += xml_linepatternsymbolizer(icons_path+"komap/"+fname)
+                      except OSError, IOError:
+                        print >> sys.stderr, "Error writing to ", icons_path+"komap/"+fname
+                    else:
+                      xml += xml_linepatternsymbolizer(entry["style"]["pattern-image"])
                 sql.add(entry["sql"])
                 itags.update(entry["chooser"].get_interesting_tags(entry["type"], zoom))
                 xml += xml_rule_end()
