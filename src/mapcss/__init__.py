@@ -42,7 +42,8 @@ ZOOM_MIN = re.compile(r'^ (\d+)\-      $', re.S | re.X)
 ZOOM_MAX = re.compile(r'^      \-(\d+) $', re.S | re.X)
 ZOOM_SINGLE = re.compile(r'^        (\d+) $', re.S | re.X)
 
-CONDITION_TRUE = re.compile(r'^ \s* ([:\w]+) \s* = \s* yes \s*  $', re.I | re.S | re.X)
+CONDITION_TRUE = re.compile(r'^ \s* ([:\w]+) \s* [?] \s*  $', re.I | re.S | re.X)
+CONDITION_invTRUE = re.compile(r'^ \s* [!] \s* ([:\w]+) \s* [?] \s*  $', re.I | re.S | re.X)
 CONDITION_FALSE = re.compile(r'^ \s* ([:\w]+) \s* = \s* no  \s*  $', re.I | re.S | re.X)
 CONDITION_SET = re.compile(r'^ \s* ([:\w]+) \s* $', re.S | re.X)
 CONDITION_UNSET = re.compile(r'^ \s* !([:\w]+) \s* $', re.S | re.X)
@@ -290,6 +291,10 @@ def parseCondition(s):
               a = CONDITION_TRUE.match(s).groups()
               log.debug("condition true: %s"%(a[0]))
               return  Condition('true'     ,a)
+            if      CONDITION_invTRUE.match(s):
+              a = CONDITION_invTRUE.match(s).groups()
+              log.debug("condition invtrue: %s"%(a[0]))
+              return  Condition('ne'     ,(a[0],"yes"))
 
             if      CONDITION_FALSE.match(s):
               a = CONDITION_FALSE.match(s).groups()
