@@ -162,7 +162,8 @@ if options.renderer == "mapnik":
         chooser_entry["type"] = chooser.ruleChains[0][0].subject
         chooser_entry["rule"] = [i.conditions for i in chooser.ruleChains[0] if i.test_zoom(zoom)]
         numerics.update(chooser.get_numerics())
-        chooser_entry["rulestring"] = " or ".join([ "("+ " and ".join([i.get_mapnik_filter() for i in rule if i.get_mapnik_filter()!='']) + ")" for rule in chooser_entry["rule"]])
+        #print chooser_entry["rule"]
+        chooser_entry["rulestring"] = " or ".join([ "("+ " and ".join([i.get_mapnik_filter() for i in rule if i.get_mapnik_filter()]) + ")" for rule in chooser_entry["rule"]])
         chooser_entry["chooser"] = chooser
         if chooser_entry["type"] == "area" and "[natural] = 'coastline'" in chooser_entry["rulestring"]:
             coast[zoom] = chooser_entry["style"]

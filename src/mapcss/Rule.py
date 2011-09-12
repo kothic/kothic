@@ -78,9 +78,10 @@ class Rule():
     b = set()
     for condition in self.conditions:
       q = condition.get_sql()
-      if q[1]:
-        a.add(q[0])
-        b.add(q[1])
+      if q:
+        if q[1]:
+          a.add(q[0])
+          b.add(q[1])
     b = " AND ".join(b)
     return a,b
 
