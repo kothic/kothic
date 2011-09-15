@@ -86,14 +86,15 @@ def xml_pointsymbolizer(path="", width="", height="", opacity=1, overlap="false"
 def xml_linesymbolizer(color="#000000", width="1", opacity="1", linecap="butt", linejoin="round", dashes=""):
   color = nicecolor(color)
   linecap  = {"none":"butt",}.get(linecap.lower(),  linecap)
-  dashes = ""
+
   if dashes:
     dashes = '<CssParameter name="stroke-dasharray">%s</CssParameter>'%(dashes)
+  else:
+    dashes = ""
   rasterizer = ""
   if float(width) < 4 and not dashes:
     rasterizer = ' rasterizer="fast"'
-    
-    
+
   return """
   <LineSymbolizer %s>
     <CssParameter name="stroke">%s</CssParameter>
