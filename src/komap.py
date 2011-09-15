@@ -135,9 +135,9 @@ if options.renderer == "mapnik":
   columnmap = {}
 
   if locale == "en":
-    columnmap["name"] = ("""(CASE WHEN "name:en" IS NOT NULL THEN "name:en" ELSE CASE WHEN "int_name" IS NOT NULL THEN "int_name" ELSE replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(translate("name",'абвгдезиклмнопрстуфьАБВГДЕЗИКЛМНОПРСТУФЬ','abvgdeziklmnoprstuf’ABVGDEZIKLMNOPRSTUF’'),'х','kh'),'Х','Kh'),'ц','ts'),'Ц','Ts'),'ч','ch'),'Ч','Ch'),'ш','sh'),'Ш','Sh'),'щ','shch'),'Щ','Shch'),'ъ','”'),'Ъ','”'),'ё','yo'),'Ё','Yo'),'ы','y'),'Ы','Y'),'э','·e'),'Э','E'),'ю','yu'),'Ю','Yu'),'й','y'),'Й','Y'),'я','ya'),'Я','Ya'),'ж','zh'),'Ж','Zh') END END) AS name""",('name:en','int_name',))
+    columnmap["name"] = ("""COALESCE("name:en","int_name", replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(translate("name",'абвгдезиклмнопрстуфьАБВГДЕЗИКЛМНОПРСТУФЬ','abvgdeziklmnoprstuf’ABVGDEZIKLMNOPRSTUF’'),'х','kh'),'Х','Kh'),'ц','ts'),'Ц','Ts'),'ч','ch'),'Ч','Ch'),'ш','sh'),'Ш','Sh'),'щ','shch'),'Щ','Shch'),'ъ','”'),'Ъ','”'),'ё','yo'),'Ё','Yo'),'ы','y'),'Ы','Y'),'э','·e'),'Э','E'),'ю','yu'),'Ю','Yu'),'й','y'),'Й','Y'),'я','ya'),'Я','Ya'),'ж','zh'),'Ж','Zh')) AS name""",('name:en','int_name',))
   elif locale:
-    columnmap["name"] =  ('(CASE WHEN "name:'+locale+'" IS NOT NULL THEN "name:'+locale+'" ELSE name END) AS name',('name:'+locale,))
+    columnmap["name"] =  ('COALESCE("name:'+locale+'", "name") AS name',('name:'+locale,))
 
   numerics = set()  # set of number-compared things, like "population<10000" needs population as number, not text
   mapniksheet = {}
@@ -296,8 +296,12 @@ if options.renderer == "mapnik":
                 xml += xml_rule_start()
                 xml += x_scale
                 xml += xml_filter(entry["rulestring"])
+                twidth = 2*float(entry["style"].get("casing-width", 1))+float(entry["style"].get("width", 0));
+                tlinejoin = "round"
+                if twidth < 3:
+                  tlinejoin = "miter"
                 xml += xml_linesymbolizer(color=entry["style"].get("casing-color", "black"),
-                  width=2*float(entry["style"].get("casing-width", 1))+float(entry["style"].get("width", 0)),
+                  width=twidth,
                   opacity=relaxedFloat(entry["style"].get("casing-opacity", entry["style"].get("opacity","1"))),
                   linecap=entry["style"].get("casing-linecap", entry["style"].get("linecap","butt")),
                   linejoin=entry["style"].get("casing-linejoin", entry["style"].get("linejoin", "round")),
@@ -362,8 +366,12 @@ if options.renderer == "mapnik":
                   if "fill-image" in entry["style"]:
                     xml += xml_polygonpatternsymbolizer(entry["style"].get("fill-image", ""))
                 if "width" in entry["style"]:
+                  twidth = relaxedFloat(entry["style"].get("width", "1"))
+                  tlinejoin = "round"
+                  if twidth <= 2:
+                    tlinejoin = "miter"
                   xml += xml_linesymbolizer(color=entry["style"].get("color", "black"),
-                    width=relaxedFloat(entry["style"].get("width", "1")),
+                    width=twidth,
                     opacity=relaxedFloat(entry["style"].get("opacity", "1")),
                     linecap=entry["style"].get("linecap", "round"),
                     linejoin=entry["style"].get("linejoin", "round"),
