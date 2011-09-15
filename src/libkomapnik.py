@@ -86,19 +86,23 @@ def xml_pointsymbolizer(path="", width="", height="", opacity=1, overlap="false"
 def xml_linesymbolizer(color="#000000", width="1", opacity="1", linecap="butt", linejoin="round", dashes=""):
   color = nicecolor(color)
   linecap  = {"none":"butt",}.get(linecap.lower(),  linecap)
+  dashes = ""
   if dashes:
     dashes = '<CssParameter name="stroke-dasharray">%s</CssParameter>'%(dashes)
-  else:
-    dashes = ""
+  rasterizer = ""
+  if float(width) < 2:
+    rasterizer = ' rasterizer="fast"'
+    
+    
   return """
-  <LineSymbolizer>
+  <LineSymbolizer %s>
     <CssParameter name="stroke">%s</CssParameter>
     <CssParameter name="stroke-width">%s</CssParameter>
     <CssParameter name="stroke-opacity">%s</CssParameter>
     <CssParameter name="stroke-linejoin">%s</CssParameter>
     <CssParameter name="stroke-linecap">%s</CssParameter>
     %s
-  </LineSymbolizer>"""%(color, float(width), float(opacity), linejoin, linecap, dashes)
+  </LineSymbolizer>"""%(rasterizer, color, float(width), float(opacity), linejoin, linecap, dashes)
 
 
 def xml_polygonsymbolizer(color="#000000", opacity="1"):
