@@ -124,7 +124,7 @@ def xml_textsymbolizer(text="name",face="DejaVu Sans Book",size="10",color="#000
   color = nicecolor(color)
   halo_color = nicecolor(halo_color)
   pos = pos.replace("exact", "X").replace("any","S, E, X, N, W, NE, SE, NW, SW").split(",")
-  pos.extend([int(x) for x in size.split(",")])
+  pos.extend([str(int(x)) for x in size.split(",")])
   pos = ",".join(pos)
   size = size.split(",")[0]
   
