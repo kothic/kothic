@@ -262,7 +262,7 @@ if options.renderer == "mapnik":
       mfile.write(xml_g)
       sql = "(" + " OR ".join(sql) + ") and way &amp;&amp; !bbox!"
       itags = add_numerics_to_itags(itags)
-      mfile.write(xml_layer("postgis", "polygon", itags, sql ))
+      mfile.write(xml_layer("postgis", "polygon", itags, sql, zoom=zoom ))
     else:
       xml_nolayer()
     for layer_type, entry_types in [("polygon",("way","area")),("line",("way", "line"))]:
@@ -330,7 +330,7 @@ if options.renderer == "mapnik":
           elif zlayer <=5 and zlayer >= -5 and full_layering:
             sql = "("+ sql +') and "layer" = \'%s\''%zlayer
           itags = add_numerics_to_itags(itags)
-          mfile.write(xml_layer("postgis", layer_type, itags, sql ))
+          mfile.write(xml_layer("postgis", layer_type, itags, sql, zoom=zoom ))
         else:
           xml_nolayer()
 
@@ -439,7 +439,7 @@ if options.renderer == "mapnik":
             itags = ", ".join(itags)
             oitags = '"'+ "\", \"".join(oitags) +'"'
             sqlz = """SELECT %s, ST_ForceRHR(way) as way from planet_osm_polygon where (%s) and way &amp;&amp; !bbox! and ST_IsValid(way)"""%(itags,sql)
-            mfile.write(xml_layer("postgis-process", layer_type, itags, sqlz ))
+            mfile.write(xml_layer("postgis-process", layer_type, itags, sqlz, zoom=zoom ))
 
 
           #### FIXME: Performance degrades painfully on large lines ST_Union. Gotta find workaround :(
@@ -454,9 +454,9 @@ if options.renderer == "mapnik":
             ##  sqlz = """select %s, ST_Union(way) as way from (SELECT * from planet_osm_line where way &amp;&amp; !bbox! #and (%s)) as tex
             ##  group by %s
             ##  """%(itags,sql,oitags)
-            #mfile.write(xml_layer("postgis-process", layer_type, itags, sqlz ))
+            #mfile.write(xml_layer("postgis-process", layer_type, itags, sqlz, zoom=zoom ))
           else:
-            mfile.write(xml_layer("postgis", layer_type, itags, sql ))
+            mfile.write(xml_layer("postgis", layer_type, itags, sql, zoom=zoom ))
         else:
           xml_nolayer()
           
@@ -499,7 +499,7 @@ if options.renderer == "mapnik":
           mfile.write(xml_g)
           sql = "(" + " OR ".join(sql) + ") and way &amp;&amp; !bbox!"
           itags = add_numerics_to_itags(itags)
-          mfile.write(xml_layer("postgis", layer_type, itags, sql ))
+          mfile.write(xml_layer("postgis", layer_type, itags, sql, zoom=zoom ))
         else:
           xml_nolayer()
     ta.reverse()
@@ -601,7 +601,7 @@ if options.renderer == "mapnik":
                         where (%s) and way_area > %s and p.way &amp;&amp; ST_Expand(!bbox!,%s) and (%s)) p
                       group by %s) p %s ST_Area(p.way) desc
                 """%(itags,oitags,pixel_size_at_zoom(zoom,10),oitags,layer_type,ttext,pixel_size_at_zoom(zoom,5)**2,max(pixel_size_at_zoom(zoom,20),3000),sqlz,oitags,order)
-                mfile.write(xml_layer("postgis-process", layer_type, itags, sqlz, oitags ))
+                mfile.write(xml_layer("postgis-process", layer_type, itags, sqlz, oitags, zoom=zoom ))
               elif layer_type == "line" and zoom < 15:
                 sqlz = " OR ".join(sql)
                 itags = ", ".join(itags)
@@ -610,10 +610,10 @@ if options.renderer == "mapnik":
                 group by %s
                 %s
                 """%(itags,max(pixel_size_at_zoom(zoom,20),3000),ttext,sqlz,oitags,order)
-                mfile.write(xml_layer("postgis-process", layer_type, itags, sqlz ))
+                mfile.write(xml_layer("postgis-process", layer_type, itags, sqlz, zoom=zoom ))
               else:
                 sql = "(" + " OR ".join(sql) + ") and way &amp;&amp; ST_Expand(!bbox!,%s) %s"%(max(pixel_size_at_zoom(zoom,20),3000),order)
-                mfile.write(xml_layer("postgis", layer_type, itags, sql ))
+                mfile.write(xml_layer("postgis", layer_type, itags, sql, zoom=zoom ))
             else:
               xml_nolayer()
 

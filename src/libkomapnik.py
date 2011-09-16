@@ -230,6 +230,11 @@ def xml_layer(type="postgis", geom="point", interesting_tags = "*", sql = "true"
   global substyles
   subs = "\n".join(["<StyleName>s%s</StyleName>"%i for i in substyles])
   substyles = []
+  intersection_SQL = ""
+  if zoom < 4:
+    intersection_SQL = '<Parameter name="intersect_max_scale">1</Parameter>'
+  elif zoom > 16:
+    intersection_SQL = '<Parameter name="intersect_min_scale">500000000000</Parameter>'
   if type == "postgis":
     interesting_tags = list(interesting_tags)
     if '"' not in "".join(interesting_tags):
@@ -249,6 +254,7 @@ def xml_layer(type="postgis", geom="point", interesting_tags = "*", sql = "true"
         where %s
         ) as text
         </Parameter>
+        %s
         <Parameter name="type">postgis</Parameter>
         <Parameter name="user">%s</Parameter>
         <Parameter name="dbname">%s</Parameter>
@@ -258,7 +264,7 @@ def xml_layer(type="postgis", geom="point", interesting_tags = "*", sql = "true"
         <Parameter name="estimate_extent">false</Parameter>
         <Parameter name="extent">-20037508.342789244, -20037508.342780735, 20037508.342789244, 20037508.342780709</Parameter>
       </Datasource>
-    </Layer>"""%(layer_id, db_proj, subs, interesting_tags, table_prefix, geom, sql, db_user, db_name, db_srid,  table_prefix, geom)
+    </Layer>"""%(layer_id, db_proj, subs, interesting_tags, table_prefix, geom, sql, intersection_SQL, db_user, db_name, db_srid,  table_prefix, geom)
   elif type == "postgis-process":
     return """
     <Layer name="l%s" status="on" srs="%s">
@@ -268,6 +274,7 @@ def xml_layer(type="postgis", geom="point", interesting_tags = "*", sql = "true"
         (%s
         ) as text
         </Parameter>
+        %s
         <Parameter name="type">postgis</Parameter>
         <Parameter name="user">%s</Parameter>
         <Parameter name="dbname">%s</Parameter>
@@ -277,7 +284,7 @@ def xml_layer(type="postgis", geom="point", interesting_tags = "*", sql = "true"
         <Parameter name="estimate_extent">false</Parameter>
         <Parameter name="extent">-20037508.342789244, -20037508.342780735, 20037508.342789244, 20037508.342780709</Parameter>
       </Datasource>
-    </Layer>"""%(layer_id, db_proj, subs, sql, db_user, db_name, db_srid,  table_prefix, geom)
+    </Layer>"""%(layer_id, db_proj, subs, sql, intersection_SQL, db_user, db_name, db_srid,  table_prefix, geom)
   elif type == "coast":
     if zoom < 9:
       return """
