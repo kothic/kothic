@@ -12,8 +12,8 @@ area|z13-[aeroway=aerodrome] {color: #008ac6; width: 0.8; z-index:5; fill-image:
 way|z7-9[waterway=river]   {color: #abc4f5; width: .2; z-index:9}
 way|z7-9[waterway=river]   {color: #abc4f5; width: .3; z-index:9}
 way|z9[waterway=stream]  {color: #abc4f5; width: .3; z-index:9}
-way|10[waterway=river]   {color: #abc4f5; width: .6; z-index:9}
-way|10[waterway=stream]  {color: #abc4f5; width: .5; z-index:9}
+way|z10[waterway=river]   {color: #abc4f5; width: .6; z-index:9}
+way|z10[waterway=stream]  {color: #abc4f5; width: .5; z-index:9}
 way|z10-14[waterway=river] {color: #abc4f5; width: .8; z-index:9}
 way|z15-[waterway=river]    {color: #abc4f5; width: 1.1; z-index:9}
 way|z10-[waterway=stream]{color: #abc4f5; width: .7; z-index:9}
@@ -825,7 +825,7 @@ node|z-6[place=sea]
 node|z7-[place=sea]
 {text:name; text-offset:0; font-size:10; font-family: DejaVu Sans Oblique; text-halo-radius:1; text-color:#4976d1;text-halo-color:#ffffff;-x-mapnik-min-distance:0}
 
-node|z3-4[natural=peak][ele>4500]
+node|z4[natural=peak][ele>4500]
 {icon-image: mountain_peak6.png; 
 text:ele; text-offset:3; font-size:7; font-family: DejaVu Sans Mono Book; text-halo-radius:0; text-color:#664229;text-halo-color:#ffffff;-x-mapnik-min-distance:0;
 }
