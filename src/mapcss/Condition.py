@@ -152,7 +152,7 @@ class Condition:
       if t == 'ne':
         return 'not([%s] = \'%s\')'%(params[0], params[1])
       if t == 'regex':
-        return '[%s].match(%s)'%(params[0], params[1])
+        return '[%s].match(\'%s\')'%(params[0], params[1].replace("'","\\'"))
       if t == 'true':
         return '[%s] = \'yes\''%(params[0])
       if t == 'untrue':
