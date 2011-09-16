@@ -119,7 +119,7 @@ class Condition:
       if t == 'ne':
         return params[0], '("%s" != \'%s\' or %s IS NULL)'%(params[0], params[1],params[0])
       if t == 'regex':
-        return params[0], '"%s" IS NOT NULL'%(params[0])
+        return params[0], '"%s" ~ \'%s\''%(params[0],params[1].replace("'","\\'"))
       if t == 'true':
         return params[0], '"%s" IN (\'true\', \'yes\', \'1\')'%(params[0])
       if t == 'untrue':
