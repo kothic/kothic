@@ -601,7 +601,7 @@ if options.renderer == "mapnik":
                         where (%s) and way_area > %s and p.way &amp;&amp; ST_Expand(!bbox!,%s) and (%s)) p
                       group by %s) p %s ST_Area(p.way) desc
                 """%(itags,oitags,pixel_size_at_zoom(zoom,10),oitags,layer_type,ttext,pixel_size_at_zoom(zoom,5)**2,max(pixel_size_at_zoom(zoom,20),3000),sqlz,oitags,order)
-                mfile.write(xml_layer("postgis-process", layer_type, itags, sqlz, oitags, zoom=zoom ))
+                mfile.write(xml_layer("postgis-process", layer_type, itags, sqlz, zoom ))
               elif layer_type == "line" and zoom < 15:
                 sqlz = " OR ".join(sql)
                 itags = ", ".join(itags)
