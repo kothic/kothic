@@ -92,8 +92,8 @@ def xml_linesymbolizer(color="#000000", width="1", opacity="1", linecap="butt", 
   else:
     dashes = ""
   rasterizer = ""
-  if float(width) < 4 and not dashes:
-    rasterizer = ' rasterizer="fast"'
+  #if float(width) < 4 and not dashes:
+  #  rasterizer = ' rasterizer="fast"'
 
   return """
   <LineSymbolizer %s>
