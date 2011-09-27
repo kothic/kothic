@@ -460,48 +460,69 @@ if options.renderer == "mapnik":
         else:
           xml_nolayer()
           
-    for layer_type, entry_types in [("point", ("node", "point")),("line",("way", "line")), ("polygon",("way","area"))]:
-        ## icons pass
-        sql_g = set()
-        itags_g = set()
-        xml_g = ""
-        for zindex in ta:
-          sql = set()
-          itags = set()
-          xml = xml_style_start()
-          for entry in zsheet[zindex]:
-            if entry["type"] in entry_types:
-              if "icon-image" in entry["style"] and ("text" not in entry["style"] or ("text" not in entry["style"] and entry["style"].get("text-position","center")!='center')):
-                xml += xml_rule_start()
-                xml += x_scale
-                xml += xml_filter(entry["rulestring"])
-                xml += xml_pointsymbolizer(
-                  path=entry["style"].get("icon-image", ""),
-                  width=entry["style"].get("icon-width", ""),
-                  height=entry["style"].get("icon-height", ""),
-                  opacity=relaxedFloat(entry["style"].get("opacity", "1")))
+          
+          
+          
+          
+          
+          
+      
+    ## icons pass
+    sql_g = set()
+    itags_g = set()
+    xml_g = ""
+    prevtype = ""
+    for zindex in ta:
+      for layer_type, entry_types in [("point", ("node", "point")),("line",("way", "line")), ("polygon",("way","area"))]:
+        sql = set()
+        itags = set()
+        xml = xml_style_start()
+        for entry in zsheet[zindex]:
+          if entry["type"] in entry_types:
+            if "icon-image" in entry["style"] and ("text" not in entry["style"] or ("text" not in entry["style"] and entry["style"].get("text-position","center")!='center')):
+              if not prevtype:
+                prevtype = layer_type
+              if prevtype != layer_type:
+                if sql_g:
+                  mfile.write(xml_g)
+                  sql_g = "(" + " OR ".join(sql_g) + ") and way &amp;&amp; !bbox!"
+                  itags_g = add_numerics_to_itags(itags_g)
+                  mfile.write(xml_layer("postgis", layer_type, itags_g, sql_g, zoom=zoom ))
+                  sql_g = set()
+                  itags_g = set()
+                  xml_g = ""
+                else:
+                  xml_nolayer()
+                prevtype = layer_type
+              xml += xml_rule_start()
+              xml += x_scale
+              xml += xml_filter(entry["rulestring"])
+              xml += xml_pointsymbolizer(
+                path=entry["style"].get("icon-image", ""),
+                width=entry["style"].get("icon-width", ""),
+                height=entry["style"].get("icon-height", ""),
+                opacity=relaxedFloat(entry["style"].get("opacity", "1")))
 
-                sql.add(entry["sql"])
-                itags.update(entry["chooser"].get_interesting_tags(entry["type"], zoom))
-                xml += xml_rule_end()
+              sql.add(entry["sql"])
+              itags.update(entry["chooser"].get_interesting_tags(entry["type"], zoom))
+              xml += xml_rule_end()
 
-          xml += xml_style_end()
-          sql.discard("()")
-          if sql:
-            sql_g.update(sql)
-            xml_g += xml
-            itags_g.update(itags)
-          else:
-            xml_nosubstyle()
-        sql = sql_g
-        itags = itags_g
-        if sql:
-          mfile.write(xml_g)
-          sql = "(" + " OR ".join(sql) + ") and way &amp;&amp; !bbox!"
-          itags = add_numerics_to_itags(itags)
-          mfile.write(xml_layer("postgis", layer_type, itags, sql, zoom=zoom ))
-        else:
-          xml_nolayer()
+        xml += xml_style_end()
+        sql.discard("()")
+      if sql:
+        sql_g.update(sql)
+        xml_g += xml
+        itags_g.update(itags)
+      else:
+        xml_nosubstyle()
+    if sql_g:
+      mfile.write(xml_g)
+      sql_g = "(" + " OR ".join(sql_g) + ") and way &amp;&amp; !bbox!"
+      itags_g = add_numerics_to_itags(itags_g)
+      mfile.write(xml_layer("postgis", layer_type, itags_g, sql_g, zoom=zoom ))
+    else:
+      xml_nolayer()
+
     ta.reverse()
     for zindex in ta:
       for layer_type, entry_types in [ ("polygon",("way","area")),("point", ("node", "point")),("line",("way", "line"))]:
