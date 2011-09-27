@@ -526,7 +526,7 @@ if options.renderer == "mapnik":
       mfile.write(xml_g)
       sql_g = "(" + " OR ".join(sql_g) + ") and way &amp;&amp; !bbox!"
       itags_g = add_numerics_to_itags(itags_g)
-      mfile.write(xml_layer("postgis", layer_type, itags_g, sql_g, zoom=zoom ))
+      mfile.write(xml_layer("postgis", prevtype, itags_g, sql_g, zoom=zoom ))
     else:
       xml_nolayer()
 
