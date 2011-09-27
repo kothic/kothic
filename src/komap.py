@@ -491,6 +491,9 @@ if options.renderer == "mapnik":
                   sql_g = set()
                   itags_g = set()
                   xml_g = ""
+                  sql = set()
+                  itags = set()
+                  
                 else:
                   xml_nolayer()
                 prevtype = layer_type
