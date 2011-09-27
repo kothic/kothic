@@ -509,12 +509,12 @@ if options.renderer == "mapnik":
 
         xml += xml_style_end()
         sql.discard("()")
-      if sql:
-        sql_g.update(sql)
-        xml_g += xml
-        itags_g.update(itags)
-      else:
-        xml_nosubstyle()
+        if sql:
+          sql_g.update(sql)
+          xml_g += xml
+          itags_g.update(itags)
+        else:
+          xml_nosubstyle()
     if sql_g:
       mfile.write(xml_g)
       sql_g = "(" + " OR ".join(sql_g) + ") and way &amp;&amp; !bbox!"
