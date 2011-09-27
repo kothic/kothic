@@ -605,17 +605,17 @@ arrows - специальное значение для синих стрело�
 line|z7[railway=rail]
 {width:.5; color: #303030;z-index:15}
 line|z7[railway=rail]::ticks
-{width:.3; color: #ffffff; dashes: 3,3;z-index:16}
+{width:.3; color: #ffffff; dashes: 3,3;z-index:15}
 
 line|z8[railway=rail]
 {width:.6; color: #303030;z-index:15}
 line|z8[railway=rail]::ticks
-{width:.35; color: #ffffff; dashes: 3,3;z-index:16}
+{width:.35; color: #ffffff; dashes: 3,3;z-index:15}
 
 line|z9-[railway=rail]
     {width:1.4; color: #606060;z-index:15}
 line|z9-[railway=rail]::ticks
-    {width:1; color: #ffffff; dashes: 6,6;z-index:16}
+    {width:1; color: #ffffff; dashes: 6,6;z-index:15}
 
 
 
@@ -763,19 +763,18 @@ node|z10-[aeroway=aerodrome]
 
 
 
-node|z3-6[capital=yes][population>5000000] { icon-image: adm_5.png;allow-overlap:true;collision-sort-by:population}
-node|z3[capital=yes][population>5000000] {text-offset:4; text:name; font-size:8; font-family: DejaVu Sans Bold; text-halo-radius:1; text-color:#505050;text-halo-color:#ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0; text-align: left;collision-sort-by:population;}
-node|z4-6[capital=yes][population>5000000] {text-offset:6; text:name; font-size:10; font-family: DejaVu Sans Bold; text-halo-radius:1; text-color:#303030;text-halo-color:#ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0; text-align: left;collision-sort-by: population;}
+node|z3[capital=yes][population>5000000] {
+  icon-image: adm_5.png;
+  text-offset:4; text:name; font-size:8; font-family: DejaVu Sans Bold; text-halo-radius:1; text-color:#505050;text-halo-color:#ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0; text-align: left;collision-sort-by:population;}
+node|z4-6[capital=yes][population>5000000] {
+  icon-image: adm_5.png;
+  text-offset:6; text:name; font-size:10; font-family: DejaVu Sans Bold; text-halo-radius:1; text-color:#303030;text-halo-color:#ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0; text-align: left;collision-sort-by: population;}
 
 node|z4-5[place][population<100000][capital][admin_level<5] { icon-image:adm_4.png;
   text-offset:5; text:name; font-size: 7; font-family: DejaVu Sans Bold; text-halo-radius:1; text-color:#404040;text-halo-color:#ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0;collision-sort-by:population}
 
 node|z4-5[place][population>=100000][population<=5000000][capital][admin_level<5] {icon-image:adm_5.png;
 text-offset:5; text:name; font-size: 8; font-family: DejaVu Sans Bold; text-halo-radius:1; text-color:#404040;text-halo-color:#ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0;z-index:1;collision-sort-by:population}
-
-
-
-node|z5[place=town][capital]{icon-image:town_4.png}
 
 
 node|z6[place=city][population<100000],
