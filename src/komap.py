@@ -479,7 +479,7 @@ if options.renderer == "mapnik":
         style_started = False
         for entry in zsheet[zindex]:
           if entry["type"] in entry_types:
-            if "icon-image" in entry["style"] and ("text" not in entry["style"] or ("text" not in entry["style"] and entry["style"].get("text-position","center")!='center')):
+            if "icon-image" in entry["style"] and ("text" not in entry["style"] or ("text" in entry["style"] and entry["style"].get("text-position","center")!='center')):
               if not prevtype:
                 prevtype = layer_type
               if prevtype != layer_type:

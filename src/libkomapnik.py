@@ -125,7 +125,8 @@ def xml_linepatternsymbolizer(path=""):
   <LinePatternSymbolizer file="%s%s"/>"""%(icons_path, path)
 
 
-def xml_textsymbolizer(text="name",face="DejaVu Sans Book",size="10",color="#000000", halo_color="#ffffff", halo_radius="0", placement="line", offset="0", overlap="false", distance="26", wrap_width=256, align="center", opacity="1", pos="X"):
+def xml_textsymbolizer(
+                      text="name",face="DejaVu Sans Book",size="10",color="#000000", halo_color="#ffffff", halo_radius="0", placement="line", offset="0", overlap="false", distance="26", wrap_width=256, align="center", opacity="1", pos="X"):
   color = nicecolor(color)
   halo_color = nicecolor(halo_color)
   pos = pos.replace("exact", "X").replace("any","S, E, X, N, W, NE, SE, NW, SW").split(",")
@@ -140,7 +141,8 @@ def xml_textsymbolizer(text="name",face="DejaVu Sans Book",size="10",color="#000
   <TextSymbolizer name="%s" fontset_name="%s" size="%s" fill="%s" halo_fill= "%s" halo_radius="%s" placement="%s" dy="%s" max_char_angle_delta="15" allow_overlap="%s" wrap_width="%s" min_distance="%s" vertical_alignment="middle" horizontal_alignment="%s" opacity="%s" placement-type="simple" placements="%s" />
   """%(text,face,int(float(size)),color,halo_color,halo_radius,placement,offset,overlap,wrap_width,distance,align,opacity,pos)
 
-def xml_shieldsymbolizer(path="", width="", height="",text="name",face="DejaVu Sans Book",size="10",color="#000000", halo_color="#ffffff", halo_radius="0", placement="line", offset="0", overlap="false", distance="26", wrap_width=256, align="center", opacity="1"):
+def xml_shieldsymbolizer(path="", width="", height="",
+                        text="name",face="DejaVu Sans Book",size="10",color="#000000", halo_color="#ffffff", halo_radius="0", placement="line", offset="0", overlap="false", distance="26", wrap_width=256, align="center", opacity="1"):
   color = nicecolor(color)
   halo_color = nicecolor(halo_color)
   placement = {"center": "point"}.get(placement.lower(), placement)
