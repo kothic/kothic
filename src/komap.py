@@ -476,7 +476,7 @@ if options.renderer == "mapnik":
       for layer_type, entry_types in [("point", ("node", "point")),("line",("way", "line")), ("polygon",("way","area"))]:
         sql = set()
         itags = set()
-        xml = xml_style_start()
+        style_started = False
         for entry in zsheet[zindex]:
           if entry["type"] in entry_types:
             if "icon-image" in entry["style"] and ("text" not in entry["style"] or ("text" not in entry["style"] and entry["style"].get("text-position","center")!='center')):
@@ -497,6 +497,9 @@ if options.renderer == "mapnik":
                 else:
                   xml_nolayer()
                 prevtype = layer_type
+              if not style_started:
+                xml = xml_style_start()
+                style_started = True
               xml += xml_rule_start()
               xml += x_scale
               xml += xml_filter(entry["rulestring"])
@@ -509,15 +512,16 @@ if options.renderer == "mapnik":
               sql.add(entry["sql"])
               itags.update(entry["chooser"].get_interesting_tags(entry["type"], zoom))
               xml += xml_rule_end()
-
-        xml += xml_style_end()
-        sql.discard("()")
-        if sql:
-          sql_g.update(sql)
-          xml_g += xml
-          itags_g.update(itags)
-        else:
-          xml_nosubstyle()
+        if style_started:
+          xml += xml_style_end()
+          style_started = False
+          sql.discard("()")
+          if sql:
+            sql_g.update(sql)
+            xml_g += xml
+            itags_g.update(itags)
+          else:
+            xml_nosubstyle()
     if sql_g:
       mfile.write(xml_g)
       sql_g = "(" + " OR ".join(sql_g) + ") and way &amp;&amp; !bbox!"
