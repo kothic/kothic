@@ -305,7 +305,8 @@ if options.renderer == "mapnik":
                   opacity=relaxedFloat(entry["style"].get("casing-opacity", entry["style"].get("opacity","1"))),
                   linecap=entry["style"].get("casing-linecap", entry["style"].get("linecap","butt")),
                   linejoin=entry["style"].get("casing-linejoin", entry["style"].get("linejoin", "round")),
-                  dashes=entry["style"].get("casing-dashes",entry["style"].get("dashes", "")))
+                  dashes=entry["style"].get("casing-dashes",entry["style"].get("dashes", "")),
+                  zoom=zoom)
 
                 sql.add(entry["sql"])
                 itags.update(entry["chooser"].get_interesting_tags(entry["type"], zoom))
@@ -375,7 +376,8 @@ if options.renderer == "mapnik":
                     opacity=relaxedFloat(entry["style"].get("opacity", "1")),
                     linecap=entry["style"].get("linecap", "round"),
                     linejoin=entry["style"].get("linejoin", "round"),
-                    dashes=entry["style"].get("dashes", ""))
+                    dashes=entry["style"].get("dashes", ""),
+                    zoom=zoom)
                   if entry["style"].get("dashes", ""):
                     there_are_dashed_lines = True
                     #print "dashes!!!"
@@ -614,7 +616,7 @@ if options.renderer == "mapnik":
                   order = "order by"
                 else:
                   order += ", "
-                if zoom >= 10:
+                if zoom >= 11 or zoom < 5:
                   sqlz = """select %s, ST_PointOnSurface(ST_Buffer(way,0)) as way
                         from planet_osm_%s
                         where (%s) and (%s) and (way_area > %s) and way &amp;&amp; ST_Expand(!bbox!,3000) %s way_area desc
