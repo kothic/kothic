@@ -764,10 +764,10 @@ node|z10-[aeroway=aerodrome]
 
 
 
-node|z3[capital=yes][population>5000000] {
+node|z3[place][capital=yes][population>5000000] {
   icon-image: adm_5.png;
   text-offset:4; text:name; font-size:8; font-family: DejaVu Sans Bold; text-halo-radius:1; text-color:#505050;text-halo-color:#ffffff; allow-overlap: true; -x-mapnik-min-distance:0; text-align: left;collision-sort-by:population;z-index: 5;}
-node|z4-6[capital=yes][population>5000000] {
+node|z4-6[place][capital=yes][population>5000000] {
   icon-image: adm_5.png;
   text-offset:6; text:name; font-size:10; font-family: DejaVu Sans Bold; text-halo-radius:1; text-color:#303030;text-halo-color:#ffffff; allow-overlap: true; -x-mapnik-min-distance:0; text-align: left;collision-sort-by: population;z-index: 5;}
 
