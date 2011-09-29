@@ -814,7 +814,7 @@ node|z7-8[place=city][population>=5000000]
 /*node|z6-7[place=city][capital=yes] {text:name; font-size:11; font-family: DejaVu Sans Bold; text-halo-radius:2; text-color:#101010;text-halo-color:#ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0;z-index:1}
 node|z6-7[place=city][capital!=yes] {text:name; font-size:11; font-family: DejaVu Sans Bold; text-halo-radius:2; text-color:#101010;text-halo-color:#ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0}*/
 
-node|z9-11[place=city] {text:name; font-size:14; font-family: DejaVu Sans Bold; text-halo-radius:2; text-color:#101010;text-halo-color:#ffffff; text-allow-overlap: false; -x-mapnik-min-distance:20; z-index:20;collision-sort-by:population;z-index: 5;}
+node|z9-11[place=city] {text:name; font-size:14; font-family: DejaVu Sans Bold; text-halo-radius:2; text-color:#101010;text-halo-color:#ffffff; text-allow-overlap: false; -x-mapnik-min-distance:20; z-index:20;collision-sort-by:population;}
 
 
 
@@ -823,9 +823,9 @@ node|z9-11[place=city] {text:name; font-size:14; font-family: DejaVu Sans Bold; 
 /*node|z6-12[place=town],
 {text:name; font-size:10; font-family: DejaVu Sans Bold; text-halo-radius:2; text-color:#101010;text-halo-color:#ffffff; text-allow-overlap: false; -x-mapnik-min-distance:3}*/
 
-node|z9-11[place=town] {text:name; font-size:12; font-family: DejaVu Sans Book; text-color:#101010; text-halo-radius:1; text-halo-color:#ffffff; z-index:20;collision-sort-by:population;z-index: 5;}
-node|z12-[place=town] {text:name; font-size:20; font-family: DejaVu Sans Book; text-color:#101010; text-opacity:0.2; text-allow-overlap: true; z-index:20;collision-sort-by:population;z-index: 5;}
-node|z12-[place=city] {text:name; font-size:25; font-family: DejaVu Sans Book; text-color:#101010; text-opacity:0.3; text-allow-overlap: true; z-index:20;collision-sort-by:population;z-index: 5;}
+node|z9-11[place=town] {text:name; font-size:12; font-family: DejaVu Sans Book; text-color:#101010; text-halo-radius:1; text-halo-color:#ffffff; z-index:20;collision-sort-by:population;}
+node|z12-[place=town] {text:name; font-size:20; font-family: DejaVu Sans Book; text-color:#101010; text-opacity:0.2; text-allow-overlap: true; z-index:20;collision-sort-by:population;}
+node|z12-[place=city] {text:name; font-size:25; font-family: DejaVu Sans Book; text-color:#101010; text-opacity:0.3; text-allow-overlap: true; z-index:20;collision-sort-by:population;}
 
 node|z9-[place=village]{text:name; font-size:10; font-family: DejaVu Sans Book; text-halo-radius:1; text-color:#606060;text-halo-color:#ffffff; text-allow-overlap: false;collision-sort-by:population;z-index: 5;}
 
