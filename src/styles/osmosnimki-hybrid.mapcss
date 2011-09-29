@@ -1,6 +1,6 @@
 /*
   Deja Vu MapCSS styles
-  Osmosnimki hybrid style
+  Osmosnimki maps style
 */
 
 
@@ -844,9 +844,9 @@ node|z10-[aeroway=aerodrome]
 
 
 
-node|z3-6[capital=yes][population>5000000] { icon-image: adm_5.png;allow-overlap:true}
-node|z3[capital=yes][population>5000000] {text-offset:4; text:name; font-size:8; font-family: DejaVu Sans Bold; text-halo-radius:1; text-color:#ffffff;text-halo-color:#4D0000; text-allow-overlap: false; -x-mapnik-min-distance:0; text-align: left;}
-node|z4-6[capital=yes][population>5000000] {text-offset:6; text:name; font-size:10; font-family: DejaVu Sans Bold; text-halo-radius:1; text-color:#ffffff;text-halo-color:#4D0000; text-allow-overlap: false; -x-mapnik-min-distance:0; text-align: left;}
+node|z3-6[capital=yes][population>5000000][place] { icon-image: adm_5.png;allow-overlap:true}
+node|z3[capital=yes][population>5000000][place] {text-offset:4; text:name; font-size:8; font-family: DejaVu Sans Bold; text-halo-radius:1; text-color:#ffffff;text-halo-color:#4D0000; text-allow-overlap: false; -x-mapnik-min-distance:0; text-align: left;}
+node|z4-6[capital=yes][population>5000000][place]{text-offset:6; text:name; font-size:10; font-family: DejaVu Sans Bold; text-halo-radius:1; text-color:#ffffff;text-halo-color:#4D0000; text-allow-overlap: false; -x-mapnik-min-distance:0; text-align: left;}
 
 node|z4-5[place][population<100000][capital][admin_level<5] { icon-image:adm_4.png;
   text-offset:5; text:name; font-size: 7; font-family: DejaVu Sans Bold; text-halo-radius:1; text-color:#ffffff;text-halo-color:#4D0000; text-allow-overlap: false; -x-mapnik-min-distance:0;}
@@ -990,7 +990,7 @@ way|z8-[natural=water]
 
 
 node|z1-3[place=continent]
-{text:name; text-offset:-10; font-size:12; font-family: DejaVu Sans ExtraLight; text-halo-radius:1; text-color:#fffeb4;text-halo-color:#7a7a7a;z-index:-1;-x-mapnik-min-distance:0}
+{text:name; text-offset:-10; font-size:20; font-family: DejaVu Sans ExtraLight; text-halo-radius:1; text-color:#fffeb4;text-halo-color:#7a7a7a;z-index:-1;-x-mapnik-min-distance:0}
 
 node|z1-6[place=ocean]
 {text:name; text-offset:0; font-size:10; font-family: DejaVu Sans Oblique; text-halo-radius:1; text-color:#a3e6ff;text-halo-color:#2e2e2e;z-index:-1;-x-mapnik-min-distance:0}
