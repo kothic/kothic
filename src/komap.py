@@ -336,6 +336,7 @@ if options.renderer == "mapnik":
           xml_nolayer()
 
     for layer_type, entry_types in [("line",("way", "line")),("polygon",("way","area"))]:
+      for zlayer in index_range:
         ## lines and polygons pass
         sql_g = set()
         there_are_dashed_lines = False
