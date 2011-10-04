@@ -265,7 +265,7 @@ if options.renderer == "mapnik":
       mfile.write(xml_layer("postgis", "polygon", itags, sql, zoom=zoom ))
     else:
       xml_nolayer()
-    for layer_type, entry_types in [("polygon",("way","area")),("line",("way", "line"))]:
+    for layer_type, entry_types in [("line",("way", "line")),("polygon",("way","area"))]:
       index_range = range(-6,7)
       full_layering = conf_full_layering
       if (zoom < 9) or not conf_full_layering :

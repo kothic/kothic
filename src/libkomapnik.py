@@ -258,6 +258,7 @@ def xml_layer(type="postgis", geom="point", interesting_tags = "*", sql = "true"
         </Parameter>
         %s
         <Parameter name="type">postgis</Parameter>
+        <Parameter name="st_prefix">true</Parameter>
         <Parameter name="user">%s</Parameter>
         <Parameter name="dbname">%s</Parameter>
         <Parameter name="srid">%s</Parameter>
@@ -278,6 +279,7 @@ def xml_layer(type="postgis", geom="point", interesting_tags = "*", sql = "true"
         </Parameter>
         %s
         <Parameter name="type">postgis</Parameter>
+        <Parameter name="st_prefix">true</Parameter>
         <Parameter name="user">%s</Parameter>
         <Parameter name="dbname">%s</Parameter>
         <Parameter name="srid">%s</Parameter>
