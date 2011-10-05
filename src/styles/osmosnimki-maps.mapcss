@@ -581,7 +581,7 @@ way|z13-[highway=primary_link]::centerline,
 
 
 
-area|z16-[highway=service][area],
+area|z16-[highway=service],
 area|z16-[area:highway=service],
 area|z16-[area:highway=residential],
 area|z16-[area:highway=unclassified],
