@@ -586,24 +586,24 @@ area|z16-[area:highway=service],
 area|z16-[area:highway=residential],
 area|z16-[area:highway=unclassified],
 area|z16-[area:highway=living_street]
-        {width: 0.3; casing-width:0.3; fill-color:#ffffff; color: #ffffff; z-index: 15}
+        {width: 0.4; casing-width:0.3; fill-color:#ffffff; color: #ffffff; z-index: 15}
  
 area|z16-[landuse=carriageway],
 area|z16-[area:highway=secondary],
 area|z16-[area:highway=tertiary]
-        {width: 0.3; casing-width:0.3; fill-color:#fcffd1; color: #fcffd1; z-index: 15}
+        {width: 0.4; casing-width:0.3; fill-color:#fcffd1; color: #fcffd1; z-index: 15}
 
 area|z16-[area:highway=primary]
-        {width: 0.3; casing-width:0.3; fill-color:#fcea97; color: #fcea97; z-index: 15}
+        {width: 0.4; casing-width:0.3; fill-color:#fcea97; color: #fcea97; z-index: 15}
 
 area|z16-[area:highway=trunk],
 area|z16-[area:highway=motorway]
-        {width: 0.3; casing-width:0.3; fill-color:#ffd780; color: #ffd780; z-index: 15}
+        {width: 0.4; casing-width:0.3; fill-color:#ffd780; color: #ffd780; z-index: 15}
 
 area|z16-[area:highway=footway],
 area|z16-[area:highway=pedestrian],
 area|z16-[area:highway=path]
-        {width: 0.3; casing-width:0.3; fill-color:#c2a2ce; color: #c2a2ce; z-index: 15}
+        {width: 0.4; casing-width:0.3; fill-color:#c2a2ce; color: #c2a2ce; z-index: 15}
 
 
 
