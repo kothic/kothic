@@ -82,7 +82,7 @@ if options.osm2pgsqlstyle != "-":
       osm2pgsql_avail_keys[line[1]] = tuple(line[0].split(","))
 
 
-def escape_sql_column(name, type="way", asname = False)
+def escape_sql_column(name, type="way", asname = False):
   if name in mapped_cols:
     return name # already escaped
   name = name.strip().strip('"')
