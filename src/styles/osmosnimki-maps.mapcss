@@ -579,6 +579,9 @@ way|z13-[highway=primary_link]::centerline,
 
 
 
+
+area|z16-[landuse=carriageway]{casing-width:0.3; fill-color:#fcffd1; width: 0.6; color: #fcffd1;z-index: 15}
+
 /*
 
 для линий можно определять subpart'ы и рисовать одну линию несколько раз _даже после появления каскадинга_ (иначе сходные правила будут объединен в одно с затиранием некоторых свойств)
