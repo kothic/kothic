@@ -50,6 +50,12 @@ parser.add_option("-l", "--locale", dest="locale",
      help="language that should be used for labels (ru, en, be, uk..)", metavar="LANG")
 parser.add_option("-o", "--output-file", dest="outfile", default="-",
      help="output filename (defaults to stdout)", metavar="FILE")
+parser.add_option("-p", "--osm2pgsql-style", dest="osm2pgsqlstyle", default="-",
+     help="osm2pgsql stylesheet filename", metavar="FILE")
+
+
+
+
 
 (options, args) = parser.parse_args()
 #print (options, args)
@@ -63,6 +69,33 @@ if options.outfile == "-":
   mfile = sys.stdout
 else:
   mfile = open(options.outfile,"w")
+
+
+
+
+osm2pgsql_avail_keys = {} # "column" : ["node", "way"]
+if options.osm2pgsqlstyle != "-":
+  mf = open(options.osm2pgsqlstyle, "r")
+  for line in mf:
+    line = line.strip().split()
+    if line and line[0][0] != "#":
+      osm2pgsql_avail_keys[line[1]] = tuple(line[0].split(","))
+
+
+def escape_sql_column(name, type="way", asname = False):
+  name = name.strip().strip('"')
+  type = {'line':'way', 'area':'way'}.get(type,type)
+  if type in osm2pgsql_avail_keys.get(name, ()) or not osm2pgsql_avail_keys:
+    return '"'+name+'"'
+  elif not asname:
+    return "(tags->'"+name+"')"
+  else:
+    return "(tags->'"+name+"') as \"" +name+'"'
+
+
+
+
+
 
 
 style = MapCSS(minzoom, maxzoom)     #zoom levels
@@ -156,10 +189,24 @@ if options.renderer == "mapnik":
         if zindex not in zsheet:
           zsheet[zindex] = []
         chooser_entry = {}
-        chooser_entry["sql"] = "("+ chooser.get_sql_hints(chooser.ruleChains[0][0].subject,zoom)[1] +")"
+        
+        chooser_entry["type"] = chooser.ruleChains[0][0].subject
+        
+        sql = "("+ chooser.get_sql_hints(chooser.ruleChains[0][0].subject,zoom)[1] +")"
+        sql = sql.split('"')
+        sq = ""
+        odd = True
+        for i in sql:
+          if not odd:
+            sq += escape_sql_column(i, chooser_entry["type"])
+          else:
+            sq += i
+          odd = not odd
+        
+        chooser_entry["sql"] = sq
         chooser_entry["style"] = styles
         fonts.add(styles.get("font-family","DejaVu Sans Book"))
-        chooser_entry["type"] = chooser.ruleChains[0][0].subject
+        
         chooser_entry["rule"] = [i.conditions for i in chooser.ruleChains[0] if i.test_zoom(zoom)]
         numerics.update(chooser.get_numerics())
         #print chooser_entry["rule"]
@@ -182,11 +229,8 @@ if options.renderer == "mapnik":
     nitags = set()
     for i in itags:
       if i in numerics:
-        tt.add("""(CASE WHEN "%s" ~ E'^[[:digit:]]+([.][[:digit:]]+)?$' THEN CAST ("%s" AS FLOAT) ELSE NULL END) as %s__num"""%(i,i,i))
-      kav = ""
-      if '"' not in i:
-        kav = '"'
-      nitags.add(kav+i+kav)
+        tt.add("""(CASE WHEN %s ~ E'^[[:digit:]]+([.][[:digit:]]+)?$' THEN CAST (%s AS FLOAT) ELSE NULL END) as %s__num"""%(escape_sql_column(i),escape_sql_column(i),i))
+      nitags.add(escape_sql_column(i, asname = True))
     itags = nitags
     itags.update(tt)
     return itags
