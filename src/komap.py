@@ -272,8 +272,8 @@ if options.renderer == "mapnik":
       index_range = (-6,0,6)
       full_layering = False
 
-    for layer_type, entry_types in [("line",("way", "line")),("polygon",("way","area"))]:
-      for zlayer in index_range:
+    for zlayer in index_range:
+      for layer_type, entry_types in [("line",("way", "line")),("polygon",("way","area"))]:
         sql_g = set()
         there_are_dashed_lines = False
         itags_g = set()
@@ -335,8 +335,9 @@ if options.renderer == "mapnik":
         else:
           xml_nolayer()
 
-    for layer_type, entry_types in [("line",("way", "line")),("polygon",("way","area"))]:
-      for zlayer in index_range:
+
+    for zlayer in index_range:
+      for layer_type, entry_types in [("line",("way", "line")),("polygon",("way","area"))]:
         ## lines and polygons pass
         sql_g = set()
         there_are_dashed_lines = False
