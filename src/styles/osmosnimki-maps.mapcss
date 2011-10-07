@@ -69,7 +69,7 @@ area|z10-[residential=rural]
 {background-color:#f4d7c7; z-index:2}
 
 area|z16-[landuse=residential]
-{ width: 0.3; color:#cb8904; z-index:2}
+{ casing-width: 0.3; casing-color:#cb8904; z-index:2}
 
 area|z10-[landuse=allotments],
 area|z10-15[leisure=garden],
@@ -581,29 +581,29 @@ way|z13-[highway=primary_link]::centerline,
 
 
 
-area|z16-[highway=service],
-area|z16-[area:highway=service],
-area|z16-[area:highway=residential],
-area|z16-[area:highway=unclassified],
-area|z16-[area:highway=living_street]
-        {width: 0.5; casing-width:0.3; fill-color:#ffffff; color: #ffffff; z-index: 15}
+area|z15-[highway=service],
+area|z15-[area:highway=service],
+area|z15-[area:highway=residential],
+area|z15-[area:highway=unclassified],
+area|z15-[area:highway=living_street]
+        {width: 0.5; casing-width:0.3; fill-color:#ffffff; color: #ffffff; z-index: 15; casing-color: #996703;}
  
-area|z16-[landuse=carriageway],
-area|z16-[area:highway=secondary],
-area|z16-[area:highway=tertiary]
-        {width: 0.5; casing-width:0.3; fill-color:#fcffd1; color: #fcffd1; z-index: 15}
+area|z15-[landuse=carriageway],
+area|z15-[area:highway=secondary],
+area|z15-[area:highway=tertiary]
+        {width: 0.5; casing-width:0.3; fill-color:#fcffd1; color: #fcffd1; z-index: 15; casing-color: #996703;}
 
-area|z16-[area:highway=primary]
-        {width: 0.5; casing-width:0.3; fill-color:#fcea97; color: #fcea97; z-index: 15}
+area|z15-[area:highway=primary]
+        {width: 0.5; casing-width:0.3; fill-color:#fcea97; color: #fcea97; z-index: 15; casing-color: #996703;}
 
-area|z16-[area:highway=trunk],
-area|z16-[area:highway=motorway]
-        {width: 0.5; casing-width:0.3; fill-color:#ffd780; color: #ffd780; z-index: 15}
+area|z15-[area:highway=trunk],
+area|z15-[area:highway=motorway]
+        {width: 0.5; casing-width:0.3; fill-color:#ffd780; color: #ffd780; z-index: 15; casing-color: #996703;}
 
-area|z16-[area:highway=footway],
-area|z16-[area:highway=pedestrian],
-area|z16-[area:highway=path]
-        {width: 0.5; casing-width:0.3; fill-color:#c2a2ce; color: #c2a2ce; z-index: 15}
+area|z15-[area:highway=footway],
+area|z15-[area:highway=pedestrian],
+area|z15-[area:highway=path]
+        {width: 0.5; casing-width:0.3; fill-color:#c2a2ce; color: #c2a2ce; z-index: 15; casing-color: #996703;}
 
 
 
@@ -666,7 +666,8 @@ way|z12-[railway=subway][colour=brown]  {width:3; color: #BB7700;z-index:15; das
 way|z12-[railway=subway][!colour] {width:3; color: #072889;z-index:15; dashes:3,3; opacity:0.3; linecap: butt; -x-mapnik-layer: top;}
 
 way|z16-[barrier=fence] {width:.3; color: black;z-index:16; -x-mapnik-layer: top;}
-way|z16-[barrier=wall] {width:.5; color: black;z-index:16; -x-mapnik-layer: top;}
+way|z16-[barrier=wall],
+way|z16-[barrier=retaining_wall] {width:.5; color: black;z-index:16; -x-mapnik-layer: top;}
 
 way|z15-[marking=sport][!colour],
         {width:.5; color: #a0a0a0;z-index:16; -x-mapnik-layer: top;}
