@@ -381,8 +381,6 @@ if options.renderer == "mapnik":
         else:
           xml_nolayer()
 
-
-    for zlayer in index_range:
       for layer_type, entry_types in [("line",("way", "line")),("polygon",("way","area"))]:
         ## lines and polygons pass
         sql_g = set()
