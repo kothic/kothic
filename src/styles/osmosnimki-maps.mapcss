@@ -586,24 +586,24 @@ area|z15-[area:highway=service],
 area|z15-[area:highway=residential],
 area|z15-[area:highway=unclassified],
 area|z15-[area:highway=living_street]
-        {width: 0.5; casing-width:0.3; fill-color:#ffffff; color: #ffffff; z-index: 15; casing-color: #996703;}
+        {width: 1; casing-width:0.3; fill-color:#ffffff; color: #ffffff; z-index: 15; casing-color: #996703;}
  
 area|z15-[landuse=carriageway],
 area|z15-[area:highway=secondary],
 area|z15-[area:highway=tertiary]
-        {width: 0.5; casing-width:0.3; fill-color:#fcffd1; color: #fcffd1; z-index: 15; casing-color: #996703;}
+        {width: 1; casing-width:0.3; fill-color:#fcffd1; color: #fcffd1; z-index: 15; casing-color: #996703;}
 
 area|z15-[area:highway=primary]
-        {width: 0.5; casing-width:0.3; fill-color:#fcea97; color: #fcea97; z-index: 15; casing-color: #996703;}
+        {width: 1; casing-width:0.3; fill-color:#fcea97; color: #fcea97; z-index: 15; casing-color: #996703;}
 
 area|z15-[area:highway=trunk],
 area|z15-[area:highway=motorway]
-        {width: 0.5; casing-width:0.3; fill-color:#ffd780; color: #ffd780; z-index: 15; casing-color: #996703;}
+        {width: 1; casing-width:0.3; fill-color:#ffd780; color: #ffd780; z-index: 15; casing-color: #996703;}
 
 area|z15-[area:highway=footway],
 area|z15-[area:highway=pedestrian],
 area|z15-[area:highway=path]
-        {width: 0.5; casing-width:0.3; fill-color:#c2a2ce; color: #c2a2ce; z-index: 15; casing-color: #996703;}
+        {width: 1; casing-width:1; fill-color:#DDB8EA; color: #DDB8EA; z-index: 15; casing-color:#c2a2ce; casing-dashes:2,2}
 
 
 
@@ -669,16 +669,23 @@ way|z16-[barrier=fence] {width:.3; color: black;z-index:16; -x-mapnik-layer: top
 way|z16-[barrier=wall],
 way|z16-[barrier=retaining_wall] {width:.5; color: black;z-index:16; -x-mapnik-layer: top;}
 
-way|z15-[marking=sport][!colour],
+
+
+/* разметка на стадионах */
+way|z15-[marking][!colour],
         {width:.5; color: #a0a0a0;z-index:16; -x-mapnik-layer: top;}
-way|z15-[marking=sport][colour=white],
-way|z15-[marking=sport][color=white]    {width:1; color: white;z-index:16; -x-mapnik-layer: top;}
-way|z15-[marking=sport][colour=red],
-way|z15-[marking=sport][color=red]    {width:1; color: #c00000;z-index:16; -x-mapnik-layer: top;}
-way|z15-[marking=sport][colour=black],
-way|z15-[marking=sport][color=black]    {width:1; color: black;z-index:16; -x-mapnik-layer: top;}
-way|z15-[marking=sport][colour=blue],
-way|z15-[marking=sport][color=blue]    {width:1; color: #0000c0;z-index:16; -x-mapnik-layer: top;}
+way|z15-[marking][colour=white],
+way|z15-[marking][color=white]    {width:1; color: white;z-index:16; -x-mapnik-layer: top;}
+way|z15-[marking][colour=red],
+way|z15-[marking][color=red]    {width:1; color: #c00000;z-index:16; -x-mapnik-layer: top;}
+way|z15-[marking][colour=black],
+way|z15-[marking][color=black]    {width:1; color: black;z-index:16; -x-mapnik-layer: top;}
+way|z15-[marking][colour=blue],
+way|z15-[marking][color=blue]    {width:1; color: #0000c0;z-index:16; -x-mapnik-layer: top;}
+
+
+
+
 
 node|z15-[amenity=bus_station] {icon-image:aut2_16x16_park.png}
 node|z16-[highway=bus_stop]    {icon-image:autobus_stop_14x10.png}
