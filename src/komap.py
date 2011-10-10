@@ -612,6 +612,7 @@ if options.renderer == "mapnik":
                   talign= entry["style"].get("text-align","center")
                   topacity= relaxedFloat(entry["style"].get("text-opacity",entry["style"].get("opacity","1")))
                   tpos = entry["style"].get("text-placement","X")
+                  ttransform = entry["style"].get("text-transform","none")
 
                   xml += xml_rule_start()
                   xml += x_scale
@@ -623,9 +624,9 @@ if options.renderer == "mapnik":
                                 entry["style"].get("icon-width", ""),
                                 entry["style"].get("icon-height", ""),
                                 ttext,tface,tsize,tcolor, thcolor, thradius, tplace,
-                                toffset,toverlap,tdistance,twrap,talign,topacity)
+                                toffset,toverlap,tdistance,twrap,talign,topacity, ttransform)
                   else:
-                    xml += xml_textsymbolizer(ttext,tface,tsize,tcolor, thcolor, thradius, tplace, toffset,toverlap,tdistance,twrap,talign,topacity,tpos)
+                    xml += xml_textsymbolizer(ttext,tface,tsize,tcolor, thcolor, thradius, tplace, toffset,toverlap,tdistance,twrap,talign,topacity,tpos,ttransform)
                   sql.add(entry["sql"])
                   itags.update(entry["chooser"].get_interesting_tags(entry["type"], zoom))
                   xml += xml_rule_end()
