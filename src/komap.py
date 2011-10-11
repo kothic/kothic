@@ -39,19 +39,19 @@ def relaxedFloat(x):
 
 parser = OptionParser()
 parser.add_option("-r", "--renderer", dest="renderer", default="mapnik",
-     help="which renderer stylesheet to generate", metavar="ENGINE")
+    help="which renderer stylesheet to generate", metavar="ENGINE")
 parser.add_option("-s", "--stylesheet", dest="filename",
-     help="read MapCSS stylesheet from FILE", metavar="FILE")
+    help="read MapCSS stylesheet from FILE", metavar="FILE")
 parser.add_option("-f", "--minzoom", dest="minzoom", default=0, type="int",
-     help="minimal available zoom level", metavar="ZOOM")
+    help="minimal available zoom level", metavar="ZOOM")
 parser.add_option("-t", "--maxzoom", dest="maxzoom", default=19, type="int",
-     help="maximal available zoom level", metavar="ZOOM")
+    help="maximal available zoom level", metavar="ZOOM")
 parser.add_option("-l", "--locale", dest="locale", 
-     help="language that should be used for labels (ru, en, be, uk..)", metavar="LANG")
+    help="language that should be used for labels (ru, en, be, uk..)", metavar="LANG")
 parser.add_option("-o", "--output-file", dest="outfile", default="-",
-     help="output filename (defaults to stdout)", metavar="FILE")
+    help="output filename (defaults to stdout)", metavar="FILE")
 parser.add_option("-p", "--osm2pgsql-style", dest="osm2pgsqlstyle", default="-",
-     help="osm2pgsql stylesheet filename", metavar="FILE")
+    help="osm2pgsql stylesheet filename", metavar="FILE")
 
 
 
@@ -252,7 +252,7 @@ if options.renderer == "mapnik":
 
 
   for font in fonts:
-     mfile.write(xml_fontset(font, True))
+    mfile.write(xml_fontset(font, True))
 
   for zoom, zsheet in mapniksheet.iteritems():
     x_scale = xml_scaledenominator(zoom)
@@ -506,14 +506,8 @@ if options.renderer == "mapnik":
               mfile.write(xml_layer("postgis", layer_type, itags, sql, zoom=zoom ))
           else:
             xml_nolayer()
-          
-          
-          
-          
-          
-          
-          
-      
+
+
     ## icons pass
     sql_g = set()
     itags_g = set()
@@ -540,7 +534,6 @@ if options.renderer == "mapnik":
                   xml_g = ""
                   sql = set()
                   itags = set()
-                  
                 else:
                   xml_nolayer()
                 prevtype = layer_type
