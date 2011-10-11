@@ -979,10 +979,10 @@ node|z13-[highway=milestone][pk]{text:pk; font-size:7; text-halo-radius:5;-x-map
 node|z17-[entrance]
     {icon-image:entrance.png; -x-mapnik-min-distance:0}
 node|z17-[entrance][ref]
-    {text:ref; text-offset:6; font-size:6; text-align:left;
+    {text:ref; text-offset:6; font-size:7; text-align:left;
     -x-mapnik-min-distance:0;font-family: DejaVu Sans Bold;
     text-halo-radius:1
     }
 node|z18-[entrance] 
-    {text: addr:flats; text-offset:7; font-size:6; -x-mapnik-min-distance:0;
+    {text: addr:flats; text-offset:8; font-size:7; -x-mapnik-min-distance:0;
     text-halo-radius:1}
