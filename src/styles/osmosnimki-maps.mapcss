@@ -226,6 +226,7 @@ way|z14[highway=service][living_street!=yes][service!=parking_aisle]
 
 
 way|z13[highway=road],
+way|z13[highway=unclassified],
 way|z13[highway=track]
 {text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Book; font-size:9; text-halo-radius: 1; text-halo-color: #ffffff;
         width:0.6; opacity: 0.5; color: #996703; z-index:10; -x-mapnik-layer: bottom;}
