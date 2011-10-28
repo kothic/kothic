@@ -216,16 +216,16 @@ linecap:butt требуется для того, чтобы сегменты н�
 
 
 
-way|z12[highway=road],
+
 way|z12[highway=track],
 way|z12[highway=residential],
+way|z12[highway=unclassified],
 way|z9[highway=secondary],
 way|z9-10[highway=tertiary],
 way|z14[highway=service][living_street!=yes][service!=parking_aisle]
         {width:0.3; opacity: 0.6; color: #996703; z-index:10; -x-mapnik-layer: bottom;}
 
 
-way|z13[highway=road],
 way|z13[highway=unclassified],
 way|z13[highway=track]
 {text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Book; font-size:9; text-halo-radius: 1; text-halo-color: #ffffff;
@@ -582,7 +582,7 @@ way|z13-[highway=primary_link]::centerline,
 
 
 
-area|z15-[highway=service],
+area|z15-[highway=service][area=yes],
 area|z15-[area:highway=service],
 area|z15-[area:highway=residential],
 area|z15-[area:highway=unclassified],
@@ -769,9 +769,10 @@ width: 0.5; color: #808080; dashes: 2,2; opacity:0.3; z-index:16}*/
 way|z12-[railway=tram]{pattern-image:rway44.png;z-index:17}
 
 
-node|z11-[railway=station][transport!=subway]
-{icon-image:rw_stat_stanzii_2_blue.png;
-text:name; text-offset:7; font-size:9; font-family: DejaVu Sans Mono Book; text-halo-radius:1; text-color:#000d6c;text-halo-color:#ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0}
+area|z12-[building=train_station][name=~/.*вокзал.*/] {icon-image:station_11x14_blue.png; z-index:9}
+area|z12-15[building=train_station][name=~/.*вокзал.*/]::lable{text:name; text-offset:13; font-size:10; font-family: DejaVu Sans Condensed Bold; text-halo-radius:1; text-color:#ffffff;text-halo-color:#363c6b; text-allow-overlap: false; -x-mapnik-min-distance:0; text-placement:any;  z-index:11}
+
+area|z16-[building=train_station][name=~/.*вокзал.*/]::lable{text:name; text-offset:13; font-size:11; font-family: DejaVu Sans Condensed Bold; text-halo-radius:1; text-color:#ffffff;text-halo-color:#363c6b; text-allow-overlap: false; -x-mapnik-min-distance:0; text-placement:any;  z-index:10}
 
 /*     Minsk        */
 node|z12-15[railway=station][transport=subway][colour=red][operator=Минский метрополитен] {icon-image:minsk_metro_red.png; z-index:17;}
