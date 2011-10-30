@@ -582,108 +582,171 @@ if options.renderer == "mapnik":
                 csb = entry["style"].get("collision-sort-by",None)
                 cso = entry["style"].get("collision-sort-order","desc")
                 collhere.add((csb,cso))
-          for (csb, cso) in collhere:
-            sql = set()
-            itags = set()
-            texttags = set()
-            xml = xml_style_start()
-            for entry in zsheet[zindex]:
-              if entry["type"] in entry_types and csb == entry["style"].get("collision-sort-by",None) and cso == entry["style"].get("collision-sort-order","desc"):
-                if "text" in entry["style"] and entry["style"].get("text-position","center")==placement:
-                  ttext = entry["style"]["text"].extract_tags().pop()
-                  texttags.add(ttext)
-                  tface = entry["style"].get("font-family","DejaVu Sans Book")
-                  tsize = entry["style"].get("font-size","10")
-                  tcolor = entry["style"].get("text-color","#000000")
-                  thcolor= entry["style"].get("text-halo-color","#ffffff")
-                  thradius= relaxedFloat(entry["style"].get("text-halo-radius","0"))
-                  tplace= entry["style"].get("text-position","center")
-                  toffset= relaxedFloat(entry["style"].get("text-offset","0"))
-                  toverlap= entry["style"].get("text-allow-overlap",entry["style"].get("allow-overlap","false"))
-                  tdistance= relaxedFloat(entry["style"].get("-x-mapnik-min-distance","20"))
-                  twrap= relaxedFloat(entry["style"].get("max-width",256))
-                  talign= entry["style"].get("text-align","center")
-                  topacity= relaxedFloat(entry["style"].get("text-opacity",entry["style"].get("opacity","1")))
-                  tpos = entry["style"].get("text-placement","X")
-                  ttransform = entry["style"].get("text-transform","none")
+          for snap_to_street in ('true', 'false'):
+            for (csb, cso) in collhere:
+              sql = set()
+              itags = set()
+              texttags = set()
+              xml = xml_style_start()
+              for entry in zsheet[zindex]:
+                if entry["type"] in entry_types and csb == entry["style"].get("collision-sort-by",None) and cso == entry["style"].get("collision-sort-order","desc") and snap_to_street == entry["style"].get("-x-mapnik-snap-to-street","false"):
+                  if "text" in entry["style"] and entry["style"].get("text-position","center")==placement:
+                    ttext = entry["style"]["text"].extract_tags().pop()
+                    texttags.add(ttext)
+                    tface = entry["style"].get("font-family","DejaVu Sans Book")
+                    tsize = entry["style"].get("font-size","10")
+                    tcolor = entry["style"].get("text-color","#000000")
+                    thcolor= entry["style"].get("text-halo-color","#ffffff")
+                    thradius= relaxedFloat(entry["style"].get("text-halo-radius","0"))
+                    tplace= entry["style"].get("text-position","center")
+                    toffset= relaxedFloat(entry["style"].get("text-offset","0"))
+                    toverlap= entry["style"].get("text-allow-overlap",entry["style"].get("allow-overlap","false"))
+                    tdistance= relaxedFloat(entry["style"].get("-x-mapnik-min-distance","20"))
+                    twrap= relaxedFloat(entry["style"].get("max-width",256))
+                    talign= entry["style"].get("text-align","center")
+                    topacity= relaxedFloat(entry["style"].get("text-opacity",entry["style"].get("opacity","1")))
+                    tpos = entry["style"].get("text-placement","X")
+                    ttransform = entry["style"].get("text-transform","none")
 
-                  xml += xml_rule_start()
-                  xml += x_scale
+                    xml += xml_rule_start()
+                    xml += x_scale
 
-                  xml += xml_filter(entry["rulestring"])
-                  if "icon-image" in entry["style"] and entry["style"].get("text-position","center")=='center':
-                    xml += xml_shieldsymbolizer(
-                                entry["style"].get("icon-image", ""),
-                                entry["style"].get("icon-width", ""),
-                                entry["style"].get("icon-height", ""),
-                                ttext,tface,tsize,tcolor, thcolor, thradius, tplace,
-                                toffset,toverlap,tdistance,twrap,talign,topacity, ttransform)
+                    xml += xml_filter(entry["rulestring"])
+                    if "icon-image" in entry["style"] and entry["style"].get("text-position","center")=='center':
+                      xml += xml_shieldsymbolizer(
+                                  entry["style"].get("icon-image", ""),
+                                  entry["style"].get("icon-width", ""),
+                                  entry["style"].get("icon-height", ""),
+                                  ttext,tface,tsize,tcolor, thcolor, thradius, tplace,
+                                  toffset,toverlap,tdistance,twrap,talign,topacity, ttransform)
+                    else:
+                      xml += xml_textsymbolizer(ttext,tface,tsize,tcolor, thcolor, thradius, tplace, toffset,toverlap,tdistance,twrap,talign,topacity,tpos,ttransform)
+                    sql.add(entry["sql"])
+                    itags.update(entry["chooser"].get_interesting_tags(entry["type"], zoom))
+                    xml += xml_rule_end()
+
+              xml += xml_style_end()
+              sql.discard("()")
+              if sql:
+                order = ""
+                if csb:
+                  if cso != "desc":
+                    cso = "asc"
+                  order = """ order by (CASE WHEN "%s" ~ E'^[[:digit:]]+([.][[:digit:]]+)?$' THEN to_char(CAST ("%s" AS FLOAT) ,'000000000000000.99999999999') else "%s" end) %s nulls last """%(csb,csb,csb,cso)
+
+                mfile.write(xml)
+
+                add_tags = set()
+                for t in itags:
+                  if t in columnmap:
+                    add_tags.update(columnmap[t][1])
+                    texttags.update(columnmap[t][1])
+                oitags = itags.union(add_tags)
+
+                oitags = [ '"'+i+'"' for i in oitags]
+                oitags = ", ".join(oitags)
+
+                ttext = " OR ".join(['"'+i+ "\" is not NULL " for i in texttags])
+                itags = [columnmap.get(i, (i,))[0] for i in itags]
+                itags = add_numerics_to_itags(itags)
+                if placement == "center" and layer_type == "polygon" and snap_to_street == 'false':
+                  sqlz = " OR ".join(sql)
+                  itags = ", ".join(itags)
+                  if not order:
+                    order = "order by"
                   else:
-                    xml += xml_textsymbolizer(ttext,tface,tsize,tcolor, thcolor, thradius, tplace, toffset,toverlap,tdistance,twrap,talign,topacity,tpos,ttransform)
-                  sql.add(entry["sql"])
-                  itags.update(entry["chooser"].get_interesting_tags(entry["type"], zoom))
-                  xml += xml_rule_end()
+                    order += ", "
+                  if zoom >= 11 or zoom < 6:
+                    sqlz = """select %s, ST_PointOnSurface(ST_Buffer(way,0)) as way
+                          from planet_osm_%s
+                          where (%s) and (%s) and (way_area > %s) and way &amp;&amp; ST_Expand(!bbox!,3000) %s way_area desc
+                  """%(itags,layer_type,ttext,sqlz,pixel_size_at_zoom(zoom,3)**2, order)
+                  else:
+                    sqlz = """select %s, ST_PointOnSurface(ST_Buffer(way,0)) as way
+                  from (
+                    select (ST_Dump(ST_Multi(ST_Buffer(ST_Collect(p.way),0)))).geom as way, %s
+                      from (
+                        select ST_Buffer(way, %s) as way, %s
+                          from planet_osm_%s p
+                          where (%s) and way_area > %s and p.way &amp;&amp; ST_Expand(!bbox!,%s) and (%s)) p
+                        group by %s) p %s ST_Area(p.way) desc
+                  """%(itags,oitags,pixel_size_at_zoom(zoom,10),oitags,layer_type,ttext,pixel_size_at_zoom(zoom,5)**2,max(pixel_size_at_zoom(zoom,20),3000),sqlz,oitags,order)
+                  mfile.write(xml_layer("postgis-process", layer_type, itags, sqlz, zoom ))
+                elif layer_type == "line" and zoom < 16 and snap_to_street == 'false':
+                  sqlz = " OR ".join(sql)
+                  itags = ", ".join(itags)
+                  #itags = "\""+ itags+"\""
+                  sqlz = """select %s, ST_LineMerge(ST_Union(way)) as way from (SELECT * from planet_osm_line where way &amp;&amp; ST_Expand(!bbox!,%s) and (%s) and (%s)) as tex
+                  group by %s
+                  %s
+                  """%(itags,max(pixel_size_at_zoom(zoom,20),3000),ttext,sqlz,oitags,order)
+                  mfile.write(xml_layer("postgis-process", layer_type, itags, sqlz, zoom=zoom ))
 
-            xml += xml_style_end()
-            sql.discard("()")
-            if sql:
-              order = ""
-              if csb:
-                if cso != "desc":
-                  cso = "asc"
-                order = """ order by (CASE WHEN "%s" ~ E'^[[:digit:]]+([.][[:digit:]]+)?$' THEN to_char(CAST ("%s" AS FLOAT) ,'000000000000000.99999999999') else "%s" end) %s nulls last """%(csb,csb,csb,cso)
 
-              mfile.write(xml)
 
-              add_tags = set()
-              for t in itags:
-                if t in columnmap:
-                  add_tags.update(columnmap[t][1])
-                  texttags.update(columnmap[t][1])
-              oitags = itags.union(add_tags)
 
-              oitags = [ '"'+i+'"' for i in oitags]
-              oitags = ", ".join(oitags)
 
-              ttext = " OR ".join(['"'+i+ "\" is not NULL " for i in texttags])
-              itags = [columnmap.get(i, (i,))[0] for i in itags]
-              itags = add_numerics_to_itags(itags)
-              if placement == "center" and layer_type == "polygon":
-                sqlz = " OR ".join(sql)
-                itags = ", ".join(itags)
-                if not order:
-                  order = "order by"
+                elif snap_to_street == 'true':
+                  sqlz = " OR ".join(sql)
+                  itags = ", ".join(itags)
+                  if not order:
+                    order = "order by"
+                  else:
+                    order += ", "
+
+                  sqlz = """select %s, 
+
+                  coalesce(
+                    (select
+                      ST_Intersection(
+                        ST_Translate(
+                          ST_Rotate(
+                            ST_GeomFromEWKT('SRID=900913;LINESTRING(-50 0, 50 0)'),
+                            -1*ST_Azimuth(ST_PointN(ST_ShortestLine(l.way, h.way),1),
+                                          ST_PointN(ST_ShortestLine(l.way, h.way),2)
+                                        )
+                          ),
+                          ST_X(ST_PointOnSurface(ST_Buffer(h.way,0.1))),
+                          ST_Y(ST_PointOnSurface(ST_Buffer(h.way,0.1)))
+                        ),
+                        ST_Buffer(h.way,20)
+                      )
+                      as way 
+                      from planet_osm_line l 
+                      where 
+                        l.way &amp;&amp; ST_Expand(h.way, 300) and
+                        l."name" = h."addr:street" and
+                        l.highway is not NULL and
+                        l."name" is not NULL
+                      order by ST_Distance(ST_Buffer(h.way,0.1), l.way) asc
+                      limit 1
+                    ),
+                    ST_Intersection(
+                      ST_MakeLine(  ST_Translate(ST_PointOnSurface(ST_Buffer(h.way,0.1)),-50,0),
+                                    ST_Translate(ST_PointOnSurface(ST_Buffer(h.way,0.1)), 50,0)
+                      ),
+                      ST_Buffer(h.way,20)
+                    )
+                  ) as way
+
+                          from planet_osm_%s h
+                          where (%s) and (%s) and (way_area > %s) and way &amp;&amp; ST_Expand(!bbox!,3000) %s way_area desc
+                  """%(itags,layer_type,ttext,sqlz,pixel_size_at_zoom(zoom,3)**2, order)
+                  mfile.write(xml_layer("postgis-process", layer_type, itags, sqlz, zoom ))
+
+
+
+
+
+
+
+
+
+
                 else:
-                  order += ", "
-                if zoom >= 11 or zoom < 6:
-                  sqlz = """select %s, ST_PointOnSurface(ST_Buffer(way,0)) as way
-                        from planet_osm_%s
-                        where (%s) and (%s) and (way_area > %s) and way &amp;&amp; ST_Expand(!bbox!,3000) %s way_area desc
-                """%(itags,layer_type,ttext,sqlz,pixel_size_at_zoom(zoom,3)**2, order)
-                else:
-                  sqlz = """select %s, ST_PointOnSurface(ST_Buffer(way,0)) as way
-                from (
-                  select (ST_Dump(ST_Multi(ST_Buffer(ST_Collect(p.way),0)))).geom as way, %s
-                    from (
-                      select ST_Buffer(way, %s) as way, %s
-                        from planet_osm_%s p
-                        where (%s) and way_area > %s and p.way &amp;&amp; ST_Expand(!bbox!,%s) and (%s)) p
-                      group by %s) p %s ST_Area(p.way) desc
-                """%(itags,oitags,pixel_size_at_zoom(zoom,10),oitags,layer_type,ttext,pixel_size_at_zoom(zoom,5)**2,max(pixel_size_at_zoom(zoom,20),3000),sqlz,oitags,order)
-                mfile.write(xml_layer("postgis-process", layer_type, itags, sqlz, zoom ))
-              elif layer_type == "line" and zoom < 15:
-                sqlz = " OR ".join(sql)
-                itags = ", ".join(itags)
-                #itags = "\""+ itags+"\""
-                sqlz = """select %s, ST_LineMerge(ST_Union(way)) as way from (SELECT * from planet_osm_line where way &amp;&amp; ST_Expand(!bbox!,%s) and (%s) and (%s)) as tex
-                group by %s
-                %s
-                """%(itags,max(pixel_size_at_zoom(zoom,20),3000),ttext,sqlz,oitags,order)
-                mfile.write(xml_layer("postgis-process", layer_type, itags, sqlz, zoom=zoom ))
+                  sql = "(" + " OR ".join(sql) + ") and way &amp;&amp; ST_Expand(!bbox!,%s) %s"%(max(pixel_size_at_zoom(zoom,20),3000),order)
+                  mfile.write(xml_layer("postgis", layer_type, itags, sql, zoom=zoom ))
               else:
-                sql = "(" + " OR ".join(sql) + ") and way &amp;&amp; ST_Expand(!bbox!,%s) %s"%(max(pixel_size_at_zoom(zoom,20),3000),order)
-                mfile.write(xml_layer("postgis", layer_type, itags, sql, zoom=zoom ))
-            else:
-              xml_nolayer()
+                xml_nolayer()
 
   mfile.write(xml_end())
