@@ -689,10 +689,6 @@ if options.renderer == "mapnik":
                 elif snap_to_street == 'true':
                   sqlz = " OR ".join(sql)
                   itags = ", ".join(itags)
-                  if not order:
-                    order = "order by"
-                  else:
-                    order += ", "
 
                   sqlz = """select %s, 
 
@@ -730,7 +726,7 @@ if options.renderer == "mapnik":
                   ) as way
 
                           from planet_osm_%s h
-                          where (%s) and (%s) and (way_area > %s) and way &amp;&amp; ST_Expand(!bbox!,3000) %s way_area desc
+                          where (%s) and (%s) and way &amp;&amp; ST_Expand(!bbox!,3000) %s
                   """%(itags,layer_type,ttext,sqlz,pixel_size_at_zoom(zoom,3)**2, order)
                   mfile.write(xml_layer("postgis-process", layer_type, itags, sqlz, zoom ))
 
