@@ -727,7 +727,7 @@ if options.renderer == "mapnik":
 
                           from planet_osm_%s h
                           where (%s) and (%s) and way &amp;&amp; ST_Expand(!bbox!,3000) %s
-                  """%(itags,layer_type,ttext,sqlz,pixel_size_at_zoom(zoom,3)**2, order)
+                  """%(itags,layer_type,ttext,sqlz, order)
                   mfile.write(xml_layer("postgis-process", layer_type, itags, sqlz, zoom ))
 
 
