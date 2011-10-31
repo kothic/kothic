@@ -32,7 +32,7 @@ area|z3-[natural=glacier]{background-color: #fcfeff; background-image: glacier.p
 
 area|z10-[place=city],
 area|z10-[place=town],
-{background-color:#FAF7F7; z-index:1}
+{background-color:#F1EEE8; z-index:1}
 
 area|z10-[place=hamlet],
 area|z10-[place=village],
@@ -59,24 +59,76 @@ z-index - порядковый номер слоя, в котором будет
 -x-mapnik-layer: bottom;
 
  */
+ 
+node|z14-[place=locality]{text:name; font-size:11;
+font-family: DejaVu Sans Book; text-color:#101010; text-halo-radius: 1;
+text-halo-color: #ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0; text-placement:any;
+max-width:30}  
 
 /* fill-color: - html-цвет заливки */
 
-area|z10-[landuse=residential], area|z10-[residential=urban]
-{background-color:#F7EFEB; z-index:2}
+area|z10-12[landuse=residential], area|z10-12[residential=urban]
+{background-color:#F4EEC3; z-index:3.1}
+
+area|z13-14[landuse=residential], area|z13-14[residential=urban]
+{background-color:#F7EFDC; z-index:2}
+
+area|z15-[landuse=residential], area|z10-[residential=urban]
+{background-color:#F7EFEC; z-index:2}
+
+area|z14-15[landuse=residential], area|z14-15[residential=urban], area|z14-15[place=locality]
+{text:name; font-size:10;
+font-family: DejaVu Sans Book; text-color:#8B5E3C;text-halo-radius: 1;
+text-halo-color: #ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0; text-placement:any;
+ max-width:40}
+
+area|z15-[building=yes][office] 
+{text:name; font-size:10;
+font-family: DejaVu Sans Book; text-color:#101010;text-halo-radius: 1;
+text-halo-color: #ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0; text-placement:any;
+ max-width:40}
+
+area|z15-[landuse=commercial]
+{text:name; font-size:10;
+font-family: DejaVu Sans Book; text-color:#101010;text-halo-radius: 1;
+text-halo-color: #ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0; text-placement:any;
+ max-width:40}
+
+node|z14-15[place=locality]
+{text:name; font-size:10;
+font-family: DejaVu Sans Book; text-color:#8B5E3C;text-halo-radius: 1;
+text-halo-color: #ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0; text-placement:any;
+ max-width:40}
+ 
+node|z16-[place=locality]
+{text:name; font-size:11;
+font-family: DejaVu Sans Book; text-color:#8B5E3C;text-halo-radius: 1;
+text-halo-color: #ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0; text-placement:any;
+ max-width:50}
+
+ 
+ 
+area|z16-[landuse=residential],
+area|z16-[residential=urban],
+area|z16-[place=locality]
+{text:name; font-size:11;
+font-family: DejaVu Sans Book; text-color:#8B5E3C;text-halo-radius: 1;
+text-halo-color: #ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0; text-placement:any;
+ max-width:50}
+
 
 area|z10-[residential=rural]
-{background-color:#f4d7c7; z-index:2}
+{background-color:#F2E6DF; z-index:2}
 
 area|z16-[landuse=residential]
-{ casing-width: 0.3; casing-color:#cb8904; z-index:2}
+{ width: 0.3; color:#cb8904; z-index:2}
 
 area|z10-[landuse=allotments],
 area|z10-15[leisure=garden],
 area|z10-15[landuse=orchard]
        {background-color:#edf2c1; z-index:3}
 
-area|z10-[leisure=park] {background-color: #c4e9a4; z-index:3;background-image:parks2.png}
+area|z10-[leisure=park]  {background-color:#C5E0A3; z-index:3}
 /* background-image: картинка, которой надо заполнить полигон  */
 
 
@@ -90,7 +142,22 @@ area|z12-[natural=heath]
        {background-color: #ecffe5; z-index:3}
 
 
-area|z10-[landuse=industrial],area|z10-[landuse=military] {background-color: #ddd8da; z-index:3}
+
+area|z10-13[landuse=industrial],area|z10-13[landuse=military] {background-color: #D8D6D7; z-index:3}
+
+area|z14-[landuse=industrial],area|z14-[landuse=military] {background-color: #DDDDDD; z-index:3}
+way|z14-15[landuse=industrial],area|z14-15[landuse=military]
+{text:name; font-size:10;
+font-family: DejaVu Sans Book; text-color:#303030; text-halo-radius: 1;
+text-halo-color: #ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0; text-placement:any;
+ max-width:50}
+
+way|z16-[landuse=industrial],area|z16-[landuse=military]
+{text:name; font-size:11;
+font-family: DejaVu Sans Book; text-color:#303030; text-halo-radius: 1;
+text-halo-color: #ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0; text-placement:any;
+ max-width:50}
+
 
 area|z15-[amenity=parking]{background-color: #ecedf4; z-index:3}
 
@@ -106,41 +173,94 @@ area|z4-[natural=desert] {background-image: desert22.png}
 
 
 
-area|z4-[natural=forest], area|z4-[natural=wood],
-area|z4-[landuse=forest], area|z4-[landuse=wood]
-       {background-color: #d6f4c6; z-index:3}
-
-area|z10-[landuse=garages] {background-color: #ddd8da; z-index:3}
-
-area|z12-[natural=forest], area|z12-[natural=wood],
-area|z12-[landuse=forest], area|z12-[landuse=wood]{text:name; text-offset:0; font-size:10; font-family: DejaVu Serif Italic; text-color:green; text-allow-overlap: false;-x-mapnik-min-distance: 0 }
 
 area|z12-[landuse=grass],
 area|z12-[natural=grass],
 area|z12-[natural=meadow],
 area|z12-[landuse=meadow],
 area|z12-[landuse=recreation_ground],
-{background-color: #f4ffe5; z-index:4}
+{background-color: #c4e9a4; z-index:3;background-image:parks2.png}
+
+
+
 
 area|z10-[natural=wetland] {background-image:swamp_world2.png; z-index:4}
 
-area|z10-[landuse=farmland], area|z10-[landuse=farm], area|z10-[landuse=field]  {background-color: #fff5c4; z-index:5}
+area|z10-[landuse=farmland], area|z10-[landuse=farm], area|z10-[landuse=field] 
+{background-color: #E9D9BD; z-index:5}
+
+  
+
+way|z10[mooring=yes]
+{icon-image:port_11x14_blue.png}
+
+node|z10[amenity=ferry_terminal]
+{icon-image:port_11x14_blue.png}
+
+way|z11-12[mooring=yes]
+{icon-image:port_11x14_blue.png; text:name; text-offset:11; font-size:9;
+font-family: DejaVu Sans Condensed Bold; text-color:#114fcd;text-halo-radius: 1;
+text-halo-color: #ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0; text-placement:any;
+ max-width:40}
+
+node|z11-12[mooring=yes],
+node|z11-12[amenity=ferry_terminal]
+{icon-image:port_11x14_blue.png; text:name; text-offset:11; font-size:9;
+font-family: DejaVu Sans Condensed Bold; text-color:#114fcd;text-halo-radius: 1;
+text-halo-color: #ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0; text-placement:any;
+max-width:40}
+ 
+ way|z13-15[mooring=yes] {icon-image:port_11x14_blue.png; text:name; text-offset:13; font-size:9;
+font-family: DejaVu Sans Condensed Bold; text-color:#114fcd;text-halo-radius: 1;
+text-halo-color: #ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0; text-placement:any;
+ max-width:50}
+ 
+node|z13-15[mooring=yes],
+node|z13-15[amenity=ferry_terminal]
+{icon-image:port_11x14_blue.png; text:name; text-offset:13; font-size:9;
+font-family: DejaVu Sans Condensed Bold; text-color:#114fcd;text-halo-radius: 1;
+text-halo-color: #ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0; text-placement:any;
+ max-width:50}
+ 
+ way|z16-[mooring=yes] {icon-image:port_11x14_blue.png; text:name; text-offset:13; font-size:10;
+font-family: DejaVu Sans Condensed Bold; text-color:#114fcd;text-halo-radius: 1;
+text-halo-color: #ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0; text-placement:any;
+ max-width:50}  
+ 
+node|z16-[mooring=yes],
+node|z16-[amenity=ferry_terminal]
+{icon-image:port_11x14_blue.png; text:name; text-offset:13; font-size:10;
+font-family: DejaVu Sans Condensed Bold; text-color:#114fcd;text-halo-radius: 1;
+text-halo-color: #ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0; text-placement:any;
+max-width:50}  
+
 
 area|z6-9[place=city],
 area|z6-9[place=town]
-     {background-color: #ffe1d0; z-index:5}
+{background-color: #F2ECEB; z-index:3}
 
 
 area|z10-[landuse=cemetery] {background-color: #e5f5dc; z-index:5; background-image:cemetry7_2.png}
+area|z12-[landuse=cemetery] {text:name; text-offset:1; font-size:9;
+font-family: DejaVu Sans Book; text-color:#040404;text-halo-radius: 1;
+text-halo-color: #ffffff; text-allow-overlap: false; max-width:50}
 
 area|z13-[aeroway=aerodrome] {color: #008ac6; width: 0.8; z-index:5; background-image:bull2.png}
 
-area|z12-[leisure=stadium],
-area|z12-[leisure=pitch],
-{background-color: #e3deb1;z-index:5;}
+area|z12-13[leisure=stadium],
+area|z12-13[leisure=pitch],
+{background-color: #e3deb1;  casing-width:0.1; casing-color: #996703; z-index:5;}
+
+
+area|z14-[leisure=stadium],
+area|z14-[leisure=pitch],
+{background-color: #e3deb1;  casing-width:0.2; casing-color: #996703; z-index:5;}
 
 
 way|z7-10[waterway=river]   {color: #C4D4F5; width: .6; z-index:9}
+area|z7-10[waterway=river]   {color: #C4D4F5; width: .6; z-index:9}
+
+
 /*
 свойства с префиксом background- в основном относятся к заливкам, без префиксов - к линиям.
 width - ширина линии
@@ -158,12 +278,40 @@ way|z15-[waterway=river]    {color: #C4D4F5; width: .9; z-index:9}
 way|z10-[waterway=stream]{color: #C4D4F5; width: .5; z-index:9}
 way|z10-[waterway=canal] {color: #abc4f5; width: .6; z-index:9}
 
+area|z9-10[waterway=stream]  {color: #C4D4F5; width: .3; z-index:9}
+area|z10-14[waterway=river] {color: #C4D4F5; width: .7; z-index:9}
+area|z15-[waterway=river]    {color: #C4D4F5; width: .9; z-index:9}
+area|z10-[waterway=stream] {color: #C4D4F5; width: .5; z-index:9}
+area|z10-[waterway=canal] {color: #abc4f5; width: .6; z-index:9}
+
+
+way|z10-13[waterway=stream], way|z9-13[waterway=river], way|z13[waterway=canal]
+{text:name; font-size:8; font-family: DejaVu Sans Oblique; text-color:#547bd1; text-position: line}
+
+way|z14-15[waterway=stream], way|z14-15[waterway=river], way|z14-15[waterway=canal]
+{text:name; font-size:9; font-family: DejaVu Sans Oblique; text-color:#547bd1; text-position: line}
+
+way|z16-[waterway=stream], way|z16-[waterway=river], way|z16-[waterway=canal]
+{text:name; font-size:11; font-family: DejaVu Sans Oblique; text-color:#547bd1; text-position: line}
+
+
+way|z10-[mooring=yes]{port_11x14_blue.png}
+
 area|z5-[waterway=riverbank],
 area|z5-[natural=water],
 area|z10-[landuse=reservoir],
-{background-color: #C4D4F5; color: #C4D4F5; width:.1; z-index:9;}
+{background-color: #C4D4F5; color: #C4D4F5; width:.1; z-index:9}
 
-area|z9-[natural=water]{text:name; text-offset:1; font-size:10; font-family: DejaVu Serif Italic; text-color:#285fd1; text-allow-overlap: false }
+area|z9-13[natural=water]{text:name; text-offset:1; font-size:9; font-family: DejaVu Serif Italic; text-color:#285fd1; text-allow-overlap: false; max-width: 30 }
+node|z9-13[natural=water]{text:name; text-offset:1; font-size:9; font-family: DejaVu Serif Italic; text-color:#285fd1; text-allow-overlap: false; max-width: 30 }
+
+area|z13-14[natural=water]{text:name; text-offset:1; font-size:10; font-family: DejaVu Serif Italic; text-color:#285fd1; text-allow-overlap: false; max-width: 30 }
+node|z13-14[natural=water]{text:name; text-offset:1; font-size:10; font-family: DejaVu Serif Italic; text-color:#285fd1; text-allow-overlap: false; max-width: 30 }
+
+area|z15-[natural=water]{text:name; text-offset:1; font-size:11; font-family: DejaVu Serif Italic; text-color:#285fd1; text-allow-overlap: false; max-width: 30 }
+node|z15-[natural=water]{text:name; text-offset:1; font-size:11; font-family: DejaVu Serif Italic; text-color:#285fd1; text-allow-overlap: false; max-width: 30 }
+
+
 /*
 text - из какого поля брать текст
 text-offset - на сколько сдвинуть текст
@@ -178,12 +326,12 @@ text-halo-color - цвет обводки текста
 
 
 way|z13-16[highway=construction]
-{text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Book; font-size:9; text-halo-radius: 1; text-halo-color: #ffffff;
+{text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Book; font-size:10; text-halo-radius: 1; text-halo-color: #ffffff;
 casing-width:0.5; casing-color:#996703;
 width:2; color: #ffffff; z-index:10; dashes:9,9}
 
 way|z17-[highway=construction]
-{text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Book; font-size:9; text-halo-radius: 1; text-halo-color: #ffffff;
+{text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Book; font-size:10; text-halo-radius: 1; text-halo-color: #ffffff;
 casing-width:0.5; casing-color:#996703;
 width:3; color: #ffffff; z-index:10; dashes:9,9}
 
@@ -194,18 +342,48 @@ dashes - пунктир (длины сегментов включенных и �
 
 
 
-way|z15-[highway=footway],
-way|z15-[highway=path],
-way|z15-[highway=cycleway],
-way|z15-[highway=pedestrian],
-{text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Book; font-size:9; text-halo-radius: 1; text-halo-color: #ffffff; text-halo-radius: 1; text-halo-color: #ffffff;
-casing-width:.3; casing-color:#bf96ce;
-width:.2; color: #ffffff; z-index:10; dashes:2,2}
+way|z15[highway=footway],
+way|z15[highway=path],
 
-way|z15-[highway=steps],
-{text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Book; font-size:9; text-halo-radius: 1; text-halo-color: #ffffff; text-halo-radius: 1; text-halo-color: #ffffff;
+{text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Book; font-size:10;
+text-halo-radius: 1; text-halo-color: #ffffff; text-halo-radius: 1; text-halo-color: #ffffff;
+width:1; color: #ffffff; z-index:10}
+
+way|z16-[highway=footway],
+way|z16-[highway=path],
+{text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Book; font-size:10;
+text-halo-radius: 1; text-halo-color: #ffffff; text-halo-radius: 1; text-halo-color: #ffffff;
+width:1.5; color: #ffffff; z-index:10}
+
+way|z14[highway=cycleway]
+{width:1; color: #4BBD94; z-index:10}
+
+
+way|z15[highway=cycleway]
+{width:1.5; color: #4BBD94; z-index:10}
+
+way|z15-[highway=cycleway]
+{text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Book; font-size:10;
+text-halo-radius: 1; text-halo-color: #ffffff; text-halo-radius: 1; text-halo-color: #ffffff}
+
+way|z16-[highway=cycleway]
+{width:2; color: #4BBD94; z-index:10}
+
+
+
+
+way|z14-[highway=pedestrian]
+{width:2; color: #ffffff; casing-width:0.5; casing-color:#996703; z-index:10}
+
+way|z14-[highway=pedestrian]
+{text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Book; font-size:10; text-halo-radius: 1; text-halo-color: #ffffff; text-halo-radius: 1; text-halo-color: #ffffff;
+casing-width:.3; casing-color:#bf96ce}
+
+
+/*way|z15-[highway=steps],
+{text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Book; font-size:10; text-halo-radius: 1; text-halo-color: #ffffff; text-halo-radius: 1; text-halo-color: #ffffff;
 casing-width:.3; casing-color:#ffffff;
-width:3; color: #bf96ce; z-index:10; dashes:1,1; linecap:butt;}
+width:3; color: #bf96ce; z-index:10; dashes:1,1; linecap:butt;}*/
 
 /*
 для отрисовки лестницы используется широкая линия с частым пунктиром, создающая впечатление перпендикулярных линий "ступенек".
@@ -216,24 +394,23 @@ linecap:butt требуется для того, чтобы сегменты н�
 
 
 
-
+way|z12[highway=road],
 way|z12[highway=track],
 way|z12[highway=residential],
-way|z12[highway=unclassified],
 way|z9[highway=secondary],
 way|z9-10[highway=tertiary],
 way|z14[highway=service][living_street!=yes][service!=parking_aisle]
         {width:0.3; opacity: 0.6; color: #996703; z-index:10; -x-mapnik-layer: bottom;}
 
 
-way|z13[highway=unclassified],
+way|z13[highway=road],
 way|z13[highway=track]
 {text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Book; font-size:9; text-halo-radius: 1; text-halo-color: #ffffff;
         width:0.6; opacity: 0.5; color: #996703; z-index:10; -x-mapnik-layer: bottom;}
 
 way|z14-16[highway=road],
 way|z14-16[highway=track]
-{text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Book; font-size:9; text-halo-radius: 1; text-halo-color: #ffffff;
+{text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Book; font-size:10; text-halo-radius: 1; text-halo-color: #ffffff;
 width:1.5;  color: #ffffff;
 casing-width:0.5; casing-color: #996703;
 z-index:9}
@@ -241,33 +418,53 @@ z-index:9}
 
 way|z16-[highway=road],
 way|z16-[highway=track]
-{text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Book; font-size:9; text-halo-radius: 1; text-halo-color: #ffffff;
+{text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Book; font-size:10; text-halo-radius: 1; text-halo-color: #ffffff;
 width:2.5;  color: #ffffff;
 casing-width:0.5; casing-color: #996703;
 z-index:9}
 
 
 
-way|z13[highway=residential]
+way|z13-14[highway=residential]
 {text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Book; font-size:9; text-halo-radius: 1; text-halo-color: #ffffff;
+width:2;  color: #ffffff;
+casing-width:0.1; casing-color: #996703;
+z-index:10}
+
+way|z15-[highway=residential]
+{text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Book; font-size:10; text-halo-radius: 1; text-halo-color: #ffffff;
 width:1.2;  color: #ffffff;
 casing-width:0.3; casing-color: #996703;
 z-index:10}
 
-
 way|z15[highway=service][living_street=yes],
 way|z15[highway=service][service=parking_aisle],
-{width:0.2; opacity: 0.5; color: #996703; z-index:10}
+{width:1.5; opacity: 1; color: #ffffff; casing-width:0.1; casing-color: #996703; z-index:10}
 
 
 
 
 way|z16-[highway=service][living_street=yes],
 way|z16-[highway=service][service=parking_aisle],
-{text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Book; font-size:9; text-halo-radius: 1; text-halo-color: #ffffff;
+{text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Book; font-size:10; text-halo-radius: 1; text-halo-color: #ffffff;
         width:1.2;  color: #ffffff;
         casing-width:0.3; casing-color: #996703;
         z-index:10}
+
+
+way|z12[highway=residential],
+way|z12[highway=unclassified]
+{width:0.5;  color: #ffffff;
+casing-width:0.1; casing-color: #996703;
+        z-index:10}
+
+way|z13[highway=residential],
+way|z13[highway=unclassified]
+
+{width:2;  color: #ffffff;
+casing-width:0.1; casing-color: #996703;
+        z-index:10}
+
 
 way|z14-15[highway=residential],
 way|z14-15[highway=unclassified],
@@ -282,7 +479,7 @@ way|z16[highway=residential],
 way|z16[highway=unclassified],
 way|z16[highway=living_street],
 way|z16[highway=service][living_street!=yes][service!=parking_aisle],
-{text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Book; font-size:9; text-halo-radius: 1; text-halo-color: #ffffff;
+{text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Book; font-size:11; text-halo-radius: 1; text-halo-color: #ffffff;
         width:3.5;  color: #ffffff;
         casing-width:0.5; casing-color: #996703;
         z-index:10}
@@ -291,7 +488,7 @@ way|z17-[highway=residential],
 way|z17-[highway=unclassified],
 way|z17-[highway=living_street],
 way|z17-[highway=service][living_street!=yes][service!=parking_aisle],
-{text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Book; font-size:9; text-halo-radius: 1; text-halo-color: #ffffff;
+{text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Book; font-size:10; text-halo-radius: 1; text-halo-color: #ffffff;
         width:4.5;  color: #ffffff;
         casing-width:0.5; casing-color: #996703;
         z-index:10}
@@ -308,8 +505,8 @@ way|z10[highway=secondary]
 way|z11[highway=secondary],
 way|z11[highway=tertiary]
 {text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Book; font-size:9; text-halo-radius: 1; text-halo-color: #ffffff; text-halo-radius: 1; text-halo-color: #ffffff;
-        width:1.4;  color: #fcffd1;
-        casing-width:0.35; casing-color: #996703;
+        width:0.4;  color: #fcffd1;
+        casing-width:0.1; casing-color: #996703;
         z-index:11}
 
 way|z12[highway=secondary],
@@ -317,8 +514,8 @@ way|z12[highway=secondary_link],
 way|z12[highway=tertiary],
 way|z12[highway=tertiary_link]
 {text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Book; font-size:9; text-halo-radius: 1; text-halo-color: #ffffff; text-halo-radius: 1; text-halo-color: #ffffff;
-        width:3;  color: #fcffd1;
-        casing-width:0.35; casing-color: #996703;
+        width:1;  color: #fcffd1;
+        casing-width:0.2; casing-color: #996703;
         z-index:11}
 
 way|z13[highway=secondary],
@@ -334,45 +531,99 @@ way|z14[highway=secondary],
 way|z14[highway=secondary_link],
 way|z14[highway=tertiary],
 way|z14[highway=tertiary_link]
-{text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Bold; font-size:9; text-halo-radius: 1; text-halo-color: #ffffff;
-        width:5;  color: #fcffd1;
+{text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Bold; font-size:9;
+text-halo-radius: 1; text-halo-color: #ffffff}
+
+way|z14[highway=secondary][tunnel!=yes],
+way|z14[highway=secondary_link][tunnel!=yes],
+way|z14[highway=tertiary][tunnel!=yes],
+way|z14[highway=tertiary_link][tunnel!=yes]
+        {width:5;  color: #fcffd1;
         casing-width:0.5; casing-color: #996703;
         z-index:11}
+
+way|z14[highway=secondary][tunnel=yes],
+way|z14[highway=secondary_link][tunnel=yes],
+way|z14[highway=tertiary][tunnel=yes],
+way|z14[highway=tertiary_link][tunnel=yes]      
+       {width:5;  color: #cdcdcd; opacity: 0.6; linecap:square;
+        z-index:11} 
+
 
 way|z15[highway=secondary],
 way|z15[highway=secondary_link],
 way|z15[highway=tertiary],
 way|z15[highway=tertiary_link]
-{text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Bold; font-size:9; text-halo-radius: 1; text-halo-color: #ffffff;
-        width:6;  color: #fcffd1;
+{text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Book; font-size:10;
+text-halo-radius: 1; text-halo-color: #ffffff}
+
+way|z15[highway=secondary][tunnel!=yes],
+way|z15[highway=secondary_link][tunnel!=yes],
+way|z15[highway=tertiary][tunnel!=yes],
+way|z15[highway=tertiary_link][tunnel!=yes]
+        {width:6;  color: #fcffd1;
         casing-width:0.5; casing-color: #996703;
         z-index:11}
-
+        
+way|z15[highway=secondary][tunnel=yes],
+way|z15[highway=secondary_link][tunnel=yes],
+way|z15[highway=tertiary][tunnel=yes],
+way|z15[highway=tertiary_link][tunnel=yes]      
+       {width:6;  color: #cdcdcd; opacity: 0.6; linecap:square;
+        z-index:11}                      
+        
 way|z16[highway=secondary],
 way|z16[highway=secondary_link],
 way|z16[highway=tertiary],
 way|z16[highway=tertiary_link]
-{text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Bold; font-size:9; text-halo-radius: 1; text-halo-color: #ffffff;
-        width:7;  color: #fcffd1;
+{text: name; text-position: line; text-color: #505050; font-family: DejaVu Sans Book; font-size:11; 
+text-halo-radius: 1; text-halo-color: #ffffff}
+
+way|z16[highway=secondary][tunnel!=yes],
+way|z16[highway=secondary_link][tunnel!=yes],
+way|z16[highway=tertiary][tunnel!=yes],
+way|z16[highway=tertiary_link][tunnel!=yes]      
+        {width:7;  color: #fcffd1;
         casing-width:0.5; casing-color: #996703;
         z-index:11}
+        
+way|z16[highway=secondary][tunnel=yes],
+way|z16[highway=secondary_link][tunnel=yes],
+way|z16[highway=tertiary][tunnel=yes],
+way|z16[highway=tertiary_link][tunnel=yes]      
+       {width:7;  color: #cdcdcd; opacity: 0.6; linecap:square;
+        z-index:11}         
 
 
 way|z17[highway=secondary],
 way|z17[highway=secondary_link],
 way|z17[highway=tertiary],
 way|z17[highway=tertiary_link]
-{text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Bold; font-size:9; text-halo-radius: 1; text-halo-color: #ffffff;
-        width:8;  color: #fcffd1;
+{text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Book; font-size:12;
+text-halo-radius: 1; text-halo-color: #ffffff}
+        
+way|z17[highway=secondary][tunnel!=yes],
+way|z17[highway=secondary_link][tunnel!=yes],
+way|z17[highway=tertiary][tunnel!=yes],
+way|z17[highway=tertiary_link][tunnel!=yes]       
+{width:8;  color: #fcffd1;
         casing-width:0.5; casing-color: #996703;
         z-index:11}
+        
+way|z17[highway=secondary][tunnel=yes],
+way|z17[highway=secondary_link][tunnel=yes],
+way|z17[highway=tertiary][tunnel=yes],
+way|z17[highway=tertiary_link][tunnel=yes]      
+       {width:8;  color: #cdcdcd; opacity: 0.6; linecap:square;
+        z-index:11}             
+        
 
 way|z18-[highway=secondary],
 way|z18-[highway=secondary_link],
 way|z18-[highway=tertiary],
 way|z18-[highway=tertiary_link]
-{text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Bold; font-size:9; text-halo-radius: 1; text-halo-color: #ffffff;
-        width:9;  color: #fcffd1;
+{text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Book; font-size:9;
+text-halo-radius: 1; text-halo-color: #ffffff; width:9;  color: #fcffd1;
         casing-width:0.5; casing-color: #996703;
         z-index:11}
 
@@ -388,74 +639,114 @@ way|z7[highway=primary],
 z-index:12}
 
 way|z8[highway=primary],
-{width:2;  color: #fcea97;
-z-index:12}
+{width:1.5;  color: #fcea97;
+casing-width:0.3; casing-color: #996703;
+z-index:13}
+
+
+
 
 way|z9[highway=primary],
 way|z9[highway=primary_link]
-{text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Bold; font-size:9; text-halo-radius: 1; text-halo-color: #ffffff;
+{text: name; text-position: line; text-color: #505050; font-family: DejaVu Sans Bold; font-size:9; text-halo-radius: 1; text-halo-color: #ffffff;
 width:2;  color: #fcea97;
 casing-width:.5; casing-color: #996703;
 z-index:12}
 
 way|z10[highway=primary],
 way|z10[highway=primary_link]
-{text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Bold; font-size:9; text-halo-radius: 1; text-halo-color: #ffffff;
+{text: name; text-position: line; text-color: #505050; font-family: DejaVu Sans Bold; font-size:9; text-halo-radius: 1; text-halo-color: #ffffff;
         width:3;  color: #fcea97;
         casing-width:.5; casing-color: #996703;
         z-index:12}
 way|z11[highway=primary],
 way|z11[highway=primary_link]
-        {text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Bold; font-size:9; text-halo-radius: 1; text-halo-color: #ffffff;
+        {text: name; text-position: line; text-color: #505050; font-family: DejaVu Sans Bold; font-size:9; text-halo-radius: 1; text-halo-color: #ffffff;
         width:4;  color: #fcea97;
         casing-width:.5; casing-color: #996703;
         z-index:12}
 
 way|z12[highway=primary],
 way|z12[highway=primary_link]
-        {text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Bold; font-size:9; text-halo-radius: 1; text-halo-color: #ffffff;
+        {text: name; text-position: line; text-color: #505050; font-family: DejaVu Sans Bold; font-size:9; text-halo-radius: 1; text-halo-color: #ffffff;
         width:5;  color: #fcea97;
         casing-width:.5; casing-color: #996703;
         z-index:12}
 
 way|z13[highway=primary],
 way|z13[highway=primary_link]
-        {text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Bold; font-size:9; text-halo-radius: 1; text-halo-color: #ffffff;
+        {text: name; text-position: line; text-color: #505050; font-family: DejaVu Sans Bold; font-size:10; text-halo-radius: 1; text-halo-color: #ffffff;
         width:6;  color: #fcea97;
         casing-width:.5; casing-color: #996703;
         z-index:12}
 
 way|z14[highway=primary],
 way|z14[highway=primary_link]
-        {text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Bold; font-size:9; text-halo-radius: 1; text-halo-color: #ffffff;
-        width:7;  color: #fcea97;
+        {text: name; text-position: line; text-color: #505050;
+        font-family: DejaVu Sans Bold; font-size:10; text-halo-radius: 1; text-halo-color: #ffffff}
+        
+way|z14[highway=primary][tunnel!=yes],
+way|z14[highway=primary_link][tunnel!=yes]
+        {width:7;  color: #fcea97;
         casing-width:.5; casing-color: #996703;
         z-index:12}
+        
+way|z14[highway=primary][tunnel=yes],
+way|z14[highway=primary_link][tunnel=yes]
+{width:7;  color: #cdcdcd;opacity: 0.6; linecap:square;
+        z-index:12}           
 
 way|z15[highway=primary],
 way|z15[highway=primary_link]
-        {text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Bold; font-size:9; text-halo-radius: 1; text-halo-color: #ffffff;
-        width:8;  color: #fcea97;
+        {text: name; text-position: line; text-color: #707070; font-family: DejaVu Sans Bold;
+        font-size:10; text-halo-radius: 1; text-halo-color: #ffffff}
+        
+way|z15[highway=primary][tunnel!=yes],
+way|z15[highway=primary_link][tunnel!=yes]       
+        {width:8;  color: #fcea97;
         casing-width:.5; casing-color: #996703;
         z-index:12}
+        
+way|z15[highway=primary][tunnel=yes],
+way|z15[highway=primary_link][tunnel=yes]
+{width:8;  color: #cdcdcd; opacity: 0.6; linecap:square;
+        z-index:12}         
+
 
 way|z16[highway=primary],
 way|z16[highway=primary_link]
-        {text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Bold; font-size:9; text-halo-radius: 1; text-halo-color: #ffffff;
-        width:9;  color: #fcea97;
+        {text: name; text-position: line; text-color: #707070; font-family: DejaVu Sans Bold;
+        font-size:11; text-halo-radius: 1; text-halo-color: #ffffff}
+  
+way|z16[highway=primary][tunnel!=yes],
+way|z16[highway=primary_link][tunnel!=yes] 
+        {width:9;  color: #fcea97;
         casing-width:.5; casing-color: #996703;
         z-index:12}
-
+way|z16[highway=primary][tunnel=yes],
+way|z16[highway=primary_link][tunnel=yes]
+{width:9;  color: #cdcdcd; opacity: 0.6; linecap:square;
+        z-index:12}   
+        
 way|z17[highway=primary],
 way|z17[highway=primary_link]
-        {text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Bold; font-size:9; text-halo-radius: 1; text-halo-color: #ffffff;
-        width:10;  color: #fcea97;
+        {text: name; text-position: line; text-color: #707070;
+        font-family: DejaVu Sans Bold; font-size:11; text-halo-radius: 1; text-halo-color: #ffffff}
+
+way|z17[highway=primary][tunnel!=yes],
+way|z17[highway=primary_link][tunnel!=yes]       
+        {width:10;  color: #fcea97;
         casing-width:.5; casing-color: #996703;
         z-index:12}
+        
+way|z17[highway=primary][tunnel=yes],
+way|z17[highway=primary_link][tunnel=yes]
+{width:10;  color: #cdcdcd; opacity: 0.6; linecap:square;
+        z-index:12}       
 
 way|z18-[highway=primary],
 way|z18-[highway=primary_link]
-        {text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Bold; font-size:9; text-halo-radius: 1; text-halo-color: #ffffff;
+        {text: name; text-position: line; text-color: #505050; font-family: DejaVu Sans Bold; font-size:12; text-halo-radius: 1; text-halo-color: #ffffff;
         width:11;  color: #fcea97;
         casing-width:.5; casing-color: #996703;
         z-index:12}
@@ -477,19 +768,19 @@ way|z7[highway=motorway]
 {width:1.2;  color: #fc9265;
 z-index:13}
 
-
 way|z8[highway=trunk],
-{width:2;  color: #fbcd40;
-z-index:13}
-
 way|z8[highway=motorway],
-{width:2;  color: #fc9265;
+{width:2;  color: #EFB467;
+casing-width:0.5; casing-color: #996703;
 z-index:13}
 
+way|z8[highway=trunk]::centerline,
+way|z8[highway=motorway]::centerline,
+{width:0.3;  color: #fa6478; z-index:13}
 
 way|z9[highway=trunk],
 way|z9[highway=motorway],
-{text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Bold; font-size:9; text-halo-radius: 1; text-halo-color: #ffffff;
+{text: name; text-position: line; text-color: #505050; font-family: DejaVu Sans Bold; font-size:9; text-halo-radius: 1; text-halo-color: #ffffff;
 width:3;  color: #ffd780;
 casing-width:1; casing-color: #996703;
 z-index:13}
@@ -497,28 +788,28 @@ z-index:13}
 
 way|z10[highway=trunk],
 way|z10[highway=motorway],
-{text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Bold; font-size:9; text-halo-radius: 1; text-halo-color: #ffffff;
+{text: name; text-position: line; text-color: #505050; font-family: DejaVu Sans Bold; font-size:9; text-halo-radius: 1; text-halo-color: #ffffff;
         width:4;  color: #ffd780;
         casing-width:1; casing-color: #996703;
         z-index:13}
 
 way|z11[highway=trunk],
 way|z11[highway=motorway],
-{text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Bold; font-size:9; text-halo-radius: 1; text-halo-color: #ffffff;
+{text: name; text-position: line; text-color: #505050; font-family: DejaVu Sans Bold; font-size:9; text-halo-radius: 1; text-halo-color: #ffffff;
         width:5;  color: #ffd780;
         casing-width:1; casing-color: #996703;
         z-index:13}
 
 way|z12[highway=trunk],
 way|z12[highway=motorway],
-{text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Bold; font-size:9; text-halo-radius: 1; text-halo-color: #ffffff;
+{text: name; text-position: line; text-color: #505050; font-family: DejaVu Sans Bold; font-size:10; text-halo-radius: 1; text-halo-color: #ffffff;
         width:7;  color: #ffd780;
         casing-width:1; casing-color: #996703;
         z-index:13}
 
 way|z13[highway=trunk],
 way|z13[highway=motorway],
-{text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Bold; font-size:9; text-halo-radius: 1; text-halo-color: #ffffff;
+{text: name; text-position: line; text-color: #505050; font-family: DejaVu Sans Bold; font-size:11; text-halo-radius: 1; text-halo-color: #ffffff;
         width:8;  color: #ffd780;
         casing-width:1; casing-color: #996703;
         z-index:13}
@@ -527,44 +818,101 @@ way|z14[highway=trunk],
 way|z14[highway=trunk_link],
 way|z14[highway=motorway],
 way|z14[highway=motorway_link],
-{text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Bold; font-size:9; text-halo-radius: 1; text-halo-color: #ffffff;
-        width:9;  color: #ffd780;
+{text: name; text-position: line; text-color: #505050; font-family: DejaVu Sans Bold; font-size:11;
+text-halo-radius: 1; text-halo-color: #ffffff}
+
+way|z14[highway=trunk][tunnel!=yes],
+way|z14[highway=trunk_link][tunnel!=yes],
+way|z14[highway=motorway][tunnel!=yes],
+way|z14[highway=motorway_link][tunnel!=yes]
+        {width:9;  color: #ffd780;
         casing-width:1; casing-color: #996703;
         z-index:13}
+        
+ way|z14[highway=trunk][tunnel=yes],
+way|z14[highway=trunk_link][tunnel=yes],
+way|z14[highway=motorway][tunnel=yes],
+way|z14[highway=motorway_link][tunnel=yes]
+{width:9;  color: #cdcdcd; opacity: 0.6; linecap:square;
+        z-index:12} 
+       
 
 
 way|z15[highway=trunk],
 way|z15[highway=trunk_link],
 way|z15[highway=motorway],
 way|z15[highway=motorway_link],
-{text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Bold; font-size:9; text-halo-radius: 1; text-halo-color: #ffffff;
-        width:10;  color: #ffd780;
+{text: name; text-position: line; text-color: #505050; font-family: DejaVu Sans Bold; font-size:12;
+text-halo-radius: 1; text-halo-color: #ffffff}
+
+way|z15[highway=trunk][tunnel!=yes],
+way|z15[highway=trunk_link][tunnel!=yes],
+way|z15[highway=motorway][tunnel!=yes],
+way|z15[highway=motorway_link][tunnel!=yes],        
+        {width:10;  color: #ffd780;
         casing-width:1; casing-color: #996703;
         z-index:13}
-
+        
+way|z15[highway=trunk][tunnel=yes],
+way|z15[highway=trunk_link][tunnel=yes],
+way|z15[highway=motorway][tunnel=yes],
+way|z15[highway=motorway_link][tunnel=yes]
+{width:10;  color: #cdcdcd; opacity: 0.6; linecap:square;
+        z-index:12}         
+              
+        
 way|z16[highway=trunk],
 way|z16[highway=trunk_link],
 way|z16[highway=motorway],
 way|z16[highway=motorway_link],
-{text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Bold; font-size:9; text-halo-radius: 1; text-halo-color: #ffffff;
-        width:11;  color: #ffd780;
+{text: name; text-position: line; text-color: #505050; font-family: DejaVu Sans Bold; font-size:11; 
+text-halo-radius: 1; text-halo-color: #ffffff}
+        
+way|z16[highway=trunk][tunnel!=yes],
+way|z16[highway=trunk_link][tunnel!=yes],
+way|z16[highway=motorway][tunnel!=yes],
+way|z16[highway=motorway_link][tunnel!=yes], 
+        {width:11;  color: #ffd780;
         casing-width:1; casing-color: #996703;
         z-index:13}
+        
+  way|z16[highway=trunk][tunnel=yes],
+way|z16[highway=trunk_link][tunnel=yes],
+way|z16[highway=motorway][tunnel=yes],
+way|z16[highway=motorway_link][tunnel=yes]
+{width:11;  color: #cdcdcd; opacity: 0.6; linecap:square;
+        z-index:12}         
+                    
 
 way|z17[highway=trunk],
 way|z17[highway=trunk_link],
 way|z17[highway=motorway],
 way|z17[highway=motorway_link],
-{text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Bold; font-size:9; text-halo-radius: 1; text-halo-color: #ffffff;
-        width:12;  color: #ffd780;
+{text: name; text-position: line; text-color: #505050; font-family: DejaVu Sans Bold;
+font-size:11; text-halo-radius: 1; text-halo-color: #ffffff}
+
+way|z17[highway=trunk][tunnel!=yes],
+way|z17[highway=trunk_link][tunnel!=yes],
+way|z17[highway=motorway][tunnel!=yes],
+way|z17[highway=motorway_link][tunnel!=yes],
+        {width:12;  color: #ffd780;
         casing-width:1; casing-color: #996703;
         z-index:13}
+        
+way|z17[highway=trunk][tunnel=yes],
+way|z17[highway=trunk_link][tunnel=yes],
+way|z17[highway=motorway][tunnel=yes],
+way|z17[highway=motorway_link][tunnel=yes]
+{width:12;  color: #cdcdcd; opacity: 0.6; linecap:square;
+        z-index:12}    
+
 
 way|z18-[highway=trunk],
 way|z18-[highway=trunk_link],
 way|z18-[highway=motorway],
 way|z18-[highway=motorway_link],
-{text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Bold; font-size:9; text-halo-radius: 1; text-halo-color: #ffffff;
+{text: name; text-position: line; text-color: #505050; font-family: DejaVu Sans Bold; 
+font-size:12; text-halo-radius: 1; text-halo-color: #ffffff;
         width:13;  color: #ffd780;
         casing-width:1; casing-color: #996703;
         z-index:13}
@@ -576,37 +924,7 @@ way|z9-[highway=motorway]::centerline,
 way|z9-[highway=motorway_link]::centerline,
 way|z13-[highway=primary]::centerline,
 way|z13-[highway=primary_link]::centerline,
-        {width:.3;  color: #fa6478; z-index:14; -x-mapnik-layer: top}
-
-
-
-
-
-area|z15-[highway=service][area=yes],
-area|z15-[area:highway=service],
-area|z15-[area:highway=residential],
-area|z15-[area:highway=unclassified],
-area|z15-[area:highway=living_street]
-        {width: 1; casing-width:0.3; fill-color:#ffffff; color: #ffffff; z-index: 15; casing-color: #996703;}
- 
-area|z15-[landuse=carriageway],
-area|z15-[area:highway=secondary],
-area|z15-[area:highway=tertiary]
-        {width: 1; casing-width:0.3; fill-color:#fcffd1; color: #fcffd1; z-index: 15; casing-color: #996703;}
-
-area|z15-[area:highway=primary]
-        {width: 1; casing-width:0.3; fill-color:#fcea97; color: #fcea97; z-index: 15; casing-color: #996703;}
-
-area|z15-[area:highway=trunk],
-area|z15-[area:highway=motorway]
-        {width: 1; casing-width:0.3; fill-color:#ffd780; color: #ffd780; z-index: 15; casing-color: #996703;}
-
-area|z15-[area:highway=footway],
-area|z15-[area:highway=pedestrian],
-area|z15-[area:highway=path]
-        {width: 1; casing-width:1; fill-color:#DDB8EA; color: #DDB8EA; z-index: 15; casing-color:#c2a2ce; casing-dashes:2,2}
-
-
+        {width:.3;  color: #fa6478; z-index:31}
 
 
 
@@ -621,9 +939,21 @@ area|z15-[area:highway=path]
 
 
 */
+way|z15-[highway=trunk][oneway=yes],
+way|z15-[highway=trunk_link][oneway=yes],
+way|z15-[highway=motorway][oneway=yes],
+way|z15-[highway=motorway_link][oneway=yes],
+way|z15-[highway=primary][oneway=yes],
+way|z15-[highway=primary_link][oneway=yes],
+way|z15-[highway=secondary][oneway=yes],
+way|z15-[highway=secondary_link][oneway=yes],
+way|z15-[highway=tertiary][oneway=yes],
+way|z15-[highway=tertiary_link][oneway=yes]
+{pattern-image:arrows; z-index:15; -x-mapnik-layer: top; fill:red}
 
-way|z16-[oneway=yes]{pattern-image:arrows;z-index:15; -x-mapnik-layer: top;}
 
+area|z15-[amenity=parking]{icon-image:parking2.png; z-index:1}
+node|z15-[amenity=parking]{icon-image:parking2.png; z-index:1}
 /*
 
 pattern-image - заливка линии картинкой.
@@ -633,22 +963,37 @@ arrows - специальное значение для синих стрело�
 */
 
 
-line|z7[railway=rail]
+line|z7[railway=rail][service!=siding][service!=spur][service!=yard]
 {width:.5; color: #303030;z-index:15}
-line|z7[railway=rail]::ticks
-{width:.3; color: #ffffff; dashes: 3,3;z-index:15}
+line|z7[railway=rail][service!=siding][service!=spur][service!=yard]::ticks
+{width:.3; color: #505050; dashes: 3,5;z-index:15}
 
-line|z8[railway=rail]
-{width:.6; color: #303030;z-index:15}
-line|z8[railway=rail]::ticks
-{width:.35; color: #ffffff; dashes: 3,3;z-index:15}
+line|z8[railway=rail][service!=siding][service!=spur][service!=yard]
+{width:1; color: #303030;z-index:15}
+line|z8[railway=rail][service!=siding][service!=spur][service!=yard]::ticks
+{width:0.7; color: #ffffff; dashes:4,8; z-index:15}
 
-line|z9-[railway=rail]
-    {width:1.4; color: #606060;z-index:15}
-line|z9-[railway=rail]::ticks
+line|z9[railway=rail][service!=siding][service!=spur][service!=yard]
+    {width:1.4; color: #5A516D;z-index:15}
+line|z9[railway=rail][service!=siding][service!=spur][service!=yard]::ticks
     {width:1; color: #ffffff; dashes: 6,6;z-index:15}
+    
+line|z10-13[railway=rail][service!=siding][service!=spur][service!=yard]
+    {width:1.7; color: #666699;z-index:15}
+line|z10-13[railway=rail][service!=siding][service!=spur][service!=yard]::ticks
+    {width:1.1; color: #ffffff; dashes: 10,8; z-index:15}
+    
+    line|z14-15[railway=rail][service!=siding][service!=spur][service!=yard]
+    {width:2.2; color: #666699;z-index:15}
+line|z12-15[railway=rail][service!=siding][service!=spur][service!=yard]::ticks
+    {width:1.3; color: #ffffff; dashes: 10,8;z-index:15}
 
 
+line|z16-[railway=rail]
+    {width:3.5; color: #666699;z-index:15}
+line|z16-[railway=rail]::ticks
+    {width:2.2; color: #ffffff; dashes: 12,9;z-index:15}
+   
 
 /*
 железная дорога рисуется в две линии:
@@ -657,6 +1002,7 @@ line|z9-[railway=rail]::ticks
 
 */
 
+
 way|z12-[railway=subway][colour=red]    {width:3; color: #DD0000;z-index:15; dashes:3,3; opacity:0.3; linecap: butt; -x-mapnik-layer: top;}
 way|z12-[railway=subway][colour=blue]   {width:3; color: #072889;z-index:15; dashes:3,3; opacity:0.3; linecap: butt; -x-mapnik-layer: top;}
 way|z12-[railway=subway][colour=purple] {width:3; color: #8B509C;z-index:15; dashes:3,3; opacity:0.3; linecap: butt; -x-mapnik-layer: top;}
@@ -664,29 +1010,103 @@ way|z12-[railway=subway][colour=orange] {width:3; color: #FF7700;z-index:15; das
 way|z12-[railway=subway][colour=green]  {width:3; color: #006600;z-index:15; dashes:3,3; opacity:0.3; linecap: butt; -x-mapnik-layer: top;}
 way|z12-[railway=subway][colour=brown]  {width:3; color: #BB7700;z-index:15; dashes:3,3; opacity:0.3; linecap: butt; -x-mapnik-layer: top;}
 
-way|z12-[railway=subway][!colour] {width:3; color: #072889;z-index:15; dashes:3,3; opacity:0.3; linecap: butt; -x-mapnik-layer: top;}
-
-way|z16-[barrier=fence] {width:.3; color: black;z-index:16; -x-mapnik-layer: top;}
-way|z16-[barrier=wall],
-way|z16-[barrier=retaining_wall] {width:.5; color: black;z-index:16; -x-mapnik-layer: top;}
+way|z13-15[railway=subway][!colour] {width:1.5; color:#700E19;z-index:15; 
+opacity:0.5; dashes:3,2; linecap: butt; z-index:15}
 
 
 
-/* разметка на стадионах */
-way|z15-[marking][!colour],
+way|z13[bridge=yes][foot=yes],
+way|z13[bridge=yes][highway=footway]
+{width:2; color:#ffffff; z-index:20; casing-width:0.3;
+casing-color:#040404}
+
+way|z14[bridge=yes][foot=yes],
+way|z14[bridge=yes][highway=footway]
+{width:2.5; color:#D3DA95; z-index:20; casing-width:0.3;
+casing-color:#040404} 
+
+
+way|z15[bridge=yes][foot=yes],
+way|z15[bridge=yes][highway=footway]
+{width:4; color:#D3DA95; z-index:20; casing-width:0.3;
+casing-color:#040404}
+
+way|z16-[bridge=yes][foot=yes],
+way|z16[bridge=yes][highway=footway]
+{width:6; color:#D3DA95; z-index:20; casing-width:0.3;
+casing-color:#040404}
+
+
+
+
+way|z13[highway=primary][bridge],
+way|z13[highway=primary_link][bridge]
+{width:3;  color: #FEC40E; linecap:square;
+        z-index:21}  
+way|z13[highway=trunk][bridge],
+way|z13[highway=trunk_link][bridge],
+way|z13[highway=motorway][bridge],
+way|z13[highway=motorway_link][bridge],       
+        {width:4;  color: #FEC40E; linecap:square;
+        z-index:21} 
+
+way|z14[highway=primary][bridge],
+way|z14[highway=primary_link][bridge]
+{width:7;  color: #F9D84B; linecap:square;
+        z-index:30}  
+way|z14[highway=trunk][bridge],
+way|z14[highway=trunk_link][bridge],
+way|z14[highway=motorway][bridge],
+way|z14[highway=motorway_link][bridge],       
+        {width:8;  color: #F9D84B; linecap:square;
+        z-index:30;} 
+
+way|z15[highway=primary][bridge],
+way|z15[highway=primary_link][bridge]
+{width:8;  color: #F9D84B; linecap:square;
+        z-index:30}  
+way|z15[highway=trunk][bridge],
+way|z15[highway=trunk_link][bridge],
+way|z15[highway=motorway][bridge],
+way|z15[highway=motorway_link][bridge],       
+        {width:9;  color: #F9D84B; linecap:square;
+        z-index:30} 
+  
+way|z15[highway=primary][bridge],
+way|z15[highway=primary_link][bridge]
+{width:9;  color: #F9D84B; linecap:square;
+        z-index:30}          
+        
+way|z16[highway=trunk][bridge],
+way|z16[highway=trunk_link][bridge],
+way|z16[highway=motorway][bridge],
+way|z16[highway=motorway_link][bridge],       
+        {width:10;  color: #F9D84B; linecap:square;
+        z-index:30} 
+ 
+way|z17[highway=primary][bridge],
+way|z17[highway=primary_link][bridge]
+{width:10;  color: #F9D84B; linecap:square;
+        z-index:30}           
+way|z17[highway=trunk][bridge],
+way|z17[highway=trunk_link][bridge],
+way|z17[highway=motorway][bridge],
+way|z17[highway=motorway_link][bridge],        
+     {width:11;  color: #F9D84B; linecap:square; z-index:30}   
+
+node|z16-[highway=traffic_signals]
+{icon-image:svetofor3.png}
+
+way|z15-[marking=sport][!colour],
         {width:.5; color: #a0a0a0;z-index:16; -x-mapnik-layer: top;}
-way|z15-[marking][colour=white],
-way|z15-[marking][color=white]    {width:1; color: white;z-index:16; -x-mapnik-layer: top;}
-way|z15-[marking][colour=red],
-way|z15-[marking][color=red]    {width:1; color: #c00000;z-index:16; -x-mapnik-layer: top;}
-way|z15-[marking][colour=black],
-way|z15-[marking][color=black]    {width:1; color: black;z-index:16; -x-mapnik-layer: top;}
-way|z15-[marking][colour=blue],
-way|z15-[marking][color=blue]    {width:1; color: #0000c0;z-index:16; -x-mapnik-layer: top;}
-
-
-
-
+way|z15-[marking=sport][colour=white],
+way|z15-[marking=sport][color=white]    {width:1; color: white;z-index:16; -x-mapnik-layer: top;}
+way|z15-[marking=sport][colour=red],
+way|z15-[marking=sport][color=red]    {width:1; color: #c00000;z-index:16; -x-mapnik-layer: top;}
+way|z15-[marking=sport][colour=black],
+way|z15-[marking=sport][color=black]    {width:1; color: black;z-index:16; -x-mapnik-layer: top;}
+way|z15-[marking=sport][colour=blue],
+way|z15-[marking=sport][color=blue]    {width:1; color: #0000c0;z-index:16; -x-mapnik-layer: top;}
 
 node|z15-[amenity=bus_station] {icon-image:aut2_16x16_park.png}
 node|z16-[highway=bus_stop]    {icon-image:autobus_stop_14x10.png}
@@ -701,38 +1121,613 @@ icon-image - картинка иконки
 
 */
 
-node|z16-[amenity=pharmacy]    {icon-image:med1_11x14.png}
-node|z16-[amenity=cinema]      {icon-image:cinema_14x14.png}
+
+node|z15-[amenity=pharmacy]    {icon-image:med1_11x14.png}
+node|z15-[amenity=cinema]      {icon-image:cinema_14x14.png}
 node|z15-[amenity=museum]      {icon-image:mus_13x12.png}
-node|z16-[tourism=zoo]         {icon-image:zoo4_14x14.png}
+node|z15-[tourism=zoo]         {icon-image:zoo4_14x14.png}
+
+node|z16-[tourism=zoo]         {icon-image:zoo4_14x14.png;
+text:name; font-size:10;
+font-family: DejaVu Sans Book; text-color:#101010; text-halo-radius: 1;
+text-halo-color: #ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0; text-placement:any;
+max-width:30}
 node|z16-[amenity=courthouse]  {icon-image:sud_14x13.png}
-node|z16-[amenity=theatre]     {icon-image:teater_14x14.png}
-node|z16-[amenity=university]  {icon-image:univer_15x11.png}
+
 node|z16-[amenity=toilets]     {icon-image:wc-3_13x13.png}
-node|z16-[amenity=place_of_worship][religion=christian]
-			      {icon-image:pravosl_kupol_11x15.png;}
-area|z16-[amenity=place_of_worship][religion=christian]
-			      {icon-image:pravosl_kupol_11x15.png;}
-node|z14-[amenity=place_of_worship]
+
+node|z16[amenity=restaurant] {icon-image:restoran.png}
+node|z16[amenity=fast_food] {icon-image:fastfood.png;}
+node|z16[amenity=pub] {icon-image:pab.png; text:name}
+node|z16[amenity=bar] {icon-image:nclub.png}
+node|z16[amenity=cafe] {icon-image:cafe.png}
+node|z17-[amenity=cafe] {icon-image:cafe.png; text-offset:10; text:name; font-size:8;
+font-family: DejaVu Sans Book; text-color:#2D1A2D; text-halo-radius: 1;
+text-halo-color: #ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0; text-placement:any;
+max-width:30; z-index:15}
+node|z16[amenity=ice_cream] {icon-image:cafe_ice.png}
+node|z16[amenity=bicycle_rental] {icon-image:velo_prokat.png}
+node|z16[amenity=car_rental] {icon-image:autorental.png}
+node|z16[amenity=car_wash] {icon-image:autowasch.png}
+node|z16[amenity=bank] {icon-image:amerikan_bank.png}
+node|z16[amenity=dentist] {icon-image:dantist.png}
+node|z16[amenity=social_facility] {icon-image:althaus.png}
+node|z16[amenity=veterinary] {icon-image:pitomnik_vetelinar.png}
+node|z16[amenity=fountain] {icon-image:fontan.png}
+node|z16[amenity=studio] {icon-image:zvukozapis.png}
+node|z16[amenity=courthouse] {icon-image:sud.png}
+node|z16[amenity=embassy] {icon-image:poposol.png}
+node|z16[amenity=marketplace] {icon-image:market1.png}
+node|z16[amenity=sauna] {icon-image:banja.png}
+node|z16[amenity=townhall] {icon-image:municipal.png}
+
+node|z17-[amenity=restaurant] {icon-image:restoran.png; text-offset:10; text:name; font-size:8;
+font-family: DejaVu Sans Book; text-color:#2D1A2D; text-halo-radius: 1;
+text-halo-color: #ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0; text-placement:any;
+max-width:30; z-index:15}
+node|z17-[amenity=fast_food] {icon-image:fastfood.png; text-offset:10; text:name; font-size:8;
+font-family: DejaVu Sans Book; text-color:#2D1A2D; text-halo-radius: 1;
+text-halo-color: #ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0; text-placement:any;
+max-width:30; z-index:15}
+node|z17-[amenity=pub] {icon-image:pab.png; ; text-offset:13; text:name; font-size:8;
+font-family: DejaVu Sans Book; text-color:#2D1A2D; text-halo-radius: 1;
+text-halo-color: #ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0; text-placement:any;
+max-width:40; z-index:15}
+node|z17-[amenity=bar] {icon-image:nclub.png;  text-offset:10; text:name; font-size:8;
+font-family: DejaVu Sans Book; text-color:#2D1A2D; text-halo-radius: 1;
+text-halo-color: #ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0; text-placement:any;
+max-width:30; z-index:15}
+node|z17-[amenity=ice_cream] {icon-image:cafe_ice.png; text-offset:10; text:name; font-size:8;
+font-family: DejaVu Sans Book; text-color:#2D1A2D; text-halo-radius: 1;
+text-halo-color: #ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0; text-placement:any;
+max-width:30; z-index:15}
+node|z17-[amenity=bicycle_rental] {icon-image:velo_prokat.png; text-offset:10; text:name; font-size:8;
+font-family: DejaVu Sans Book; text-color:#2D1A2D; text-halo-radius: 1;
+text-halo-color: #ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0; text-placement:any;
+max-width:30; z-index:15}
+node|z17-[amenity=car_rental] {icon-image:autorental.png; text-offset:10; text:name; font-size:8;
+font-family: DejaVu Sans Book; text-color:#2D1A2D; text-halo-radius: 1;
+text-halo-color: #ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0; text-placement:any;
+max-width:30; z-index:15}
+node|z17-[amenity=car_wash] {icon-image:autowasch.png; text-offset:10; text:name; font-size:8;
+font-family: DejaVu Sans Book; text-color:#2D1A2D; text-halo-radius: 1;
+text-halo-color: #ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0; text-placement:any;
+max-width:30; z-index:15}
+node|z17-[amenity=bank] {icon-image:amerikan_bank.png; text-offset:14; text:name; font-size:8;
+font-family: DejaVu Sans Book; text-color:#2D1A2D; text-halo-radius: 1;
+text-halo-color: #ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0; text-placement:any;
+max-width:40; z-index:15}
+node|z17-[amenity=dentist] {icon-image:dantist.png; text-offset:10; text:name; font-size:8;
+font-family: DejaVu Sans Book; text-color:#2D1A2D; text-halo-radius: 1;
+text-halo-color: #ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0; text-placement:any;
+max-width:30; z-index:15}
+node|z17-[amenity=social_facility] {icon-image:althaus.png; text-offset:10; text:name; font-size:8;
+font-family: DejaVu Sans Book; text-color:#2D1A2D; text-halo-radius: 1;
+text-halo-color: #ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0; text-placement:any;
+max-width:30; z-index:15}
+node|z17-[amenity=veterinary] {icon-image:pitomnik_vetelinar.png; text-offset:10; text:name; font-size:8;
+font-family: DejaVu Sans Book; text-color:#2D1A2D; text-halo-radius: 1;
+text-halo-color: #ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0; text-placement:any;
+max-width:30; z-index:15}
+node|z17-[amenity=fountain] {icon-image:fontan.png; text-offset:10; text:name; font-size:8;
+font-family: DejaVu Sans Book; text-color:#2D1A2D; text-halo-radius: 1;
+text-halo-color: #ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0; text-placement:any;
+max-width:30; z-index:15}
+node|z17-[amenity=studio] {icon-image:zvukozapis.png; text-offset:10; text:name; font-size:8;
+font-family: DejaVu Sans Book; text-color:#2D1A2D; text-halo-radius: 1;
+text-halo-color: #ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0; text-placement:any;
+max-width:30; z-index:15}
+node|z17-[amenity=courthouse] {icon-image:sud.png; text-offset:15; text:name; font-size:8;
+font-family: DejaVu Sans Book; text-color:#2D1A2D; text-halo-radius: 1;
+text-halo-color: #ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0; text-placement:any;
+max-width:40; z-index:15}
+node|z17-[amenity=embassy] {icon-image:poposol.png; text-offset:10; text:name; font-size:8;
+font-family: DejaVu Sans Book; text-color:#2D1A2D; text-halo-radius: 1;
+text-halo-color: #ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0; text-placement:any;
+max-width:30; z-index:15}
+node|z17-[amenity=marketplace] {icon-image:market1.png; text-offset:14; text:name; font-size:8;
+font-family: DejaVu Sans Book; text-color:#2D1A2D; text-halo-radius: 1;
+text-halo-color: #ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0; text-placement:any;
+max-width:30; z-index:15}
+node|z17-[amenity=sauna] {icon-image:banja.png; text-offset:10; text:name; font-size:8;
+font-family: DejaVu Sans Book; text-color:#2D1A2D; text-halo-radius: 1;
+text-halo-color: #ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0; text-placement:any;
+max-width:30; z-index:15}
+node|z17-[amenity=townhall] {icon-image:municipal.png; text-offset:10; text:name; font-size:8;
+font-family: DejaVu Sans Book; text-color:#2D1A2D; text-halo-radius: 1;
+text-halo-color: #ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0; text-placement:any;
+max-width:30; z-index:15}
+
+
+
+
+node|z16[amenity=place_of_worship][religion=buddhist] {icon-image:buddizm.png}
+node|z16[amenity=place_of_worship][religion=buddhist]
+{icon-image:buddizm.png}
+node|z15-16[amenity=place_of_worship][religion=christian]{icon-image:pravosl_kupol_11x15.png}
+node|z16[amenity=place_of_worship][religion=hindu] {icon-image:sinagoga.png}
+node|z16[amenity=place_of_worship][religion=hindu]
+{icon-image:sinagoga.png}
+node|z16[amenity=place_of_worship][religion=muslim]{icon-image:mechet.png}
+node|z16[amenity=place_of_worship][religion=muslim]
+{icon-image:mechet.png}
+
+node|z17-[amenity=place_of_worship][religion=buddhist] {icon-image:buddizm.png; text-offset:20; 
+text:name; font-size:9;
+font-family: DejaVu Sans Oblique; text-color:#2C154C; text-halo-radius: 0;
+text-halo-color: #ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0; text-placement:any;
+max-width:60}
+node|z17-[amenity=place_of_worship][religion=buddhist]
+{icon-image:buddizm.png; text-offset:20; text:name; font-size:9;
+font-family: DejaVu Sans Oblique; text-color:#2C154C; text-halo-radius: 0;
+text-halo-color: #ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0; text-placement:any;
+max-width:60}
+node|z17-[amenity=place_of_worship][religion=christian]{icon-image:pravosl_kupol_11x15.png;
+text-offset:25; text:name; font-size:9;
+font-family: DejaVu Sans Oblique; text-color:#2C154C; text-halo-radius: 0;
+text-halo-color: #ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0; text-placement:any;
+max-width:60}
+node|z17-[amenity=place_of_worship][religion=hindu] {icon-image:sinagoga.png; text-offset:20; 
+text:name; font-size:9;
+font-family: DejaVu Sans Oblique; text-color:#2C154C; text-halo-radius: 0;
+text-halo-color: #ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0; text-placement:any;
+max-width:60}
+node|z17-[amenity=place_of_worship][religion=hindu]
+{icon-image:sinagoga.png; text-offset:20; text:name; font-size:8;
+font-family: DejaVu Sans Oblique; text-color:#2C154C; text-halo-radius: 0;
+text-halo-color: #ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0; text-placement:any;
+max-width:60}
+node|z17-[amenity=place_of_worship][religion=muslim]{icon-image:mechet.png; text-offset:20; text:name; font-size:9;
+font-family: DejaVu Sans Oblique; text-color:#2C154C; text-halo-radius: 0;
+text-halo-color: #ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0; text-placement:any;
+max-width:60}
+node|z17-[amenity=place_of_worship][religion=muslim]
+{icon-image:mechet.png; text-offset:20; text:name; font-size:9;
+font-family:DejaVu Sans Oblique; text-color:#2C154C; text-halo-radius: 0;
+text-halo-color: #ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0; text-placement:any;
+max-width:60}
+
+
+
+node|z16[tourism=camp_site] {icon-image:camping.png}
+node|z16[tourism=information] {icon-image:info.png}
+node|z16[historic=memorial] {icon-image:historic_monument.png}
+node|z16[historic=monument] {icon-image:monument.png}
+node|z16[historic=wayside_cross ] {icon-image:catolik.png}
+node|z16[historic=rune_stone] {icon-image:kult_place.png}
+node|z16[sport=9pin] {icon-image:kegelbahn.png}
+node|z16[sport=10pin] {icon-image:kegelbahn.png}
+node|z16[sport=equestrian] {icon-image:ippodrom.png}
+node|z16[sport=skating] {icon-image:katok.png}
+node|z16[sport=table_tennis] {icon-image:pingpong.png}
+
+node|z17-[tourism=camp_site] {icon-image:camping.png; text-offset:10; text:name; font-size:8;
+font-family: DejaVu Sans Book; text-color:#2D1A2D; text-halo-radius: 1;
+text-halo-color: #ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0; text-placement:any;
+max-width:30; z-index:15}
+node|z17-[tourism=information] {icon-image:info.png; text-offset:10; text:name; font-size:8;
+font-family: DejaVu Sans Book; text-color:#2D1A2D; text-halo-radius: 1;
+text-halo-color: #ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0; text-placement:any;
+max-width:30; z-index:15}
+node|z17-[historic=memorial] {icon-image:historic_monument.png; text-offset:13; text:name; font-size:8;
+font-family: DejaVu Sans Book; text-color:#2D1A2D; text-halo-radius: 1;
+text-halo-color: #ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0; text-placement:any;
+max-width:40; z-index:15}
+node|z17-[historic=monument] {icon-image:monument.png; text-offset:13; text:name; font-size:8;
+font-family: DejaVu Sans Book; text-color:#2D1A2D; text-halo-radius: 1;
+text-halo-color: #ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0; text-placement:any;
+max-width:40; z-index:15}
+node|z17-[historic=wayside_cross ] {icon-image:catolik.png; text-offset:10; text:name; font-size:8;
+font-family: DejaVu Sans Book; text-color:#2D1A2D; text-halo-radius: 1;
+text-halo-color: #ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0; text-placement:any;
+max-width:30; z-index:15}
+node|z17-[historic=rune_stone] {icon-image:kult_place.png; text-offset:10; text:name; font-size:8;
+font-family: DejaVu Sans Book; text-color:#2D1A2D; text-halo-radius: 1;
+text-halo-color: #ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0; text-placement:any;
+max-width:30; z-index:15}
+node|z17-[sport=9pin] {icon-image:kegelbahn.png; text-offset:10; text:name; font-size:8;
+font-family: DejaVu Sans Book; text-color:#2D1A2D; text-halo-radius: 1;
+text-halo-color: #ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0; text-placement:any;
+max-width:30; z-index:15}
+node|z17-[sport=10pin] {icon-image:kegelbahn.png; text-offset:10; text:name; font-size:8;
+font-family: DejaVu Sans Book; text-color:#2D1A2D; text-halo-radius: 1;
+text-halo-color: #ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0; text-placement:any;
+max-width:30; z-index:15
+node|z17-[sport=equestrian] {icon-image:ippodrom.png; text-offset:10; text:name; font-size:8;
+font-family: DejaVu Sans Book; text-color:#2D1A2D; text-halo-radius: 1;
+text-halo-color: #ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0; text-placement:any;
+max-width:30; z-index:15}
+node|z17-[sport=skating] {icon-image:katok.png; text-offset:10; text:name; font-size:8;
+font-family: DejaVu Sans Book; text-color:#2D1A2D; text-halo-radius: 1;
+text-halo-color: #ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0; text-placement:any;
+max-width:30; z-index:15}
+node|z17-[sport=table_tennis] {icon-image:pingpong.png; text-offset:10; text:name; font-size:8;
+font-family: DejaVu Sans Book; text-color:#2D1A2D; text-halo-radius: 1;
+text-halo-color: #ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0; text-placement:any;
+max-width:30; z-index:15}
+
+
+node|z15-16[shop=art] {icon-image:galereja.png}
+node|z16[shop=car_repair] {icon-image:autoservis.png}
+node|z16[shop=clothes] {icon-image:odegda.png}
+node|z16[shop=hairdresser] {icon-image:salon.png}
+node|z16[shop=shoes] {icon-image:obuv.png}
+node|z16[shop=optician] {icon-image:opthika.png}
+node|z16[shop=supermarket] {icon-image:market.png}
+node|z16[leisure=water_park] {icon-image:aquapark.png}
+node|z16[leisure=swimming_pool] {icon-image:bassejn.png}
+node|z16[leisure=travel_agent] {icon-image:turizm.png}
+node|z16[leisure=dressmaker] {icon-image:atelje.png}
+
+node|z17-[shop=art] {icon-image:galereja.png; text-offset:10; text:name; font-size:8;
+font-family: DejaVu Sans Book; text-color:#2D1A2D; text-halo-radius: 1;
+text-halo-color: #ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0; text-placement:any;
+max-width:30; z-index:15}
+node|z17-[shop=car_repair] {icon-image:autoservis.png; text-offset:10; text:name; font-size:8;
+font-family: DejaVu Sans Book; text-color:#2D1A2D; text-halo-radius: 1;
+text-halo-color: #ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0; text-placement:any;
+max-width:30; z-index:15}
+node|z17-[shop=clothes] {icon-image:odegda.png; text-offset:10; text:name; font-size:8;
+font-family: DejaVu Sans Book; text-color:#2D1A2D; text-halo-radius: 1;
+text-halo-color: #ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0; text-placement:any;
+max-width:30; z-index:15}
+node|z17-[shop=hairdresser] {icon-image:salon.png; text-offset:10; text:name; font-size:8;
+font-family: DejaVu Sans Book; text-color:#2D1A2D; text-halo-radius: 1;
+text-halo-color: #ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0; text-placement:any;
+max-width:30; z-index:15}
+node|z17-[shop=shoes] {icon-image:obuv.png; text-offset:10; text:name; font-size:8;
+font-family: DejaVu Sans Book; text-color:#2D1A2D; text-halo-radius: 1;
+text-halo-color: #ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0; text-placement:any;
+max-width:30; z-index:15}
+node|z17-[shop=optician] {icon-image:opthika.png; text-offset:10; text:name; font-size:8;
+font-family: DejaVu Sans Book; text-color:#2D1A2D; text-halo-radius: 1;
+text-halo-color: #ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0; text-placement:any;
+max-width:30; z-index:15}
+
+node|z17-[shop=supermarket] {icon-image:market.png; text-offset:14; text:name; font-size:8;
+font-family: DejaVu Sans Book; text-color:#2D1A2D; text-halo-radius: 1;
+text-halo-color: #ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0; text-placement:any;
+max-width:30; z-index:15}
+
+node|z17-[leisure=water_park] {icon-image:aquapark.png; text-offset:10; text:name; font-size:8;
+font-family: DejaVu Sans Book; text-color:#2D1A2D; text-halo-radius: 1;
+text-halo-color: #ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0; text-placement:any;
+max-width:30; z-index:15}
+node|z17-[leisure=swimming_pool] {icon-image:bassejn.png; text-offset:10; text:name; font-size:8;
+font-family: DejaVu Sans Book; text-color:#2D1A2D; text-halo-radius: 1;
+text-halo-color: #ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0; text-placement:any;
+max-width:30; z-index:15}
+node|z17-[leisure=travel_agent] {icon-image:turizm.png; text-offset:10; text:name; font-size:8;
+font-family: DejaVu Sans Book; text-color:#2D1A2D; text-halo-radius: 1;
+text-halo-color: #ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0; text-placement:any;
+max-width:30; z-index:15}
+node|z17-[leisure=dressmaker] {icon-image:atelje.png; text-offset:10; text:name; font-size:8;
+font-family: DejaVu Sans Book; text-color:#2D1A2D; text-halo-radius: 1;
+text-halo-color: #ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0; text-placement:any;
+max-width:30; z-index:15}
+
+                                
+/*node|z14-[amenity=place_of_worship]
 {text: name; text-color: #623f00; font-family: DejaVu Serif Italic; font-size:9; text-halo-radius: 1; text-halo-color: #ffffff;text-offset:3;max-width:70}
 area|z14-[amenity=place_of_worship]
 {text: name; text-color: #623f00; font-family: DejaVu Serif Italic; font-size:9; text-halo-radius: 1; text-halo-color: #ffffff;text-offset:3;max-width:70;z-index:16;
 width:0.1; color: #111111; text-opacity: 1; fill-color: #777777; fill-opacity: 0.5; }
 
+*/
+
+area|z16[building=yes][amenity=pharmacy]    {icon-image:med1_11x14.png}
+area|z16[building=yes][amenity=museum]      {icon-image:mus_13x12.png}
+area|z16[building=yes][tourism=zoo]         {icon-image:zoo4_14x14.png}
+area|z16[building=yes][amenity=courthouse]  {icon-image:sud_14x13.png}
+area|z16[building=yes][amenity=toilets]     {icon-image:wc-3_13x13.png}
+area|z16[building=yes][amenity=restaurant] {icon-image:restoran.png}
+area|z16[building=yes][amenity=fast_food] {icon-image:fastfood.png}
+area|z16[building=yes][amenity=pub] {icon-image:pab.png}
+area|z16[building=yes][amenity=bar] {icon-image:nclub.png}
+area|z16[building=yes][amenity=cafe] {icon-image:cafe.png}
+area|z16[building=yes][amenity=ice_cream] {icon-image:cafe_ice.png}
+area|z16[building=yes][amenity=bicycle_rental] {icon-image:velo_prokat.png}
+area|z16[building=yes][amenity=car_rental] {icon-image:autorental.png}
+area|z16[building=yes][amenity=car_wash] {icon-image:autowasch.png}
+area|z16[building=yes][amenity=bank] {icon-image:amerikan_bank.png}
+area|z16[building=yes][amenity=dentist] {icon-image:dantist.png}
+area|z16[building=yes][amenity=social_facility] {icon-image:althaus.png}
+area|z16[building=yes][amenity=veterinary] {icon-image:pitomnik_vetelinar.png}
+area|z16[building=yes][amenity=fountain] {icon-image:fontan.png}
+area|z16[building=yes][amenity=studio] {icon-image:zvukozapis.png}
+area|z16[building=yes][amenity=courthouse] {icon-image:sud.png}
+area|z16[building=yes][amenity=embassy] {icon-image:poposol.png}
+area|z16[building=yes][amenity=marketplace] {icon-image:market1.png}
+area|z16[building=yes][amenity=sauna] {icon-image:banja.png}
+area|z16[building=yes][amenity=townhall] {icon-image:municipal.png}
+area|z16[building=yes][amenity=place_of_worship][religion=buddhist]
+{icon-image:buddizm.png}
+area|z15-16[building=yes][amenity=place_of_worship][religion=christian]
+{icon-image:pravosl_kupol_11x15.png}
+area|z16[building=yes][amenity=place_of_worship][religion=hindu]
+{icon-image:sinagoga.png}
+area|z16[building=yes][amenity=place_of_worship][religion=muslim]
+{icon-image:mechet.png}
+
+
+area|z17-[building=yes][amenity=pharmacy]    {icon-image:med1_11x14.png; text-offset:10; text:name; font-size:8;
+font-family: DejaVu Sans Book; text-color:#2D1A2D; text-halo-radius: 1;
+text-halo-color: #ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0; text-placement:any;
+max-width:30; z-index:15}
+area|z17-[building=yes][amenity=museum]      {icon-image:mus_13x12.png; text-offset:10; text:name; font-size:8;
+font-family: DejaVu Sans Book; text-color:#2D1A2D; text-halo-radius: 1;
+text-halo-color: #ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0; text-placement:any;
+max-width:30; z-index:15}
+area|z17-[building=yes][tourism=zoo]         {icon-image:zoo4_14x14.png; text-offset:10; text:name; font-size:8;
+font-family: DejaVu Sans Book; text-color:#2D1A2D; text-halo-radius: 1;
+text-halo-color: #ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0; text-placement:any;
+max-width:30; z-index:15}
+area|z17-[building=yes][amenity=courthouse]  {icon-image:sud_14x13.png; text-offset:14; text:name; font-size:8;
+font-family: DejaVu Sans Book; text-color:#2D1A2D; text-halo-radius: 1;
+text-halo-color: #ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0; text-placement:any;
+max-width:40; z-index:15}
+area|z17-[building=yes][amenity=toilets]     {icon-image:wc-3_13x13.png; text-offset:10; text:name; font-size:8;
+font-family: DejaVu Sans Book; text-color:#2D1A2D; text-halo-radius: 1;
+text-halo-color: #ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0; text-placement:any;
+max-width:30; z-index:15}
+area|z17-[building=yes][amenity=restaurant] {icon-image:restoran.png; text-offset:10; text:name; font-size:8;
+font-family: DejaVu Sans Book; text-color:#2D1A2D; text-halo-radius: 1;
+text-halo-color: #ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0; text-placement:any;
+max-width:30; z-index:15}
+area|z17-[building=yes][amenity=fast_food] {icon-image:fastfood.png; text-offset:10; text:name; font-size:8;
+font-family: DejaVu Sans Book; text-color:#2D1A2D; text-halo-radius: 1;
+text-halo-color: #ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0; text-placement:any;
+max-width:30; z-index:15}
+area|z17-[building=yes][amenity=pub] {icon-image:pab.png; text-offset:13; text:name; font-size:8;
+font-family: DejaVu Sans Book; text-color:#2D1A2D; text-halo-radius: 1;
+text-halo-color: #ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0; text-placement:any;
+max-width:40; z-index:15}
+area|z17-[building=yes][amenity=bar] {icon-image:nclub.png; text-offset:10; text:name; font-size:8;
+font-family: DejaVu Sans Book; text-color:#2D1A2D; text-halo-radius: 1;
+text-halo-color: #ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0; text-placement:any;
+max-width:30; z-index:15}
+area|z17-[building=yes][amenity=cafe] {icon-image:cafe.png; text-offset:10; text:name; font-size:8;
+font-family: DejaVu Sans Book; text-color:#2D1A2D; text-halo-radius: 1;
+text-halo-color: #ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0; text-placement:any;
+max-width:30; z-index:15}
+area|z17-[building=yes][amenity=ice_cream] {icon-image:cafe_ice.png; text-offset:10; text:name; font-size:8;
+font-family: DejaVu Sans Book; text-color:#2D1A2D; text-halo-radius: 1;
+text-halo-color: #ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0; text-placement:any;
+max-width:30; z-index:15}
+area|z17-[building=yes][amenity=bicycle_rental] {icon-image:velo_prokat.png; text-offset:10; text:name; font-size:8;
+font-family: DejaVu Sans Book; text-color:#2D1A2D; text-halo-radius: 1;
+text-halo-color: #ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0; text-placement:any;
+max-width:30; z-index:15}
+area|z17-[building=yes][amenity=car_rental] {icon-image:autorental.png; text-offset:10; text:name; font-size:8;
+font-family: DejaVu Sans Book; text-color:#2D1A2D; text-halo-radius: 1;
+text-halo-color: #ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0; text-placement:any;
+max-width:30; z-index:15}
+area|z17-[building=yes][amenity=car_wash] {icon-image:autowasch.png; text-offset:10; text:name; font-size:8;
+font-family: DejaVu Sans Book; text-color:#2D1A2D; text-halo-radius: 1;
+text-halo-color: #ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0; text-placement:any;
+max-width:30; z-index:15}
+area|z17-[building=yes][amenity=bank] {icon-image:amerikan_bank.png; text-offset:10; text:name; font-size:8;
+font-family: DejaVu Sans Book; text-color:#2D1A2D; text-halo-radius: 1;
+text-halo-color: #ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0; text-placement:any;
+max-width:30; z-index:15}
+area|z17-[building=yes][amenity=dentist] {icon-image:dantist.png; text-offset:10; text:name; font-size:8;
+font-family: DejaVu Sans Book; text-color:#2D1A2D; text-halo-radius: 1;
+text-halo-color: #ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0; text-placement:any;
+max-width:30; z-index:15}
+area|z17-[building=yes][amenity=social_facility] {icon-image:althaus.png; text-offset:10; text:name; font-size:8;
+font-family: DejaVu Sans Book; text-color:#2D1A2D; text-halo-radius: 1;
+text-halo-color: #ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0; text-placement:any;
+max-width:30; z-index:15}
+area|z17-[building=yes][amenity=veterinary] {icon-image:pitomnik_vetelinar.png; text-offset:10; text:name; font-size:8;
+font-family: DejaVu Sans Book; text-color:#2D1A2D; text-halo-radius: 1;
+text-halo-color: #ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0; text-placement:any;
+max-width:30; z-index:15}
+area|z17-[building=yes][amenity=fountain] {icon-image:fontan.png; text-offset:15; text:name; font-size:8;
+font-family: DejaVu Sans Book; text-color:#2D1A2D; text-halo-radius: 1;
+text-halo-color: #ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0; text-placement:any;
+max-width:40; z-index:15}
+area|z17-[building=yes][amenity=studio] {icon-image:zvukozapis.png; text-offset:10; text:name; font-size:8;
+font-family: DejaVu Sans Book; text-color:#2D1A2D; text-halo-radius: 1;
+text-halo-color: #ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0; text-placement:any;
+max-width:30; z-index:15}
+area|z17-[building=yes][amenity=courthouse] {icon-image:sud.png; text-offset:15; text:name; font-size:8;
+font-family: DejaVu Sans Book; text-color:#2D1A2D; text-halo-radius: 1;
+text-halo-color: #ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0; text-placement:any;
+max-width:30; z-index:15}
+area|z17-[building=yes][amenity=embassy] {icon-image:poposol.png; text-offset:10; text:name; font-size:8;
+font-family: DejaVu Sans Book; text-color:#2D1A2D; text-halo-radius: 1;
+text-halo-color: #ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0; text-placement:any;
+max-width:30; z-index:15}
+area|z17-[building=yes][amenity=marketplace] {icon-image:market1.png; text-offset:10; text:name; font-size:8;
+font-family: DejaVu Sans Book; text-color:#2D1A2D; text-halo-radius: 1;
+text-halo-color: #ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0; text-placement:any;
+max-width:30; z-index:15}
+area|z17-[building=yes][amenity=sauna] {icon-image:banja.png; text-offset:10; text:name; font-size:8;
+font-family: DejaVu Sans Book; text-color:#2D1A2D; text-halo-radius: 1;
+text-halo-color: #ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0; text-placement:any;
+max-width:30; z-index:15}
+area|z17-[building=yes][amenity=townhall] {icon-image:municipal.png; text-offset:10; text:name; font-size:8;
+font-family: DejaVu Sans Book; text-color:#2D1A2D; text-halo-radius: 1;
+text-halo-color: #ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0; text-placement:any;
+max-width:30; z-index:15}
+area|z17-[building=yes][amenity=place_of_worship][religion=buddhist]
+{icon-image:buddizm.png; text-offset:14; text:name; font-size:9;
+font-family: DejaVu Sans Oblique; text-color:#2D1A2D; text-halo-radius: 0;
+text-halo-color: #ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0; text-placement:any;
+max-width:30; z-index:15}
+area|z17-[building=yes][amenity=place_of_worship][religion=christian]
+{icon-image:pravosl_kupol_11x15.png; text-offset:25; text:name; font-size:9;
+font-family: DejaVu Sans Oblique; text-color:#2D1A2D; text-halo-radius: 0;
+text-halo-color: #ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0; text-placement:any;
+max-width:60; z-index:15}
+area|z17-[building=yes][amenity=place_of_worship][religion=hindu]
+{icon-image:sinagoga.png; text-offset:14; text:name; font-size:9;
+font-family: DejaVu Sans Oblique; text-color:#2D1A2D; text-halo-radius: 0;
+text-halo-color: #ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0; text-placement:any;
+max-width:40; z-index:15}
+area|z17-[building=yes][amenity=place_of_worship][religion=muslim]
+{icon-image:mechet.png; text-offset:14; text:name; font-size:9;
+font-family:DejaVu Sans Oblique; text-color:#2D1A2D; text-halo-radius: 0;
+text-halo-color: #ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0; text-placement:any;
+max-width:40; z-index:15}
+
+
+area|z17-[building=yes][amenity=place_of_worship][religion=buddhist]
+{icon-image:buddizm.png; text-offset:20; text:name; font-size:9;
+font-family: DejaVu Sans Oblique; text-color:#2C154C; text-halo-radius: 0;
+text-halo-color: #ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0; text-placement:any;
+max-width:60}
+area|z17-[building=yes][amenity=place_of_worship][religion=christian]
+{icon-image:pravosl_kupol_11x15.png; text-offset:25; text:name; font-size:9;
+font-family: DejaVu Sans Oblique; text-color:#2C154C; text-halo-radius: 0;
+text-halo-color: #ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0; text-placement:any;
+max-width:60}
+area|z17-[building=yes][amenity=place_of_worship][religion=hindu]
+{icon-image:sinagoga.png; text-offset:20; text:name; font-size:9;
+font-family: DejaVu Sans Oblique; text-color:#2C154C; text-halo-radius: 0;
+text-halo-color: #ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0; text-placement:any;
+max-width:60}
+area|z17-[building=yes][amenity=place_of_worship][religion=muslim]
+{icon-image:mechet.png; text-offset:20; text:name; font-size:9;
+font-family: DejaVu Sans Oblique; text-color:#2C154C; text-halo-radius: 0;
+text-halo-color: #ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0; text-placement:any;
+max-width:60}
+
+
+
+area|z16[building=yes][tourism=camp_site] {icon-image:camping.png}
+area|z16[building=yes][tourism=information] {icon-image:info.png}
+area|z15-[building=yes][historic=castle] {icon-image:fort.png; text-offset:13; text:name; font-size:9;
+font-family: DejaVu Sans Oblique; text-color:#2D1D1E; text-halo-radius: 0;
+text-halo-color: #ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0; text-placement:any;
+max-width:50; z-index:15}
+
+
+
+area|z16[building=yes][historic=memorial] {icon-image:historic_monument.png}
+area|z16[building=yes][historic=monument] {icon-image:monument.png}
+area|z16[building=yes][historic=wayside_cross ] {icon-image:catolik.png}
+area|z16[building=yes][historic=rune_stone] {icon-image:kult_place.png}
+area|z16[building=yes][sport=9pin] {icon-image:kegelbahn.png}
+area|z16[building=yes][sport=10pin] {icon-image:kegelbahn.png}
+area|z16[building=yes][sport=equestrian] {icon-image:ippodrom.png}
+area|z16[building=yes][sport=skating] {icon-image:katok.png}
+area|z16[building=yes][sport=table_tennis] {icon-image:pingpong.png}
+area|z16[building=yes][shop=art] {icon-image:galereja.png}
+area|z16[building=yes][shop=car_repair] {icon-image:autoservis.png}
+area|z16[building=yes][shop=clothes] {icon-image:odegda.png}
+area|z16[building=yes][shop=hairdresser] {icon-image:salon.png}
+area|z16[building=yes][shop=shoes] {icon-image:obuv.png}
+area|z16[building=yes][shop=optician] {icon-image:opthika.png}
+area|z16[building=yes][shop=supermarket] {icon-image:market.png}
+area|z16[building=yes][leisure=water_park] {icon-image:aquapark.png}
+area|z16[building=yes][leisure=swimming_pool] {icon-image:bassejn.png}
+area|z16[building=yes][leisure=travel_agent] {icon-image:turizm.png}
+area|z16[building=yes][leisure=dressmaker] {icon-image:atelje.png}
+
+
+
+area|z17-[building=yes][tourism=camp_site] {icon-image:camping.png; text-offset:10; text:name; font-size:8;
+font-family: DejaVu Sans Book; text-color:#2D1A2D; text-halo-radius: 1;
+text-halo-color: #ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0; text-placement:any;
+max-width:30; z-index:15}
+area|z17-[building=yes][tourism=information] {icon-image:info.png; text-offset:10; text:name; font-size:8;
+font-family: DejaVu Sans Book; text-color:#2D1A2D; text-halo-radius: 1;
+text-halo-color: #ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0; text-placement:any;
+max-width:30; z-index:15}
+area|z17-[building=yes][historic=memorial] {icon-image:historic_monument.png; text-offset:13; text:name; font-size:8;
+font-family: DejaVu Sans Book; text-color:#2D1A2D; text-halo-radius: 1;
+text-halo-color: #ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0; text-placement:any;
+max-width:40; z-index:15}
+area|z17-[building=yes][historic=monument] {icon-image:monument.png; text-offset:13; text:name; font-size:8;
+font-family: DejaVu Sans Book; text-color:#2D1A2D; text-halo-radius: 1;
+text-halo-color: #ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0; text-placement:any;
+max-width:40; z-index:15}
+area|z17-[building=yes][historic=wayside_cross ] {icon-image:catolik.png; text-offset:10; text:name; font-size:8;
+font-family: DejaVu Sans Book; text-color:#2D1A2D; text-halo-radius: 1;
+text-halo-color: #ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0; text-placement:any;
+max-width:30; z-index:15}
+area|z17-[building=yes][historic=rune_stone] {icon-image:kult_place.png; text-offset:10; text:name; font-size:8;
+font-family: DejaVu Sans Book; text-color:#2D1A2D; text-halo-radius: 1;
+text-halo-color: #ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0; text-placement:any;
+max-width:30; z-index:15}
+area|z17-[building=yes][sport=9pin] {icon-image:kegelbahn.png; text-offset:10; text:name; font-size:8;
+font-family: DejaVu Sans Book; text-color:#2D1A2D; text-halo-radius: 1;
+text-halo-color: #ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0; text-placement:any;
+max-width:30; z-index:15}
+area|z17-[building=yes][sport=10pin] {icon-image:kegelbahn.png; text-offset:10; text:name; font-size:8;
+font-family: DejaVu Sans Book; text-color:#2D1A2D; text-halo-radius: 1;
+text-halo-color: #ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0; text-placement:any;
+max-width:30; z-index:15}
+area|z17-[building=yes][sport=equestrian] {icon-image:ippodrom.png; text-offset:10; text:name; font-size:8;
+font-family: DejaVu Sans Book; text-color:#2D1A2D; text-halo-radius: 1;
+text-halo-color: #ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0; text-placement:any;
+max-width:30; z-index:15}
+area|z17-[building=yes][sport=skating] {icon-image:katok.png; text-offset:10; text:name; font-size:8;
+font-family: DejaVu Sans Book; text-color:#2D1A2D; text-halo-radius: 1;
+text-halo-color: #ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0; text-placement:any;
+max-width:30; z-index:15}
+area|z17-[building=yes][sport=table_tennis] {icon-image:pingpong.png; text-offset:10; text:name; font-size:8;
+font-family: DejaVu Sans Book; text-color:#2D1A2D; text-halo-radius: 1;
+text-halo-color: #ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0; text-placement:any;
+max-width:30; z-index:15}
+area|z17-[building=yes][shop=art] {icon-image:galereja.png; text-offset:10; text:name; font-size:8;
+font-family: DejaVu Sans Book; text-color:#2D1A2D; text-halo-radius: 1;
+text-halo-color: #ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0; text-placement:any;
+max-width:30; z-index:15}
+area|z17-[building=yes][shop=car_repair] {icon-image:autoservis.png; text-offset:10; text:name; font-size:8;
+font-family: DejaVu Sans Book; text-color:#2D1A2D; text-halo-radius: 1;
+text-halo-color: #ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0; text-placement:any;
+max-width:30; z-index:15}
+area|z17-[building=yes][shop=clothes] {icon-image:odegda.png; text-offset:10; text:name; font-size:8;
+font-family: DejaVu Sans Book; text-color:#2D1A2D; text-halo-radius: 1;
+text-halo-color: #ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0; text-placement:any;
+max-width:30; z-index:15}
+area|z17-[building=yes][shop=hairdresser] {icon-image:salon.png; text-offset:10; text:name; font-size:8;
+font-family: DejaVu Sans Book; text-color:#2D1A2D; text-halo-radius: 1;
+text-halo-color: #ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0; text-placement:any;
+max-width:30; z-index:15}
+area|z17-[building=yes][shop=shoes] {icon-image:obuv.png; text-offset:10; text:name; font-size:8;
+font-family: DejaVu Sans Book; text-color:#2D1A2D; text-halo-radius: 1;
+text-halo-color: #ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0; text-placement:any;
+max-width:30; z-index:15}
+area|z17-[building=yes][shop=optician] {icon-image:opthika.png; text-offset:10; text:name; font-size:8;
+font-family: DejaVu Sans Book; text-color:#2D1A2D; text-halo-radius: 1;
+text-halo-color: #ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0; text-placement:any;
+max-width:30; z-index:15}
+area|z17-[building=yes][shop=supermarket] {icon-image:market.png; text-offset:10; text:name; font-size:8;
+font-family: DejaVu Sans Book; text-color:#2D1A2D; text-halo-radius: 1;
+text-halo-color: #ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0; text-placement:any;
+max-width:30; z-index:15}
+area|z17-[building=yes][leisure=water_park] {icon-image:aquapark.png; text-offset:10; text:name; font-size:8;
+font-family: DejaVu Sans Book; text-color:#2D1A2D; text-halo-radius: 1;
+text-halo-color: #ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0; text-placement:any;
+max-width:30; z-index:15}
+area|z17-[building=yes][leisure=swimming_pool] {icon-image:bassejn.png; text-offset:10; text:name; font-size:8;
+font-family: DejaVu Sans Book; text-color:#2D1A2D; text-halo-radius: 1;
+text-halo-color: #ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0; text-placement:any;
+max-width:30; z-index:15}
+area|z17-[building=yes][leisure=travel_agent] {icon-image:turizm.png; text-offset:10; text:name; font-size:8;
+font-family: DejaVu Sans Book; text-color:#2D1A2D; text-halo-radius: 1;
+text-halo-color: #ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0; text-placement:any;
+max-width:30; z-index:15}
+area|z17-[building=yes][leisure=dressmaker] {icon-image:atelje.png; text-offset:10; text:name; font-size:8;
+font-family: DejaVu Sans Book; text-color:#2D1A2D; text-halo-radius: 1;
+text-halo-color: #ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0; text-placement:any;
+max-width:30; z-index:15}
+
 
 
 node|z17-[amenity=kindergarten]{icon-image:kindergarten_14x14.png}
-node|z17-[amenity=school]      {icon-image:school_13x13.png}
 node|z17-[amenity=library]     {icon-image:lib_13x14.png}
-node|z17-[tourism=hotel]       {icon-image:hotell_14x14.png}
-node|z17-[amenity=post_office] {icon-image:post_14x11.png}
+node|z16-[amenity=post_office] {icon-image:post_14x11.png}
 node|z17-[amenity=restaurant]  {icon-image:rest_14x14.png}
-node|z17-[shop]                {icon-image:superm_12x12.png}
+
 
 
 
 area|z2-3[boundary=administrative][admin_level=2]
-   {width: 0.35; color: silver; opacity:0.4; z-index:9}
+   {width: 0.6; color:#000000; opacity:0.2; z-index:9}
 
 area|z4[boundary=administrative][admin_level=2]
    {width: 0.35; color: silver; opacity:0.6; z-index:9}
@@ -754,13 +1749,28 @@ area|z4-[boundary=administrative][admin_level=3]
 */
 
 area|z10-[boundary=administrative][admin_level=6]
-{width: 0.4; color: #101010; opacity:0.6; z-index:9} /*  dashes: 1,2; */
+{width: 0.4; color: #2D0768; opacity:0.6;  dashes: 1,2; z-index:9} /*  dashes: 1,2; */
 
 
 area|z4-5[boundary=administrative][admin_level=4]
-{width: 0.3; color: #000000; opacity:0.8; z-index:9} /*  dashes: 1,2; */
-area|z6-[boundary=administrative][admin_level=4]
-{width: 0.4; color: #000000; opacity:0.8; z-index:9} /*  dashes: 1,2; */
+{width: 0.3; color: #2D0768; opacity:0.8;  dashes: 1,2; z-index:9} /*  dashes: 1,2; */
+
+area|z6-9[boundary=administrative][admin_level=4]
+{width: 3.5; color: #c9bbd4; opacity:0.3; z-index:16.4}
+area|z6-9[boundary=administrative][admin_level=4]::centerline,
+{width: 0.7; color: #202020; dashes: 1,3; opacity:0.5; z-index:16.4}
+
+area|z9[boundary=administrative][admin_level=4]
+{width: 3.5; color: #B392D3; opacity:0.4; z-index:16.4}
+area|z6-9[boundary=administrative][admin_level=4]::centerline,
+{width: 0.7; color: #202020; dashes: 1,3; opacity:0.5; z-index:16.4}
+
+
+area|z10-[boundary=administrative][admin_level=4]
+{width: 4.5; color: #B392D3; opacity:0.4; z-index:16.4}
+/*area|z10-[boundary=administrative][admin_level=4]::centerline,
+{width: 1; color: #202020; dashes: 1,3; opacity:0.5; z-index:16.4}*/
+
 
 /*way[boundary=administrative][admin_level=8]
 {casing-width: 1; casing-opacity: 0.3; casing-color: #808080; casing-dashes:;
@@ -769,9 +1779,13 @@ width: 0.5; color: #808080; dashes: 2,2; opacity:0.3; z-index:16}*/
 way|z12-[railway=tram]{pattern-image:rway44.png;z-index:17}
 
 
-area|z12-[building=train_station][name=~/.*вокзал.*/] {icon-image:station_11x14_blue.png}
-area|z12-[building=train_station][name=~/.*вокзал.*/] {text:name; text-offset:11; font-size:9; font-family: DejaVu Sans Mono Book; text-halo-radius:1; text-color:#000d6c;text-halo-color:#ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0; text-placement:any;}
+node|z11-14[railway=station][transport!=subway]
+{icon-image:rw_stat_stanzii_2_blue.png;
+text:name; text-offset:7; font-size:9; font-family: DejaVu Sans Mono Book; text-halo-radius:1; text-color:#000d6c;text-halo-color:#ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0}
 
+node|z15-[railway=station][transport!=subway]
+{icon-image:rw_stat_stanzii_2_blue.png;
+text:name; text-offset:7; font-size:9; font-family: DejaVu Sans Mono Book; text-halo-radius:1; text-color:#000d6c;text-halo-color:#ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0}
 
 /*     Minsk        */
 node|z12-15[railway=station][transport=subway][colour=red][operator=Минский метрополитен] {icon-image:minsk_metro_red.png; z-index:17;}
@@ -787,27 +1801,83 @@ node|z12-15[railway=station][transport=subway][colour=brown][operator=Wiener Lin
 node|z12-15[railway=station][transport=subway][!colour][operator=Wiener Linien]{icon-image:vienna-ubahn-blue.png;z-index:17;}
 
 /*  Others  */
-node|z12-15[railway=station][transport=subway][!colour] {icon-image:metro_others6.png;z-index:17;}
+node|z12[railway=station][transport=subway][!colour] {icon-image:metro_others6_copy.png;z-index:17;}
+node|z13-15[railway=station][transport=subway][!colour] {icon-image:metro_others6.png;z-index:17;}
 
-node|z12-15[railway=station][transport=subway]::label {text:name; text-offset:13; font-size:9; font-family: DejaVu Sans Book; text-halo-radius:2; text-color:#1300bb;text-halo-color:#ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0; text-placement:any;}
-node|z16-[railway=subway_entrance] {icon-image:metro_others6.png;z-index:17;}
-node|z16-[railway=subway_entrance][name] {text:name; text-offset:12; font-size:9; font-family: DejaVu Sans Book; text-halo-radius:2; text-color:#1300bb;text-halo-color:#ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0}
+node|z13-14[railway=station][transport=subway]::label
+{text:name; text-offset:13; font-size:9; font-family: DejaVu Sans Book; text-halo-radius:1.5;
+text-color:#BE1E2D;text-halo-color:#ffffff; text-allow-overlap: false;
+-x-mapnik-min-distance:0; text-placement:any; z-index:20}
+node|z15[railway=station][transport=subway]::label {text:name; text-offset:13;
+font-size:10; font-family: DejaVu Sans Book;
+text-halo-radius:1.5; text-color:#BE1E2D; text-halo-color:#ffffff; text-allow-overlap: false;
+-x-mapnik-min-distance:0; text-placement:any; z-index:20}
+node|z16-[railway=subway_entrance] {icon-image:metro_others6.png;z-index:17}
+node|z16-[railway=subway_entrance]::label {text:name; text-offset:13;
+font-size:10; font-family: DejaVu Sans Book; text-halo-radius:1.5;
+text-color:#BE1E2D;text-halo-color:#ffffff; text-allow-overlap: false;
+-x-mapnik-min-distance:0; text-placement:any; z-index:20}
 
 
 
+area|z10[building=train_station][name=~/.*вокзал.*/] {icon-image:station_10x14_tuman.png; z-index:1}
+area|z11-12[building=train_station][name=~/.*вокзал.*/] {icon-image:station_10x14_tuman.png; z-index:1} 
+area|z11-12[building=train_station][name=~/.*вокзал.*/]::lable {text:name; text-offset:11; font-size:10; font-family: DejaVu Sans Condensed Bold; text-halo-radius:1; text-color:#363c6b; text-halo-color:#ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0; text-placement:any; z-index:30}
 
-node|z10-[aeroway=aerodrome]
+area|z13-[building=train_station][name=~/.*вокзал.*/] {icon-image:station_11x14_blue.png; z-index:1}
+area|z13-15[building=train_station][name=~/.*вокзал.*/]::lable {text:name; text-offset:11; font-size:11; font-family: DejaVu Sans Condensed Bold; text-halo-radius:1; text-color:#363c6b; text-halo-color:#ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0; text-placement:any; z-index:30}
+area|z15-[building=train_station][name=~/.*вокзал.*/]::lable {text:name; text-offset:11; font-size:12;
+font-family: DejaVu Sans Condensed Bold; text-halo-radius:1; text-color:#363c6b;
+text-halo-color:#ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0; text-placement:any; z-index:30}
+area|z14-[building=train_station][name=~/.*вокзал.*/] 
+{width: .3; color: #28085B; fill-color: #B1B1C9;  z-index:18}
+
+/*line|z14-15[railway][bridge][service!=siding][service!=spur][service!=yard]
+{pattern-image:tun73.png; pattern-rotate:0; pattern-scale:1.1; pattern-spacing: 0.7; z-index:12.1 } 
+line|z14-15[railway][bridge][service!=siding][service!=spur][service!=yard]
+{width:2.2; color: #666699;z-index:12.2}*/
+
+
+/*line|z14-15[railway][railway!=subway][bridge][service!=siding][service!=spur][service!=yard]
+{pattern-image:tun73.png; pattern-rotate:0; pattern-scale:1.1; pattern-spacing: 0.7; z-index:12.1 } 
+line|z14-15[railway][railway!=subway][bridge][service!=siding][service!=spur][service!=yard]
+{width:2.2; color: #666699;z-index:12.2}*/
+
+line|z14-[railway][railway=subway][bridge][service!=siding][service!=spur][service!=yard]
+{pattern-image:tun74.png; pattern-rotate:0; pattern-scale:0.7; pattern-spacing: 0.7; z-index:12.2 }
+
+line|z14-[railway][railway=subway][bridge][service!=siding][service!=spur][service!=yard]
+{text:name;  font-size:11; text-position:line;
+font-family: DejaVu Sans Condensed Book; text-halo-radius:1; text-color:#000000;
+text-halo-color:#ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0; text-placement:any; z-index:30}
+
+/*line|z14-[railway][railway=subway][bridge][service!=siding][service!=spur][service!=yard]
+{width:2.2; color: #ffffff;z-index:12.1}*/
+
+
+
+line|z14-15[railway=rail][bridge][service!=siding][service!=spur][service!=yard]::ticks
+    {width:1; color: #ffffff; dashes: 11,9; opacity: 1; z-index:12.3}
+
+
+node|z8-[aeroway=aerodrome]
        {icon-image:airport_world.png;
-       text:name; text-offset:12; font-size:9; font-family: DejaVu Sans Condensed Bold; text-halo-radius:1; text-color:#1e7ca5;text-halo-color:#ffffff; text-allow-overlap: false;z-index:17}
-
+       text:name; text-offset:12; font-size:9; font-family: DejaVu Sans Condensed Bold; text-halo-radius:1; text-color:#1e7ca5;text-halo-color:#ffffff; text-allow-overlap: false;z-index:30}
+area |z8-[aeroway=aerodrome]
+       {icon-image:airport_world.png;
+       text:name; text-offset:12; font-size:9; font-family: DejaVu Sans Condensed Bold; text-halo-radius:1; text-color:#1e7ca5;text-halo-color:#ffffff; text-allow-overlap: false;z-index:30}
 
 
 node|z3[place][capital=yes][population>5000000] {
   icon-image: adm_5.png;
-  text-offset:4; text:name; font-size:8; font-family: DejaVu Sans Bold; text-halo-radius:1; text-color:#505050;text-halo-color:#ffffff; allow-overlap: true; -x-mapnik-min-distance:0; text-align: left;collision-sort-by:population;z-index: 5;}
-node|z4-6[place][capital=yes][population>5000000] {
-  icon-image: adm_5.png;
-  text-offset:6; text:name; font-size:10; font-family: DejaVu Sans Bold; text-halo-radius:1; text-color:#303030;text-halo-color:#ffffff; allow-overlap: true; -x-mapnik-min-distance:0; text-align: left;collision-sort-by: population;z-index: 5;}
+  text-offset:4; text:name; font-size:8; font-family: DejaVu Sans Bold; text-halo-radius:1;
+  text-color:#505050;text-halo-color:#ffffff; allow-overlap: true; -x-mapnik-min-distance:0;
+  text-align: left;collision-sort-by:population;z-index: 5;}
+
+node|z4-6[place][capital=yes][population>5000000] {icon-image: adm_5.png;
+  text-offset:6; text:name; font-size:10; font-family: DejaVu Sans Bold; text-halo-radius:1;
+  text-color:#303030;text-halo-color:#ffffff; allow-overlap: true; -x-mapnik-min-distance:0;
+  text-align: left;collision-sort-by: population;z-index: 5}
 
 node|z4-5[place][population<100000][capital][admin_level<5] { icon-image:adm_4.png;
   text-offset:5; text:name; font-size: 7; font-family: DejaVu Sans Bold; text-halo-radius:1; text-color:#404040;text-halo-color:#ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0;collision-sort-by:population;z-index: 5;}
@@ -818,41 +1888,48 @@ text-offset:5; text:name; font-size: 8; font-family: DejaVu Sans Bold; text-halo
 
 node|z6[place=city][population<100000],
 node|z6[place=town][population<100000][admin_level]
-{icon-image:adm1_4_6.png; text-offset:5; text:name; font-size:8; font-family: DejaVu Sans Bold; text-halo-radius:1; text-color:#202020;text-halo-color:#ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0;collision-sort-by:population;z-index: 5;}
+{icon-image:adm1_4_6.png; text-offset:5; text:name; font-size:8; font-family: DejaVu Sans Bold;
+text-halo-radius:1; text-color:#202020;text-halo-color:#ffffff;
+text-allow-overlap: false; -x-mapnik-min-distance:0;collision-sort-by:population;z-index: 5;}
 
 node|z7[place=city][population<100000],
 node|z7[place=town][population<100000],
-{icon-image:town_6.png; text-offset:5; text:name; font-size:9; font-family: DejaVu Sans Bold; text-halo-radius:1; text-color:#202020;text-halo-color:#ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0;collision-sort-by:population;z-index: 5;}
+{icon-image:town_4.png; text-offset:7; text:name;
+font-size:9; font-family: DejaVu Sans Bold; text-halo-radius:1; 
+text-color:#303030;text-halo-color:#ffffff; text-allow-overlap: false;
+-x-mapnik-min-distance:0;collision-sort-by:population;z-index: 5;}
 
 node|z7[place=town][!population],
 node|z7[place=city][!population],
-{icon-image:town_6.png; text-offset:5; text:name; font-size:8; font-family: DejaVu Sans Bold; text-halo-radius:1; text-color:#202020;text-halo-color:#ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0;collision-sort-by:population;z-index: 5;}
+{icon-image:town_4.png; text-offset:7; text:name; font-size:8; font-family: DejaVu Sans Bold; text-halo-radius:1; text-color:#202020;text-halo-color:#ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0;collision-sort-by:population;z-index: 5;}
 
 node|z8[place=town]
-{icon-image:town_6.png; text-offset:5; text:name; font-size:8; font-family: DejaVu Sans Bold; text-halo-radius:1; text-color:#202020;text-halo-color:#ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0;collision-sort-by:population;z-index: 5;}
+{icon-image:town_4.png; text-offset:7; text:name; font-size:9; font-family: DejaVu Sans Bold; text-halo-radius:1; text-halo-color:#ffffff;text-color:#202020; text-allow-overlap: false; -x-mapnik-min-distance:0;}
 
 node|z6-8[place=city][population>=100000][population<=1000000],
 node|z6[place=town][population>=100000][population<=1000000][admin_level]
-{icon-image:adm1_5.png; text-offset:5; text:name; font-size:9; font-family: DejaVu Sans Bold; text-halo-radius:1; text-color:#303030;text-halo-color:#ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0;collision-sort-by:population;z-index: 5;}
+{icon-image:adm1_5.png; text-offset:7; text:name; font-size:10; font-family: DejaVu Sans Bold; text-halo-radius:1; text-halo-color:#ffffff;text-color:#202020; text-allow-overlap: false; -x-mapnik-min-distance:0;}
 
 node|z7-8[place=city][population>=100000][population<=1000000],
 node|z7[place=town][population>=100000][population<=1000000]
-{icon-image:adm1_5.png; text-offset:5; text:name; font-size:10; font-family: DejaVu Sans Bold; text-halo-radius:1; text-color:#303030;text-halo-color:#ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0;collision-sort-by:population;z-index: 5;}
+{icon-image:adm1_5.png; text-offset:7; text:name; font-size:10; font-family: DejaVu Sans Bold; text-halo-radius:1; text-halo-color:#ffffff;text-color:#202020; text-allow-overlap: false; -x-mapnik-min-distance:0;}
 
 node|z6[place=city][population>1000000]
-{icon-image:adm1_6_test2.png; text-offset:5; text:name; font-size: 10; font-family: DejaVu Sans Bold; text-halo-radius:1; text-color:#404040;text-halo-color:#ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0;z-index:1;collision-sort-by:population;z-index: 5;}
+{icon-image:adm1_5_test2.png; text-offset:7; text:name; font-size: 10; font-family: DejaVu Sans Bold; text-halo-radius:2; text-halo-color:#ffffff;text-color:#202020; text-allow-overlap: false; -x-mapnik-min-distance:0;z-index:1}
 
 node|z7-8[place=city][population>1000000][population<5000000]
-{icon-image:adm1_6_test2.png; text-offset:5; text:name; font-size: 11; font-family: DejaVu Sans Bold; text-halo-radius:1; text-color:#404040;text-halo-color:#ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0;z-index:2;collision-sort-by:population;z-index: 5;}
+{icon-image:adm_5.png; text-offset:7; text:name; font-size: 11; font-family: DejaVu Sans Bold; text-halo-radius:1; text-halo-color:#ffffff;text-color:#202020; text-allow-overlap: false; -x-mapnik-min-distance:0;z-index:2}
 
 node|z7-8[place=city][population>=5000000]
-{icon-image:adm_6.png; text-offset:5; text:name; font-size: 12; font-family: DejaVu Sans Bold; text-halo-radius:1; text-color:#404040;text-halo-color:#ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0;z-index:3;collision-sort-by:population;z-index: 5;}
+{icon-image:adm_5.png; text-offset:8; text:name; font-size: 12; font-family: DejaVu Sans Bold; text-halo-radius:1; text-halo-color:#ffffff;text-color:#202020; text-allow-overlap: false; -x-mapnik-min-distance:0;z-index:3}
 
 
-/*node|z6-7[place=city][capital=yes] {text:name; font-size:11; font-family: DejaVu Sans Bold; text-halo-radius:2; text-color:#101010;text-halo-color:#ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0;z-index:1}
-node|z6-7[place=city][capital!=yes] {text:name; font-size:11; font-family: DejaVu Sans Bold; text-halo-radius:2; text-color:#101010;text-halo-color:#ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0}*/
+node|z6-7[place=city][admin_level=2] {icon-image:adm_6.png; text-offset:8; text:name; font-size:12; font-family: DejaVu Sans Bold; text-halo-radius:2; text-color:#101010;text-halo-color:#ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0;z-index:7}
+node|z6-7[place=city][capital!=yes] {icon-image:adm2_5.png;text:name; font-size:10; font-family: DejaVu Sans Bold; text-halo-radius:1; text-color:#101010;text-halo-color:#ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0;z-index:6}*/
 
-node|z9-11[place=city] {text:name; font-size:14; font-family: DejaVu Sans Bold; text-halo-radius:2; text-color:#101010;text-halo-color:#ffffff; text-allow-overlap: false; -x-mapnik-min-distance:20; z-index:20;collision-sort-by:population;}
+node|z8-11[place][admin_level=2] {icon-image:adm_6.png; text-offset:8; text:name; font-size:12; font-family: DejaVu Sans Bold; text-halo-radius:2; text-color:#101010;text-halo-color:#ffffff; text-allow-overlap: false; -x-mapnik-min-distance:20; z-index:20;collision-sort-by:population; z-index:50}
+
+node|z8-11[place=city][admin_level!=2] {icon-image:city_center17_2.png; text-offset:8; text:name; font-size:11; font-family: DejaVu Sans Bold; text-halo-radius:1; text-color:#101010;text-halo-color:#ffffff; text-allow-overlap: false; -x-mapnik-min-distance:20; z-index:20;collision-sort-by:population; }
 
 
 
@@ -861,18 +1938,84 @@ node|z9-11[place=city] {text:name; font-size:14; font-family: DejaVu Sans Bold; 
 /*node|z6-12[place=town],
 {text:name; font-size:10; font-family: DejaVu Sans Bold; text-halo-radius:2; text-color:#101010;text-halo-color:#ffffff; text-allow-overlap: false; -x-mapnik-min-distance:3}*/
 
-node|z9-11[place=town] {text:name; font-size:12; font-family: DejaVu Sans Book; text-color:#101010; text-halo-radius:1; text-halo-color:#ffffff; z-index:20;collision-sort-by:population;}
-node|z12-[place=town] {text:name; font-size:20; font-family: DejaVu Sans Book; text-color:#101010; text-opacity:0.2; text-allow-overlap: true; z-index:20;collision-sort-by:population;}
-node|z12-[place=city] {text:name; font-size:25; font-family: DejaVu Sans Book; text-color:#101010; text-opacity:0.3; text-allow-overlap: true; z-index:20;collision-sort-by:population;}
+node|z9-10[place=town] {icon-image:town_4.png; text-offset:7; text:name; font-size:10;
+font-family: DejaVu Sans Bold; text-halo-radius:1; text-color:#303030;text-halo-color:#ffffff;
+text-allow-overlap: false; -x-mapnik-min-distance:0;collision-sort-by:population;z-index: 5;}
+
+node|z11[place=town] {icon-image:town_4.png; text-offset:7; text:name; font-size:10;
+font-family: DejaVu Sans Bold; text-halo-radius:1; text-color:#303030;text-halo-color:#ffffff;
+text-allow-overlap: false; -x-mapnik-min-distance:0;collision-sort-by:population;z-index: 5;}
+
+node|z12-[place=town] { text-offset:7; text:name; font-size:11; font-family: DejaVu Sans Bold; text-halo-radius:1; text-color:#303030;text-halo-color:#ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0;collision-sort-by:population;z-index: 5;}
+
+node|z12-[place=city] { text:name; font-size:10; font-family: DejaVu Sans Bold; text-halo-radius:1; text-color:#202020;text-halo-color:#ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0;collision-sort-by:population;z-index: 5;}
 
 node|z9-[place=village]{text:name; font-size:10; font-family: DejaVu Sans Book; text-halo-radius:1; text-color:#606060;text-halo-color:#ffffff; text-allow-overlap: false;collision-sort-by:population;z-index: 5;}
 
 node|z9-[place=hamlet]{text:name; font-size:9; font-family: DejaVu Sans Book; text-halo-radius:1; text-color:#505050;text-halo-color:#ffffff; text-allow-overlap: false;collision-sort-by:population;z-index: 5;}
 
-area|z9-[landuse=nature_reserve],
+/*area|z9-[landuse=nature_reserve],
 area|z11-[leisure=park],
 {text:name; font-size:10;font-family: DejaVu Serif Italic; text-halo-radius:0; text-color:#3c8000;text-halo-color:#ffffff; text-allow-overlap: false}
+*/
+/*area|z11-[landuse=nature_reserve],
+area|z12-[leisure=park],
+{text:name;text-offset:0; font-size:10;font-family: DejaVu Serif Italic; text-halo-radius:0.5; text-color:#fffccc;text-halo-color:#285500; text-allow-overlap: false}
+*/
 
+area|z3-[natural=forest], area|z4-[natural=wood],
+area|z3-[landuse=forest], area|z4-[landuse=wood]
+       {background-color: #d6f4c6; z-index:5}
+       
+area|z10-13[landuse=garages] {width: .1; color: #3F3E3E; fill-color: #E0E0E0;  z-index:3;}
+area|z14-[landuse=garages] {width: .2; color: #3F3E3E; fill-color: #CCCACB;  z-index:3;}
+
+area|z13-[natural=beach]{background-color: #FFF9AE; z-index:4}
+area|z14-[natural=beach]
+{text:name; 
+font-size:9; font-family: DejaVu Serif Italic; text-color:#A89B00;
+text-allow-overlap: false;-x-mapnik-min-distance: 0;
+max-width: 30; text-halo-radius:1; text-halo-color:#ffffff;  z-index:11}
+
+area|z10-12[landuse=nature_reserve],
+area|z10-12[boundary=national_park]
+area|z12[leisure=park],
+area|z12[natural=forest], area|z12-[natural=wood],
+area|z12[landuse=forest], area|z12-[landuse=wood]
+{text:name; text-offset:13; 
+font-size:9; font-family: DejaVu Serif Italic; text-color:green;
+text-allow-overlap: false;-x-mapnik-min-distance: 0;
+max-width: 40; text-halo-radius:1; text-halo-color:#ffffff;  z-index:11}
+
+
+area|z13[landuse=nature_reserve],
+area|z13[boundary=national_park]
+area|z13[natural=forest], area|z13-15[natural=wood],
+area|z13[landuse=forest], area|z13-15[landuse=wood]
+area|z13[leisure=park]
+{text:name; text-offset:0; font-size:9; font-family: DejaVu Serif Italic;
+text-color:green; text-halo-radius:1; max-width: 40; text-halo-color:#ffffff; text-allow-overlap: false;-x-mapnik-min-distance: 0;
+z-index:11}
+
+area|z14[landuse=nature_reserve],
+area|z14[boundary=national_park]
+area|z14[natural=forest], area|z13-15[natural=wood],
+area|z14[landuse=forest], area|z13-15[landuse=wood]
+area|z14[leisure=park]
+{text:name; text-offset:0; font-size:10; font-family: DejaVu Serif Italic;
+text-color:green; text-halo-radius:1;max-width: 40;  text-halo-color:#ffffff; text-allow-overlap: false;-x-mapnik-min-distance: 0;
+z-index:11}
+
+
+area|z15-[landuse=nature_reserve],
+area|z15-[boundary=national_park],
+area|z15-[natural=forest], area|z13-15[natural=wood],
+area|z15-[landuse=forest], area|z13-15[landuse=wood],
+area|z15-[leisure=park]
+{text:name;text-offset:0; font-size:10;font-family: DejaVu Serif Italic;
+text-halo-radius:0; text-color:#419c2e;text-halo-color:#092316; text-halo-radius:1; text-halo-color:#ffffff;
+text-allow-overlap: false; max-width:40; text-offset:15;z-index:11;
+ z-index:11}
 
 
 /*
@@ -881,18 +2024,21 @@ shields!!!!
 */
 
 
-way|z10-[waterway=stream], way|z9-[waterway=river], way|z13-[waterway=canal]
-{text:name; font-size:9; font-family: DejaVu Sans Oblique; text-color:#547bd1; text-position: line}
 
-node|z1-3[place=continent]
-{text:name; text-offset:-10; font-size:10; font-family: DejaVu Sans ExtraLight; text-halo-radius:1; text-color:#202020;text-halo-color:#ffffff;z-index:-1;-x-mapnik-min-distance:0}
-node|z2-3[place=continent]
+node|z1[place=continent]
+{text:name; text-offset:-10; font-size:11; font-family: DejaVu Sans ExtraLight; text-halo-radius:1; text-color:#303030;text-halo-color:#ffffff; z-index:-1;-x-mapnik-min-distance:0}
+/*node|z2-3[place=continent]
 {text:name; text-offset:-10; font-size:8; font-family: DejaVu Sans ExtraLight; text-halo-radius:1; text-color:#202020;text-halo-color:#ffffff;z-index:-1;-x-mapnik-min-distance:0}
+*/
+node|z1[place=ocean]
+{text:name; font-size:8; font-family: DejaVu Sans Oblique; text-halo-radius:0; text-color:#4976d1;text-halo-color:#ffffff;z-index:-1; max-width:50; text-transform: uppercase;  -x-mapnik-min-distance:0}
 
-node|z2-6[place=ocean]
-{text:name; font-size:8; font-family: DejaVu Sans Oblique; text-halo-radius:1; text-color:#202020;text-halo-color:#ffffff;z-index:-1;-x-mapnik-min-distance:0}
+node|z2-[place=ocean]
+{text:name; font-size:9; font-family: DejaVu Sans Oblique; text-halo-radius:0; text-color:#4976d1;text-halo-color:#ffffff;z-index:-1; max-width:50; text-transform: uppercase;  -x-mapnik-min-distance:0}
+
+
 node|z7-[place=ocean]
-{text:name; text-offset:0; font-size:11; font-family: DejaVu Sans Oblique; text-halo-radius:1; text-color:#202020;text-halo-color:#ffffff;z-index:-1;-x-mapnik-min-distance:0}
+{text:name; text-offset:0; font-size:11; font-family: DejaVu Sans Oblique; text-halo-radius:1; text-color:#202020;text-halo-color:#ffffff; text-transform: uppercase; z-index:-1;-x-mapnik-min-distance:0}
 
 node|z3-6[place=sea]
 {text:name; text-offset:0; font-size:8; font-family: DejaVu Sans Oblique; text-halo-radius:1; text-color:#4976d1;text-halo-color:#ffffff;-x-mapnik-min-distance:0}
@@ -929,13 +2075,33 @@ node|z8-10[place=country]
 area|z3-5[boundary=administrative][admin_level=3]
 {text:name; text-offset:-5; font-size:8; font-family: DejaVu Sans ExtraLight; text-halo-radius:0; text-color:#101010;text-halo-color:#ffffff;-x-mapnik-min-distance:0;max-width:50}
 
-area|z6-10[boundary=administrative][admin_level=4]
-{text:name; text-offset:17; font-size:14; font-family: DejaVu Sans ExtraLight; text-halo-radius:1; text-color:#606060;text-halo-color:#ffffff;-x-mapnik-min-distance:0}
+area|z6-10[boundary=administrative][admin_level=4][name!=Москва]
+{text:name; text-offset:17; font-size:14; font-family: DejaVu Sans ExtraLight; text-halo-radius:1; text-color:#381E51;text-halo-color:#ffffff;-x-mapnik-min-distance:0}
 area|z10-[boundary=administrative][admin_level=6]
 {text:name; text-offset:-10; font-size:12; font-family: DejaVu Sans ExtraLight; text-halo-radius:1; text-color:#7848a0;text-halo-color:#ffffff}
 
-node|z12-[place=suburb]
-{text:name; font-size:12; font-family: DejaVu Sans ExtraLight; text-color:#7848a0;z-index:20}
+/*area|z13-14[admin_level=8]{color: #7848a0; width: 3;  z-index:30; opacity:0.5}*/
+
+node|z12-14[place=suburb]
+{text:name; font-size:12; font-family: DejaVu Sans Book; text-color:#7848a0; z-index:20}
+area|z12-14[place=suburb]
+{text:name; font-size:12; font-family: DejaVu Sans Book; text-color:#7848a0; z-index:20}
+
+area|z10[admin_level=5] {text:name; text-offset:0; font-size:10;
+font-family: DejaVu Sans Bold; text-halo-radius:1; text-color:#662D91; text-halo-color:#ffffff;
+text-allow-overlap: false; -x-mapnik-min-distance:0;     text-position: center;  max-width: 20; opacity:0.5; z-index:30}
+
+node|z11-13[admin_level=8]
+{text:name; font-size:11; font-family: DejaVu Sans Book; text-color:#7848a0;z-index:20; opacity:0.7; max-width: 25}
+area|z11-13[admin_level=8]
+{text:name; font-size:11; font-family: DejaVu Sans Book; text-color:#7848a0;z-index:20; opacity:0.7; max-width: 25}
+
+node|z14[admin_level=8]
+{text:name; font-size:12; font-family: DejaVu Sans Book; text-color:#7848a0;z-index:20; opacity:0.7; max-width: 30 }
+area|z14[admin_level=8]
+{text:name; font-size:12; font-family: DejaVu Sans Book; text-color:#7848a0;z-index:20; opacity:0.7; max-width: 30}
+
+
 
 
 
@@ -964,10 +2130,227 @@ node|z12-[place=suburb]
 /*way[landuse=industrial] {fill-color: #855}*/
 
 
-area|z13-[building] {width: .3; color: #cca352; z-index:17;}
-area|z15-[building=yes] { fill-color: #E7CCB4;  z-index:17;}
+area|z13[building] {width: .3; color: #cca352; opacity:0.5; z-index:17;}
+area|z14[building] {width: .4; color: #cca352; z-index:17;}
+
+area|z15-[building] { width: .5; color: #D49D3C; fill-color: #E7CCB4;  z-index:17;}
+area|z15-[building=kindergarten] { width: .5; color: #D49D3C; fill-color: #E7CCB4;  z-index:17;}
+
+
+
 area|z15-[building=public] { fill-color: #edc2ba;  z-index:17;}
-area|z15-[building][building!=yes][building!=public] {fill-color: #D8D1D1; z-index:17;}
+area|z15-[building][building!=yes][building!=public] {fill-color: #E8CDB5; z-index:17;}
+
+
+
+
+area|z15-[building=yes][amenity=kindergarten],
+area|z15-[building=yes][amenity=school],
+area|z15-[building=yes][amenity=college],
+area|z15-[building=yes][amenity=library],
+area|z15-[building=yes][amenity=university]
+{width: .5; color: #D49D3C; fill-color: #EAB5AD;  z-index:17; text:name; text-offset:0; font-size:9;
+font-family: DejaVu Sans Oblique; text-halo-radius:1; text-color:#843542; text-halo-color:#ffffff;
+text-allow-overlap: false; -x-mapnik-min-distance:0;     text-position: center;  max-width: 20 }
+
+node|z15-[amenity=kindergarten],
+node|z15-[amenity=school],
+node|z15-[amenity=college],
+node|z15-[amenity=library],
+node|z15-[amenity=university]
+{text:name; text-offset:0; font-size:9;
+font-family: DejaVu Sans Oblique; text-halo-radius:1; text-color:#843542; text-halo-color:#ffffff;
+text-allow-overlap: false; -x-mapnik-min-distance:0;     text-position: center;  max-width: 20 }
+
+area|z15-[building=yes][amenity=kindergarten],
+area|z15-[building=yes][amenity=school],
+area|z15-[building=yes][amenity=college],
+area|z15-[building=yes][amenity=library],
+area|z15-[building=yes][amenity=university]
+{text:name; text-offset:0; font-size:9;
+font-family: DejaVu Sans Oblique; text-halo-radius:1; text-color:#843542; text-halo-color:#ffffff;
+text-allow-overlap: false; -x-mapnik-min-distance:0;     text-position: center;  max-width: 20 }
+
+area|z14[building=yes][amenity=hospital],
+area|z14[building=yes][amenity=doctors],
+area|z14[building=yes][emergency=ambulance_station]
+{icon-image:med_20_30_1.png;  width: .3; color: #BC0017; z-index:17}
+
+
+area|z15-[building=yes][amenity=hospital],
+area|z15-[building=yes][amenity=doctors],
+area|z15-[building=yes][emergency=ambulance_station]
+{icon-image:med_20_30_1.png;  width: .3; color: #BC0017; fill-color: #E2AAB4;z-index:17}
+
+area|z15-[building=yes][amenity=fire_station], 
+area|z15-[building=yes][amenity=police] 
+{width: .3; color: #BC0017; fill-color: #E2AAB4; text:name; text-offset:0; font-size:11;
+font-family: DejaVu Sans Condensed Book; text-halo-radius:1;
+text-color:#010101; text-halo-color:#ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0; 
+text-position: center;  max-width: 20 }
+
+node|z14-16[amenity=hospital],
+node|z14-16[amenity=doctors],
+node|z14-16[emergency=ambulance_station]
+{icon-image:med_20_30_1.png}
+
+node|z17-[amenity=hospital],
+node|z17-[amenity=doctors],
+node|z17-[emergency=ambulance_station]
+{icon-image:med_20_30_1.png; ext:name; text-offset:15; text:name; font-size:9;
+font-family:DejaVu Sans Oblique; text-color:#7F0D18; text-halo-radius: 0;
+text-halo-color: #ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0; text-placement:any;
+max-width:30}
+
+area|z17-[building=yes][amenity=hospital],
+area|z17-[building=yes][amenity=doctors],
+area|z17-[building=yes][emergency=ambulance_station]
+{icon-image:med_20_30_1.png; width: .3; color: #BC0017; fill-color: #E59AA4;z-index:17;
+text:name; font-size:9; text-offset:15;
+font-family: DejaVu Sans Oblique; text-color:#7F0D18; text-halo-radius: 0;
+text-halo-color: #ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0; text-placement:any;
+max-width:30}
+
+
+
+node|z15-[amenity=fire_station], 
+node|z15-[amenity=police] 
+{text:name; text-offset:0; font-size:11; font-family: DejaVu Sans Condensed Book; text-halo-radius:1;
+text-color:#010101; text-halo-color:#ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0; 
+text-position: center;  max-width: 20 }
+
+
+area|z15-[building=yes][leisure=sports_centre]
+{width: .5; color: #3A8089; fill-color: #AAB9BA;  z-index:17; text:name; font-size:10;
+font-family: DejaVu Sans Book; text-color:#1C4434; text-halo-radius: 1;
+text-halo-color: #ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0; text-placement:any;
+max-width:30 }
+
+area|z15-[building=yes][amenity=place_of_worship] 
+{width: .3; color: #28085B; fill-color: #CABADB;  z-index:17}
+
+area|z15-[building=yes][office] 
+{width: .3; color: #28085B; fill-color: #C6B3B6;  z-index:17}
+
+node|z15[amenity=cinema], 
+{icon-image:cinema_14x14.png}
+node|z16-[amenity=cinema], 
+{icon-image:cinema_14x14.png; ext:name; text-offset:20; text:name; font-size:9;
+font-family: DejaVu Sans Oblique; text-color:#2D1A2D; text-halo-radius: 0;
+text-halo-color: #ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0; text-placement:any;
+max-width:30}
+
+area|z15[building=yes][amenity=cinema], 
+{icon-image:cinema_14x14.png}
+area|z16-[building=yes][amenity=cinema], 
+{icon-image:cinema_14x14.png; ext:name; text-offset:20; text:name; font-size:9;
+font-family: DejaVu Sans Oblique; text-color:#2D1A2D; text-halo-radius: 0;
+text-halo-color: #ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0; text-placement:any;
+max-width:30; z-index:20}
+
+area|z15-[building=yes][amenity=theatre],
+{width: .3; color: #28085B; fill-color: #A6E2E2;  z-index:17}
+
+node|z15[amenity=theatre],
+{icon-image:teater_14x14.png}
+node|z16-[amenity=theatre],
+{icon-image:teater_14x14.png; ext:name; text-offset:20; text:name; font-size:9;
+font-family: DejaVu Sans Oblique; text-color:#2D1A2D; text-halo-radius: 0;
+text-halo-color: #ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0; text-placement:any;
+max-width:30; z-index:20}
+area|z15[building=yes][amenity=theatre],
+{icon-image:teater_14x14.png}
+area|z16-[building=yes][amenity=theatre],
+{icon-image:teater_14x14.png; ext:name; text-offset:20; text:name; font-size:9;
+font-family: DejaVu Sans Oblique; text-color:#2D1A2D; text-halo-radius: 0;
+text-halo-color: #ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0; text-placement:any;
+max-width:30; z-index:20}
+
+area|z15-[building=yes][amenity=arts_centre], 
+area|z15-[building=yes][tourism=attraction],
+area|z15-[building=yes][tourism=artwork],
+area|z15-[building=yes][tourism=museum]
+{width: .3; color: #28085B; fill-color: #BABDD3;  z-index:17}
+
+
+
+area|z15-[building=yes][amenity=arts_centre], 
+area|z15-[building=yes][tourism=attraction],
+area|z15-[building=yes][tourism=artwork],
+{ext:name; text-offset:0; text:name; font-size:9;
+font-family: DejaVu Sans Oblique; text-color:#292F51; text-halo-radius: 0;
+text-halo-color: #ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0; text-placement:any;
+max-width:40}
+area|z16-[building=yes][tourism=museum]
+{icon-image:museum.png; ext:name; text-offset:15; text:name; font-size:9;
+font-family: DejaVu Sans Oblique; text-color:#292F51; text-halo-radius: 0;
+text-halo-color: #ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0; text-placement:any;
+max-width:40; z-index:20}
+
+node|z15[tourism=museum]
+{icon-image:museum.png}
+
+node|z16-[amenity=arts_centre], 
+node|z16-[tourism=attraction],
+node|z16-[tourism=artwork],
+{ext:name; text-offset:0; text:name; font-size:9;
+font-family: DejaVu Sans Oblique; text-color:#292F51; text-halo-radius: 0;
+text-halo-color: #ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0; text-placement:any;
+max-width:40; z-index:20}
+
+node|z16-[tourism=museum]
+{icon-image:museum.png; ext:name; text-offset:15; text:name; font-size:9;
+font-family: DejaVu Sans Oblique; text-color:#292F51; text-halo-radius: 0;
+text-halo-color: #ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0; text-placement:any;
+max-width:40; z-index:20}
+
+area|z15-[building=yes][tourism=alpine_hut],
+area|z15-[building=yes][tourism=bed_and_breakfast],
+area|z15-[building=yes][tourism=chalet],
+area|z15-[building=yes][tourism=guest_house],
+area|z15-[building=yes][tourism=hostel],
+area|z15-[building=yes][tourism=hotel],
+area|z15-[building=yes][tourism=motel]
+{width: .3; color: #28085B; fill-color: #D3B2CC;  z-index:17}
+
+area|z15-[building=yes][tourism=alpine_hut],
+area|z15-[building=yes][tourism=bed_and_breakfast],
+area|z15-[building=yes][tourism=chalet],
+area|z15-[building=yes][tourism=guest_house],
+area|z15-[building=yes][tourism=hostel],
+area|z15-[building=yes][tourism=hotel],
+area|z15-[building=yes][tourism=motel]
+{icon-image:hotell_14x14.png; ext:name; text-offset:15; text:name; font-size:9;
+font-family: DejaVu Sans Oblique; text-color:#3F1337; text-halo-radius: 0;
+text-halo-color: #ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0; text-placement:any;
+max-width:30; z-index:20}
+
+
+
+area|z16-[building=yes]
+{text:name; font-size:9;
+font-family: DejaVu Sans Book; text-color:#101010; text-halo-radius: 1;
+text-halo-color: #ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0; text-placement:any;
+max-width:30; z-index:14}
+
+area|z16-[building=retail]
+{text:name; font-size:9;
+font-family: DejaVu Sans Book; text-color:#101010; text-halo-radius: 1;
+text-halo-color: #ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0; text-placement:any;
+max-width:30; z-index:14}
+
+
+area|z15-[leisure=pitch]
+{text:name; font-size:10;
+font-family: DejaVu Sans Book; text-color:#101010; text-halo-radius: 1;
+text-halo-color: #ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0; text-placement:any;
+max-width:30}
+
+/*area|z15[building] {text: addr:housenumber; text-halo-radius:1; text-position: center; font-size:8;
+-x-mapnik-min-distance:10; opacity:0.8}*/
+
+/*area|z15[building] {text: addr:housenumber; text-halo-radius:1; text-position: center; font-size:8;
+-x-mapnik-min-distance:10; opacity:0.8}*/
 
 area|z15-16[building] {text: addr:housenumber; text-halo-radius:1; text-position: line; font-size:7; -x-mapnik-min-distance:10; opacity:0.8; -x-mapnik-snap-to-street: true}
 
@@ -976,7 +2359,10 @@ node|z15-16[addr:housenumber][addr:street][!amenity][!shop] {text: addr:housenum
 area|z17-[building] {text: addr:housenumber; text-halo-radius:1; text-position: line; font-size:8; -x-mapnik-min-distance:1; opacity:0.8; -x-mapnik-snap-to-street: true}
 node|z17-[addr:housenumber][!amenity][!shop] {text: addr:housenumber; text-halo-radius:1; text-position: line; font-size:8; -x-mapnik-min-distance:1; opacity:0.8; -x-mapnik-snap-to-street: true} /* used in cities like Vienna */
 
+
 node|z13-[highway=milestone][pk]{text:pk; font-size:7; text-halo-radius:5;-x-mapnik-min-distance:0}
+
+
 
 node|z17-[entrance]
     {icon-image:entrance.png; -x-mapnik-min-distance:0}
