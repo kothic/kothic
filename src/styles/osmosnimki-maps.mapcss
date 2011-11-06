@@ -981,7 +981,7 @@ area|z15-[area:highway=motorway]
 area|z15-[area:highway=footway],    
 area|z15-[area:highway=pedestrian],   
 area|z15-[area:highway=path]    
-         {width: 1; casing-width:1; fill-color:#ffffff; color: #ffffff; z-index: 15; casing-color:#996703}
+         {width: 1; casing-width:0.3; fill-color:#f0f0f0; color: #ffffff; z-index: 15; casing-color:#996703}
 
 
 
