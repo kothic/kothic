@@ -67,16 +67,21 @@ max-width:30}
 
 /* fill-color: - html-цвет заливки */
 
-area|z10-12[landuse=residential], area|z10-12[residential=urban]
+area|z10-12[landuse=residential][!residential],
+area|z10-12[residential=urban]
 {background-color:#F4EEC3; z-index:3.1}
 
-area|z13-14[landuse=residential], area|z13-14[residential=urban]
+area|z13-14[landuse=residential][!residential],
+area|z13-14[residential=urban]
 {background-color:#F7EFDC; z-index:2}
 
-area|z15-[landuse=residential], area|z10-[residential=urban]
+area|z15-[landuse=residential][!residential],
+area|z10-[residential=urban]
 {background-color:#F7EFEC; z-index:2}
 
-area|z14-15[landuse=residential], area|z14-15[residential=urban], area|z14-15[place=locality]
+area|z14-15[landuse=residential][!residential],
+area|z14-15[residential=urban],
+area|z14-15[place=locality]
 {text:name; font-size:10;
 font-family: DejaVu Sans Book; text-color:#8B5E3C;text-halo-radius: 1;
 text-halo-color: #ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0; text-placement:any;
@@ -108,7 +113,7 @@ text-halo-color: #ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0; t
 
  
  
-area|z16-[landuse=residential],
+area|z16-[landuse=residential][!residential],
 area|z16-[residential=urban],
 area|z16-[place=locality]
 {text:name; font-size:11;
@@ -152,7 +157,7 @@ font-family: DejaVu Sans Book; text-color:#303030; text-halo-radius: 1;
 text-halo-color: #ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0; text-placement:any;
  max-width:50}
 
-way|z16-[landuse=industrial],area|z16-[landuse=military]
+way|z16-[landuse=industrial]
 {text:name; font-size:11;
 font-family: DejaVu Sans Book; text-color:#303030; text-halo-radius: 1;
 text-halo-color: #ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0; text-placement:any;
@@ -258,7 +263,7 @@ area|z14-[leisure=pitch],
 
 
 way|z7-10[waterway=river]   {color: #C4D4F5; width: .6; z-index:9}
-area|z7-10[waterway=river]   {color: #C4D4F5; width: .6; z-index:9}
+
 
 
 /*
@@ -277,12 +282,6 @@ way|z10-14[waterway=river] {color: #C4D4F5; width: .7; z-index:9}
 way|z15-[waterway=river]    {color: #C4D4F5; width: .9; z-index:9}
 way|z10-[waterway=stream]{color: #C4D4F5; width: .5; z-index:9}
 way|z10-[waterway=canal] {color: #abc4f5; width: .6; z-index:9}
-
-area|z9-10[waterway=stream]  {color: #C4D4F5; width: .3; z-index:9}
-area|z10-14[waterway=river] {color: #C4D4F5; width: .7; z-index:9}
-area|z15-[waterway=river]    {color: #C4D4F5; width: .9; z-index:9}
-area|z10-[waterway=stream] {color: #C4D4F5; width: .5; z-index:9}
-area|z10-[waterway=canal] {color: #abc4f5; width: .6; z-index:9}
 
 
 way|z10-13[waterway=stream], way|z9-13[waterway=river], way|z13[waterway=canal]
@@ -372,18 +371,23 @@ way|z16-[highway=cycleway]
 
 
 
-way|z14-[highway=pedestrian]
+way|z14-[highway=pedestrian][!area]
 {width:2; color: #ffffff; casing-width:0.5; casing-color:#996703; z-index:10}
 
-way|z14-[highway=pedestrian]
-{text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Book; font-size:10; text-halo-radius: 1; text-halo-color: #ffffff; text-halo-radius: 1; text-halo-color: #ffffff;
-casing-width:.3; casing-color:#bf96ce}
+way|z14-[highway=pedestrian][!area]
+{text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Book; font-size:10; text-halo-radius: 1; text-halo-color: #ffffff; text-halo-radius: 1; text-halo-color: #ffffff}
+
+way|z14-[highway=pedestrian][area]
+{fill-color: #ffffff; casing-width:0.5; casing-color:#996703; z-index:10}
+
+way|z14-[highway=pedestrian][area]
+{text: name; text-position: center; text-color: #404040; font-family: DejaVu Sans Book; font-size:10; text-halo-radius: 1; text-halo-color: #ffffff; text-halo-radius: 1; text-halo-color: #ffffff}
 
 
-/*way|z15-[highway=steps],
+way|z15-[highway=steps],
 {text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Book; font-size:10; text-halo-radius: 1; text-halo-color: #ffffff; text-halo-radius: 1; text-halo-color: #ffffff;
 casing-width:.3; casing-color:#ffffff;
-width:3; color: #bf96ce; z-index:10; dashes:1,1; linecap:butt;}*/
+width:3; color: #bf96ce; z-index:10; dashes:1,1; linecap:butt;}
 
 /*
 для отрисовки лестницы используется широкая линия с частым пунктиром, создающая впечатление перпендикулярных линий "ступенек".
@@ -950,6 +954,40 @@ way|z15-[highway=secondary_link][oneway=yes],
 way|z15-[highway=tertiary][oneway=yes],
 way|z15-[highway=tertiary_link][oneway=yes]
 {pattern-image:arrows; z-index:15; -x-mapnik-layer: top; fill:red}
+
+
+
+
+
+
+
+
+area|z15-[highway=service][area=yes],   
+area|z15-[area:highway=service],    
+area|z15-[area:highway=residential],    
+area|z15-[area:highway=unclassified],   
+area|z15-[area:highway=living_street]   
+         {width: 1; casing-width:0.3; fill-color:#ffffff; color: #ffffff; z-index: 15; casing-color: #996703;}
+
+area|z15-[landuse=carriageway],   
+area|z15-[area:highway=secondary],    
+area|z15-[area:highway=tertiary]    
+         {width: 1; casing-width:0.3; fill-color:#fcffd1; color: #fcffd1; z-index: 15; casing-color: #996703;}
+area|z15-[area:highway=primary]   
+         {width: 1; casing-width:0.3; fill-color:#fcea97; color: #fcea97; z-index: 15; casing-color: #996703;}
+         area|z15-[area:highway=trunk],    
+area|z15-[area:highway=motorway]    
+         {width: 1; casing-width:0.3; fill-color:#ffd780; color: #ffd780; z-index: 15; casing-color: #996703;}
+area|z15-[area:highway=footway],    
+area|z15-[area:highway=pedestrian],   
+area|z15-[area:highway=path]    
+         {width: 1; casing-width:1; fill-color:#ffffff; color: #ffffff; z-index: 15; casing-color:#996703}
+
+
+
+
+
+
 
 
 area|z15-[amenity=parking]{icon-image:parking2.png; z-index:1}
