@@ -377,11 +377,6 @@ way|z14-[highway=pedestrian][!area]
 way|z14-[highway=pedestrian][!area]
 {text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Book; font-size:10; text-halo-radius: 1; text-halo-color: #ffffff; text-halo-radius: 1; text-halo-color: #ffffff}
 
-way|z14-[highway=pedestrian][area]
-{fill-color: #ffffff; casing-width:0.5; casing-color:#996703; z-index:10}
-
-way|z14-[highway=pedestrian][area]
-{text: name; text-position: center; text-color: #404040; font-family: DejaVu Sans Book; font-size:10; text-halo-radius: 1; text-halo-color: #ffffff; text-halo-radius: 1; text-halo-color: #ffffff}
 
 
 way|z15-[highway=steps],
@@ -978,12 +973,18 @@ area|z15-[area:highway=primary]
          area|z15-[area:highway=trunk],    
 area|z15-[area:highway=motorway]    
          {width: 1; casing-width:0.3; fill-color:#ffd780; color: #ffd780; z-index: 15; casing-color: #996703;}
+
 area|z15-[area:highway=footway],    
 area|z15-[area:highway=pedestrian],   
 area|z15-[area:highway=path]    
-         {width: 1; casing-width:0.3; fill-color:#fdfdfd; color: #fdfdfd; z-index: 15; casing-color:#996703}
+         {width: 1; casing-width:0.3; fill-color:#C5C5C5; color: #C5C5C5; z-index: 15; casing-color:#996703}
 
 
+way|z14-[highway=pedestrian][area]
+{fill-color: #C5C5C5; casing-width:0.5; casing-color:#996703; z-index:10}
+
+way|z14-[highway=pedestrian][area]
+{text: name; text-position: center; text-color: #404040; font-family: DejaVu Sans Book; font-size:10; text-halo-radius: 1; text-halo-color: #ffffff; text-halo-radius: 1; text-halo-color: #ffffff}
 
 
 
@@ -1134,6 +1135,11 @@ way|z17[highway=motorway_link][bridge],
 
 node|z16-[highway=traffic_signals]
 {icon-image:svetofor3.png}
+
+way|z16-[barrier=fence] {width:.3; color: black;z-index:16; -x-mapnik-layer: top;}  1015  
+way|z16-[barrier=wall],   
+way|z16-[barrier=retaining_wall] {width:.5; color: black;z-index:16; -x-mapnik-layer: top;}
+
 
 way|z15-[marking=sport][!colour],
         {width:.5; color: #a0a0a0;z-index:16; -x-mapnik-layer: top;}
