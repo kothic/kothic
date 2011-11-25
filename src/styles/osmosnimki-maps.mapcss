@@ -2645,14 +2645,13 @@ max-width:30}
 /*area|z15[building] {text: addr:housenumber; text-halo-radius:1; text-position: center; font-size:8;
 -x-mapnik-min-distance:10; opacity:0.8}*/
 
-area|z16-[building] {text: addr:housenumber; text-halo-radius:1; text-position: center; font-size:9;
--x-mapnik-min-distance:10; opacity:0.8}
+area|z15-16[building] {text: addr:housenumber; text-halo-radius:1; text-position: line; font-size:7; -x-mapnik-min-distance:10; opacity:0.8; -x-mapnik-snap-to-street: true}
 
-node|z15-16[addr:housenumber][!amenity][!shop] {text: addr:housenumber; text-halo-radius:1;
-text-position: center; font-size:7; -x-mapnik-min-distance:10; opacity:0.8} /* used in cities like Vienna */
+node|z15-16[addr:housenumber][addr:street][!amenity][!shop] {text: addr:housenumber; text-halo-radius:1; text-position: line; font-size:7; -x-mapnik-min-distance:10; opacity:0.8; -x-mapnik-snap-to-street: true} /* used in cities like Vienna */
 
-area|z17-[building] {text: addr:housenumber; text-halo-radius:1; text-position: center; font-size:8; -x-mapnik-min-distance:10; opacity:0.8}
-node|z17-[addr:housenumber][!amenity][!shop] {text: addr:housenumber; text-halo-radius:1; text-position: center; font-size:8; -x-mapnik-min-distance:10; opacity:0.8} /* used in cities like Vienna */
+area|z17-[building] {text: addr:housenumber; text-halo-radius:1; text-position: line; font-size:8; -x-mapnik-min-distance:5; opacity:0.8; -x-mapnik-snap-to-street: true}
+
+node|z17-[addr:housenumber][!amenity][!shop] {text: addr:housenumber; text-halo-radius:1; text-position: line; font-size:8; -x-mapnik-min-distance:5; opacity:0.8; -x-mapnik-snap-to-street: true} /* used in cities like Vienna */
 
 node|z13-[highway=milestone][pk]{text:pk; font-size:7; text-halo-radius:5;-x-mapnik-min-distance:0}
 
