@@ -698,8 +698,8 @@ if options.renderer == "mapnik":
                         ST_Translate(
                           ST_Rotate(
                             ST_GeomFromEWKT('SRID=900913;LINESTRING(-50 0, 50 0)'),
-                            -1*ST_Azimuth(ST_PointN(ST_ShortestLine(l.way, ST_PointOnSurface(h.way)),1),
-                                          ST_PointN(ST_ShortestLine(l.way, ST_PointOnSurface(h.way)),2)
+                            -1*ST_Azimuth(ST_PointN(ST_ShortestLine(l.way, ST_PointOnSurface(ST_Buffer(h.way,0.1))),1),
+                                          ST_PointN(ST_ShortestLine(l.way, ST_PointOnSurface(ST_Buffer(h.way,0.1))),2)
                                         )
                           ),
                           ST_X(ST_PointOnSurface(ST_Buffer(h.way,0.1))),
@@ -711,6 +711,7 @@ if options.renderer == "mapnik":
                       from planet_osm_line l 
                       where 
                         l.way &amp;&amp; ST_Expand(h.way, 600) and
+                        ST_IsValid(l.way) and
                         l."name" = h."addr:street" and
                         l.highway is not NULL and
                         l."name" is not NULL
@@ -722,8 +723,8 @@ if options.renderer == "mapnik":
                         ST_Translate(
                           ST_Rotate(
                             ST_GeomFromEWKT('SRID=900913;LINESTRING(-50 0, 50 0)'),
-                            -1*ST_Azimuth(ST_PointN(ST_ShortestLine(ST_Centroid(l.way), ST_PointOnSurface(h.way)),1),
-                                          ST_PointN(ST_ShortestLine(ST_Centroid(l.way), ST_PointOnSurface(h.way)),2)
+                            -1*ST_Azimuth(ST_PointN(ST_ShortestLine(ST_Centroid(l.way), ST_PointOnSurface(ST_Buffer(h.way,0.1))),1),
+                                          ST_PointN(ST_ShortestLine(ST_Centroid(l.way), ST_PointOnSurface(ST_Buffer(h.way,0.1))),2)
                                         )
                           ),
                           ST_X(ST_PointOnSurface(ST_Buffer(h.way,0.1))),
@@ -735,6 +736,7 @@ if options.renderer == "mapnik":
                       from planet_osm_polygon l 
                       where 
                         l.way &amp;&amp; ST_Expand(h.way, 600) and
+                        ST_IsValid(l.way) and
                         l."name" = h."addr:street" and
                         l.highway is not NULL and
                         l."name" is not NULL
