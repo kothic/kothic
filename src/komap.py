@@ -171,6 +171,8 @@ if options.renderer == "mapnik":
 
   if locale == "en":
     columnmap["name"] = ("""COALESCE("name:en","int_name", replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(translate("name",'абвгдезиклмнопрстуфьАБВГДЕЗИКЛМНОПРСТУФЬ','abvgdeziklmnoprstuf’ABVGDEZIKLMNOPRSTUF’'),'х','kh'),'Х','Kh'),'ц','ts'),'Ц','Ts'),'ч','ch'),'Ч','Ch'),'ш','sh'),'Ш','Sh'),'щ','shch'),'Щ','Shch'),'ъ','”'),'Ъ','”'),'ё','yo'),'Ё','Yo'),'ы','y'),'Ы','Y'),'э','·e'),'Э','E'),'ю','yu'),'Ю','Yu'),'й','y'),'Й','Y'),'я','ya'),'Я','Ya'),'ж','zh'),'Ж','Zh')) AS name""",('name:en','int_name',))
+  elif locale == "be":
+    columnmap["name"] =  ('COALESCE("name:be", "name:ru", "int_name", "name:en", "name") AS name',('name:be', "name:ru", "int_name", "name:en"))    
   elif locale:
     columnmap["name"] =  ('COALESCE("name:'+locale+'", "name") AS name',('name:'+locale,))
   mapped_cols = [i[0] for i in columnmap.values()]
