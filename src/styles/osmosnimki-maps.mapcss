@@ -829,24 +829,24 @@ way|z18-[highway=primary_link]
         z-index:12}
 
 
-way|z6[highway=trunk]
+line|z6[highway=trunk]
 {width:0.9;  color: #F7EFA9;
 z-index:13}
 
-way|z6[highway=motorway]
+line|z6[highway=motorway]
 {width:0.9;  color: #F7EFA9;
 z-index:13}
 
-way|z7[highway=trunk]
+line|z7[highway=trunk]
 {width:1;  color: #fbcd40;
 z-index:13}
 
-way|z7[highway=motorway]
+line|z7[highway=motorway]
 {width:1.2;  color: #fc9265;
 z-index:13}
 
-way|z8[highway=trunk],
-way|z8[highway=motorway],
+line|z8[highway=trunk],
+line|z8[highway=motorway],
 {width:1.7;  color: #EDBF88;
 casing-width:0.2; casing-color: #996703;
 z-index:13}
@@ -2212,9 +2212,9 @@ area|z12-[leisure=park],
 {text:name;text-offset:0; font-size:10;font-family: DejaVu Serif Italic; text-halo-radius:0.5; text-color:#fffccc;text-halo-color:#285500; text-allow-overlap: false}
 */
 
-area|z8-[natural=forest], area|z8-[natural=wood],
-area|z8-[landuse=forest], area|z8-[landuse=wood]
-       {background-color: #d6f4c6; z-index:5}
+area|z8-[natural=wood],
+area|z8-[landuse=forest]
+       {background-color: #d6f4c6; z-index:5; background-opacity:0.7}
        
 area|z10-13[landuse=garages] {width: .1; color: #3F3E3E; fill-color: #E0E0E0;  z-index:3;}
 area|z14-[landuse=garages] {width: .2; color: #3F3E3E; fill-color: #CCCACB;  z-index:3;}
