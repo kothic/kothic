@@ -22,7 +22,7 @@ area - площадные объекты (обычно - замкнутые пу
 
 area[natural=coastline] {fill-color: #fcf8e4;-x-mapnik-layer: bottom}
 
-area|z2-[natural=ocean] {fill-color: #C4D4F5;z-index:10}
+area|z2-[natural=ocean] {fill-color: #C4D4F5;z-index:10; fill-opacity: 0.5}
 
 area|z3-[natural=glacier]{background-color: #fcfeff; background-image: glacier.png}
 
