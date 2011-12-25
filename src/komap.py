@@ -243,6 +243,7 @@ if options.renderer == "mapnik":
 
   bgcolor = style.get_style("canvas", {}, maxzoom)[0].get("fill-color", "")
   opacity = style.get_style("canvas", {}, maxzoom)[0].get("opacity", 1)
+  demhack = style.get_style("canvas", {}, maxzoom)[0].get("-x-mapnik-dem-hack", False)
 
   if (opacity == 1) and bgcolor:
     mfile.write(xml_start(bgcolor))
@@ -260,6 +261,7 @@ if options.renderer == "mapnik":
     x_scale = xml_scaledenominator(zoom)
     ta = zsheet.keys()
     ta.sort(key=float)
+    
     if zoom in coast:
       xml = xml_style_start()
       xml += xml_rule_start()
@@ -272,7 +274,56 @@ if options.renderer == "mapnik":
       xml += xml_style_end()
       xml += xml_layer("coast", zoom=zoom)
       mfile.write(xml)
+    
+    if demhack:
+      xml="""
+<Style name="elevationz%s">
+  <Rule>%s
+    <RasterSymbolizer>
+      <RasterColorizer default-mode="linear" epsilon="0.001">
+        <stop value="701"  color="#98b7f5"/>
+        <stop value="1701"  color="#9fbcf5"/>
+        <stop value="2701"  color="#a6c1f5"/>
+        <stop value="3701"  color="#abc4f5"/>
+        <stop value="4701"  color="#b0c7f5"/>
+        <stop value="5701"  color="#b5caf5"/>
+        <stop value="6701"  color="#bacef5"/>
+        <stop value="7701"  color="#bfd1f5"/>
+        <stop value="8701"  color="#c4d4f5"/>
+        <stop value="9701"  color="#c6d6f5"/>
+        <stop value="10201"  color="#c9d7f5"/>
+        <!--stop value="10501"  color="#cbd9f5"/-->
+        <!-- stop value="10701"  color="cedbf5"/ -->
+        <stop value="10502"  color="rgba(231, 209, 175, 0.1)"/>
+        <!--stop value="10701" color="rgba(50, 180, 50, 0.0)"/ -->
+        <stop value="10901"  color="rgba(231, 209, 175, 0.2)"/>
+        <stop value="11201"  color="rgba(226, 203, 170, 0.2)"/>
+        <stop value="11701" color="rgba(217, 194, 159, 0.3)"/>
+        <stop value="12701" color="rgba(208, 184, 147, 0.4)"/>
+        <stop value="13701" color="rgba(197, 172, 136, 0.5)"/>
+        <stop value="14701" color="rgba(188, 158, 120, 0.55)"/>
+        <stop value="15701" color="rgba(179, 139, 102, 0.6)"/>
+        <stop value="16701" color="rgba(157, 121, 87, 0.7)"/>
+        <stop value="17701" color="rgba(157, 121, 87, 0.8)"/>
+        <stop value="18701" color="rgba(144, 109, 77, 0.9)"/>
+     </RasterColorizer>
+    </RasterSymbolizer>
+  </Rule>
+</Style>
 
+<Layer name="ele-rasterz%s">
+    <StyleName>elevationz%s</StyleName>
+    <Datasource>
+        <Parameter name="file">/raid/srtm/Full/CleanTOPO2merc.tif</Parameter>
+        <Parameter name="type">gdal</Parameter>
+        <Parameter name="band">1</Parameter>
+        <Parameter name="srid">4326</Parameter>
+    </Datasource>
+</Layer>
+      """ 
+      xml = xml%(zoom, x_scale, zoom, zoom)
+      mfile.write(xml)
+    
     sql_g = set()
     there_are_dashed_lines = False
     itags_g = set()
@@ -313,6 +364,31 @@ if options.renderer == "mapnik":
       mfile.write(xml_layer("postgis", "polygon", itags, sql, zoom=zoom ))
     else:
       xml_nolayer()
+    
+    if demhack and zoom<6:
+      xml = """
+      <Style name="hillshadez%s">
+  <Rule>
+  %s
+    <RasterSymbolizer opacity="1" scaling="bilinear" mode="multiply">
+      <RasterColorizer  default-mode="linear">
+        <stop value="0"   color="rgba(0,0,0,0.1)" />
+        <stop value="255" color="rgba(255,255,255,0)" />
+      </RasterColorizer>
+    </RasterSymbolizer>
+  </Rule>
+</Style>
+<Layer name="datarasterz%s"> 
+    <StyleName>hillshadez%s</StyleName>
+    <Datasource>
+        <Parameter name="file">/raid/srtm/Full/CleanTOPO2merchs.tif</Parameter>
+        <Parameter name="type">gdal</Parameter>
+        <Parameter name="band">1</Parameter>
+    </Datasource>
+</Layer>
+      """
+      xml = xml%(zoom, x_scale, zoom, zoom)
+      mfile.write(xml)
     
     index_range = range(-6,7)
     full_layering = conf_full_layering
