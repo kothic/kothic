@@ -359,7 +359,7 @@ if options.renderer == "mapnik":
     itags = itags_g
     if sql:
       mfile.write(xml_g)
-      sql = "(" + " OR ".join(sql) + ") and way &amp;&amp; !bbox!"
+      sql = "(" + " OR ".join(sql) + ")"# and way &amp;&amp; !bbox!"
       itags = add_numerics_to_itags(itags)
       mfile.write(xml_layer("postgis", "polygon", itags, sql, zoom=zoom ))
     else:
@@ -468,7 +468,7 @@ if options.renderer == "mapnik":
         itags = itags_g
         if sql:
           mfile.write(xml_g)
-          sql = "(" + " OR ".join(sql) + ") and way &amp;&amp; !bbox!"
+          sql = "(" + " OR ".join(sql) + ")"# and way &amp;&amp; !bbox!"
           if zlayer == 0 and full_layering:
             sql = "("+ sql +') and ("layer" not in ('+ ", ".join(['\'%s\''%i for i in range(-5,6) if i != 0])+") or \"layer\" is NULL)"
           elif zlayer <=5 and zlayer >= -5 and full_layering:
@@ -577,7 +577,7 @@ if options.renderer == "mapnik":
           itags = itags_g
           if sql:
             mfile.write(xml_g)
-            sql = "(" + " OR ".join(sql) + ") and way &amp;&amp; !bbox!"
+            sql = "(" + " OR ".join(sql) + ")"# and way &amp;&amp; !bbox!"
             if zlayer == 0 and full_layering:
               sql = "("+ sql +') and ("layer" not in ('+ ", ".join(['\'%s\''%i for i in range(-5,6) if i != 0])+") or \"layer\" is NULL)"
             elif zlayer <=5 and zlayer >= -5 and full_layering:
@@ -630,7 +630,7 @@ if options.renderer == "mapnik":
               if prevtype != layer_type:
                 if sql_g:
                   mfile.write(xml_g)
-                  sql_g = "(" + " OR ".join(sql_g) + ") and way &amp;&amp; !bbox!"
+                  sql_g = "(" + " OR ".join(sql_g) + ")"# and way &amp;&amp; !bbox!"
                   itags_g = add_numerics_to_itags(itags_g)
                   mfile.write(xml_layer("postgis", prevtype, itags_g, sql_g, zoom=zoom ))
                   sql_g = set()
@@ -668,7 +668,7 @@ if options.renderer == "mapnik":
             xml_nosubstyle()
     if sql_g:
       mfile.write(xml_g)
-      sql_g = "(" + " OR ".join(sql_g) + ") and way &amp;&amp; !bbox!"
+      sql_g = "(" + " OR ".join(sql_g) + ")"# and way &amp;&amp; !bbox!"
       itags_g = add_numerics_to_itags(itags_g)
       mfile.write(xml_layer("postgis", prevtype, itags_g, sql_g, zoom=zoom ))
     else:
@@ -870,7 +870,7 @@ if options.renderer == "mapnik":
 
 
                 else:
-                  sql = "(" + " OR ".join(sql) + ") and way &amp;&amp; ST_Expand(!bbox!,%s) %s"%(max(pixel_size_at_zoom(zoom,20),3000),order)
+                  sql = "(" + " OR ".join(sql) + ")  %s"%(order)#and way &amp;&amp; ST_Expand(!bbox!,%s), max(pixel_size_at_zoom(zoom,20),3000),
                   mfile.write(xml_layer("postgis", layer_type, itags, sql, zoom=zoom ))
               else:
                 xml_nolayer()
