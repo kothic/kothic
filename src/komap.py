@@ -395,13 +395,30 @@ if options.renderer == "mapnik":
     if (zoom < 9) or not conf_full_layering :
       index_range = (-6,0,6)
       full_layering = False
-
+    def check_if_roads_table(rulestring):
+      roads = set([
+        "[highway] = 'secondary'",
+        "[highway] = 'secondary_link'",
+        "[highway] = 'primary'",
+        "[highway] = 'primary_link'",
+        "[highway] = 'trunk'",
+        "[highway] = 'trunk_link'",
+        "[highway] = 'motorway'",
+        "[highway] = 'motorway_link'",
+        "[boundary] = 'administrative'",
+        "[railway] "
+        ])
+      for r in roads:
+        if r in rulestring:
+          return True
+      return False
     for zlayer in index_range:
       for layer_type, entry_types in [("line",("way", "line")),("polygon",("way","area"))]:
         sql_g = set()
         there_are_dashed_lines = False
         itags_g = set()
         xml_g = ""
+        roads = (layer_type == 'line') and (zoom < 9) # whether to use planet_osm_roads
         ## casings pass
         for zindex in ta:
           sql = set()
@@ -420,6 +437,8 @@ if options.renderer == "mapnik":
                 xml += xml_rule_start()
                 xml += x_scale
                 xml += xml_filter(entry["rulestring"])
+                if not check_if_roads_table(entry["rulestring"]):
+                  roads = False
                 twidth = 2*float(entry["style"].get("casing-width", 1))+float(entry["style"].get("width", 0));
                 tlinejoin = "round"
                 if twidth < 3:
@@ -455,6 +474,8 @@ if options.renderer == "mapnik":
           elif zlayer <=5 and zlayer >= -5 and full_layering:
             sql = "("+ sql +') and "layer" = \'%s\''%zlayer
           itags = add_numerics_to_itags(itags)
+          if roads:
+            layer_type = 'roads'
           mfile.write(xml_layer("postgis", layer_type, itags, sql, zoom=zoom ))
         else:
           xml_nolayer()
@@ -466,6 +487,7 @@ if options.renderer == "mapnik":
           there_are_dashed_lines = False
           there_are_line_patterns = False
           itags_g = set()
+          roads = (layer_type == 'line') and (zoom < 9) # whether to use planet_osm_roads
           xml_g = ""
         
           sql = set()
@@ -484,6 +506,8 @@ if options.renderer == "mapnik":
                 xml += xml_rule_start()
                 xml += x_scale
                 xml += xml_filter(entry["rulestring"])
+                if not check_if_roads_table(entry["rulestring"]):
+                  roads = False
                 if layer_type == "polygon":
                   if "fill-color" in entry["style"]:
                     xml += xml_polygonsymbolizer(entry["style"].get("fill-color", "black"), entry["style"].get("fill-opacity", "1"))
@@ -581,6 +605,8 @@ if options.renderer == "mapnik":
               ##  """%(itags,sql,oitags)
               #mfile.write(xml_layer("postgis-process", layer_type, itags, sqlz, zoom=zoom ))
             else:
+              if roads:
+                layer_type = 'roads'
               mfile.write(xml_layer("postgis", layer_type, itags, sql, zoom=zoom ))
           else:
             xml_nolayer()
