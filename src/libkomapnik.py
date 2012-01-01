@@ -239,7 +239,7 @@ def xml_layer(type="postgis", geom="point", interesting_tags = "*", sql = "true"
   subs = "\n".join(["<StyleName>s%s</StyleName>"%i for i in substyles])
   substyles = []
   intersection_SQL = ""
-  if zoom < 4:
+  if zoom < 5:
     intersection_SQL = '<Parameter name="intersect_max_scale">1</Parameter>'
   elif zoom > 16:
     intersection_SQL = '<Parameter name="intersect_min_scale">500000000000</Parameter>'
