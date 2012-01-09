@@ -378,7 +378,7 @@ if options.renderer == "mapnik":
   <Rule>%s
     <RasterSymbolizer>
       <RasterColorizer default-mode="linear" epsilon="0.001">
-        <stop value="-200"  color="#c9d7f5"/>
+        <stop value="-100"  color="rgba(231, 209, 175, 0.1)"/>
         <stop value="200"  color="rgba(231, 209, 175, 0.2)"/>
         <stop value="500"  color="rgba(226, 203, 170, 0.2)"/>
         <stop value="1000" color="rgba(217, 194, 159, 0.3)"/>
