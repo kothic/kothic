@@ -389,7 +389,7 @@ area|z15-[area:highway=footway],
 area|z15-[area:highway=pedestrian],
 area|z15-[highway=pedestrian][area],
 area|z15-[area:highway=path]
-{casing-width: 0.3; fill-color:#CDC7BA; z-index: 14;
+{casing-width: 0.3; fill-color:#F2EFE9; z-index: 14; width:1; color: #F2EFE9;
 casing-color:#996703}
 
 /*{width: 1; casing-width:1; fill-color:#ffffff; color: #DDB8EA; z-index: 15;
