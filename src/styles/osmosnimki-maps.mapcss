@@ -2234,8 +2234,8 @@ area|z10-12[landuse=nature_reserve],
 area|z10-12[boundary=national_park],
 area|z10-12[boundary=protected_area],
 area|z12[leisure=park],
-area|z12[natural=forest], area|z12-[natural=wood],
-area|z12[landuse=forest], area|z12-[landuse=wood]
+area|z12[natural=wood],
+area|z12[landuse=forest]
 {text:name; text-offset:13; 
 font-size:9; font-family: DejaVu Serif Italic; text-color:green;
 text-allow-overlap: false;-x-mapnik-min-distance: 0;
@@ -2245,8 +2245,8 @@ max-width: 40; text-halo-radius:1; text-halo-color:#ffffff;  z-index:11}
 area|z13[landuse=nature_reserve],
 area|z13[boundary=national_park],
 area|z13[boundary=protected_area],
-area|z13[natural=forest], area|z13-15[natural=wood],
-area|z13[landuse=forest], area|z13-15[landuse=wood]
+area|z13[natural=wood],
+area|z13[landuse=forest],
 area|z13[leisure=park]
 {text:name; text-offset:0; font-size:9; font-family: DejaVu Serif Italic;
 text-color:green; text-halo-radius:1; max-width: 40; text-halo-color:#ffffff; text-allow-overlap: false;-x-mapnik-min-distance: 0;
@@ -2255,8 +2255,8 @@ z-index:11}
 area|z14[landuse=nature_reserve],
 area|z14[boundary=national_park],
 area|z14[boundary=protected_area],
-area|z14[natural=forest], area|z13-15[natural=wood],
-area|z14[landuse=forest], area|z13-15[landuse=wood]
+area|z14[natural=wood],
+area|z14[landuse=forest],
 area|z14[leisure=park]
 {text:name; text-offset:0; font-size:10; font-family: DejaVu Serif Italic;
 text-color:green; text-halo-radius:1;max-width: 40;  text-halo-color:#ffffff; text-allow-overlap: false;-x-mapnik-min-distance: 0;
@@ -2265,8 +2265,8 @@ z-index:11}
 
 area|z15-[landuse=nature_reserve],
 area|z15-[boundary=national_park],
-area|z15-[natural=forest], area|z13-15[natural=wood],
-area|z15-[landuse=forest], area|z13-15[landuse=wood],
+area|z15-[natural=wood],
+area|z15-[landuse=forest],
 area|z15-[leisure=park],
 area|z15-[boundary=protected_area]
 {text:name;text-offset:0; font-size:10;font-family: DejaVu Serif Italic;
@@ -2276,7 +2276,7 @@ text-allow-overlap: false; max-width:40; text-offset:15;z-index:11;
 
 
 /*
-shields!!!!
+TODO: shields!!!!
 
 */
 
