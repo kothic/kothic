@@ -387,6 +387,7 @@ area|z15-[area:highway=motorway]
 
 area|z15-[area:highway=footway],
 area|z15-[area:highway=pedestrian],
+area|z15-[highway=pedestrian][area],
 area|z15-[area:highway=path]
 {width: 0.3; fill-color:#F2EFE9; z-index: 14;
 casing-color:#996703}
@@ -452,13 +453,16 @@ way|z16-[highway=cycleway]
 
 
 
-way|z14-[highway=pedestrian]
+way|z14-[highway=pedestrian][!area]
 {width:2; color: #ffffff; casing-width:0.5; casing-color:#996703; z-index:10}
 
-way|z14-[highway=pedestrian]
+line|z14-[highway=pedestrian]
 {text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Book; font-size:10; text-halo-radius: 1; text-halo-color: #ffffff; text-halo-radius: 1; text-halo-color: #ffffff;
 casing-width:.3; casing-color:#bf96ce}
 
+area|z14-[highway=pedestrian]
+{text: name; text-color: #404040; font-family: DejaVu Sans Book; font-size:10; text-halo-radius: 1; text-halo-color: #ffffff; text-halo-radius: 1; text-halo-color: #ffffff;
+casing-width:.3; casing-color:#bf96ce}
 
 /*way|z15-[highway=steps],
 {text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Book; font-size:10; text-halo-radius: 1; text-halo-color: #ffffff; text-halo-radius: 1; text-halo-color: #ffffff;
