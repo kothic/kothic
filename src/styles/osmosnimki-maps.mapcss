@@ -2691,4 +2691,4 @@ way|z16-[highway=steps] [layer!=-2][layer!=-3][layer!=-4][layer!=-5]
 /*ЛЭП*/
 way|z14-[power=line],
 {color:#595b68; width:0.5;pattern-image:lep2.png; pattern-rotate:90;
-pattern-scale:1; pattern-spacing: 40}
+pattern-scale:1; pattern-spacing: 40; z-index: 20; -x-mapnik-layer: top;}
