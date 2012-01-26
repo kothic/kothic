@@ -2058,6 +2058,9 @@ node|z12-15[railway=station][transport=subway][colour=yellow][operator=cz:DPP]{i
 node|z12-15[railway=station][transport=subway][colour=green][operator=cz:DPP]{icon-image:praha-metro-green.png;z-index:17;}
 
 
+/*     Ekaterinburg */
+node|z12-15[railway=station][transport=subway][colour=green][operator=ЕМУП «Екатеринбургский метрополитен»]{icon-image:ekaterinburg-metro-green.png;z-index:17;}
+node|z12-15[railway=station][transport=subway][colour=green][operator=Екатеринбургский метрополитен]{icon-image:ekaterinburg-metro-green.png;z-index:17;}
 
 /*  Others  */
 node|z12[railway=station][transport=subway][!colour] {icon-image:metro_others6_copy.png;z-index:17;}
