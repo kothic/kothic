@@ -1095,6 +1095,8 @@ way|z12-[railway=subway][colour=purple] {width:3; color: #8B509C;z-index:15; das
 way|z12-[railway=subway][colour=orange] {width:3; color: #FF7700;z-index:15; dashes:3,3; opacity:0.3; linecap: butt; -x-mapnik-layer: top;}
 way|z12-[railway=subway][colour=green]  {width:3; color: #006600;z-index:15; dashes:3,3; opacity:0.3; linecap: butt; -x-mapnik-layer: top;}
 way|z12-[railway=subway][colour=brown]  {width:3; color: #BB7700;z-index:15; dashes:3,3; opacity:0.3; linecap: butt; -x-mapnik-layer: top;}
+way|z12-[railway=subway][colour=yellow] {width:3; color: #F7C600;z-index:15; dashes:3,3; opacity:0.3; linecap: butt; -x-mapnik-layer: top;}
+
 
 /*way|z13-15[railway=subway][!colour][tunnel!=yes] {width:1.5; color:#700E19;z-index:15; 
 opacity:0.5; dashes:3,2; linecap: butt; z-index:15}*/
@@ -2048,6 +2050,14 @@ node|z12-15[railway=station][transport=subway][colour=purple][operator=Wiener Li
 node|z12-15[railway=station][transport=subway][colour=green][operator=Wiener Linien]{icon-image:vienna-ubahn-green.png;z-index:17;}
 node|z12-15[railway=station][transport=subway][colour=brown][operator=Wiener Linien]{icon-image:vienna-ubahn-brown.png;z-index:17;}
 node|z12-15[railway=station][transport=subway][!colour][operator=Wiener Linien]{icon-image:vienna-ubahn-blue.png;z-index:17;}
+
+
+/*     Prague       */
+node|z12-15[railway=station][transport=subway][colour=red][operator=cz:DPP]{icon-image:praha-metro-red.png;z-index:17;}
+node|z12-15[railway=station][transport=subway][colour=yellow][operator=cz:DPP]{icon-image:praha-metro-yellow.png;z-index:17;}
+node|z12-15[railway=station][transport=subway][colour=green][operator=cz:DPP]{icon-image:praha-metro-green.png;z-index:17;}
+
+
 
 /*  Others  */
 node|z12[railway=station][transport=subway][!colour] {icon-image:metro_others6_copy.png;z-index:17;}
