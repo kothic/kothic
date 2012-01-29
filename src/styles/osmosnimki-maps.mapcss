@@ -203,6 +203,7 @@ area|z4-[natural=desert] {background-image: desert22.png}
 
 area|z12-[landuse=grass],
 area|z12-[natural=grass],
+area|z12-[natural=grassland],
 area|z12-[natural=meadow],
 area|z12-[landuse=meadow],
 area|z12-[landuse=recreation_ground],
@@ -314,25 +315,28 @@ casing-opacity - прозрачность обводки
 
 
 way|z9-10[waterway=stream]  {color: #C4D4F5; width: .3; z-index:9}
-way|z10-14[waterway=river] {color: #C4D4F5; width: .7; z-index:9}
-way|z15-[waterway=river]    {color: #C4D4F5; width: .9; z-index:9}
 way|z10-[waterway=stream]{color: #C4D4F5; width: .5; z-index:9}
+
+way|z10-14[waterway=river] {color: #C4D4F5; width: .7; z-index:9}
+way|z15-[waterway=river]    {color: #C4D4F5; width: 1; z-index:9}
+
 way|z10-[waterway=canal] {color: #abc4f5; width: .6; z-index:9}
 
-area|z9-10[waterway=stream]  {color: #C4D4F5; width: .3; z-index:9}
-area|z10-14[waterway=river] {color: #C4D4F5; width: .7; z-index:9}
-area|z15-[waterway=river]    {color: #C4D4F5; width: .9; z-index:9}
-area|z10-[waterway=stream] {color: #C4D4F5; width: .5; z-index:9}
-area|z10-[waterway=canal] {color: #abc4f5; width: .6; z-index:9}
+way|z14-[waterway=ditch],
+way|z14-[waterway=drain],
+    {color: #abc4f5; width: .4; z-index:9}
 
-
-way|z10-13[waterway=stream], way|z9-13[waterway=river], way|z13[waterway=canal]
+way|z10-13[waterway=stream],
+way|z9-13[waterway=river],
+way|z13[waterway=canal]
 {text:name; font-size:8; font-family: DejaVu Sans Oblique; text-color:#547bd1; text-position: line}
 
-way|z14-15[waterway=stream], way|z14-15[waterway=river], way|z14-15[waterway=canal]
+way|z14-15[waterway=stream],
+way|z14-15[waterway=river],
+way|z14-15[waterway=canal],
 {text:name; font-size:9; font-family: DejaVu Sans Oblique; text-color:#547bd1; text-position: line}
 
-way|z16-[waterway=stream], way|z16-[waterway=river], way|z16-[waterway=canal]
+way|z16-[waterway]
 {text:name; font-size:11; font-family: DejaVu Sans Oblique; text-color:#547bd1; text-position: line}
 
 
