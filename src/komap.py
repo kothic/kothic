@@ -882,7 +882,7 @@ if options.renderer == "mapnik":
                   sqlz = """select %s, ST_LineMerge(ST_Union(way)) as way from (SELECT * from planet_osm_line where way &amp;&amp; ST_Expand(!bbox!,%s) and (%s) and (%s)) as tex
                   group by %s
                   %s
-                  """%(itags,max(pixel_size_at_zoom(zoom,20),3000),ttext,sqlz,oitags,order)
+                  """%(itags,max(pixel_size_at_zoom(zoom,20),3000),ttext,sqlz,goitags,order)
                   mfile.write(xml_layer("postgis-process", layer_type, itags, sqlz, zoom=zoom ))
 
 
