@@ -234,7 +234,7 @@ if options.renderer == "mapnik":
     if escape:
       escape = escape_sql_column
     else:
-      escape = lambda i:'"'+i+'"'
+      escape = lambda i, asname=False:'"'+i+'"'
     for i in itags:
       if i in numerics:
         tt.add("""(CASE WHEN %s ~ E'^[[:digit:]]+([.][[:digit:]]+)?$' THEN CAST (%s AS FLOAT) ELSE NULL END) as %s__num"""%(escape(i),escape(i),i))
