@@ -134,14 +134,14 @@ text-halo-color: #ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0; t
  max-width:50}
 
 area|z14-[power=generator]
-{width: .5; color: #D8D6D7; fill-color: #D8D6D7; z-index:17}
+{width: .5; color: #D8D6D7; background-color: #D8D6D7; z-index:17}
 
 area|z14-[power=generator]
 {text:name; font-size:11;
 font-family: DejaVu Sans Book; text-color:#303030; text-halo-radius: 1;
 text-halo-color: #ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0; text-placement:any;
  max-width:50;
- width: .5; color: #D8D6D7; fill-color: #D8D6D7; z-index:17}
+ width: .5; color: #D8D6D7; background-color: #D8D6D7; z-index:17}
 
 
 area|z10-[residential=rural]
@@ -350,6 +350,9 @@ way|z14-15[waterway=canal],
 
 way|z16-[waterway]
 {text:name; font-size:11; font-family: DejaVu Sans Oblique; text-color:#547bd1; text-position: line}
+
+
+
 
 
 way|z10-[mooring=yes]{port_11x14_blue.png}
