@@ -837,7 +837,7 @@ if options.renderer == "mapnik":
                     texttags.update(columnmap[t][1])
                 oitags = itags.union(add_tags)
 
-                oitags = [ escape_sql_column(i) for i in oitags]
+                oitags = [ escape_sql_column(i, asname=True) for i in oitags]
                 oitags = ", ".join(oitags)
 
                 ttext = " OR ".join(['"'+i+ "\" is not NULL " for i in texttags])
@@ -858,13 +858,13 @@ if options.renderer == "mapnik":
                   else:
                     sqlz = """select %s, way
                   from (
-                    select (ST_Dump(ST_Multi(ST_Buffer(ST_Collect(p.way),0)))).geom as way, %s
+                    select (ST_Dump(ST_Multi(ST_Buffer(ST_Collect(p.way),%s)))).geom as way, %s
                       from (
-                        select ST_Buffer(way, %s) as way, %s
+                        select *
                           from planet_osm_%s p
                           where (%s) and way_area > %s and p.way &amp;&amp; ST_Expand(!bbox!,%s) and (%s)) p
                         group by %s) p %s ST_Area(p.way) desc
-                  """%(itags,oitags,pixel_size_at_zoom(zoom,10),oitags,layer_type,ttext,pixel_size_at_zoom(zoom,5)**2,max(pixel_size_at_zoom(zoom,20),3000),sqlz,oitags,order)
+                  """%(itags,pixel_size_at_zoom(zoom,10),oitags,layer_type,ttext,pixel_size_at_zoom(zoom,5)**2,max(pixel_size_at_zoom(zoom,20),3000),sqlz,oitags,order)
                   mfile.write(xml_layer("postgis-process", layer_type, itags, sqlz, zoom ))
                 elif layer_type == "line" and zoom < 16 and snap_to_street == 'false':
                   sqlz = " OR ".join(sql)
