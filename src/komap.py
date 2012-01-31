@@ -235,8 +235,8 @@ if options.renderer == "mapnik":
       escape = escape_sql_column
     else:
       def escape(i, asname=False):
-        if name in mapped_cols:
-          return name # already escaped
+        if i in mapped_cols:
+          return i # already escaped
         return '"'+i+'"'
     for i in itags:
       if i in numerics:
