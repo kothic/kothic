@@ -297,7 +297,7 @@ if options.renderer == "mapnik":
   </Rule>
 </Style>
 
-<Layer name="ele-raster1z%s" srs="+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0 +k=1.0 +units=m +nadgrids=@null +wktext  +no_defs">
+<Layer name="ele-raster1z%s">
     <StyleName>elevation1z%s</StyleName>
     <Datasource>
         <Parameter name="file">/raid/srtm/Full/CleanTOPO2merc.tif</Parameter>
@@ -358,7 +358,7 @@ if options.renderer == "mapnik":
   </Rule>
 </Style>
 
-<Layer name="ele-rasterz%s" srs="+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0 +k=1.0 +units=m +nadgrids=@null +wktext  +no_defs">
+<Layer name="ele-rasterz%s">
     <StyleName>elevationz%s</StyleName>
     <Datasource>
         <Parameter name="file">/raid/srtm/Full/CleanTOPO2merc.tif</Parameter>
@@ -394,7 +394,7 @@ if options.renderer == "mapnik":
   </Rule>
 </Style>
 
-<Layer name="ele-rasterz%s" srs="+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0 +k=1.0 +units=m +nadgrids=@null +wktext  +no_defs">
+<Layer name="ele-rasterz%s">
     <StyleName>elevationz%s</StyleName>
     <Datasource>
         <Parameter name="file">/raid/srtm/srtmm.vrt</Parameter>
@@ -461,7 +461,7 @@ if options.renderer == "mapnik":
     </RasterSymbolizer>
   </Rule>
 </Style>
-<Layer name="datarasterz%s" srs="+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0 +k=1.0 +units=m +nadgrids=@null +wktext  +no_defs"> 
+<Layer name="datarasterz%s"> 
     <StyleName>hillshadez%s</StyleName>
     <Datasource>
         <Parameter name="file">/raid/srtm/Full/CleanTOPO2merchs.tif</Parameter>
