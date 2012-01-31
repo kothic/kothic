@@ -228,13 +228,17 @@ if options.renderer == "mapnik":
   #sys.stderr.write(str(numerics)+"\n")
   #print mapniksheet
 
-  def add_numerics_to_itags(itags):
+  def add_numerics_to_itags(itags, escape = True):
     tt = set()
     nitags = set()
+    if escape:
+      escape = escape_sql_column
+    else:
+      escape = lambda i:'"'+i+'"'
     for i in itags:
       if i in numerics:
-        tt.add("""(CASE WHEN %s ~ E'^[[:digit:]]+([.][[:digit:]]+)?$' THEN CAST (%s AS FLOAT) ELSE NULL END) as %s__num"""%(escape_sql_column(i),escape_sql_column(i),i))
-      nitags.add(escape_sql_column(i, asname = True))
+        tt.add("""(CASE WHEN %s ~ E'^[[:digit:]]+([.][[:digit:]]+)?$' THEN CAST (%s AS FLOAT) ELSE NULL END) as %s__num"""%(escape(i),escape(i),i))
+      nitags.add(escape(i, asname = True))
     itags = nitags
     itags.update(tt)
     return itags
@@ -830,12 +834,12 @@ if options.renderer == "mapnik":
                     texttags.update(columnmap[t][1])
                 oitags = itags.union(add_tags)
 
-                oitags = [ '"'+i+'"' for i in oitags]
+                oitags = [ escape_sql_column(i) for i in oitags]
                 oitags = ", ".join(oitags)
 
                 ttext = " OR ".join(['"'+i+ "\" is not NULL " for i in texttags])
                 itags = [columnmap.get(i, (i,))[0] for i in itags]
-                itags = add_numerics_to_itags(itags)
+                itags = add_numerics_to_itags(itags, escape = False)
                 if placement == "center" and layer_type == "polygon" and snap_to_street == 'false':
                   sqlz = " OR ".join(sql)
                   itags = ", ".join(itags)
