@@ -836,15 +836,21 @@ if options.renderer == "mapnik":
                     add_tags.update(columnmap[t][1])
                     texttags.update(columnmap[t][1])
                     
-                oitags = itags.union(add_tags)
+                oitags = itags.union(add_tags) # SELECT: (tags->'mooring') as "mooring"
                 oitags = ", ".join([ escape_sql_column(i, asname=True) for i in oitags])
                 
-                goitags = itags.union(add_tags)
+                goitags = itags.union(add_tags) # GROUP BY: (tags->'mooring')
                 goitags = ", ".join([ escape_sql_column(i) for i in goitags])
+                
+                itags = [columnmap.get(i, (i,))[0] for i in itags]
+                
+                fitags = add_numerics_to_itags(itags) 
+                itags = add_numerics_to_itags(fitags) # population => {population, population__num}
+                neitags = add_numerics_to_itags(fitags, escape = False) # for complex polygons, no escapng needed
+                del fitags
 
                 ttext = " OR ".join(['"'+i+ "\" is not NULL " for i in texttags])
-                itags = [columnmap.get(i, (i,))[0] for i in itags]
-                itags = add_numerics_to_itags(itags) 
+
                 if placement == "center" and layer_type == "polygon" and snap_to_street == 'false':
                   
                   sqlz = " OR ".join(sql)
@@ -859,7 +865,7 @@ if options.renderer == "mapnik":
                           where (%s) and (%s) and (way_area > %s) and way &amp;&amp; ST_Expand(!bbox!,3000) %s way_area desc
                   """%(itags,layer_type,ttext,sqlz,pixel_size_at_zoom(zoom,3)**2, order)
                   else:
-                    itags = add_numerics_to_itags(itags, escape = False) # for complex polygons, no escapng needed
+                    
                     sqlz = """select %s, way
                   from (
                     select (ST_Dump(ST_Multi(ST_Buffer(ST_Collect(p.way),%s)))).geom as way, %s
@@ -868,7 +874,7 @@ if options.renderer == "mapnik":
                           from planet_osm_%s p
                           where (%s) and way_area > %s and p.way &amp;&amp; ST_Expand(!bbox!,%s) and (%s)) p
                         group by %s) p %s ST_Area(p.way) desc
-                  """%(itags,pixel_size_at_zoom(zoom,10),oitags,layer_type,ttext,pixel_size_at_zoom(zoom,5)**2,max(pixel_size_at_zoom(zoom,20),3000),sqlz,goitags,order)
+                  """%(neitags,pixel_size_at_zoom(zoom,10),oitags,layer_type,ttext,pixel_size_at_zoom(zoom,5)**2,max(pixel_size_at_zoom(zoom,20),3000),sqlz,goitags,order)
                   mfile.write(xml_layer("postgis-process", layer_type, itags, sqlz, zoom ))
                 elif layer_type == "line" and zoom < 16 and snap_to_street == 'false':
                   sqlz = " OR ".join(sql)
