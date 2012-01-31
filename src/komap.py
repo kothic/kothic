@@ -835,10 +835,12 @@ if options.renderer == "mapnik":
                   if t in columnmap:
                     add_tags.update(columnmap[t][1])
                     texttags.update(columnmap[t][1])
+                    
                 oitags = itags.union(add_tags)
-
                 oitags = ", ".join([ escape_sql_column(i, asname=True) for i in oitags])
-                goitags = ", ".join([ escape_sql_column(i) for i in oitags])
+                
+                goitags = itags.union(add_tags)
+                goitags = ", ".join([ escape_sql_column(i) for i in goitags])
 
                 ttext = " OR ".join(['"'+i+ "\" is not NULL " for i in texttags])
                 itags = [columnmap.get(i, (i,))[0] for i in itags]
