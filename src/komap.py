@@ -842,9 +842,9 @@ if options.renderer == "mapnik":
                 goitags = itags.union(add_tags) # GROUP BY: (tags->'mooring')
                 goitags = ", ".join([ escape_sql_column(i) for i in goitags])
                 
-                itags = [columnmap.get(i, (i,))[0] for i in itags]
+                fitags = [columnmap.get(i, (i,))[0] for i in itags]
                 
-                fitags = add_numerics_to_itags(itags) 
+                #fitags = add_numerics_to_itags(itags) 
                 itags = add_numerics_to_itags(fitags) # population => {population, population__num}
                 neitags = add_numerics_to_itags(fitags, escape = False) # for complex polygons, no escapng needed
                 del fitags
