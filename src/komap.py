@@ -852,9 +852,9 @@ if options.renderer == "mapnik":
                 ttext = " OR ".join(['"'+i+ "\" is not NULL " for i in texttags])
 
                 if placement == "center" and layer_type == "polygon" and snap_to_street == 'false':
-                  
                   sqlz = " OR ".join(sql)
                   itags = ", ".join(itags)
+                  neitags = ", ".join(neitags)
                   if not order:
                     order = "order by"
                   else:
@@ -865,7 +865,6 @@ if options.renderer == "mapnik":
                           where (%s) and (%s) and (way_area > %s) and way &amp;&amp; ST_Expand(!bbox!,3000) %s way_area desc
                   """%(itags,layer_type,ttext,sqlz,pixel_size_at_zoom(zoom,3)**2, order)
                   else:
-                    
                     sqlz = """select %s, way
                   from (
                     select (ST_Dump(ST_Multi(ST_Buffer(ST_Collect(p.way),%s)))).geom as way, %s
