@@ -844,12 +844,12 @@ if options.renderer == "mapnik":
                   else:
                     order += ", "
                   if zoom >= 11 or zoom < 6:
-                    sqlz = """select %s, ST_PointOnSurface(ST_Buffer(way,0)) as way
+                    sqlz = """select %s, way) as way
                           from planet_osm_%s
                           where (%s) and (%s) and (way_area > %s) and way &amp;&amp; ST_Expand(!bbox!,3000) %s way_area desc
                   """%(itags,layer_type,ttext,sqlz,pixel_size_at_zoom(zoom,3)**2, order)
                   else:
-                    sqlz = """select %s, ST_PointOnSurface(ST_Buffer(way,0)) as way
+                    sqlz = """select %s, way
                   from (
                     select (ST_Dump(ST_Multi(ST_Buffer(ST_Collect(p.way),0)))).geom as way, %s
                       from (
