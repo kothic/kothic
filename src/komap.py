@@ -843,7 +843,7 @@ if options.renderer == "mapnik":
                     order = "order by"
                   else:
                     order += ", "
-                  if zoom >= 11 or zoom < 6:
+                  if zoom > 13 or zoom < 6:
                     sqlz = """select %s, way
                           from planet_osm_%s
                           where (%s) and (%s) and (way_area > %s) and way &amp;&amp; ST_Expand(!bbox!,3000) %s way_area desc

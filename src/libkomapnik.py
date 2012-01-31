@@ -144,7 +144,7 @@ def xml_textsymbolizer(
     dy = 0
   
   return """
-  <TextSymbolizer name="%s" fontset_name="%s" size="%s" fill="%s" halo_fill= "%s" halo_radius="%s" placement="%s" dx="%s" dy="%s" max_char_angle_delta="17" allow_overlap="%s" wrap_width="%s" min_distance="%s" vertical_alignment="middle" horizontal_alignment="%s" opacity="%s" placement-type="simple" placements="%s" text-transform="%s" minimum-path-length="2" />
+  <TextSymbolizer name="%s" fontset_name="%s" size="%s" fill="%s" halo_fill= "%s" halo_radius="%s" placement="%s" dx="%s" dy="%s" max_char_angle_delta="17" allow_overlap="%s" wrap_width="%s" min_distance="%s" vertical_alignment="middle" horizontal_alignment="%s" opacity="%s" placement-type="simple" placements="%s" text-transform="%s" minimum-path-length="5" />
   """%(text,face,int(float(size)),color,halo_color,halo_radius,placement,dx,dy,overlap,wrap_width,distance,align,opacity,pos, transform)
 
 def xml_shieldsymbolizer(path="", width="", height="",
