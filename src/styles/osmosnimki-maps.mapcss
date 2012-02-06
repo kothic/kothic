@@ -2113,15 +2113,9 @@ line|z14-15[railway=rail][bridge][service!=siding][service!=spur][service!=yard]
     {width:1; color: #ffffff; dashes: 11,9; opacity: 1; z-index:12.3}
 
 
-node|z8[aeroway=aerodrome]
-       {icon-image:aerodrome_osm.png}
-area |z8[aeroway=aerodrome]
-       {icon-image:aerodrome_osm.png}
+
 
 node|z9-[aeroway=aerodrome]
-       {icon-image:aerodrome_osm.png;
-       text:name; text-offset:12; font-size:9; font-family: DejaVu Sans Condensed Bold; text-halo-radius:1; text-color:#1e7ca5;text-halo-color:#ffffff; text-allow-overlap: false;z-index:30}
-area |z9-[aeroway=aerodrome]
        {icon-image:aerodrome_osm.png;
        text:name; text-offset:12; font-size:9; font-family: DejaVu Sans Condensed Bold; text-halo-radius:1; text-color:#1e7ca5;text-halo-color:#ffffff; text-allow-overlap: false;z-index:30}
 
