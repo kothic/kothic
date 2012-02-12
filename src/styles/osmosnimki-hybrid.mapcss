@@ -1,6 +1,6 @@
 /*
   Deja Vu MapCSS styles
-  Osmosnimki maps style
+  Osmosnimki hybrid style
 */
 
 
@@ -1118,12 +1118,22 @@ node|z11-[place=suburb]
 
 
 
-area|z15-[building] {text: addr:housenumber; text-halo-radius:1; text-halo-color:#1e0000; text-color: #ffeecc; text-position: center; font-size:9; -x-mapnik-min-distance:10; opacity:0.8}
+area|z15-16[building] {text: addr:housenumber; text-halo-radius:1; text-halo-color:#1e0000; text-color: #ffeecc; text-position: center; font-size:8; -x-mapnik-min-distance:10; opacity:0.8; -x-mapnik-snap-to-street: true}
+
+node|z15-16[addr:housenumber][addr:street][!amenity][!shop] {text: addr:housenumber; text-halo-radius:1; text-halo-color:#1e0000; text-color: #ffeecc; text-position: center; font-size:8; -x-mapnik-min-distance:10; opacity:0.8; -x-mapnik-snap-to-street: true}
+
+
+area|z17-[building] {text: addr:housenumber; text-halo-radius:1; text-halo-color:#1e0000; text-color: #ffeecc; text-position: center; font-size:8; -x-mapnik-min-distance:10; opacity:0.8; -x-mapnik-snap-to-street: true}
+
+node|z17-[addr:housenumber][addr:street][!amenity][!shop] {text: addr:housenumber; text-halo-radius:1; text-halo-color:#1e0000; text-color: #ffeecc; text-position: center; font-size:8; -x-mapnik-min-distance:10; opacity:0.8; -x-mapnik-snap-to-street: true}
+
+
 
 
 node|z13-[highway=milestone][pk]{text:pk; font-size:7; text-halo-radius:5;-x-mapnik-min-distance:0}
       
        
+
 
 
       
