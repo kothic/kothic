@@ -2416,7 +2416,8 @@ area|z15-[building=kindergarten] { width: .5; color: #D49D3C; fill-color: #E7CCB
 
 
 
-
+area|z15-[building=school],
+area|z15-[building=kindergarten],
 area|z15-[building][amenity=kindergarten],
 area|z15-[building][amenity=school],
 area|z15-[building][amenity=college],
@@ -2435,6 +2436,8 @@ node|z15-[amenity=university]
 font-family: DejaVu Sans Oblique; text-halo-radius:1; text-color:#843542; text-halo-color:#ffffff;
 text-allow-overlap: false; -x-mapnik-min-distance:0;     text-position: center;  max-width: 20 }
 
+area|z15-[building=school],
+area|z15-[building=kindergarten],
 area|z15-[building][amenity=kindergarten],
 area|z15-[building][amenity=school],
 area|z15-[building][amenity=college],
@@ -2450,6 +2453,7 @@ area|z14[building][emergency=ambulance_station]
 {width: .5; color: #D49D3C; z-index:17}*/
 
 
+area|z15-[building=hospital],
 area|z15-[building][amenity=hospital],
 area|z15-[building][amenity=doctors],
 area|z15-[building][emergency=ambulance_station]
@@ -2475,6 +2479,7 @@ font-family:DejaVu Sans Oblique; text-color:#7F0D18; text-halo-radius: 0;
 text-halo-color: #ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0; text-placement:any;
 max-width:30}
 
+area|z17-[building=hospital],
 area|z17-[building][amenity=hospital],
 area|z17-[building][amenity=doctors],
 area|z17-[building][emergency=ambulance_station]
