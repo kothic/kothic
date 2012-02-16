@@ -834,19 +834,19 @@ way|z17[highway=primary_link]
 
 way|z17[highway=primary][tunnel!=yes],
 way|z17[highway=primary_link][tunnel!=yes]       
-        {width:11;  color: #fcea97;
+        {width:13;  color: #fcea97;
         casing-width:.5; casing-color: #996703;
         z-index:12}
         
 way|z17[highway=primary][tunnel=yes],
 way|z17[highway=primary_link][tunnel=yes]
-{width:11;  color: #cdcdcd; opacity: 0.6; linecap:square;
+{width:13;  color: #cdcdcd; opacity: 0.6; linecap:square;
         z-index:12}       
 
 way|z18-[highway=primary],
 way|z18-[highway=primary_link]
         {text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Bold; font-size:12; text-halo-radius: 1; text-halo-color: #ffffff;
-        width:13;  color: #fcea97;
+        width:15;  color: #fcea97;
         casing-width:.5; casing-color: #996703;
         z-index:12}
 
@@ -2389,10 +2389,16 @@ area|z14[admin_level=8]
 /*way[landuse=industrial] {fill-color: #855}*/
 
 
-area|z13[building] {width: .3; color: #cca352; opacity:0.5; z-index:17;}
-area|z14[building] {width: .4; color: #cca352; z-index:17;}
+area|z13[building][building!=no][building!=construction] {width: .3; color: #cca352; opacity:0.5; z-index:17;}
+area|z14[building][building!=no][building!=construction] {width: .4; color: #cca352; z-index:17;}
+area|z15-[building][building!=no][building!=construction] { width: .5; color: #D49D3C; fill-color: #E7CCB4;  z-index:17;}
 
-area|z15-[building] { width: .5; color: #D49D3C; fill-color: #E7CCB4;  z-index:17;}
+
+area|z13[building=construction] {width: .3; color: #cca352; opacity:0.5; z-index:17; dashes: 2,2}
+area|z14[building=construction] {width: .4; color: #cca352; z-index:17; dashes: 3,3}
+area|z15-[building=construction] { width: .5; color: #D49D3C; fill-image: buildings-hatch.png  z-index:17; dashes: 4,4}
+
+
 area|z15-[building=kindergarten] { width: .5; color: #D49D3C; fill-color: #E7CCB4;  z-index:17;}
 
 
