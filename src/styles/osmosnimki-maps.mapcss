@@ -2389,14 +2389,20 @@ area|z14[admin_level=8]
 /*way[landuse=industrial] {fill-color: #855}*/
 
 
-area|z13[building][building!=no][building!=construction] {width: .3; color: #cca352; opacity:0.5; z-index:17;}
-area|z14[building][building!=no][building!=construction] {width: .4; color: #cca352; z-index:17;}
-area|z15-[building][building!=no][building!=construction] { width: .5; color: #D49D3C; fill-color: #E7CCB4;  z-index:17;}
+area|z13[building][building!=no][building!=construction][building!=planned] {width: .3; color: #cca352; opacity:0.5; z-index:17;}
+area|z14[building][building!=no][building!=construction][building!=planned] {width: .4; color: #cca352; z-index:17;}
+area|z15-[building][building!=no][building!=construction][building!=planned] { width: .5; color: #D49D3C; fill-color: #E7CCB4;  z-index:17;}
 
 
-area|z13[building=construction] {width: .3; color: #cca352; opacity:0.5; z-index:17; dashes: 2,2}
-area|z14[building=construction] {width: .4; color: #cca352; z-index:17; dashes: 3,3}
-area|z15-[building=construction] { width: .5; color: #D49D3C; fill-image: buildings-hatch.png  z-index:17; dashes: 4,4}
+area|z13[building=construction],
+area|z13[building=planned],
+  {width: .3; color: #cca352; opacity:0.5; z-index:17; dashes: 2,2}
+area|z14[building=construction],
+area|z14[building=planned],
+  {width: .4; color: #cca352; z-index:17; dashes: 3,3}
+area|z15-[building=construction],
+area|z15-[building=planned],
+  {width: .5; color: #D49D3C; fill-image: buildings-hatch.png  z-index:17; dashes: 4,4}
 
 
 area|z15-[building=kindergarten] { width: .5; color: #D49D3C; fill-color: #E7CCB4;  z-index:17;}
