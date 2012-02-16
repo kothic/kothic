@@ -2402,7 +2402,7 @@ area|z14[building=planned],
   {width: .4; color: #cca352; z-index:17; dashes: 3,3}
 area|z15-[building=construction],
 area|z15-[building=planned],
-  {width: .5; color: #D49D3C; fill-image: buildings-hatch.png  z-index:17; dashes: 4,4}
+  {width: .5; color: #D49D3C; fill-image: buildings-hatch.png; z-index:17; dashes: 4,4}
 
 
 area|z15-[building=kindergarten] { width: .5; color: #D49D3C; fill-color: #E7CCB4;  z-index:17;}
@@ -2410,7 +2410,7 @@ area|z15-[building=kindergarten] { width: .5; color: #D49D3C; fill-color: #E7CCB
 
 
 area|z15-[building=public] { fill-color: #edc2ba;  z-index:17;}
-area|z15-[building][building!=yes][building!=public] {fill-color: #E8CDB5; z-index:17;}
+area|z15-[building][building!=yes][building!=public][building!=construction][building!=planned] {fill-color: #E8CDB5; z-index:17;}
 
 
 
