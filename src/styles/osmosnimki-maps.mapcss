@@ -124,7 +124,7 @@ area|z15-[landuse=construction],
 area|z15-[amenity=kindergarten][!building],
 area|z15-[amenity=school][!building],
 area|z15-[amenity=university][!building],
-{fill-color: #F7E1DD; z-index:9;}
+{background-color: #F7E1DD; z-index:9;}
 
 
 
