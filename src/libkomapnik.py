@@ -21,14 +21,14 @@ from debug import debug, Timer
 from mapcss.webcolors.webcolors import whatever_to_hex as nicecolor
 
 
-map_proj = "+init=epsg:3857"
-db_proj = "+init=epsg:3857"
-table_prefix = "planet_osm_"
-db_user = "gis"
-db_name = "gis"
-db_srid = 900913
-icons_path = "/home/gis/mapnik/kosmo/icons/"
-world_bnd_path = "/home/gis/mapnik/world_boundaries/"
+map_proj = ""
+db_proj = ""
+table_prefix = ""
+db_user = ""
+db_name = ""
+db_srid = ""
+icons_path = ""
+world_bnd_path = ""
 
 
 
@@ -205,6 +205,86 @@ def xml_rule_start():
 def xml_rule_end():
   return """
   </Rule>"""
+
+def xml_cleantopo(zoom, x_scale):
+  return """
+<Style name="elevation1z%s">
+  <Rule>%s
+    <RasterSymbolizer>
+      <RasterColorizer default-mode="linear" epsilon="0.001">
+        <stop value="701"  color="#98b7f5"/>
+        <stop value="1701"  color="#9fbcf5"/>
+        <stop value="2701"  color="#a6c1f5"/>
+        <stop value="3701"  color="#abc4f5"/>
+        <stop value="4701"  color="#b0c7f5"/>
+        <stop value="5701"  color="#b5caf5"/>
+        <stop value="6701"  color="#bacef5"/>
+        <stop value="7701"  color="#bfd1f5"/>
+        <stop value="8701"  color="#c4d4f5"/>
+        <stop value="9701"  color="#c6d6f5"/>
+        <stop value="10201"  color="#c9d7f5"/>
+        <!--stop value="10501"  color="#cbd9f5"/-->
+        <!-- stop value="10701"  color="cedbf5"/ -->
+        <stop value="10502"  color="rgba(231, 209, 175, 0.1)"/>
+        <!--stop value="10701" color="rgba(50, 180, 50, 0.0)"/ -->
+        <stop value="10901"  color="rgba(231, 209, 175, 0.2)"/>
+        <stop value="11201"  color="rgba(226, 203, 170, 0.2)"/>
+        <stop value="11701" color="rgba(217, 194, 159, 0.3)"/>
+        <stop value="12701" color="rgba(208, 184, 147, 0.4)"/>
+        <stop value="13701" color="rgba(197, 172, 136, 0.5)"/>
+        <stop value="14701" color="rgba(188, 158, 120, 0.55)"/>
+        <stop value="15701" color="rgba(179, 139, 102, 0.6)"/>
+        <stop value="16701" color="rgba(157, 121, 87, 0.7)"/>
+        <stop value="17701" color="rgba(157, 121, 87, 0.8)"/>
+        <stop value="18701" color="rgba(144, 109, 77, 0.9)"/>
+     </RasterColorizer>
+    </RasterSymbolizer>
+  </Rule>
+</Style>
+
+<Layer name="ele-raster1z%s">
+    <StyleName>elevation1z%s</StyleName>
+    <Datasource>
+        <Parameter name="file">/raid/srtm/Full/CleanTOPO2merc.tif</Parameter>
+        <Parameter name="type">gdal</Parameter>
+        <Parameter name="band">1</Parameter>
+        <Parameter name="srid">4326</Parameter>
+    </Datasource>
+</Layer>
+      """ % (zoom, x_scale, zoom, zoom)
+
+def xml_srtm(zoom, x_scale):
+  return """
+<Style name="elevationz%s">
+  <Rule>%s
+    <RasterSymbolizer>
+      <RasterColorizer default-mode="linear" epsilon="0.001">
+        <stop value="-100"  color="rgba(231, 209, 175, 0.1)"/>
+        <stop value="200"  color="rgba(231, 209, 175, 0.2)"/>
+        <stop value="500"  color="rgba(226, 203, 170, 0.2)"/>
+        <stop value="1000" color="rgba(217, 194, 159, 0.3)"/>
+        <stop value="2000" color="rgba(208, 184, 147, 0.4)"/>
+        <stop value="3000" color="rgba(197, 172, 136, 0.5)"/>
+        <stop value="4000" color="rgba(188, 158, 120, 0.55)"/>
+        <stop value="5000" color="rgba(179, 139, 102, 0.6)"/>
+        <stop value="6000" color="rgba(157, 121, 87, 0.7)"/>
+        <stop value="7000" color="rgba(157, 121, 87, 0.8)"/>
+        <stop value="8000" color="rgba(144, 109, 77, 0.9)"/>
+     </RasterColorizer>
+    </RasterSymbolizer>
+  </Rule>
+</Style>
+
+<Layer name="ele-rasterz%s">
+    <StyleName>elevationz%s</StyleName>
+    <Datasource>
+        <Parameter name="file">/raid/srtm/srtmm.vrt</Parameter>
+        <Parameter name="type">gdal</Parameter>
+        <Parameter name="band">1</Parameter>
+        <Parameter name="srid">4326</Parameter>
+    </Datasource>
+</Layer>
+      """ % (zoom, x_scale, zoom, zoom)
 
 def xml_hardcoded_arrows():
   return """
