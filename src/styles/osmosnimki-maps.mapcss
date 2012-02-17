@@ -189,6 +189,7 @@ area|z14-[landuse=industrial], area|z14-[landuse=military] {background-color: #D
 
 way|z14-15[landuse=industrial],
 way|z14-15[landuse=garages][name!=гаражи],
+way|z14-15[landuse=allotments],
 /*,area|z14-15[landuse=military]*/
 {text:name; font-size:10;
 font-family: DejaVu Sans Book; text-color:#303030; text-halo-radius: 1;
@@ -197,6 +198,7 @@ text-halo-color: #ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0; t
 
 way|z16-[landuse=industrial],
 way|z16-[landuse=garages][name!=гаражи],
+way|z16-[landuse=allotments],
 /*,area|z16-[landuse=military]*/
 {text:name; font-size:11;
 font-family: DejaVu Sans Book; text-color:#303030; text-halo-radius: 1;
