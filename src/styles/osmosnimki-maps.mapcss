@@ -2748,7 +2748,7 @@ way|z16-[aerialway]
 {color: black; width:0.1; -x-mapnik-layer: top;}
 
 way|z16-[aerialway]::ticks
-{color: black; width:4; dashes: 0.1,40; linecap:butt; -x-mapnik-layer: top;}
+{color: black; width:4; dashes: 1,40; linecap:butt; -x-mapnik-layer: top;}
 
 way|z16-[piste:type=downhill][piste:difficulty=novice]
 {opacity: 0.3; width:4; -x-mapnik-layer: top; color: green  }
