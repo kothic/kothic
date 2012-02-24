@@ -28,7 +28,7 @@ area|z3-[natural=glacier]{background-color: #fcfeff; background-image: glacier.p
 
 area|z10-[place=city],
 area|z10-[place=town],
-{background-color:#F1EEE8; z-index:1}
+{background-color:#FAF7F7; z-index:1}
 
 area|z10-[place=hamlet],
 area|z10-[place=village],
@@ -2172,8 +2172,7 @@ text-offset:5; text:name; font-size: 8; font-family: DejaVu Sans Book; text-halo
 
 
 
-node|z6-7[place=city][admin_level=2] {icon-image:adm_6.png; text-offset:8; text:name; font-size:12; font-family: DejaVu Sans Bold; text-halo-radius:2; text-color:#303030;text-halo-color:#ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0; collision-sort-by:population; z-index:50}
-
+node|z6-7[place=city][admin_level=2] {icon-image:adm_6.png;  text-offset:8; text:name; font-size:12; font-family: DejaVu Sans Bold; text-halo-radius:2; text-color:#303030;text-halo-color:#ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0; collision-sort-by:population; z-index:50}
 node|z6-7[place=city][admin_level=3] {icon-image:adm1_5.png; text-offset:8; text:name; font-size:11; font-family: DejaVu Sans Bold; text-halo-radius:2; text-color:#404040;text-halo-color:#ffffff; text-allow-overlap: false; -x-mapnik-min-distance:20; collision-sort-by:population; z-index:50}
 node|z6-7[place=city][admin_level=4] {icon-image:adm1_5.png; text-offset:8; text:name; font-size:10; font-family: DejaVu Sans Bold; text-halo-radius:2; text-color:#404040;text-halo-color:#ffffff; text-allow-overlap: false; -x-mapnik-min-distance:20; collision-sort-by:population; z-index:50}
 node|z6-7[place=city][admin_level=6] {icon-image:adm1_5.png; text-offset:8; text:name; font-size:10; font-family: DejaVu Sans Bold; text-halo-radius:2; text-color:#404040;text-halo-color:#ffffff; text-allow-overlap: false; -x-mapnik-min-distance:20; collision-sort-by:population; z-index:50}
