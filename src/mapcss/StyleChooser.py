@@ -290,7 +290,7 @@ class StyleChooser:
       for a,b in r.iteritems():
         a = a.strip()
         b = b.strip()
-        if a = "casing-width":
+        if a == "casing-width":
           "josm support"
           if b[0] = "+":
             try:
