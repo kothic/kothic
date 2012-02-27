@@ -135,7 +135,8 @@ class StyleChooser:
                         "hack to support josm's style casings"
                         if b.strip()[0] = "+":
                           try:
-                            ra[a] = float(b) / 2.
+                            b = float(b) / 2.
+                            ra[a] = b
                           except ValueError:
                             pass
                           
