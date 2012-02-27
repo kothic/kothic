@@ -478,7 +478,7 @@ if options.renderer == "mapnik":
                 xml += xml_filter(entry["rulestring"])
                 if not check_if_roads_table(entry["rulestring"]):
                   roads = False
-                if layer_type == "polygon":
+                if layer_type == "polygon" and (entry["style"].get("fill-position", "foreground")=="foreground"):
                   if "fill-color" in entry["style"]:
                     xml += xml_polygonsymbolizer(entry["style"].get("fill-color", "black"), entry["style"].get("fill-opacity", "1"))
                   if "fill-image" in entry["style"]:
