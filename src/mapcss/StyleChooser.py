@@ -294,7 +294,7 @@ class StyleChooser:
           "josm support"
           if b[0] == "+":
             try:
-              b = float(b)/2
+              b = str(float(b)/2)
             except:
               pass
         if "text" == a[-4:]:
