@@ -131,6 +131,14 @@ class StyleChooser:
                     ra = {}
                     for a, b in r.iteritems():
                       "checking and nicifying style table"
+                      if a == "casing-width":
+                        "hack to support josm's style casings"
+                        if b.strip()[0] = "+":
+                          try:
+                            ra[a] = float(b) / 2.
+                          except ValueError:
+                            pass
+                          
                       if "color" in a:
                         "parsing color value to 3-tuple"
                         ra[a] = colorparser(b)
