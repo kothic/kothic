@@ -472,16 +472,16 @@ if options.renderer == "mapnik":
                   continue
               elif zlayer not in range(-5,6):
                 continue
-              if "width" in entry["style"] or "pattern-image" in entry["style"] or (("fill-color" in entry["style"] or "fill-image" in entry["style"]) and layer_type == "polygon"):
+              if "width" in entry["style"] or "pattern-image" in entry["style"] or (("fill-color" in entry["style"] or "fill-image" in entry["style"]) and (layer_type == "polygon") and (entry["style"].get("fill-position", "foreground")=="foreground")):
                 xml += xml_rule_start()
                 xml += x_scale
                 xml += xml_filter(entry["rulestring"])
                 if not check_if_roads_table(entry["rulestring"]):
                   roads = False
                 if layer_type == "polygon":
-                  if "fill-color" in entry["style"]  and (entry["style"].get("fill-position", "foreground")=="foreground"):
+                  if "fill-color" in entry["style"]:
                     xml += xml_polygonsymbolizer(entry["style"].get("fill-color", "black"), entry["style"].get("fill-opacity", "1"))
-                  if "fill-image" in entry["style"]  and (entry["style"].get("fill-position", "foreground")=="foreground"):
+                  if "fill-image" in entry["style"]:
                     xml += xml_polygonpatternsymbolizer(entry["style"].get("fill-image", ""))
                 if "width" in entry["style"]:
                   twidth = relaxedFloat(entry["style"].get("width", "1"))
