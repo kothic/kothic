@@ -253,12 +253,9 @@ class MapCSS():
                 css=OBJECT.sub("",css)
                 sc.newObject(obj)
                 previous=oOBJECT
-                
 
               #// Declaration - {...}
               elif DECLARATION.match(css):
-                
-                
                 decl = DECLARATION.match(css).groups()[0]
                 log.debug("declaration found: %s"% (decl))
                 sc.addStyles(parseDeclaration(decl))
@@ -356,22 +353,11 @@ def parseDeclaration(s):
                   """
                   styles=[]
                   t = {}
-                  #var t:Object=new Object();
-                  #var o:Object=new Object();
-                  #var a:String, k:String;
-
-                  #// Create styles
-                  #var ss:ShapeStyle =new ShapeStyle() ;
-                  #var ps:PointStyle =new PointStyle() ;
-                  #var ts:TextStyle  =new TextStyle()  ;
-                  #var hs:ShieldStyle=new ShieldStyle();
-                  #var xs:InstructionStyle=new InstructionStyle();
 
                   for a in s.split(';'):
                           #if ((o=ASSIGNMENT_EVAL.exec(a)))   { t[o[1].replace(DASH,'_')]=new Eval(o[2]); }
                           if ASSIGNMENT.match(a):
                             tzz = ASSIGNMENT.match(a).groups()
-                            
                             t[tzz[0]]=tzz[1].strip().strip('"')
                             logging.debug("%s == %s" % (tzz[0],tzz[1]) )
                           else:

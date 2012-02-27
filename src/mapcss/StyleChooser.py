@@ -131,15 +131,6 @@ class StyleChooser:
                     ra = {}
                     for a, b in r.iteritems():
                       "checking and nicifying style table"
-                      if a == "casing-width":
-                        "hack to support josm's style casings"
-                        if b.strip()[0] = "+":
-                          try:
-                            b = float(b) / 2.
-                            ra[a] = b
-                          except ValueError:
-                            pass
-                          
                       if "color" in a:
                         "parsing color value to 3-tuple"
                         ra[a] = colorparser(b)
@@ -160,7 +151,7 @@ class StyleChooser:
                       else:
                         ra[a]=b
                     
-                    ra["layer"] = float(tags.get("layer",0))*100+ra.get("z-index",1) # calculating z-index
+                    ra["layer"] = float(tags.get("layer",0))*1000+ra.get("z-index",1) # calculating z-index
                     for k,v in ra.items():  # if a value is empty, we don't need it - renderer will do as default.
                       if not v:
                         del ra[k]
@@ -297,11 +288,19 @@ class StyleChooser:
     for r in a:
       ra = {}
       for a,b in r.iteritems():
+        a = a.strip()
+        b = b.strip()
+        if a = "casing-width":
+          "josm support"
+          if b[0] = "+":
+            try:
+              b = float(b)/2
+            except:
+              pass
         if "text" == a[-4:]:
-          if b.strip()[:5] != "eval(":
+          if b[:5] != "eval(":
             b = "eval(tag(\""+b+"\"))"
-
-        if b.strip()[:5] == "eval(":
+        if b[:5] == "eval(":
           b = Eval(b)
         ra[a] = b
       rb.append(ra)
