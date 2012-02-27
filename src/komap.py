@@ -330,15 +330,15 @@ if options.renderer == "mapnik":
       xml = xml_style_start()
       for entry in zsheet[zindex]:
         if entry["type"] in ("way", "area", "polygon"):
-          if "background-color" in entry["style"] or "background-image" in entry["style"]:
+          if ("fill-color" in entry["style"] or "fill-image" in entry["style"]) and (entry["style"].get("fill-position", "foreground")=="background"):
             xml += xml_rule_start()
             xml += x_scale
 
             xml += xml_filter(entry["rulestring"])
-            if "background-color" in entry["style"]:
-              xml += xml_polygonsymbolizer(entry["style"].get("background-color", "black"), entry["style"].get("background-opacity", "1"))
-            if "background-image" in entry["style"]:
-              xml += xml_polygonpatternsymbolizer(entry["style"].get("background-image", ""))
+            if "fill-color" in entry["style"]:
+              xml += xml_polygonsymbolizer(entry["style"].get("fill-color", "black"), entry["style"].get("fill-opacity", "1"))
+            if "fill-image" in entry["style"]:
+              xml += xml_polygonpatternsymbolizer(entry["style"].get("fill-image", ""))
             sql.add(entry["sql"])
             itags.update(entry["chooser"].get_interesting_tags(entry["type"], zoom))
             xml += xml_rule_end()
@@ -479,9 +479,9 @@ if options.renderer == "mapnik":
                 if not check_if_roads_table(entry["rulestring"]):
                   roads = False
                 if layer_type == "polygon":
-                  if "fill-color" in entry["style"]:
+                  if "fill-color" in entry["style"]  and (entry["style"].get("fill-position", "foreground")=="foreground"):
                     xml += xml_polygonsymbolizer(entry["style"].get("fill-color", "black"), entry["style"].get("fill-opacity", "1"))
-                  if "fill-image" in entry["style"]:
+                  if "fill-image" in entry["style"]  and (entry["style"].get("fill-position", "foreground")=="foreground"):
                     xml += xml_polygonpatternsymbolizer(entry["style"].get("fill-image", ""))
                 if "width" in entry["style"]:
                   twidth = relaxedFloat(entry["style"].get("width", "1"))
