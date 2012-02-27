@@ -292,7 +292,7 @@ class StyleChooser:
         b = b.strip()
         if a == "casing-width":
           "josm support"
-          if b[0] = "+":
+          if b[0] == "+":
             try:
               b = float(b)/2
             except:
