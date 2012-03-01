@@ -485,14 +485,24 @@ if options.renderer == "mapnik":
                     xml += xml_polygonpatternsymbolizer(entry["style"].get("fill-image", ""))
                 if "width" in entry["style"]:
                   twidth = relaxedFloat(entry["style"].get("width", "1"))
+                  
+                  # linejoins are round, but for thin roads they're miter
                   tlinejoin = "round"
                   if twidth <= 2:
                     tlinejoin = "miter"
+                  tlinejoin = entry["style"].get("linejoin", tlinejoin)
+
+                  # linecaps are round for roads, and butts for roads on non-default layer=
+                  tlinecap = "round"
+                  if zlayer != 0:
+                    tlinecap = "butt"
+                  tlinecap = entry["style"].get("linecap", tlinecap)
+
                   xml += xml_linesymbolizer(color=entry["style"].get("color", "black"),
                     width=twidth,
                     opacity=relaxedFloat(entry["style"].get("opacity", "1")),
-                    linecap=entry["style"].get("linecap", "round"),
-                    linejoin=entry["style"].get("linejoin", "round"),
+                    linecap=tlinecap,
+                    linejoin=tlinejoin,
                     dashes=entry["style"].get("dashes", ""),
                     zoom=zoom)
                   if entry["style"].get("dashes", ""):
@@ -505,29 +515,28 @@ if options.renderer == "mapnik":
                   else:
                     if "pattern-rotate" in entry["style"] or "pattern-spacing" in entry["style"]:
                       fname = entry["style"]["pattern-image"]
-                      im = Image.open(icons_path + fname).convert("RGBA")
-                      fname = "f"+fname
-                      if "pattern-rotate" in entry["style"]:
-                        im = im.rotate(relaxedFloat(entry["style"]["pattern-rotate"]))
-                        fname = "r"+str(relaxedFloat(entry["style"]["pattern-rotate"]))+fname
-                      if "pattern-scale" in entry["style"]:
-                        sc = relaxedFloat(entry["style"]["pattern-scale"])*1.
-                        ns = (max(int(round(im.size[0]*sc)),1), max(int(round(im.size[1]*sc)),1))
-                        im = im.resize(ns, Image.BILINEAR)
-                        fname = "z"+str(sc)+fname
-                      if "pattern-spacing" in entry["style"]:
-                        im2 = Image.new("RGBA", (im.size[0]+int(relaxedFloat(entry["style"]["pattern-spacing"])),im.size[1]))
-                        im2.paste(im,(0,0))
-                        im = im2
-                        fname = "s"+str(int(relaxedFloat(entry["style"]["pattern-spacing"])))+fname
                       try:
+                        im = Image.open(icons_path + fname).convert("RGBA")
+                        fname = "f"+fname
+                        if "pattern-rotate" in entry["style"]:
+                          im = im.rotate(relaxedFloat(entry["style"]["pattern-rotate"]))
+                          fname = "r"+str(relaxedFloat(entry["style"]["pattern-rotate"]))+fname
+                        if "pattern-scale" in entry["style"]:
+                          sc = relaxedFloat(entry["style"]["pattern-scale"])*1.
+                          ns = (max(int(round(im.size[0]*sc)),1), max(int(round(im.size[1]*sc)),1))
+                          im = im.resize(ns, Image.BILINEAR)
+                          fname = "z"+str(sc)+fname
+                        if "pattern-spacing" in entry["style"]:
+                          im2 = Image.new("RGBA", (im.size[0]+int(relaxedFloat(entry["style"]["pattern-spacing"])),im.size[1]))
+                          im2.paste(im,(0,0))
+                          im = im2
+                          fname = "s"+str(int(relaxedFloat(entry["style"]["pattern-spacing"])))+fname
                         if not os.path.exists(icons_path+"komap/"):
                           os.makedirs(icons_path+"komap/")
                         if not os.path.exists(icons_path+"komap/"+fname):
                           im.save(icons_path+"komap/"+fname, "PNG")
                         xml += xml_linepatternsymbolizer("komap/"+fname)
-                        
-                      except OSError, IOError:
+                      except:
                         print >> sys.stderr, "Error writing to ", icons_path+"komap/"+fname
                     else:
                       xml += xml_linepatternsymbolizer(entry["style"]["pattern-image"])
@@ -557,7 +566,7 @@ if options.renderer == "mapnik":
             if layer_type == "polygon" and there_are_line_patterns:
               itags = ", ".join(itags)
               oitags = '"'+ "\", \"".join(oitags) +'"'
-              sqlz = """SELECT %s, ST_ForceRHR(way) as way from planet_osm_polygon where (%s) and way &amp;&amp; !bbox! and ST_IsValid(way)"""%(itags,sql)
+              sqlz = """SELECT %s, ST_ForceRHR(way) as way from %spolygon where (%s) and way &amp;&amp; !bbox! and ST_IsValid(way)"""%(itags, libkomapnik.table_prefix ,sql)
               mfile.write(xml_layer("postgis-process", layer_type, itags, sqlz, zoom=zoom ))
 
 
@@ -741,28 +750,28 @@ if options.renderer == "mapnik":
                       order += ", "
                     if zoom > 13 or zoom < 6:
                       sqlz = """select %s, way
-                            from planet_osm_%s
+                            from %s%s
                             where (%s) and (%s) and (way_area > %s) and way &amp;&amp; ST_Expand(!bbox!,3000) %s way_area desc
-                    """%(itags,layer_type,ttext,sqlz,pixel_size_at_zoom(zoom,3)**2, order)
+                    """%(itags,libkomapnik.table_prefix,layer_type,ttext,sqlz,pixel_size_at_zoom(zoom,3)**2, order)
                     else:
                       sqlz = """select %s, way
                     from (
                       select (ST_Dump(ST_Multi(ST_Buffer(ST_Collect(p.way),%s)))).geom as way, %s
                         from (
                           select *
-                            from planet_osm_%s p
+                            from %s%s p
                             where (%s) and way_area > %s and p.way &amp;&amp; ST_Expand(!bbox!,%s) and (%s)) p
                           group by %s) p %s ST_Area(p.way) desc
-                    """%(neitags,pixel_size_at_zoom(zoom,10),oitags,layer_type,ttext,pixel_size_at_zoom(zoom,5)**2,max(pixel_size_at_zoom(zoom,20),3000),sqlz,goitags,order)
+                    """%(neitags,pixel_size_at_zoom(zoom,10),oitags,libkomapnik.table_prefix,layer_type,ttext,pixel_size_at_zoom(zoom,5)**2,max(pixel_size_at_zoom(zoom,20),3000),sqlz,goitags,order)
                     mfile.write(xml_layer("postgis-process", layer_type, itags, sqlz, zoom ))
                   elif layer_type == "line" and zoom < 16 and snap_to_street == 'false':
                     sqlz = " OR ".join(sql)
                     itags = ", ".join(itags)
                     #itags = "\""+ itags+"\""
-                    sqlz = """select %s, ST_LineMerge(ST_Union(way)) as way from (SELECT * from planet_osm_line where way &amp;&amp; ST_Expand(!bbox!,%s) and (%s) and (%s)) as tex
+                    sqlz = """select %s, ST_LineMerge(ST_Union(way)) as way from (SELECT * from %sline where way &amp;&amp; ST_Expand(!bbox!,%s) and (%s) and (%s)) as tex
                     group by %s
                     %s
-                    """%(itags,max(pixel_size_at_zoom(zoom,20),3000),ttext,sqlz,goitags,order)
+                    """%(itags,libkomapnik.table_prefix,max(pixel_size_at_zoom(zoom,20),3000),ttext,sqlz,goitags,order)
                     mfile.write(xml_layer("postgis-process", layer_type, itags, sqlz, zoom=zoom ))
 
 
@@ -780,7 +789,7 @@ if options.renderer == "mapnik":
                         ST_Intersection(
                           ST_Translate(
                             ST_Rotate(
-                              ST_GeomFromEWKT('SRID=900913;LINESTRING(-50 0, 50 0)'),
+                              ST_GeomFromEWKT('SRID=%s;LINESTRING(-50 0, 50 0)'),
                               -1*ST_Azimuth(ST_PointN(ST_ShortestLine(l.way, ST_PointOnSurface(ST_Buffer(h.way,0.1))),1),
                                             ST_PointN(ST_ShortestLine(l.way, ST_PointOnSurface(ST_Buffer(h.way,0.1))),2)
                                           )
@@ -791,7 +800,7 @@ if options.renderer == "mapnik":
                           ST_Buffer(h.way,20)
                         )
                         as way 
-                        from planet_osm_line l 
+                        from %sline l 
                         where 
                           l.way &amp;&amp; ST_Expand(h.way, 600) and
                           ST_IsValid(l.way) and
@@ -805,7 +814,7 @@ if options.renderer == "mapnik":
                         ST_Intersection(
                           ST_Translate(
                             ST_Rotate(
-                              ST_GeomFromEWKT('SRID=900913;LINESTRING(-50 0, 50 0)'),
+                              ST_GeomFromEWKT('SRID=%s;LINESTRING(-50 0, 50 0)'),
                               -1*ST_Azimuth(ST_PointN(ST_ShortestLine(ST_Centroid(l.way), ST_PointOnSurface(ST_Buffer(h.way,0.1))),1),
                                             ST_PointN(ST_ShortestLine(ST_Centroid(l.way), ST_PointOnSurface(ST_Buffer(h.way,0.1))),2)
                                           )
@@ -816,7 +825,7 @@ if options.renderer == "mapnik":
                           ST_Buffer(h.way,20)
                         )
                         as way 
-                        from planet_osm_polygon l 
+                        from %spolygon l 
                         where 
                           l.way &amp;&amp; ST_Expand(h.way, 600) and
                           ST_IsValid(l.way) and
@@ -834,9 +843,9 @@ if options.renderer == "mapnik":
                       )
                     ) as way
 
-                            from planet_osm_%s h
+                            from %s%s h
                             where (%s) and (%s) and way &amp;&amp; ST_Expand(!bbox!,3000) %s
-                    """%(itags,layer_type,ttext,sqlz, order)
+                    """%(itags, libkomapnik.db_srid,  libkomapnik.table_prefix, libkomapnik.db_srid,  libkomapnik.table_prefix, libkomapnik.table_prefix, layer_type, ttext,sqlz, order)
                     mfile.write(xml_layer("postgis-process", layer_type, itags, sqlz, zoom ))
 
 
