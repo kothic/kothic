@@ -1,3 +1,8 @@
+meta {
+    title: "Osmosnimki mapcss stylesheet";   /* title shown in the menu */
+}
+
+
 /*
   Deja Vu MapCSS styles
   Osmosnimki maps style
@@ -5,7 +10,38 @@
 
 /* коментарии отделяются так и могут встречаться везде, где можно поставить пробел */
 
-canvas {fill-color:  #C4D4F5; -x-mapnik-dem-hack: true}
+canvas {
+  fill-color: #C4D4F5;
+  -x-mapnik-dem-hack: true;
+}
+
+canvas {
+  background-color: #fcf8e4; /* for josm: ground color*/
+  default-points: false;
+  default-lines: false;
+}
+
+way::* {
+    linejoin: miter;
+    linecap: none;
+}
+
+area {
+    fill-opacity: 0.0;
+}
+
+way:closed, relation[type=multipolygon] {
+    fill-opacity: 1.0;
+}
+
+*::* {
+    text-halo-color: white;
+    text-anchor-horizontal: center;
+    text-anchor-vertical: center;
+}
+
+
+
 /*
 селектор, что рисовать.
 
@@ -24,11 +60,11 @@ area[natural=coastline] {fill-color: #fcf8e4;-x-mapnik-layer: bottom}
 
 area|z2-[natural=ocean] {fill-color: #C4D4F5;z-index:10; fill-opacity: 0.5}
 
-area|z3-[natural=glacier]{background-color: #fcfeff; background-image: glacier.png}
+area|z3-[natural=glacier]{fill-position:background; fill-color: #fcfeff; fill-image: glacier.png}
 
 area|z10-[place=city],
 area|z10-[place=town],
-{background-color:#FAF7F7; z-index:1}
+{fill-position:background; fill-color:#FAF7F7; z-index:1}
 
 area|z10-[place=hamlet],
 area|z10-[place=village],
@@ -41,7 +77,7 @@ area|z10-[place=locality]
 тег - тег присутствует, значение не важно
 
   */
-       {background-color:#f3eceb; z-index:1}
+       {fill-position:background; fill-color:#f3eceb; z-index:1}
 /*
 z-index - порядковый номер слоя, в котором будет лежать объект.
 чем меньше, тем ниже будет находиться объект (другие будут перекрывать), 
@@ -67,13 +103,13 @@ max-width:30}
 /* fill-color: - html-цвет заливки */
 
 area|z10-12[landuse=residential], area|z10-12[residential=urban]
-{background-color:#F7EFEC; z-index:3.1}
+{fill-position:background; fill-color:#F7EFEC; z-index:3.1}
 
 area|z13-14[landuse=residential], area|z13-14[residential=urban]
-{background-color:#F7EFDC; z-index:2}
+{fill-position:background; fill-color:#F7EFDC; z-index:2}
 
 area|z15-[landuse=residential], area|z10-[residential=urban]
-{background-color:#F7EFEC; z-index:2}
+{fill-position:background; fill-color:#F7EFEC; z-index:2}
 
 area|z14-15[landuse=residential], area|z14-15[residential=urban], area|z14-15[place=locality]
 {text:name; font-size:10;
@@ -124,7 +160,7 @@ area|z15-[landuse=construction],
 area|z15-[amenity=kindergarten][!building],
 area|z15-[amenity=school][!building],
 area|z15-[amenity=university][!building],
-{background-color: #F7E1DD; z-index:9;}
+{fill-position:background; fill-color: #F7E1DD; z-index:9;}
 
 
 
@@ -147,18 +183,18 @@ text-halo-color: #ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0; t
  max-width:50}
 
 area|z14-[power=generator]
-{width: .5; color: #D8D6D7; background-color: #D8D6D7; z-index:17}
+{width: .5; color: #D8D6D7; fill-position:background; fill-color: #D8D6D7; z-index:17}
 
 area|z14-[power=generator]
 {text:name; font-size:11;
 font-family: DejaVu Sans Book; text-color:#303030; text-halo-radius: 1;
 text-halo-color: #ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0; text-placement:any;
  max-width:50;
- width: .5; color: #D8D6D7; background-color: #D8D6D7; z-index:17}
+ width: .5; color: #D8D6D7; fill-position:background; fill-color: #D8D6D7; z-index:17}
 
 
 area|z10-[residential=rural]
-{background-color:#F2E6DF; z-index:2}
+{fill-position:background; fill-color:#F2E6DF; z-index:2}
 
 area|z16-[landuse=residential]
 { width: 0.3; color:#cb8904; z-index:2}
@@ -166,32 +202,32 @@ area|z16-[landuse=residential]
 area|z10-[landuse=allotments],
 area|z10-15[leisure=garden],
 area|z10-15[landuse=orchard]
-       {background-color:#edf2c1; z-index:3}
+       {fill-position:background; fill-color:#edf2c1; z-index:3}
 
-area|z10-[leisure=park]  {background-color:#C5E0A3; z-index:3}
-/* background-image: картинка, которой надо заполнить полигон  */
+area|z10-[leisure=park]  {fill-position:background; fill-color:#C5E0A3; z-index:3}
+/* fill-image: картинка, которой надо заполнить полигон  */
 
 
 area|z16-[leisure=garden],
 area|z16-[landuse=orchard]
-       {background-image:sady10.png; z-index:3}
+       {fill-image:sady10.png; z-index:3}
 
 area|z12-[natural=scrub]
-       {background-color: #e5f5dc;background-image:kust1.png; z-index:3}
+       {fill-position:background; fill-color: #e5f5dc;fill-image:kust1.png; z-index:3}
 area|z12-[natural=heath]
-       {background-color: #ecffe5; z-index:3}
+       {fill-position:background; fill-color: #ecffe5; z-index:3}
 
 
 
 area|z10-13[landuse=industrial],
 area|z10-13[landuse=railway],
 area|z10-13[landuse=military]
-       {background-color: #D8D6D7; z-index:3}
+       {fill-position:background; fill-color: #D8D6D7; z-index:3}
 
 area|z14-[landuse=industrial],
 area|z14-[landuse=railway],
 area|z14-[landuse=military]
-       {background-color: #DDDDDD; z-index:3}
+       {fill-position:background; fill-color: #DDDDDD; z-index:3}
 
 way|z14-15[landuse=industrial],
 way|z14-15[landuse=garages][name!=гаражи],
@@ -212,9 +248,9 @@ text-halo-color: #ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0; t
  max-width:50}
 
 
-area|z15-[amenity=parking]{background-color: #ecedf4; z-index:3}
+area|z15-[amenity=parking]{fill-position:background; fill-color: #ecedf4; z-index:3}
 
-area|z4-[natural=desert] {background-image: desert22.png}
+area|z4-[natural=desert] {fill-image: desert22.png}
 
 
 /*
@@ -233,15 +269,15 @@ area|z12-[natural=grassland],
 area|z12-[natural=meadow],
 area|z12-[landuse=meadow],
 area|z12-[landuse=recreation_ground],
-{background-color: #c4e9a4; z-index:3;background-image:parks2.png}
+{fill-position:background; fill-color: #c4e9a4; z-index:3;fill-image:parks2.png}
 
 
 
 
-area|z10-[natural=wetland] {background-image:swamp_world2.png; z-index:4}
+area|z10-[natural=wetland] {fill-image:swamp_world2.png; fill-position:background; z-index:4}
 
 area|z10-[landuse=farmland], area|z10-[landuse=farm], area|z10-[landuse=field] 
-{background-color: #E9D9BD; z-index:5}
+{fill-position:background; fill-color: #E9D9BD; z-index:5}
 
   
 
@@ -306,26 +342,26 @@ max-width:50}
 
 area|z8-9[place=city],
 area|z8-9[place=town]
-{background-color: #F2ECEB; z-index:3}
+{fill-position:background; fill-color: #F2ECEB; z-index:3}
 
 
-area|z10-[landuse=cemetery] {background-color: #e5f5dc; z-index:5; background-image:cemetry7_2.png}
+area|z10-[landuse=cemetery] {fill-position:background; fill-color: #e5f5dc; z-index:5; fill-image:cemetry7_2.png}
 area|z12-[landuse=cemetery] {text:name; text-offset:1; font-size:9;
 font-family: DejaVu Sans Book; text-color:#040404;text-halo-radius: 1;
 text-halo-color: #ffffff; text-allow-overlap: false; max-width:50}
 
-area|z13-[aeroway=aerodrome] {color: #008ac6; width: 0.8; z-index:5; background-image:bull2.png}
+area|z13-[aeroway=aerodrome] {color: #008ac6; width: 0.8; z-index:5; fill-image:bull2.png}
 
 
 
 
 area|z12-[leisure=stadium],
 area|z12-[leisure=pitch],
-{background-color: #e3deb1;  casing-width:0.1; casing-color: #996703; z-index:10;}
+{fill-position:background; fill-color: #e3deb1;  casing-width:0.1; casing-color: #996703; z-index:10;}
 
 area|z12-[leisure=track],
 area|z12-[leisure=playground],
-{background-color: #DEE7B4;  casing-width:0.1; casing-color: #996703; z-index:10;}
+{fill-position:background; fill-color: #DEE7B4;  casing-width:0.1; casing-color: #996703; z-index:10;}
 
 
 
@@ -390,7 +426,7 @@ way|z10-[mooring=yes]{port_11x14_blue.png}
 area|z6-[waterway=riverbank],
 area|z6-[natural=water],
 area|z10-[landuse=reservoir],
-{background-color: #C4D4F5; color: #C4D4F5; width:.1; z-index:9}
+{fill-position:background; fill-color: #C4D4F5; color: #C4D4F5; width:.1; z-index:9}
 
 area|z9-13[natural=water]{text:name; text-offset:1; font-size:9; font-family: DejaVu Serif Italic; text-color:#285fd1; text-allow-overlap: false; max-width: 30 }
 node|z9-13[natural=water]{text:name; text-offset:1; font-size:9; font-family: DejaVu Serif Italic; text-color:#285fd1; text-allow-overlap: false; max-width: 30 }
@@ -2258,12 +2294,12 @@ area|z12-[leisure=park],
 
 area|z8-[natural=wood],
 area|z8-[landuse=forest]
-       {background-color: #d6f4c6; z-index:5; background-opacity:0.7}
+       {fill-position:background; fill-color: #d6f4c6; z-index:5; fill-opacity:0.7}
        
 area|z10-13[landuse=garages] {width: .1; color: #3F3E3E; fill-color: #E0E0E0;  z-index:3;}
 area|z14-[landuse=garages] {width: .2; color: #3F3E3E; fill-color: #CCCACB;  z-index:3;}
 
-area|z13-[natural=beach]{background-color: #FFF9AE; z-index:4}
+area|z13-[natural=beach]{fill-position:background; fill-color: #FFF9AE; z-index:4}
 area|z14-[natural=beach]
 {icon-image:bench_osm.png; text:name; text-offset:15; 
 font-size:9; font-family: DejaVu Serif Italic; text-color:#A89B00;
@@ -2272,7 +2308,7 @@ max-width: 30; text-halo-radius:1; text-halo-color:#ffffff;  z-index:11}
 
 area|z10-[leisure=nature_reserve],
 area|z10-[boundary=protected_area]
-{background-color: #C0DDA2; z-index:6}
+{fill-position:background; fill-color: #C0DDA2; z-index:6}
 
 area|z10-12[landuse=nature_reserve],
 area|z10-12[boundary=national_park],
