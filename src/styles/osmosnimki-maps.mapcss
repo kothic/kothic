@@ -2029,7 +2029,7 @@ area|z4-5[boundary=administrative][admin_level=4]
 area|z4-5[boundary=administrative][admin_level=4]::centerline,
 {width: 0.2; color: #311549; opacity:0.4; z-index:16.4}
 
-area|z6-9[boundary=administrative][admin_level=4]
+area|z7-9[boundary=administrative][admin_level=4]
 {width: 4; color: #c9bbd4; opacity:0.4; z-index:16.4}
 area|z6-9[boundary=administrative][admin_level=4]::centerline,
 {width: 0.7; color: #311549; opacity:0.2; z-index:16.4}
@@ -2375,8 +2375,14 @@ node|z8-10[place=country]
 area|z3-5[boundary=administrative][admin_level=3]
 {text:name; text-offset:-5; font-size:8; font-family: DejaVu Sans ExtraLight; text-halo-radius:0; text-color:#101010;text-halo-color:#ffffff;-x-mapnik-min-distance:0;max-width:50}
 
-area|z6-10[boundary=administrative][admin_level=4][name!=Москва]
+
+area|z6[boundary=administrative][admin_level=4][name!=Москва]
+{text:name; text-offset:15; font-size:12; font-family: DejaVu Sans ExtraLight; text-halo-radius:1; text-color:#381E51;text-halo-color:#ffffff;-x-mapnik-min-distance:0}
+
+area|z7-10[boundary=administrative][admin_level=4][name!=Москва]
 {text:name; text-offset:17; font-size:14; font-family: DejaVu Sans ExtraLight; text-halo-radius:1; text-color:#381E51;text-halo-color:#ffffff;-x-mapnik-min-distance:0}
+
+
 area|z10-[boundary=administrative][admin_level=6]
 {text:name; text-offset:-10; font-size:12; font-family: DejaVu Sans ExtraLight; text-halo-radius:1; text-color:#7848a0;text-halo-color:#ffffff}
 
