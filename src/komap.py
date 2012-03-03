@@ -74,6 +74,8 @@ libkomapnik.db_name = config.get("mapnik", "db_name")
 libkomapnik.db_srid = config.get("mapnik", "db_srid")
 libkomapnik.icons_path = config.get("mapnik", "icons_path")
 libkomapnik.world_bnd_path = config.get("mapnik", "world_bnd_path")
+libkomapnik.cleantopo_dem_path = config.get("mapnik", "cleantopo_dem_path")
+libkomapnik.srtm_dem_path = config.get("mapnik", "srtm_dem_path")
 
 from libkomapnik import *
 
@@ -199,7 +201,7 @@ if options.renderer == "mapnik":
   if locale == "en":
     columnmap["name"] = ("""COALESCE("name:en","int_name", replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(translate("name",'абвгдезиклмнопрстуфьАБВГДЕЗИКЛМНОПРСТУФЬ','abvgdeziklmnoprstuf’ABVGDEZIKLMNOPRSTUF’'),'х','kh'),'Х','Kh'),'ц','ts'),'Ц','Ts'),'ч','ch'),'Ч','Ch'),'ш','sh'),'Ш','Sh'),'щ','shch'),'Щ','Shch'),'ъ','”'),'Ъ','”'),'ё','yo'),'Ё','Yo'),'ы','y'),'Ы','Y'),'э','·e'),'Э','E'),'ю','yu'),'Ю','Yu'),'й','y'),'Й','Y'),'я','ya'),'Я','Ya'),'ж','zh'),'Ж','Zh')) AS name""",('name:en','int_name',))
   elif locale == "be":
-    columnmap["name"] =  ('COALESCE("name:be", "name:ru", "int_name", "name:en", "name") AS name',('name:be', "name:ru", "int_name", "name:en"))    
+    columnmap["name"] =  ('COALESCE("name:be", "name:ru", "int_name", "name:en", "name") AS name',('name:be', "name:ru", "int_name", "name:en"))
   elif locale:
     columnmap["name"] =  ('COALESCE("name:'+locale+'", "name") AS name',('name:'+locale,))
   mapped_cols = [i[0] for i in columnmap.values()]
@@ -247,10 +249,6 @@ if options.renderer == "mapnik":
             coast[zoom] = chooser_entry["style"]
         else:
           zsheet[zindex].append(chooser_entry)
-
-
-
-
 
   #sys.stderr.write(str(numerics)+"\n")
   #print mapniksheet
@@ -485,7 +483,7 @@ if options.renderer == "mapnik":
                     xml += xml_polygonpatternsymbolizer(entry["style"].get("fill-image", ""))
                 if "width" in entry["style"]:
                   twidth = relaxedFloat(entry["style"].get("width", "1"))
-                  
+
                   # linejoins are round, but for thin roads they're miter
                   tlinejoin = "round"
                   if twidth <= 2:
@@ -567,8 +565,7 @@ if options.renderer == "mapnik":
               itags = ", ".join(itags)
               oitags = '"'+ "\", \"".join(oitags) +'"'
               sqlz = """SELECT %s, ST_ForceRHR(way) as way from %spolygon where (%s) and way &amp;&amp; !bbox! and ST_IsValid(way)"""%(itags, libkomapnik.table_prefix ,sql)
-              mfile.write(xml_layer("postgis-process", layer_type, itags, sqlz, zoom=zoom ))
-
+              mfile.write(xml_layer("postgis-process", layer_type, itags, sqlz, zoom=zoom))
 
             #### FIXME: Performance degrades painfully on large lines ST_Union. Gotta find workaround :(
             #if layer_type == "polygon" and there_are_dashed_lines:

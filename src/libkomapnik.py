@@ -29,6 +29,8 @@ db_name = ""
 db_srid = ""
 icons_path = ""
 world_bnd_path = ""
+cleantopo_dem_path = ""
+srtm_dem_path = ""
 
 
 
@@ -78,9 +80,8 @@ def xml_pointsymbolizer(path="", width="", height="", opacity=1, overlap="false"
   if height:
     height =' height="%s" '%height
   return """
-  <PointSymbolizer file="%s%s" %s %s opacity="%s" allow_overlap="%s" />"""\
-          %(icons_path, \
-          path, width, height, opacity, overlap)
+  <PointSymbolizer file="%s" %s %s opacity="%s" allow_overlap="%s" />"""\
+          %(os.path.join(icons_path, path), width, height, opacity, overlap)
 
 
 def xml_linesymbolizer(color="#000000", width="1", opacity="1", linecap="butt", linejoin="round", dashes="", zoom=200):
@@ -117,12 +118,12 @@ def xml_polygonsymbolizer(color="#000000", opacity="1"):
 
 def xml_polygonpatternsymbolizer(file=""):
   return """
-  <PolygonPatternSymbolizer file="%s%s"/>"""%(icons_path,file)
+  <PolygonPatternSymbolizer file="%s"/>"""%(os.path.join(icons_path,file))
 
 
-def xml_linepatternsymbolizer(path=""):
+def xml_linepatternsymbolizer(file=""):
   return """
-  <LinePatternSymbolizer file="%s%s"/>"""%(icons_path, path)
+  <LinePatternSymbolizer file="%s"/>"""%(os.path.join(icons_path,file))
 
 
 def xml_textsymbolizer(
@@ -245,13 +246,13 @@ def xml_cleantopo(zoom, x_scale):
 <Layer name="ele-raster1z%s">
     <StyleName>elevation1z%s</StyleName>
     <Datasource>
-        <Parameter name="file">/raid/srtm/Full/CleanTOPO2merc.tif</Parameter>
+        <Parameter name="file">%s</Parameter>
         <Parameter name="type">gdal</Parameter>
         <Parameter name="band">1</Parameter>
-        <Parameter name="srid">4326</Parameter>
+        <Parameter name="srid">3857</Parameter>
     </Datasource>
 </Layer>
-      """ % (zoom, x_scale, zoom, zoom)
+      """ % (zoom, x_scale, zoom, zoom, cleantopo_dem_path)
 
 def xml_srtm(zoom, x_scale):
   return """
@@ -278,13 +279,13 @@ def xml_srtm(zoom, x_scale):
 <Layer name="ele-rasterz%s">
     <StyleName>elevationz%s</StyleName>
     <Datasource>
-        <Parameter name="file">/raid/srtm/srtmm.vrt</Parameter>
+        <Parameter name="file">%s</Parameter>
         <Parameter name="type">gdal</Parameter>
         <Parameter name="band">1</Parameter>
-        <Parameter name="srid">4326</Parameter>
+        <Parameter name="srid">3857</Parameter>
     </Datasource>
 </Layer>
-      """ % (zoom, x_scale, zoom, zoom)
+      """ % (zoom, x_scale, zoom, zoom, srtm_dem_path)
 
 def xml_hardcoded_arrows():
   return """
