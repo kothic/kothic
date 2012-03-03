@@ -16,6 +16,7 @@
 #   along with kothic.  If not, see <http://www.gnu.org/licenses/>.
 
 
+import os
 from debug import debug, Timer
 
 from mapcss.webcolors.webcolors import whatever_to_hex as nicecolor
