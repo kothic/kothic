@@ -27,7 +27,7 @@ way::* {
 }
 
 area {
-    fill-opacity: 0.0;
+    fill-opacity: 0.0001;
 }
 
 way:closed, relation[type=multipolygon] {
@@ -250,7 +250,7 @@ text-halo-color: #ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0; t
 
 area|z15-[amenity=parking]{fill-position:background; fill-color: #ecedf4; z-index:3}
 
-area|z4-[natural=desert] {fill-image: desert22.png}
+area|z4-[natural=desert] {fill-image: "desert22.png" }
 
 
 /*
@@ -268,8 +268,12 @@ area|z12-[natural=grass],
 area|z12-[natural=grassland],
 area|z12-[natural=meadow],
 area|z12-[landuse=meadow],
-area|z12-[landuse=recreation_ground],
-{fill-position:background; fill-color: #c4e9a4; z-index:3;fill-image:parks2.png}
+area|z12-[landuse=recreation_ground]{
+  fill-position: background;
+  fill-color: #c4e9a4;
+  z-index: 3;
+  fill-image: "parks2.png";
+}
 
 
 
@@ -1133,10 +1137,6 @@ arrows - специальное значение для синих стрело�
 */
 
 
-line|z7[railway=rail][service!=siding][service!=spur][service!=yard]
-{width:.5; color: #303030;z-index:15}
-line|z7[railway=rail][service!=siding][service!=spur][service!=yard]::ticks
-{width:.3; color: #505050; dashes: 3,5;z-index:15}
 
 line|z8[railway=rail][service!=siding][service!=spur][service!=yard]
 {width:1; color: #303030;z-index:15}
@@ -2034,11 +2034,11 @@ node|z17-[amenity=restaurant]  {icon-image:restaurant.png}
 
 
 
-area|z2-3[boundary=administrative][admin_level=2]
-   {width: 0.6; color:#000000; opacity:0.2; z-index:9}
+line|z2-3[boundary=administrative][admin_level=2]
+   {width: 0.6; color:#000000; opacity:0.2; z-index:9.1}
 
-area|z4[boundary=administrative][admin_level=2]
-   {width: 0.35; color: silver; opacity:0.6; z-index:9}
+line|z4[boundary=administrative][admin_level=2]
+   {width: 0.35; color: #444444; opacity:0.6; z-index:9.1}
 
 area|z5-[boundary=administrative][admin_level=2]
 
@@ -2820,4 +2820,32 @@ way|z16-[piste:type=downhill][piste:difficulty=expert]
 
 way|z16-[piste:type=downhill][piste:difficulty=freeride]
 {opacity: 0.3; width:4; -x-mapnik-layer: top; color: yellow  }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
