@@ -753,13 +753,15 @@ if options.renderer == "mapnik":
                     else:
                       sqlz = """select %s, way
                     from (
-                      select (ST_Dump(ST_Multi(ST_Buffer(ST_Collect(p.way),%s)))).geom as way, %s
+                      select (ST_Dump(ST_Multi(ST_Buffer(ST_Simplify(ST_Collect(p.way),%s),%s)))).geom as way, %s
                         from (
                           select *
                             from %s%s p
                             where (%s) and way_area > %s and p.way &amp;&amp; ST_Expand(!bbox!,%s) and (%s)) p
                           group by %s) p %s ST_Area(p.way) desc
-                    """%(neitags,pixel_size_at_zoom(zoom,10),oitags,libkomapnik.table_prefix,layer_type,ttext,pixel_size_at_zoom(zoom,5)**2,max(pixel_size_at_zoom(zoom,20),3000),sqlz,goitags,order)
+                    """%(neitags,pixel_size_at_zoom(zoom,9),pixel_size_at_zoom(zoom,10),oitags,
+                    libkomapnik.table_prefix,layer_type,ttext,pixel_size_at_zoom(zoom,5)**2,max(pixel_size_at_zoom(zoom,20),3000),sqlz,goitags,order)
+
                     mfile.write(xml_layer("postgis-process", layer_type, itags, sqlz, zoom ))
                   elif layer_type == "line" and zoom < 16 and snap_to_street == 'false':
                     sqlz = " OR ".join(sql)
