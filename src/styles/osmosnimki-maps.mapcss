@@ -2034,10 +2034,10 @@ node|z17-[amenity=restaurant]  {icon-image:restaurant.png}
 
 
 
-line|z2-3[boundary=administrative][admin_level=2]
+area|z2-3[boundary=administrative][admin_level=2]
    {width: 0.6; color:#000000; opacity:0.2; z-index:9.1}
 
-line|z4[boundary=administrative][admin_level=2]
+area|z4[boundary=administrative][admin_level=2]
    {width: 0.35; color: #444444; opacity:0.6; z-index:9.1}
 
 area|z5-[boundary=administrative][admin_level=2]
@@ -2764,7 +2764,7 @@ node|z13-[highway=milestone][pk]{text:pk; font-size:7; text-halo-radius:5;-x-map
 node|z17-[entrance]
   {icon-image:entrance.png; -x-mapnik-min-distance:0}
 node|z17-[entrance][ref]
-  {text:ref; text-offset:6; font-size:7; text-align:left;
+  {text:ref; text-offset:7; font-size:7; text-align:left;
   -x-mapnik-min-distance:0;font-family: DejaVu Sans Bold;
   text-halo-radius:1}
 node|z18-[entrance]
