@@ -76,8 +76,8 @@ libkomapnik.icons_path = config.get("mapnik", "icons_path")
 libkomapnik.world_bnd_path = config.get("mapnik", "world_bnd_path")
 libkomapnik.cleantopo_dem_path = config.get("mapnik", "cleantopo_dem_path")
 libkomapnik.srtm_dem_path = config.get("mapnik", "srtm_dem_path")
-libkomapnik.cleantopo_dem_path = config.get("mapnik", "cleantopo_hs_path")
-libkomapnik.srtm_dem_path = config.get("mapnik", "srtm_hs_path")
+libkomapnik.cleantopo_hs_path = config.get("mapnik", "cleantopo_hs_path")
+libkomapnik.srtm_hs_path = config.get("mapnik", "srtm_hs_path")
 
 
 from libkomapnik import *
