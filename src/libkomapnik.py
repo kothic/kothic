@@ -32,7 +32,8 @@ icons_path = ""
 world_bnd_path = ""
 cleantopo_dem_path = ""
 srtm_dem_path = ""
-
+cleantopo_hs_path = ""
+srtm_hs_path = ""
 
 
 substyles = []
@@ -288,6 +289,35 @@ def xml_srtm(zoom, x_scale):
 </Layer>
       """ % (zoom, x_scale, zoom, zoom, srtm_dem_path)
 
+      
+def xml_hillshade(zoom, x_scale):
+  hs_path = cleantopo_hs_path
+  if zoom>6:
+    hs_path = srtm_hs_path
+  return """
+<Style name="hillshade%s">
+  <Rule>%s
+    <RasterSymbolizer opacity="1" scaling="bilinear" mode="multiply">
+      <RasterColorizer  default-mode="linear">
+        <stop value="0"   color="rgba(0,0,0,0.2)" />
+        <stop value="255" color="rgba(255,255,255,0)" />
+      </RasterColorizer>
+    </RasterSymbolizer>
+  </Rule>
+</Style>
+
+<Layer name="ele-hsz%s">
+    <StyleName>hillshade%s</StyleName>
+    <Datasource>
+        <Parameter name="file">%s</Parameter>
+        <Parameter name="type">gdal</Parameter>
+        <Parameter name="band">1</Parameter>
+        <Parameter name="srid">3857</Parameter>
+    </Datasource>
+</Layer>
+      """ % (zoom, x_scale, zoom, zoom, hs_path)
+      
+      
 def xml_hardcoded_arrows():
   return """
   <LineSymbolizer>

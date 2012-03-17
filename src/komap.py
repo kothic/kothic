@@ -76,6 +76,9 @@ libkomapnik.icons_path = config.get("mapnik", "icons_path")
 libkomapnik.world_bnd_path = config.get("mapnik", "world_bnd_path")
 libkomapnik.cleantopo_dem_path = config.get("mapnik", "cleantopo_dem_path")
 libkomapnik.srtm_dem_path = config.get("mapnik", "srtm_dem_path")
+libkomapnik.cleantopo_dem_path = config.get("mapnik", "cleantopo_hs_path")
+libkomapnik.srtm_dem_path = config.get("mapnik", "srtm_hs_path")
+
 
 from libkomapnik import *
 
@@ -276,6 +279,7 @@ if options.renderer == "mapnik":
   bgcolor = style.get_style("canvas", {}, maxzoom)[0].get("fill-color", "")
   opacity = style.get_style("canvas", {}, maxzoom)[0].get("opacity", 1)
   demhack = style.get_style("canvas", {}, maxzoom)[0].get("-x-mapnik-dem-hack", False)
+  hshack = style.get_style("canvas", {}, maxzoom)[0].get("-x-mapnik-hs-hack", False)
 
   if (opacity == 1) and bgcolor:
     mfile.write(xml_start(bgcolor))
@@ -357,6 +361,10 @@ if options.renderer == "mapnik":
       mfile.write(xml_layer("postgis", "polygon", itags, sql, zoom=zoom ))
     else:
       xml_nolayer()
+    
+    if hshack:
+      xml = xml_hillshade(zoom, x_scale)
+      mfile.write(xml)
 
     index_range = range(-6,7)
     full_layering = conf_full_layering
