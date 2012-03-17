@@ -694,7 +694,7 @@ if options.renderer == "mapnik":
                                     "",
                                     "",
                                     ttext,tface,tsize,tcolor, "#000000", 0, "center",
-                                    toffset,toverlap,tdistance,twrap,talign,topacity, ttransform, False, tspacing)
+                                    toffset,toverlap,tdistance,twrap,talign,topacity, ttransform, "false", tspacing)
                       sql.add(entry["sql"])
                       itags.update(entry["chooser"].get_interesting_tags(entry["type"], zoom))
                       xml += xml_rule_end()
