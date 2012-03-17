@@ -658,7 +658,7 @@ if options.renderer == "mapnik":
             collhere = set()
             for entry in zsheet[zindex]:
               if entry["type"] in entry_types:#, "node", "line", "point"):
-                if "text" in entry["style"] and entry["style"].get("text-position","center")==placement:
+                if ("text" in entry["style"] or "shield-text" in entry["style"]) and entry["style"].get("text-position","center")==placement:
                   csb = entry["style"].get("collision-sort-by",None)
                   cso = entry["style"].get("collision-sort-order","desc")
                   collhere.add((csb,cso))
