@@ -297,7 +297,7 @@ def xml_hillshade(zoom, x_scale):
   return """
 <Style name="hillshade%s">
   <Rule>%s
-    <RasterSymbolizer opacity="1" scaling="bilinear" mode="grain_merge">
+    <RasterSymbolizer opacity="1" scaling="bilinear" mode="multiply2">
       <RasterColorizer  default-mode="linear">
         <stop value="0"   color="rgba(0,0,0,1)" />
         <stop value="255" color="rgba(255,255,255,1)" />
