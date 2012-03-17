@@ -670,6 +670,34 @@ if options.renderer == "mapnik":
                 xml = xml_style_start()
                 for entry in zsheet[zindex]:
                   if entry["type"] in entry_types and csb == entry["style"].get("collision-sort-by",None) and cso == entry["style"].get("collision-sort-order","desc") and snap_to_street == entry["style"].get("-x-mapnik-snap-to-street","false"):
+                    if "shield-text" in entry["style"] and "shield-image" in entry["style"]:
+                      ttext = entry["style"]["shield-text"].extract_tags().pop()
+                      texttags.add(ttext)
+                      tface = entry["style"].get("shield-font-family","DejaVu Sans Book")
+                      tsize = entry["style"].get("shield-font-size","10")
+                      tcolor = entry["style"].get("shield-text-color","#000000")
+                      toverlap= entry["style"].get("text-allow-overlap",entry["style"].get("allow-overlap","false"))
+                      tdistance= relaxedFloat(entry["style"].get("-x-mapnik-min-distance","20"))
+                      twrap= relaxedFloat(entry["style"].get("shield-max-width",25))
+                      talign= entry["style"].get("shield-text-align","center")
+                      topacity= relaxedFloat(entry["style"].get("shield-text-opacity",entry["style"].get("opacity","1")))
+                      toffset= relaxedFloat(entry["style"].get("shield-text-offset","0"))
+                      ttransform = entry["style"].get("shield-text-transform","none")
+                      xml += xml_rule_start()
+                      xml += x_scale
+
+                      xml += xml_filter(entry["rulestring"])
+                      
+                      xml += xml_shieldsymbolizer(
+                                    entry["style"].get("shield-image", ""),
+                                    "",
+                                    "",
+                                    ttext,tface,tsize,tcolor, "#000000", 0, "center",
+                                    toffset,toverlap,tdistance,twrap,talign,topacity, ttransform)
+                      sql.add(entry["sql"])
+                      itags.update(entry["chooser"].get_interesting_tags(entry["type"], zoom))
+                      xml += xml_rule_end()
+                      
                     if "text" in entry["style"] and entry["style"].get("text-position","center")==placement:
                       ttext = entry["style"]["text"].extract_tags().pop()
                       texttags.add(ttext)
