@@ -683,6 +683,7 @@ if options.renderer == "mapnik":
                       topacity= relaxedFloat(entry["style"].get("shield-text-opacity",entry["style"].get("opacity","1")))
                       toffset= relaxedFloat(entry["style"].get("shield-text-offset","0"))
                       ttransform = entry["style"].get("shield-text-transform","none")
+                      tspacing = entry["style"].get("shield-spacing","500")
                       xml += xml_rule_start()
                       xml += x_scale
 
@@ -693,7 +694,7 @@ if options.renderer == "mapnik":
                                     "",
                                     "",
                                     ttext,tface,tsize,tcolor, "#000000", 0, "center",
-                                    toffset,toverlap,tdistance,twrap,talign,topacity, ttransform)
+                                    toffset,toverlap,tdistance,twrap,talign,topacity, ttransform, False, tspacing)
                       sql.add(entry["sql"])
                       itags.update(entry["chooser"].get_interesting_tags(entry["type"], zoom))
                       xml += xml_rule_end()
