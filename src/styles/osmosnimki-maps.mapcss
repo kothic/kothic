@@ -486,12 +486,12 @@ casing-color:#c2a2ce; casing-dashes:2,2}*/
 
 
 way|z13-16[highway=construction]
-{text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Book; font-size:10; text-halo-radius: 1; text-halo-color: #ffffff;
+{text: name; text-position: line; text-spacing: 512; text-color: #404040; font-family: DejaVu Sans Book; font-size:10; text-halo-radius: 1; text-halo-color: #ffffff;
 casing-width:0.5; casing-color:#996703;
 width:2; color: #ffffff; z-index:10; dashes:9,9}
 
 way|z17-[highway=construction]
-{text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Book; font-size:10; text-halo-radius: 1; text-halo-color: #ffffff;
+{text: name; text-position: line; text-spacing: 512; text-color: #404040; font-family: DejaVu Sans Book; font-size:10; text-halo-radius: 1; text-halo-color: #ffffff;
 casing-width:0.5; casing-color:#996703;
 width:3; color: #ffffff; z-index:10; dashes:9,9}
 
@@ -505,19 +505,19 @@ dashes - пунктир (длины сегментов включенных и �
 way|z15[highway=footway],
 way|z15[highway=path],
 
-{text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Book; font-size:10;
+{text: name; text-position: line; text-spacing: 512; text-color: #404040; font-family: DejaVu Sans Book; font-size:10;
 text-halo-radius: 1; text-halo-color: #ffffff; text-halo-radius: 1; text-halo-color: #ffffff;
 width:1; color: #ffffff; z-index:10}
 
 /*way|z16-[highway=footway][tunnel!=yes][layer!=-1],
 way|z16-[highway=path][tunnel!=yes][layer!=-1],
-{text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Book; font-size:10;
+{text: name; text-position: line; text-spacing: 512; text-color: #404040; font-family: DejaVu Sans Book; font-size:10;
 text-halo-radius: 1; text-halo-color: #ffffff; text-halo-radius: 1; text-halo-color: #ffffff;
 width:1.7; color: #ffffff; casing-width:0.5;  casing-color:#bf96ce;  z-index:10}*/
 
 way|z16-[highway=footway][tunnel!=yes][layer!=-1],
 way|z16-[highway=path][tunnel!=yes][layer!=-1],
-{text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Book; font-size:10;
+{text: name; text-position: line; text-spacing: 512; text-color: #404040; font-family: DejaVu Sans Book; font-size:10;
 text-halo-radius: 1; text-halo-color: #ffffff; text-halo-radius: 1; text-halo-color: #ffffff;
 width:1.7; color: #ffffff; casing-width:0.5;  casing-color:#D8B495;  z-index:10}
 
@@ -533,7 +533,7 @@ way|z15[highway=cycleway]
 {width:1.5; color: #4BBD94; z-index:10}
 
 way|z15-[highway=cycleway]
-{text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Book; font-size:10;
+{text: name; text-position: line; text-spacing: 512; text-color: #404040; font-family: DejaVu Sans Book; font-size:10;
 text-halo-radius: 1; text-halo-color: #ffffff; text-halo-radius: 1; text-halo-color: #ffffff}
 
 way|z16-[highway=cycleway]
@@ -546,7 +546,7 @@ way|z14-[highway=pedestrian][!area]
 {width:2; color: #ffffff; casing-width:0.5; casing-color:#996703; z-index:10}
 
 line|z14-[highway=pedestrian]
-{text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Book; font-size:10; text-halo-radius: 1; text-halo-color: #ffffff; text-halo-radius: 1; text-halo-color: #ffffff;
+{text: name; text-position: line; text-spacing: 512; text-color: #404040; font-family: DejaVu Sans Book; font-size:10; text-halo-radius: 1; text-halo-color: #ffffff; text-halo-radius: 1; text-halo-color: #ffffff;
 casing-width:.3; casing-color:#bf96ce}
 
 area|z14-[highway=pedestrian]
@@ -554,7 +554,7 @@ area|z14-[highway=pedestrian]
 casing-width:.3; casing-color:#bf96ce}
 
 /*way|z15-[highway=steps],
-{text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Book; font-size:10; text-halo-radius: 1; text-halo-color: #ffffff; text-halo-radius: 1; text-halo-color: #ffffff;
+{text: name; text-position: line; text-spacing: 512; text-color: #404040; font-family: DejaVu Sans Book; font-size:10; text-halo-radius: 1; text-halo-color: #ffffff; text-halo-radius: 1; text-halo-color: #ffffff;
 casing-width:.3; casing-color:#ffffff;
 width:3; color: #bf96ce; z-index:10; dashes:1,1; linecap:butt;}*/
 
@@ -575,12 +575,12 @@ way|z14[highway=service][living_street!=yes][service!=parking_aisle]
 
 way|z13[highway=road],
 way|z13[highway=track]
-{text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Book; font-size:9; text-halo-radius: 1; text-halo-color: #ffffff;
+{text: name; text-position: line; text-spacing: 512; text-color: #404040; font-family: DejaVu Sans Book; font-size:9; text-halo-radius: 1; text-halo-color: #ffffff;
         width:0.6; opacity: 0.5; color: #996703; z-index:10; -x-mapnik-layer: bottom;}
 
 way|z14-16[highway=road],
 way|z14-16[highway=track]
-{text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Book; font-size:10; text-halo-radius: 1; text-halo-color: #ffffff;
+{text: name; text-position: line; text-spacing: 512; text-color: #404040; font-family: DejaVu Sans Book; font-size:10; text-halo-radius: 1; text-halo-color: #ffffff;
 width:1.5;  color: #ffffff;
 casing-width:0.5; casing-color: #996703;
 z-index:9}
@@ -588,7 +588,7 @@ z-index:9}
 
 way|z16-[highway=road],
 way|z16-[highway=track]
-{text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Book; font-size:10; text-halo-radius: 1; text-halo-color: #ffffff;
+{text: name; text-position: line; text-spacing: 512; text-color: #404040; font-family: DejaVu Sans Book; font-size:10; text-halo-radius: 1; text-halo-color: #ffffff;
 width:2.5;  color: #ffffff;
 casing-width:0.5; casing-color: #996703;
 z-index:9}
@@ -596,13 +596,13 @@ z-index:9}
 
 
 way|z13-14[highway=residential]
-{text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Book; font-size:9; text-halo-radius: 1; text-halo-color: #ffffff;
+{text: name; text-position: line; text-spacing: 512; text-color: #404040; font-family: DejaVu Sans Book; font-size:9; text-halo-radius: 1; text-halo-color: #ffffff;
 width:2;  color: #ffffff;
 casing-width:0.1; casing-color: #996703;
 z-index:10}
 
 way|z15-[highway=residential]
-{text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Book; font-size:10; text-halo-radius: 1; text-halo-color: #ffffff;
+{text: name; text-position: line; text-spacing: 512; text-color: #404040; font-family: DejaVu Sans Book; font-size:10; text-halo-radius: 1; text-halo-color: #ffffff;
 width:1.2;  color: #ffffff;
 casing-width:0.3; casing-color: #996703;
 z-index:10}
@@ -616,7 +616,7 @@ way|z15[highway=service][service=parking_aisle],
 
 way|z16-[highway=service][living_street=yes],
 way|z16-[highway=service][service=parking_aisle],
-{text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Book; font-size:10; text-halo-radius: 1; text-halo-color: #ffffff;
+{text: name; text-position: line; text-spacing: 512; text-color: #404040; font-family: DejaVu Sans Book; font-size:10; text-halo-radius: 1; text-halo-color: #ffffff;
         width:2;  color: #ffffff;
         casing-width:0.3; casing-color: #996703;
         z-index:10}
@@ -639,7 +639,7 @@ way|z14-15[highway=residential],
 way|z14-15[highway=unclassified],
 way|z15[highway=service][living_street!=yes][service!=parking_aisle],
 
-{text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Book; font-size:9; text-halo-radius: 1; text-halo-color: #ffffff;
+{text: name; text-position: line; text-spacing: 512; text-color: #404040; font-family: DejaVu Sans Book; font-size:9; text-halo-radius: 1; text-halo-color: #ffffff;
         width:2.5;  color: #ffffff;
         casing-width:0.5; casing-color: #996703;
         z-index:10}
@@ -648,7 +648,7 @@ way|z16[highway=residential],
 way|z16[highway=unclassified],
 way|z16[highway=living_street],
 way|z16[highway=service][living_street!=yes][service!=parking_aisle],
-{text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Book; font-size:11; text-halo-radius: 1; text-halo-color: #ffffff;
+{text: name; text-position: line; text-spacing: 512; text-color: #404040; font-family: DejaVu Sans Book; font-size:11; text-halo-radius: 1; text-halo-color: #ffffff;
         width:3.5;  color: #ffffff;
         casing-width:0.5; casing-color: #996703;
         z-index:10}
@@ -657,7 +657,7 @@ way|z17-[highway=residential],
 way|z17-[highway=unclassified],
 way|z17-[highway=living_street],
 way|z17-[highway=service][living_street!=yes][service!=parking_aisle],
-{text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Book; font-size:11; text-halo-radius: 1; text-halo-color: #ffffff;
+{text: name; text-position: line; text-spacing: 512; text-color: #404040; font-family: DejaVu Sans Book; font-size:11; text-halo-radius: 1; text-halo-color: #ffffff;
         width:4.5;  color: #ffffff;
         casing-width:0.5; casing-color: #996703;
         z-index:10}
@@ -666,14 +666,14 @@ way|z17-[highway=service][living_street!=yes][service!=parking_aisle],
 
 /* way|z10[highway=tertiary] */
 way|z10[highway=secondary]
-        {text: name; text-position: line;
+        {text: name; text-position: line; text-spacing: 512;
         width:1.2;  color: #fcffd1;
         casing-width:0.35; casing-color: #996703;
         z-index:11}
 
 way|z11[highway=secondary],
 way|z11[highway=tertiary]
-{text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Book; font-size:9; text-halo-radius: 1; text-halo-color: #ffffff; text-halo-radius: 1; text-halo-color: #ffffff;
+{text: name; text-position: line; text-spacing: 512; text-color: #404040; font-family: DejaVu Sans Book; font-size:9; text-halo-radius: 1; text-halo-color: #ffffff; text-halo-radius: 1; text-halo-color: #ffffff;
         width:0.4;  color: #fcffd1;
         casing-width:0.1; casing-color: #996703;
         z-index:11}
@@ -682,7 +682,7 @@ way|z12[highway=secondary],
 way|z12[highway=secondary_link],
 way|z12[highway=tertiary],
 way|z12[highway=tertiary_link]
-{text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Book; font-size:9; text-halo-radius: 1; text-halo-color: #ffffff; text-halo-radius: 1; text-halo-color: #ffffff;
+{text: name; text-position: line; text-spacing: 512; text-color: #404040; font-family: DejaVu Sans Book; font-size:9; text-halo-radius: 1; text-halo-color: #ffffff; text-halo-radius: 1; text-halo-color: #ffffff;
         width:1;  color: #fcffd1;
         casing-width:0.2; casing-color: #996703;
         z-index:11}
@@ -691,7 +691,7 @@ way|z13[highway=secondary],
 way|z13[highway=secondary_link],
 way|z13[highway=tertiary],
 way|z13[highway=tertiary_link]
-{text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Book; font-size:9; text-halo-radius: 1; text-halo-color: #ffffff;
+{text: name; text-position: line; text-spacing: 512; text-color: #404040; font-family: DejaVu Sans Book; font-size:9; text-halo-radius: 1; text-halo-color: #ffffff;
         width:4;  color: #fcffd1;
         casing-width:0.35; casing-color: #996703;
         z-index:11}
@@ -700,7 +700,7 @@ way|z14[highway=secondary],
 way|z14[highway=secondary_link],
 way|z14[highway=tertiary],
 way|z14[highway=tertiary_link]
-{text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Bold; font-size:9;
+{text: name; text-position: line; text-spacing: 512; text-color: #404040; font-family: DejaVu Sans Bold; font-size:9;
 text-halo-radius: 1; text-halo-color: #ffffff}
 
 way|z14[highway=secondary][tunnel!=yes],
@@ -723,7 +723,7 @@ way|z15[highway=secondary],
 way|z15[highway=secondary_link],
 way|z15[highway=tertiary],
 way|z15[highway=tertiary_link]
-{text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Book; font-size:10;
+{text: name; text-position: line; text-spacing: 512; text-color: #404040; font-family: DejaVu Sans Book; font-size:10;
 text-halo-radius: 1; text-halo-color: #ffffff}
 
 way|z15[highway=secondary][tunnel!=yes],
@@ -745,7 +745,7 @@ way|z16[highway=secondary],
 way|z16[highway=secondary_link],
 way|z16[highway=tertiary],
 way|z16[highway=tertiary_link]
-{text: name; text-position: line; text-color: #505050; font-family: DejaVu Sans Book; font-size:11; 
+{text: name; text-position: line; text-spacing: 512; text-color: #505050; font-family: DejaVu Sans Book; font-size:11; 
 text-halo-radius: 1; text-halo-color: #ffffff}
 
 way|z16[highway=secondary][tunnel!=yes],
@@ -768,7 +768,7 @@ way|z17[highway=secondary],
 way|z17[highway=secondary_link],
 way|z17[highway=tertiary],
 way|z17[highway=tertiary_link]
-{text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Book; font-size:12;
+{text: name; text-position: line; text-spacing: 512; text-color: #404040; font-family: DejaVu Sans Book; font-size:12;
 text-halo-radius: 1; text-halo-color: #ffffff}
         
 way|z17[highway=secondary][tunnel!=yes],
@@ -791,7 +791,7 @@ way|z18-[highway=secondary],
 way|z18-[highway=secondary_link],
 way|z18-[highway=tertiary],
 way|z18-[highway=tertiary_link]
-{text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Book; font-size:9;
+{text: name; text-position: line; text-spacing: 512; text-color: #404040; font-family: DejaVu Sans Book; font-size:9;
 text-halo-radius: 1; text-halo-color: #ffffff; width:11;  color: #fcffd1;
         casing-width:0.5; casing-color: #996703;
         z-index:11}
@@ -817,41 +817,41 @@ z-index:13}
 
 way|z9[highway=primary],
 way|z9[highway=primary_link]
-{text: name; text-position: line; text-color: #505050; font-family: DejaVu Sans Bold; font-size:9; text-halo-radius: 1; text-halo-color: #ffffff;
+{text: name; text-position: line; text-spacing: 512; text-color: #505050; font-family: DejaVu Sans Bold; font-size:9; text-halo-radius: 1; text-halo-color: #ffffff;
 width:1.5;  color: #fcea97;
 casing-width:.3; casing-color: #996703;
 z-index:12}
 
 way|z10[highway=primary],
 way|z10[highway=primary_link]
-{text: name; text-position: line; text-color: #505050; font-family: DejaVu Sans Bold; font-size:9; text-halo-radius: 1; text-halo-color: #ffffff;
+{text: name; text-position: line; text-spacing: 512; text-color: #505050; font-family: DejaVu Sans Bold; font-size:9; text-halo-radius: 1; text-halo-color: #ffffff;
         width:3;  color: #fcea97;
         casing-width:.5; casing-color: #996703;
         z-index:12}
 way|z11[highway=primary],
 way|z11[highway=primary_link]
-        {text: name; text-position: line; text-color: #505050; font-family: DejaVu Sans Bold; font-size:9; text-halo-radius: 1; text-halo-color: #ffffff;
+        {text: name; text-position: line; text-spacing: 512; text-color: #505050; font-family: DejaVu Sans Bold; font-size:9; text-halo-radius: 1; text-halo-color: #ffffff;
         width:4;  color: #fcea97;
         casing-width:.5; casing-color: #996703;
         z-index:12}
 
 way|z12[highway=primary],
 way|z12[highway=primary_link]
-        {text: name; text-position: line; text-color: #505050; font-family: DejaVu Sans Bold; font-size:9; text-halo-radius: 1; text-halo-color: #ffffff;
+        {text: name; text-position: line; text-spacing: 512; text-color: #505050; font-family: DejaVu Sans Bold; font-size:9; text-halo-radius: 1; text-halo-color: #ffffff;
         width:5;  color: #fcea97;
         casing-width:.5; casing-color: #996703;
         z-index:12}
 
 way|z13[highway=primary],
 way|z13[highway=primary_link]
-        {text: name; text-position: line; text-color: #505050; font-family: DejaVu Sans Bold; font-size:10; text-halo-radius: 1; text-halo-color: #ffffff;
+        {text: name; text-position: line; text-spacing: 512; text-color: #505050; font-family: DejaVu Sans Bold; font-size:10; text-halo-radius: 1; text-halo-color: #ffffff;
         width:6;  color: #fcea97;
         casing-width:.5; casing-color: #996703;
         z-index:12}
 
 way|z14[highway=primary],
 way|z14[highway=primary_link]
-        {text: name; text-position: line; text-color: #505050;
+        {text: name; text-position: line; text-spacing: 512; text-color: #505050;
         font-family: DejaVu Sans Bold; font-size:10; text-halo-radius: 1; text-halo-color: #ffffff}
         
 way|z14[highway=primary][tunnel!=yes],
@@ -867,7 +867,7 @@ way|z14[highway=primary_link][tunnel=yes]
 
 way|z15[highway=primary],
 way|z15[highway=primary_link]
-        {text: name; text-position: line; text-color: #505050; font-family: DejaVu Sans Bold;
+        {text: name; text-position: line; text-spacing: 512; text-color: #505050; font-family: DejaVu Sans Bold;
         font-size:10; text-halo-radius: 1; text-halo-color: #ffffff}
         
 way|z15[highway=primary][tunnel!=yes],
@@ -884,7 +884,7 @@ way|z15[highway=primary_link][tunnel=yes]
 
 way|z16[highway=primary],
 way|z16[highway=primary_link]
-        {text: name; text-position: line; text-color: #505050; font-family: DejaVu Sans Bold;
+        {text: name; text-position: line; text-spacing: 512; text-color: #505050; font-family: DejaVu Sans Bold;
         font-size:11; text-halo-radius: 1; text-halo-color: #ffffff}
   
 way|z16[highway=primary][tunnel!=yes],
@@ -899,7 +899,7 @@ way|z16[highway=primary_link][tunnel=yes]
         
 way|z17[highway=primary],
 way|z17[highway=primary_link]
-        {text: name; text-position: line; text-color: #505050;
+        {text: name; text-position: line; text-spacing: 512; text-color: #505050;
         font-family: DejaVu Sans Bold; font-size:11; text-halo-radius: 1; text-halo-color: #ffffff}
 
 way|z17[highway=primary][tunnel!=yes],
@@ -915,7 +915,7 @@ way|z17[highway=primary_link][tunnel=yes]
 
 way|z18-[highway=primary],
 way|z18-[highway=primary_link]
-        {text: name; text-position: line; text-color: #404040; font-family: DejaVu Sans Bold; font-size:12; text-halo-radius: 1; text-halo-color: #ffffff;
+        {text: name; text-position: line; text-spacing: 512; text-color: #404040; font-family: DejaVu Sans Bold; font-size:12; text-halo-radius: 1; text-halo-color: #ffffff;
         width:15;  color: #fcea97;
         casing-width:.5; casing-color: #996703;
         z-index:12}
@@ -949,7 +949,7 @@ way|z8[highway=motorway]::centerline,
 
 way|z9[highway=trunk],
 way|z9[highway=motorway],
-{text: name; text-position: line; text-color: #505050; font-family: DejaVu Sans Bold; font-size:9; text-halo-radius: 1; text-halo-color: #ffffff;
+{text: name; text-position: line; text-spacing: 512; text-color: #505050; font-family: DejaVu Sans Bold; font-size:9; text-halo-radius: 1; text-halo-color: #ffffff;
 width:2.5;  color: #ffd780;
 casing-width:0.5; casing-color: #996703;
 z-index:13}
@@ -958,28 +958,28 @@ z-index:13}
 
 way|z10[highway=trunk],
 way|z10[highway=motorway],
-{text: name; text-position: line; text-color: #505050; font-family: DejaVu Sans Bold; font-size:9; text-halo-radius: 1; text-halo-color: #ffffff;
+{text: name; text-position: line; text-spacing: 512; text-color: #505050; font-family: DejaVu Sans Bold; font-size:9; text-halo-radius: 1; text-halo-color: #ffffff;
         width:4;  color: #ffd780;
         casing-width:1; casing-color: #996703;
         z-index:13}
 
 way|z11[highway=trunk],
 way|z11[highway=motorway],
-{text: name; text-position: line; text-color: #505050; font-family: DejaVu Sans Bold; font-size:9; text-halo-radius: 1; text-halo-color: #ffffff;
+{text: name; text-position: line; text-spacing: 512; text-color: #505050; font-family: DejaVu Sans Bold; font-size:9; text-halo-radius: 1; text-halo-color: #ffffff;
         width:5;  color: #ffd780;
         casing-width:1; casing-color: #996703;
         z-index:13}
 
 way|z12[highway=trunk],
 way|z12[highway=motorway],
-{text: name; text-position: line; text-color: #505050; font-family: DejaVu Sans Bold; font-size:10; text-halo-radius: 1; text-halo-color: #ffffff;
+{text: name; text-position: line; text-spacing: 512; text-color: #505050; font-family: DejaVu Sans Bold; font-size:10; text-halo-radius: 1; text-halo-color: #ffffff;
         width:7;  color: #ffd780;
         casing-width:1; casing-color: #996703;
         z-index:13}
 
 way|z13[highway=trunk],
 way|z13[highway=motorway],
-{text: name; text-position: line; text-color: #505050; font-family: DejaVu Sans Bold; font-size:11; text-halo-radius: 1; text-halo-color: #ffffff;
+{text: name; text-position: line; text-spacing: 512; text-color: #505050; font-family: DejaVu Sans Bold; font-size:11; text-halo-radius: 1; text-halo-color: #ffffff;
         width:8;  color: #ffd780;
         casing-width:1; casing-color: #996703;
         z-index:13}
@@ -988,7 +988,7 @@ way|z14[highway=trunk],
 way|z14[highway=trunk_link],
 way|z14[highway=motorway],
 way|z14[highway=motorway_link],
-{text: name; text-position: line; text-color: #505050; font-family: DejaVu Sans Bold; font-size:11;
+{text: name; text-position: line; text-spacing: 512; text-color: #505050; font-family: DejaVu Sans Bold; font-size:11;
 text-halo-radius: 1; text-halo-color: #ffffff}
 
 way|z14[highway=trunk][tunnel!=yes],
@@ -1012,7 +1012,7 @@ way|z15[highway=trunk],
 way|z15[highway=trunk_link],
 way|z15[highway=motorway],
 way|z15[highway=motorway_link],
-{text: name; text-position: line; text-color: #505050; font-family: DejaVu Sans Bold; font-size:12;
+{text: name; text-position: line; text-spacing: 512; text-color: #505050; font-family: DejaVu Sans Bold; font-size:12;
 text-halo-radius: 1; text-halo-color: #ffffff}
 
 way|z15[highway=trunk][tunnel!=yes],
@@ -1035,7 +1035,7 @@ way|z16[highway=trunk],
 way|z16[highway=trunk_link],
 way|z16[highway=motorway],
 way|z16[highway=motorway_link],
-{text: name; text-position: line; text-color: #505050; font-family: DejaVu Sans Bold; font-size:11; 
+{text: name; text-position: line; text-spacing: 512; text-color: #505050; font-family: DejaVu Sans Bold; font-size:11; 
 text-halo-radius: 1; text-halo-color: #ffffff}
         
 way|z16[highway=trunk][tunnel!=yes],
@@ -1058,7 +1058,7 @@ way|z17[highway=trunk],
 way|z17[highway=trunk_link],
 way|z17[highway=motorway],
 way|z17[highway=motorway_link],
-{text: name; text-position: line; text-color: #505050; font-family: DejaVu Sans Bold;
+{text: name; text-position: line; text-spacing: 512; text-color: #505050; font-family: DejaVu Sans Bold;
 font-size:11; text-halo-radius: 1; text-halo-color: #ffffff}
 
 way|z17[highway=trunk][tunnel!=yes],
@@ -1081,7 +1081,7 @@ way|z18-[highway=trunk],
 way|z18-[highway=trunk_link],
 way|z18-[highway=motorway],
 way|z18-[highway=motorway_link],
-{text: name; text-position: line; text-color: #505050; font-family: DejaVu Sans Bold; 
+{text: name; text-position: line; text-spacing: 512; text-color: #505050; font-family: DejaVu Sans Bold; 
 font-size:12; text-halo-radius: 1; text-halo-color: #ffffff;
         width:15;  color: #ffd780;
         casing-width:1; casing-color: #996703;
@@ -2450,11 +2450,11 @@ area|z14[admin_level=8]
 /*way[highway]
     {width: eval( any( metric(tag("width")), metric ( num(tag("lanes")) * 4), metric("7m")));
     color:#ffffff;
-    text: name; text-position: line; text-color:#000000;text-halo-radius:2;text-halo-color:#ffffff;
+    text: name; text-position: line; text-spacing: 512; text-color:#000000;text-halo-radius:2;text-halo-color:#ffffff;
     casing-color: #D29D39;}*/
 
 /*way[highway=primary], way[highway=primary_link]
-       {z-index:9; width:5; color: #FCE57D; casing-width:1; casing-color: #CBB48B; text: name; text-position: line;}*/
+       {z-index:9; width:5; color: #FCE57D; casing-width:1; casing-color: #CBB48B; text: name; text-position: line; text-spacing: 512;}*/
 
 
 
