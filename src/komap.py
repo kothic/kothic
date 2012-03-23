@@ -809,10 +809,10 @@ if options.renderer == "mapnik":
                     else:
                       order += ", "
                     #itags = "\""+ itags+"\""
-                    sqlz = """select * from (select %s, ST_LineMerge(ST_Union(way)) as way from (SELECT * from %sline where way &amp;&amp; ST_Expand(!bbox!,%s) and (%s) and (%s)) as tex
+                    sqlz = """select * from (select %s, ST_Simplify(ST_LineMerge(ST_Union(way)),%s) as way from (SELECT * from %sline where way &amp;&amp; ST_Expand(!bbox!,%s) and (%s) and (%s)) as tex
                     group by %s) p
                     %s ST_Length(p.way) desc
-                    """%(itags,libkomapnik.table_prefix,max(pixel_size_at_zoom(zoom,20),3000),ttext,sqlz,goitags,order)
+                    """%(itags,pixel_size_at_zoom(zoom,4),libkomapnik.table_prefix,max(pixel_size_at_zoom(zoom,20),3000),ttext,sqlz,goitags,order)
                     mfile.write(xml_layer("postgis-process", layer_type, itags, sqlz, zoom=zoom ))
 
 
