@@ -813,7 +813,7 @@ if options.renderer == "mapnik":
                     group by %s) p
                     where ST_Length(p.way) > %s
                     %s ST_Length(p.way) desc
-                    """%(itags,pixel_size_at_zoom(zoom,4),libkomapnik.table_prefix,max(pixel_size_at_zoom(zoom,20),3000),ttext,sqlz,goitags,pixel_size_at_zoom(zoom,4),order)
+                    """%(itags,pixel_size_at_zoom(zoom,3),libkomapnik.table_prefix,max(pixel_size_at_zoom(zoom,20),3000),ttext,sqlz,goitags,pixel_size_at_zoom(zoom,4),order)
                     mfile.write(xml_layer("postgis-process", layer_type, itags, sqlz, zoom=zoom ))
 
 
