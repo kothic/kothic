@@ -112,6 +112,7 @@ if options.osm2pgsqlstyle != "-":
     line = line.strip().split()
     if line and line[0][0] != "#":
       osm2pgsql_avail_keys[line[1]] = tuple(line[0].split(","))
+  osm2pgsql_avail_keys["tegs"] = ("node","way")
 
 
 def escape_sql_column(name, type="way", asname = False):
