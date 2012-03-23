@@ -208,7 +208,7 @@ if options.renderer == "mapnik":
   elif locale and "name:"+locale in osm2pgsql_avail_keys or not osm2pgsql_avail_keys:
     columnmap["name"] =  ('COALESCE("name:'+locale+'", "name") AS name',('name:'+locale,))
   elif locale:
-    columnmap["name"] =  ("COALESCE(tags->'name:"+locale+'\', "name") AS name',('tags'))
+    columnmap["name"] =  ("COALESCE(tags->'name:"+locale+'\', "name") AS name',('tags',))
 
   mapped_cols = [i[0] for i in columnmap.values()]
   numerics = set()  # set of number-compared things, like "population<10000" needs population as number, not text
