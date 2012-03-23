@@ -844,7 +844,7 @@ if options.renderer == "mapnik":
                           l."name" = h."addr:street" and
                           l.highway is not NULL and
                           l."name" is not NULL
-                        order by ST_Distance(ST_Buffer(h.way,0.1), l.way) asc
+                        order by ST_Distance(ST_PointOnSurface(ST_Buffer(h.way,0.1)), l.way) asc
                         limit 1
                       ),
                       (select
@@ -869,7 +869,7 @@ if options.renderer == "mapnik":
                           l."name" = h."addr:street" and
                           l.highway is not NULL and
                           l."name" is not NULL
-                        order by ST_Distance(ST_Buffer(h.way,0.1), l.way) asc
+                        order by ST_Distance(ST_PointOnSurface(ST_Buffer(h.way,0.1)), l.way) asc
                         limit 1
                       ),
                       ST_Intersection(
