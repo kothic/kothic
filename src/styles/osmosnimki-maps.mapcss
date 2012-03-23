@@ -791,7 +791,7 @@ way|z18-[highway=secondary],
 way|z18-[highway=secondary_link],
 way|z18-[highway=tertiary],
 way|z18-[highway=tertiary_link]
-{text: name; text-position: line; text-spacing: 512; text-color: #404040; font-family: DejaVu Sans Book; font-size:9;
+{text: name; text-position: line; text-spacing: 512; text-color: #404040; font-family: DejaVu Sans Book; font-size:13;
 text-halo-radius: 1; text-halo-color: #ffffff; width:11;  color: #fcffd1;
         casing-width:0.5; casing-color: #996703;
         z-index:11}
