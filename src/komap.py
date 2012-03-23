@@ -804,10 +804,14 @@ if options.renderer == "mapnik":
                   elif layer_type == "line" and zoom < 16 and snap_to_street == 'false':
                     sqlz = " OR ".join(sql)
                     itags = ", ".join(itags)
+                    if not order:
+                      order = "order by"
+                    else:
+                      order += ", "
                     #itags = "\""+ itags+"\""
-                    sqlz = """select %s, ST_LineMerge(ST_Union(way)) as way from (SELECT * from %sline where way &amp;&amp; ST_Expand(!bbox!,%s) and (%s) and (%s)) as tex
-                    group by %s
-                    %s
+                    sqlz = """select * from (select %s, ST_LineMerge(ST_Union(way)) as way from (SELECT * from %sline where way &amp;&amp; ST_Expand(!bbox!,%s) and (%s) and (%s)) as tex
+                    group by %s) p
+                    %s ST_Length(p.way) desc
                     """%(itags,libkomapnik.table_prefix,max(pixel_size_at_zoom(zoom,20),3000),ttext,sqlz,goitags,order)
                     mfile.write(xml_layer("postgis-process", layer_type, itags, sqlz, zoom=zoom ))
 
