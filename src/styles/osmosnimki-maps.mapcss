@@ -512,8 +512,12 @@ way|z12[highway=path]
 {casing-width:.3; casing-color: #ffffff; z-index:10}
 
 
-way|z13-14[highway=footway],
-way|z13-14[highway=path]
+way|z13[highway=footway],
+way|z13[highway=path]
+{casing-width:.4; casing-color: #ffffff; z-index:10}
+
+way|z14[highway=footway],
+way|z14[highway=path]
 {casing-width:.5; casing-color: #ffffff; z-index:10}
 
 
