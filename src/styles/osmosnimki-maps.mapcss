@@ -2419,7 +2419,7 @@ text:name; text-offset:3; font-size:10; font-family: DejaVu Sans Mono Book; text
 collision-sort-by:ele}
 
 
-node|z2-3[place=country][population>9000000]
+node|z2-3[place=country][population>2000000]
 {text:name; font-size:10,9,8,7,6; font-family: DejaVu Sans Book; text-halo-radius:1; text-color:#dd5875;text-halo-color:#ffffff;z-index:1;-x-mapnik-min-distance:0;text-placement:any;collision-sort-by:population}
 
 node|z4[place=country]
