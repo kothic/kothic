@@ -502,12 +502,12 @@ dashes - пунктир (длины сегментов включенных и �
 
 
 
-way|z15[highway=footway],
-way|z15[highway=path],
+way|z12-15[highway=footway],
+way|z12-15[highway=path],
 
 {text: name; text-position: line; text-spacing: 512; text-color: #404040; font-family: DejaVu Sans Book; font-size:10;
 text-halo-radius: 1; text-halo-color: #ffffff; text-halo-radius: 1; text-halo-color: #ffffff;
-width:1; color: #ffffff; z-index:10}
+casing-width:1; casing-color: #ffffff; z-index:10}
 
 /*way|z16-[highway=footway][tunnel!=yes][layer!=-1],
 way|z16-[highway=path][tunnel!=yes][layer!=-1],
@@ -2294,6 +2294,7 @@ area|z12-[leisure=park],
 {text:name;text-offset:0; font-size:10;font-family: DejaVu Serif Italic; text-halo-radius:0.5; text-color:#fffccc;text-halo-color:#285500; text-allow-overlap: false}
 */
 
+
 area|z8-[natural=wood],
 area|z8-[landuse=forest]
        {fill-position:background; fill-color: #d6f4c6; z-index:5; fill-opacity:0.7}
@@ -2308,9 +2309,11 @@ font-size:9; font-family: DejaVu Serif Italic; text-color:#A89B00;
 text-allow-overlap: false;-x-mapnik-min-distance: 0;
 max-width: 30; text-halo-radius:1; text-halo-color:#ffffff;  z-index:11}
 
+
+
 area|z10-[leisure=nature_reserve],
 area|z10-[boundary=protected_area]
-{fill-position:background; fill-color: #C0DDA2; z-index:6}
+{color: #C0DDA2; width: 2; dashes: 5,5; z-index:4}
 
 area|z10-12[landuse=nature_reserve],
 area|z10-12[boundary=national_park],
