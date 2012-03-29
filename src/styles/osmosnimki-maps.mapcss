@@ -509,19 +509,19 @@ dashes - пунктир (длины сегментов включенных и �
 
 way|z12[highway=footway],
 way|z12[highway=path]
-{casing-width:.1; casing-color: #ffffff; z-index:10}
+{casing-width:.3; casing-color: #ffffff; z-index:10}
 
 
 way|z13-14[highway=footway],
 way|z13-14[highway=path]
-{casing-width:.2; casing-color: #ffffff; z-index:10}
+{casing-width:.5; casing-color: #ffffff; z-index:10}
 
 
 way|z15[highway=footway],
 way|z15[highway=path]
 {text: name; text-position: line; text-spacing: 512; text-color: #404040; font-family: DejaVu Sans Book; font-size:10;
 text-halo-radius: 1; text-halo-color: #ffffff; text-halo-radius: 1; text-halo-color: #ffffff;
-casing-width:.5; casing-color: #ffffff; z-index:10}
+casing-width:.6; casing-color: #ffffff; z-index:10}
 
 /*way|z16-[highway=footway][tunnel!=yes][layer!=-1],
 way|z16-[highway=path][tunnel!=yes][layer!=-1],
