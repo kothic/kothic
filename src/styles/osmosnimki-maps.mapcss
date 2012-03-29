@@ -385,9 +385,13 @@ casing-opacity - прозрачность обводки
 
 
 way|z9-10[waterway=stream]  {color: #C4D4F5; width: .3; z-index:9}
-way|z10-[waterway=stream]   {color: #C4D4F5; width: .5; z-index:9}
+way|z10-12[waterway=stream] {color: #C4D4F5; width: .5; z-index:9}
+way|z13-14[waterway=stream] {color: #C4D4F5; width: 1; z-index:9}
+way|z14-[waterway=stream]   {color: #C4D4F5; width: 1.5; z-index:9}
 
 way|z10-14[waterway=river]  {color: #C4D4F5; width: .7; z-index:9}
+
+way|z10-14[waterway=river]  {color: #C4D4F5; width: 3; z-index:9}
 
 way|z15[waterway=river][!tunnel] {color: #C4D4F5; width: 4; z-index:9}
 way|z15[waterway=river][tunnel]  {color: #C4D4F5; width: 4; z-index:9; dashes:3,3; linecap: butt}
@@ -502,12 +506,22 @@ dashes - пунктир (длины сегментов включенных и �
 
 
 
-way|z12-15[highway=footway],
-way|z12-15[highway=path],
 
+way|z12[highway=footway],
+way|z12[highway=path]
+{casing-width:.1; casing-color: #ffffff; z-index:10}
+
+
+way|z13-14[highway=footway],
+way|z13-14[highway=path]
+{casing-width:.2; casing-color: #ffffff; z-index:10}
+
+
+way|z15[highway=footway],
+way|z15[highway=path]
 {text: name; text-position: line; text-spacing: 512; text-color: #404040; font-family: DejaVu Sans Book; font-size:10;
 text-halo-radius: 1; text-halo-color: #ffffff; text-halo-radius: 1; text-halo-color: #ffffff;
-casing-width:1; casing-color: #ffffff; z-index:10}
+casing-width:.5; casing-color: #ffffff; z-index:10}
 
 /*way|z16-[highway=footway][tunnel!=yes][layer!=-1],
 way|z16-[highway=path][tunnel!=yes][layer!=-1],
