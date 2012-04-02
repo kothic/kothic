@@ -18,6 +18,11 @@
 from debug import debug, Timer
 from mapcss import MapCSS
 import sys
+
+reload(sys)
+sys.setdefaultencoding("utf-8")
+
+
 import os
 import Image
 from optparse import OptionParser
