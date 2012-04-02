@@ -391,7 +391,7 @@ way|z14-[waterway=stream]   {color: #C4D4F5; width: 1.5; z-index:9}
 
 way|z10-14[waterway=river]  {color: #C4D4F5; width: .7; z-index:9}
 
-way|z10-14[waterway=river]  {color: #C4D4F5; width: 3; z-index:9}
+
 
 way|z15[waterway=river][!tunnel] {color: #C4D4F5; width: 4; z-index:9}
 way|z15[waterway=river][tunnel]  {color: #C4D4F5; width: 4; z-index:9; dashes:3,3; linecap: butt}
