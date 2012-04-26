@@ -222,7 +222,7 @@ if options.renderer == "mapnik":
 #    a = "replace(" + a + ", '"+ i+ j + "', '"+ i+ k + "')"
   elif locale == "be":
     columnmap["name"] =  ('COALESCE("name:be", "name:ru", "int_name", "name:en", "name") AS name',('name:be', "name:ru", "int_name", "name:en"))
-  elif locale and "name:"+locale in osm2pgsql_avail_keys or not osm2pgsql_avail_keys:
+  elif locale and ("name:"+locale in osm2pgsql_avail_keys or not osm2pgsql_avail_keys):
     columnmap["name"] =  ('COALESCE("name:'+locale+'", "name") AS name',('name:'+locale,))
   elif locale:
     columnmap["name"] =  ("COALESCE(tags->'name:"+locale+'\', "name") AS name',('tags',))
