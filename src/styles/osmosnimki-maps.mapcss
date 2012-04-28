@@ -432,7 +432,7 @@ line|z16-[waterway]
 
 
 
-way|z10-[mooring=yes]{"port_11x14_blue.png"}
+way|z10-[mooring=yes]{icon-image:"port_11x14_blue.png"}
 
 area|z6-[waterway=riverbank],
 area|z6-[natural=water],
