@@ -3,12 +3,48 @@ meta {
 }
 
 
+
+
 /*
   Deja Vu MapCSS styles
   Osmosnimki maps style
 */
 
 /* коментарии отделяются так и могут встречаться везде, где можно поставить пробел */
+
+
+
+
+
+        ele[-11000]{fill-color:#98b7f5}
+        ele[-10000]{fill-color:#9fbcf5}
+        ele[-9000] {fill-color:#a6c1f5}
+        ele[-8000] {fill-color:#abc4f5}
+        ele[-7000] {fill-color:#b0c7f5}
+        ele[-6000] {fill-color:#b5caf5}
+        ele[-5000] {fill-color:#bacef5}
+        ele[-4000] {fill-color:#bfd1f5}
+        ele[-3000] {fill-color:#c4d4f5}
+        ele[-2000] {fill-color:#c6d6f5}
+        ele[-500]  {fill-color:#c9d7f5}
+        ele[-200]  {fill-color:rgb(231, 209, 175); fill-opacity: 0.1}
+        ele[200]   {fill-color:rgb(231, 209, 175); fill-opacity: 0.2}
+        ele[500]   {fill-color:rgb(226, 203, 170); fill-opacity: 0.2}
+        ele[1000]  {fill-color:rgb(217, 194, 159); fill-opacity: 0.3}
+        ele[2000]  {fill-color:rgb(208, 184, 147); fill-opacity: 0.4}
+        ele[3000]  {fill-color:rgb(197, 172, 136); fill-opacity: 0.5}
+        ele[4000]  {fill-color:rgb(188, 158, 120); fill-opacity: 0.55}
+        ele[5000]  {fill-color:rgb(179, 139, 102); fill-opacity: 0.6}
+        ele[6000]  {fill-color:rgb(157, 121, 87);  fill-opacity: 0.7}
+        ele[7000]  {fill-color:rgb(157, 121, 87);  fill-opacity: 0.8}
+        ele[8000]  {fill-color:rgb(144, 109, 77);  fill-opacity: 0.9}
+
+
+
+
+
+
+
 
 canvas {
   fill-color: #C4D4F5;
@@ -1532,7 +1568,7 @@ max-width:30; z-index:15}
 node|z17-[sport=10pin] {icon-image:"9pin.png"; text-offset:10; text:name; font-size:8;
 font-family: "DejaVu Sans Book"; text-color:#2D1A2D; text-halo-radius: 1;
 text-halo-color: #ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0; text-placement:any;
-max-width:30; z-index:15
+max-width:30; z-index:15}
 node|z17-[sport=equestrian] {icon-image:"equestrian.png"; text-offset:10; text:name; font-size:8;
 font-family: "DejaVu Sans Book"; text-color:#2D1A2D; text-halo-radius: 1;
 text-halo-color: #ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0; text-placement:any;

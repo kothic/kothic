@@ -839,32 +839,30 @@ def whatever_to_rgb(string):
   """
   Converts CSS3 color or a hex into rgb triplet; hash of string if fails.
   """
+  string = string.strip().lower()
   try:
     return name_to_rgb(string)
   except ValueError:
     try:
       return hex_to_rgb(string)
     except ValueError:
-      #a = md5.new(string)
-      return hex_to_rgb("#"+md5(string).hexdigest()[:6])
+      try:
+        if string[:3] == "rgb":
+          return tuple([float(i) for i in string[4:-1].split(",")][0:3])
+          
+      except:
+        return hex_to_rgb("#"+md5(string).hexdigest()[:6])
 
 def whatever_to_hex(string):
   if type(string) == tuple:
     return cairo_to_hex(string)
   return rgb_to_hex(whatever_to_rgb(string))
-    
-    
 def whatever_to_cairo(string):
   a = whatever_to_rgb(string)
   return a[0]/255.,a[1]/255.,a[2]/255.,
 def cairo_to_hex (cairo):
   return rgb_to_hex((cairo[0]*255,cairo[1]*255,cairo[2]*255,))
   
-
-
-
-
-
 
 
 

@@ -75,13 +75,14 @@ class QuadTileBackend:
     
     
   def filename(self, (z,x,y)):
+    
     return "%s/z%s/%s/x%s/%s/y%s.vtile"%(self.path, z, x/1024, x, y/1024, y)
   def load_tile(self, k):
     #debug("loading tile: %s"% (k,))
     try:
       f = open(self.filename(k))
     except IOError:
-      #print ( "Failed open: '%s'" % self.filename(k) )
+      print ( "Failed open: '%s'" % self.filename(k) )
       return {}
     t = {}
     for line in f:
@@ -112,7 +113,10 @@ class QuadTileBackend:
     zoom = max(zoom, 0)                 ## Negative zooms are nonsense
     a,d,c,b = [int(x) for x in projections.tile_by_bbox(bbox,zoom, self.proj)]
     resp = {}
-    hint = [x[0] for x in sql_hint]
+    
+    hint = set()
+    for j in [x[0] for x in sql_hint]:
+      hint.update(j)
 
     for tile in set([(zoom,i,j) for i in range(a, c+1) for j in range(b, d+1)]):
       # Loading current vector tile
@@ -131,7 +135,7 @@ class QuadTileBackend:
         "filling response with interesting-tagged objects"
         need = False
         for tag in ti[obj].tags:
-          if tag in hint:
+          #if tag in hint:
             need = True
             break
         if need:

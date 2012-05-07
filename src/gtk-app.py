@@ -38,7 +38,8 @@ try:
   import psyco
   psyco.full()
 except ImportError:
-  debug("Psyco import failed. Program may run slower. Ir you run it on i386 machine, please install Psyco to get best performance.")
+  pass
+#  debug("Psyco import failed. Program may run slower. Ir you run it on i386 machine, please install Psyco to get best performance.")
 
 
 class KothicApp:
@@ -104,7 +105,7 @@ class KothicApp:
 
   def load_style(self):
     self.style = Styling(0,25)
-    self.style.parse(open("styles/default.mapcss","r").read())
+    self.style.parse(open("styles/osmosnimki-maps.mapcss","r").read())
   def reload_style(self,w):
     self.style = Styling(0,25)
     self.style.parse(open("styles/%s"%w.StyleName,"r").read())

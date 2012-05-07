@@ -17,6 +17,8 @@
 
 from debug import debug, Timer
 from mapcss import MapCSS
+import mapcss.webcolors
+whatever_to_hex = mapcss.webcolors.webcolors.whatever_to_hex
 import sys
 
 reload(sys)
@@ -234,6 +236,7 @@ if options.renderer == "mapnik":
   # {zoom: {z-index: [{sql:sql_hint, cond: mapnikfiltercondition, subject: subj, style: {a:b,c:d..}},{r2}...]...}...}
   coast = {}
   fonts = set()
+  demhack = False
   for zoom in range (minzoom, maxzoom):
     mapniksheet[zoom] = {}
     zsheet = mapniksheet[zoom]
@@ -268,8 +271,10 @@ if options.renderer == "mapnik":
         #print chooser_entry["rule"]
         chooser_entry["rulestring"] = " or ".join([ "("+ " and ".join([i.get_mapnik_filter() for i in rule if i.get_mapnik_filter()]) + ")" for rule in chooser_entry["rule"]])
         chooser_entry["chooser"] = chooser
+        if chooser_entry["type"] == "ele":
+          demhack = True
         if chooser_entry["type"] == "area" and "[natural] = 'coastline'" in chooser_entry["rulestring"]:
-            coast[zoom] = chooser_entry["style"]
+          coast[zoom] = chooser_entry["style"]
         else:
           zsheet[zindex].append(chooser_entry)
 
@@ -298,7 +303,6 @@ if options.renderer == "mapnik":
 
   bgcolor = style.get_style("canvas", {}, maxzoom)[0].get("fill-color", "")
   opacity = style.get_style("canvas", {}, maxzoom)[0].get("opacity", 1)
-  demhack = style.get_style("canvas", {}, maxzoom)[0].get("-x-mapnik-dem-hack", False)
   hshack = style.get_style("canvas", {}, maxzoom)[0].get("-x-mapnik-hs-hack", False)
 
   if (opacity == 1) and bgcolor:
@@ -317,8 +321,26 @@ if options.renderer == "mapnik":
     x_scale = xml_scaledenominator(zoom)
     ta = zsheet.keys()
     ta.sort(key=float)
+    demcolors = {}
+    demramp = {"ground":"", "ocean":""}
+
+    if demhack:
+      for zindex in ta:
+        for entry in zsheet[zindex]:
+          if entry["type"] in ("ele",):
+            ele =  int(entry["rule"][0][0].params[0])
+            demcolors[ele] = (whatever_to_hex(entry["style"].get('fill-color', '#ffffff')), entry["style"].get('fill-opacity', '1'))
+      dk = demcolors.keys()
+      dk.sort()
+      for ele in dk:
+        (color, opacity) = demcolors[ele]
+        demramp["ocean"] += '<stop value="%s"  color="rgba(%s,%s,%s,%s)"/>' %(ele, int(color[1:3],16), int(color[3:5],16), int(color[5:7],16), opacity)
+        demramp["ground"] += '<stop value="%s"  color="rgba(%s,%s,%s,%s)"/>' %(ele-11701, int(color[1:3],16), int(color[3:5],16), int(color[5:7],16), opacity)
+        
+            
+    
     if demhack and zoom >= 7:
-      xml = xml_cleantopo(zoom, x_scale)
+      xml = xml_cleantopo(zoom, x_scale, demramp["ocean"])
       mfile.write(xml)
     if zoom in coast:
       xml = xml_style_start()
@@ -334,11 +356,11 @@ if options.renderer == "mapnik":
       mfile.write(xml)
     
     if demhack and zoom < 7:
-      xml = xml_cleantopo(zoom, x_scale)
+      xml = xml_cleantopo(zoom, x_scale, demramp["ocean"])
       mfile.write(xml)
     
     if demhack and zoom >= 7:
-      xml = xml_srtm(zoom, x_scale)
+      xml = xml_srtm(zoom, x_scale, demramp["ground"])
       mfile.write(xml)
 
     sql_g = set()
@@ -355,7 +377,6 @@ if options.renderer == "mapnik":
           if ("fill-color" in entry["style"] or "fill-image" in entry["style"]) and (entry["style"].get("fill-position", "foreground")=="background"):
             xml += xml_rule_start()
             xml += x_scale
-
             xml += xml_filter(entry["rulestring"])
             if "fill-color" in entry["style"]:
               xml += xml_polygonsymbolizer(entry["style"].get("fill-color", "black"), entry["style"].get("fill-opacity", "1"))

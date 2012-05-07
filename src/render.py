@@ -151,8 +151,10 @@ class RasterTile:
     ww = []
 
     for way in vectors:
-      
-      st = style.get_style("way", way.tags, self.zoom, scale, zscale)
+      type = "line"
+      if way.coords[0] == way.coords[-1]:
+        type == "area"
+      st = style.get_style("area", way.tags, self.zoom, scale, zscale)
       if st:
        for fpt in st:
         #debug(fpt)
