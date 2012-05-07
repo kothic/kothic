@@ -232,7 +232,7 @@ def xml_cleantopo(zoom, x_scale, demramp):
 </Layer>
 """ % (zoom, x_scale, demramp, zoom, zoom, cleantopo_dem_path)
 
-def xml_srtm(zoom, x_scale):
+def xml_srtm(zoom, x_scale, demramp):
   return """
 <Style name="elevationz%s">
   <Rule>%s
