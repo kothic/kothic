@@ -113,10 +113,7 @@ def xml_polygonsymbolizer(color="#000000", opacity="1"):
   color = nicecolor(color)
   
   return """
-  <PolygonSymbolizer>
-    <CssParameter name="fill">%s</CssParameter>
-    <CssParameter name="fill-opacity">%s</CssParameter>
-  </PolygonSymbolizer>"""%(color, float(opacity))
+  <PolygonSymbolizer fill="%s" fill-opacity="%s" gamma="0.65" />"""%(color, float(opacity))
 
 def xml_polygonpatternsymbolizer(file=""):
   return """
