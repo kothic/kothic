@@ -372,16 +372,16 @@ def xml_layer(type="postgis", geom="point", interesting_tags = "*", sql = "true"
       </Datasource>
     </Layer>"""%(layer_id, db_proj, subs, sql, intersection_SQL, db_user, db_name, db_srid,  table_prefix, geom)
   elif type == "coast":
-    #if zoom < 9:
-      #return """
-      #<Layer name="l%s" status="on" srs="%s">
-        #%s
-        #<Datasource>
-        #<Parameter name="type">shape</Parameter>
-        #<Parameter name="file">%sshoreline_300</Parameter>
-        #</Datasource>
-      #</Layer>"""%(layer_id, db_proj, subs, world_bnd_path)
-    #else:
+    if zoom < 9:
+      return """
+      <Layer name="l%s" status="on" srs="%s">
+        %s
+        <Datasource>
+        <Parameter name="type">shape</Parameter>
+        <Parameter name="file">%sshoreline_300</Parameter>
+        </Datasource>
+      </Layer>"""%(layer_id, db_proj, subs, world_bnd_path)
+    else:
       return """
       <Layer name="l%s" status="on" srs="%s">
         %s
