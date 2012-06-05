@@ -679,8 +679,8 @@ if options.renderer == "mapnik":
                   opacity=relaxedFloat(entry["style"].get("opacity", "1")))
                 if ("text" in entry["style"] and entry["style"].get("text-position","center")=='center'):
 									ttext = entry["style"]["text"].extract_tags().pop()
-									sql.add("(("+entry["sql"]+") and "+columnmap.get(ttext, (ttext,))[0] + " is NULL)")
-									itags.update((escape_sql_column(ttext),))
+									sql.add("(("+entry["sql"]+") and "+escape_sql_column(ttext) + " is NULL)")
+									itags.add(escape_sql_column(ttext))
 									if ttext in columnmap:
 										itags.update(columnmap[ttext][1])
                 else:
