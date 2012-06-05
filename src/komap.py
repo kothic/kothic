@@ -649,7 +649,7 @@ if options.renderer == "mapnik":
           style_started = False
           for entry in zsheet[zindex]:
             if entry["type"] in entry_types:
-              if "icon-image" in entry["style"] and ("text" not in entry["style"] or ("text" in entry["style"] and entry["style"].get("text-position","center")!='center')):
+              if "icon-image" in entry["style"]:
                 if not prevtype:
                   prevtype = layer_type
                 if prevtype != layer_type:
@@ -677,8 +677,17 @@ if options.renderer == "mapnik":
                   width=entry["style"].get("icon-width", ""),
                   height=entry["style"].get("icon-height", ""),
                   opacity=relaxedFloat(entry["style"].get("opacity", "1")))
-
-                sql.add(entry["sql"])
+                if ("text" in entry["style"] and entry["style"].get("text-position","center")=='center'):
+									
+									
+									ttext = entry["style"]["text"].extract_tags().pop()
+									sql.add("(("+entry["sql"]+") and "+columnmap.get(ttext, (escape_sql_column(ttext),))[0] + " is NULL)")
+									itags.update((escape_sql_column(ttext),))
+									if ttext in columnmap:
+										itags.update((columnmap[ttext][1],))
+                else:
+									sql.add(entry["sql"])
+                
                 itags.update(entry["chooser"].get_interesting_tags(entry["type"], zoom))
                 xml += xml_rule_end()
           if style_started:
@@ -856,9 +865,6 @@ if options.renderer == "mapnik":
                     %s ST_Length(p.way) desc
                     """%(itags,pixel_size_at_zoom(zoom,3),libkomapnik.table_prefix,max(pixel_size_at_zoom(zoom,20),3000),ttext,sqlz,goitags,pixel_size_at_zoom(zoom,4),order)
                     mfile.write(xml_layer("postgis-process", layer_type, itags, sqlz, zoom=zoom ))
-
-
-
 
 
                   elif snap_to_street == 'true':
