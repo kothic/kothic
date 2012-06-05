@@ -680,7 +680,7 @@ if options.renderer == "mapnik":
                 if ("text" in entry["style"] and entry["style"].get("text-position","center")=='center'):
 									ttext = entry["style"]["text"].extract_tags().pop()
 									sql.add("(("+entry["sql"]+") and "+escape_sql_column(ttext) + " is NULL)")
-									itags.add(escape_sql_column(ttext))
+									itags.add(ttext)
 									if ttext in columnmap:
 										itags.update(columnmap[ttext][1])
                 else:
