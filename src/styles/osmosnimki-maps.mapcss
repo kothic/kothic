@@ -1389,7 +1389,9 @@ node|z16[amenity=bank] {icon-image:"amerikan_bank.png"}
 node|z16[amenity=dentist] {icon-image:"dentist_osm.png"}
 node|z16[amenity=social_facility] {icon-image:"social_facility.png"}
 node|z16[amenity=veterinary] {icon-image:"veterinary.png"}
-node|z16[amenity=fountain] {icon-image:"fountain.png"}
+node|z16[amenity=fountain],
+area|z16[amenity=fountain],
+	{icon-image:"fountain.png"}
 node|z16[amenity=studio] {icon-image:"studio.png"}
 node|z16[amenity=courthouse] {icon-image:"courthouse.png"}
 node|z16[amenity=embassy] {icon-image:"poconzulat.png"}
@@ -1448,7 +1450,9 @@ node|z17-[amenity=veterinary] {icon-image:"veterinary.png"; text-offset:10; text
 font-family: "DejaVu Sans Book"; text-color:#2D1A2D; text-halo-radius: 1;
 text-halo-color: #ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0; text-placement:any;
 max-width:30; z-index:15}
-node|z17-[amenity=fountain] {icon-image:"fountain.png"; text-offset:10; text:name; font-size:8;
+node|z17-[amenity=fountain],
+area|z17-[amenity=fountain],
+{icon-image:"fountain.png"; text-offset:10; text:name; font-size:8;
 font-family: "DejaVu Sans Book"; text-color:#2D1A2D; text-halo-radius: 1;
 text-halo-color: #ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0; text-placement:any;
 max-width:30; z-index:15}
