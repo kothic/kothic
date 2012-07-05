@@ -86,7 +86,7 @@ def xml_pointsymbolizer(path="", width="", height="", opacity=1, overlap="false"
           %(os.path.join(icons_path, path), width, height, opacity, overlap)
 
 
-def xml_linesymbolizer(color="#000000", width="1", opacity="1", linecap="butt", linejoin="round", dashes="", zoom=200):
+def xml_linesymbolizer(color="#000000", width="1", opacity="1", linecap="butt", linejoin="round", dashes="", smooth=0, zoom=200):
   color = nicecolor(color)
   linecap  = {"none":"butt",}.get(linecap.lower(),  linecap)
 
@@ -99,14 +99,14 @@ def xml_linesymbolizer(color="#000000", width="1", opacity="1", linecap="butt", 
 #    rasterizer = ' rasterizer="fast"'
 
   return """
-  <LineSymbolizer %s smooth="0.2" stroke="%s" stroke-width="%s" stroke-opacity="%s" stroke-linejoin="%s" stroke-linecap="%s" %s/>"""%(rasterizer, color, float(width), float(opacity), linejoin, linecap, dashes)
+  <LineSymbolizer %s smooth="%s" stroke="%s" stroke-width="%s" stroke-opacity="%s" stroke-linejoin="%s" stroke-linecap="%s" %s/>"""%(rasterizer, smooth, color, float(width), float(opacity), linejoin, linecap, dashes)
 
 
-def xml_polygonsymbolizer(color="#000000", opacity="1"):
+def xml_polygonsymbolizer(color="#000000", opacity="1", smooth='0'):
   color = nicecolor(color)
   
   return """
-  <PolygonSymbolizer fill="%s" fill-opacity="%s" gamma="0.73" smooth="0.2" />"""%(color, float(opacity))
+  <PolygonSymbolizer fill="%s" fill-opacity="%s" gamma="0.73" smooth="%s" />"""%(color, float(opacity), smooth)
 
 def xml_polygonpatternsymbolizer(file=""):
   return """
