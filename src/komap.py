@@ -353,7 +353,7 @@ if options.renderer == "mapnik":
       xml += xml_rule_start()
       xml += x_scale
       if "fill-color" in coast[zoom]:
-        xml += xml_polygonsymbolizer(coast[zoom].get("fill-color", "#ffffff"), relaxedFloat(coast[zoom].get("fill-opacity", "1")), entry["style"].get("smooth","0"))
+        xml += xml_polygonsymbolizer(coast[zoom].get("fill-color", "#ffffff"), relaxedFloat(coast[zoom].get("fill-opacity", "1")), relaxedFloat(entry["style"].get("smooth","0")))
       if "fill-image" in coast[zoom]:
         xml += xml_polygonpatternsymbolizer(coast[zoom].get("fill-image", ""))
       xml += xml_rule_end()
@@ -385,7 +385,7 @@ if options.renderer == "mapnik":
             xml += x_scale
             xml += xml_filter(entry["rulestring"])
             if "fill-color" in entry["style"]:
-              xml += xml_polygonsymbolizer(entry["style"].get("fill-color", "black"), entry["style"].get("fill-opacity", "1"), entry["style"].get("smooth","0"))
+              xml += xml_polygonsymbolizer(entry["style"].get("fill-color", "black"), relaxedFloat(entry["style"].get("fill-opacity", "1")), relaxedFloat(entry["style"].get("smooth","0")))
             if "fill-image" in entry["style"]:
               xml += xml_polygonpatternsymbolizer(entry["style"].get("fill-image", ""))
             sql.add(entry["sql"])
@@ -472,7 +472,7 @@ if options.renderer == "mapnik":
                   linecap=entry["style"].get("casing-linecap", entry["style"].get("linecap","butt")),
                   linejoin=entry["style"].get("casing-linejoin", entry["style"].get("linejoin", "round")),
                   dashes=entry["style"].get("casing-dashes",entry["style"].get("dashes", "")),
-                  smooth=entry["style"].get("smooth","0"),
+                  smooth=relaxedFloat(entry["style"].get("smooth","0")),
                   zoom=zoom)
 
                 sql.add(entry["sql"])
@@ -534,7 +534,7 @@ if options.renderer == "mapnik":
                   roads = False
                 if layer_type == "polygon" and (entry["style"].get("fill-position", "foreground")=="foreground"):
                   if "fill-color" in entry["style"]:
-                    xml += xml_polygonsymbolizer(entry["style"].get("fill-color", "black"), entry["style"].get("fill-opacity", "1"), entry["style"].get("smooth","0"),)
+                    xml += xml_polygonsymbolizer(entry["style"].get("fill-color", "black"), relaxedFloat(entry["style"].get("fill-opacity", "1")), relaxedFloat(entry["style"].get("smooth","0")))
                   if "fill-image" in entry["style"]:
                     xml += xml_polygonpatternsymbolizer(entry["style"].get("fill-image", ""))
                 if "width" in entry["style"]:
@@ -558,7 +558,7 @@ if options.renderer == "mapnik":
                     linecap=tlinecap,
                     linejoin=tlinejoin,
                     dashes=entry["style"].get("dashes", ""),
-                    smooth=entry["style"].get("smooth","0"),
+                    smooth=relaxedFloat(entry["style"].get("smooth","0")),
                     zoom=zoom)
                   if entry["style"].get("dashes", ""):
                     there_are_dashed_lines = True
