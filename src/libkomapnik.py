@@ -99,7 +99,7 @@ def xml_linesymbolizer(color="#000000", width="1", opacity="1", linecap="butt", 
 #    rasterizer = ' rasterizer="fast"'
 
   return """
-  LineSymbolizer %s smooth="0.2" stroke="%s" stroke-width="%s" stroke-opacity="%s" stroke-linejoin="%s" stroke-linecap="%s" %s/>"""%(rasterizer, color, float(width), float(opacity), linejoin, linecap, dashes)
+  <LineSymbolizer %s smooth="0.2" stroke="%s" stroke-width="%s" stroke-opacity="%s" stroke-linejoin="%s" stroke-linecap="%s" %s/>"""%(rasterizer, color, float(width), float(opacity), linejoin, linecap, dashes)
 
 
 def xml_polygonsymbolizer(color="#000000", opacity="1"):
