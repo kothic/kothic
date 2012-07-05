@@ -91,7 +91,7 @@ def xml_linesymbolizer(color="#000000", width="1", opacity="1", linecap="butt", 
   linecap  = {"none":"butt",}.get(linecap.lower(),  linecap)
 
   if dashes:
-    dashes = '<CssParameter name="stroke-dasharray">%s</CssParameter>'%(dashes)
+    dashes = 'stroke-dasharray="%s"'%(dashes)
   else:
     dashes = ""
   rasterizer = ""
@@ -99,21 +99,14 @@ def xml_linesymbolizer(color="#000000", width="1", opacity="1", linecap="butt", 
 #    rasterizer = ' rasterizer="fast"'
 
   return """
-  <LineSymbolizer %s>
-    <CssParameter name="stroke">%s</CssParameter>
-    <CssParameter name="stroke-width">%s</CssParameter>
-    <CssParameter name="stroke-opacity">%s</CssParameter>
-    <CssParameter name="stroke-linejoin">%s</CssParameter>
-    <CssParameter name="stroke-linecap">%s</CssParameter>
-    %s
-  </LineSymbolizer>"""%(rasterizer, color, float(width), float(opacity), linejoin, linecap, dashes)
+  LineSymbolizer %s smooth="0.2" stroke="%s" stroke-width="%s" stroke-opacity="%s" stroke-linejoin="%s" stroke-linecap="%s" %s/>"""%(rasterizer, color, float(width), float(opacity), linejoin, linecap, dashes)
 
 
 def xml_polygonsymbolizer(color="#000000", opacity="1"):
   color = nicecolor(color)
   
   return """
-  <PolygonSymbolizer fill="%s" fill-opacity="%s" gamma="0.73" />"""%(color, float(opacity))
+  <PolygonSymbolizer fill="%s" fill-opacity="%s" gamma="0.73" smooth="0.2" />"""%(color, float(opacity))
 
 def xml_polygonpatternsymbolizer(file=""):
   return """
