@@ -34,7 +34,7 @@ cleantopo_dem_path = ""
 srtm_dem_path = ""
 cleantopo_hs_path = ""
 srtm_hs_path = ""
-
+text_scale = 1
 
 substyles = []
 
@@ -132,9 +132,9 @@ def xml_textsymbolizer(
   color = nicecolor(color)
   halo_color = nicecolor(halo_color)
   pos = pos.replace("exact", "X").replace("any","S, E, X, N, W, NE, SE, NW, SW").split(",")
-  pos.extend([str(int(float(x))) for x in size.split(",")])
+  pos.extend([str(int(float(x)*text_scale)) for x in size.split(",")])
   pos = ",".join(pos)
-  size = size.split(",")[0]
+  size = str(int(float(size.split(",")[0])*text_scale))
   
   
   placement = {"center": "interior"}.get(placement.lower(), placement)
@@ -163,7 +163,7 @@ def xml_shieldsymbolizer(path="", width="", height="",
   return """
     <ShieldSymbolizer file="%s%s" %s %s name="%s" fontset_name="%s" size="%s" fill="%s" halo_fill= "%s" halo_radius="%s" placement="%s" dy="%s" allow_overlap="%s" wrap_width="%s" min_distance="%s" horizontal_alignment="%s" opacity="%s" text-transform="%s" unlock-image="%s" spacing="%s" />
   """%(icons_path, \
-    path, width, height,text,face,int(float(size)),color,halo_color,halo_radius,placement,offset,overlap,wrap_width,distance,align,opacity, transform, unlock_image, spacing )
+    path, width, height,text,face,int(float(size)*text_scale),color,halo_color,halo_radius,placement,offset,overlap,wrap_width,distance,align,opacity, transform, unlock_image, spacing )
 
 def xml_filter(string):
   return """

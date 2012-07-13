@@ -64,6 +64,8 @@ parser.add_option("-p", "--osm2pgsql-style", dest="osm2pgsqlstyle", default="-",
     help="osm2pgsql stylesheet filename", metavar="FILE")
 parser.add_option("-b", "--background-only", dest="bgonly", action="store_true", default=False,
     help="Skip rendering of icons and labels", metavar="BOOL")
+parser.add_option("-T", "--text-scale", dest="textscale", default=1, type="float",
+    help="text size scale", metavar="SCALE")
 parser.add_option("-c", "--config", dest="conffile", default="komap.conf",
     help="config file name", metavar="FILE")
 
@@ -85,6 +87,7 @@ libkomapnik.cleantopo_dem_path = config.get("mapnik", "cleantopo_dem_path")
 libkomapnik.srtm_dem_path = config.get("mapnik", "srtm_dem_path")
 libkomapnik.cleantopo_hs_path = config.get("mapnik", "cleantopo_hs_path")
 libkomapnik.srtm_hs_path = config.get("mapnik", "srtm_hs_path")
+libkomapnik.text_scale = options.textscale
 
 
 from libkomapnik import *
