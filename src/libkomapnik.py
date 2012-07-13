@@ -94,19 +94,28 @@ def xml_linesymbolizer(color="#000000", width="1", opacity="1", linecap="butt", 
     dashes = 'stroke-dasharray="%s"'%(dashes)
   else:
     dashes = ""
+
+  if smooth:
+    smooth = 'smooth="%s"'%(smooth)
+  else:
+    smooth = ""
+
   rasterizer = ""
 #  if float(width) < 4 and not dashes and zoom < 6:
 #    rasterizer = ' rasterizer="fast"'
 
   return """
-  <LineSymbolizer %s smooth="%s" stroke="%s" stroke-width="%s" stroke-opacity="%s" stroke-linejoin="%s" stroke-linecap="%s" %s/>"""%(rasterizer, smooth, color, float(width), float(opacity), linejoin, linecap, dashes)
+  <LineSymbolizer %s %s stroke="%s" stroke-width="%s" stroke-opacity="%s" stroke-linejoin="%s" stroke-linecap="%s" %s/>"""%(rasterizer, smooth, color, float(width), float(opacity), linejoin, linecap, dashes)
 
 
 def xml_polygonsymbolizer(color="#000000", opacity="1", smooth='0'):
   color = nicecolor(color)
-  
+  if smooth:
+    smooth = 'smooth="%s"'%(smooth)
+  else:
+    smooth = ""
   return """
-  <PolygonSymbolizer fill="%s" fill-opacity="%s" gamma="0.73" smooth="%s" />"""%(color, float(opacity), smooth)
+  <PolygonSymbolizer fill="%s" fill-opacity="%s" gamma="0.73" %s />"""%(color, float(opacity), smooth)
 
 def xml_polygonpatternsymbolizer(file=""):
   return """
