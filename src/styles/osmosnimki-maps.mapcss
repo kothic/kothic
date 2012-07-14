@@ -13,8 +13,7 @@ meta {
 /* коментарии отделяются так и могут встречаться везде, где можно поставить пробел */
 
 
-
-
+/*
 
         ele[-11000]{fill-color:#98b7f5}
         ele[-10000]{fill-color:#9fbcf5}
@@ -40,7 +39,7 @@ meta {
         ele[8000]  {fill-color:rgb(144, 109, 77);  fill-opacity: 0.9}
 
 
-
+*/
 
 
 
@@ -48,7 +47,7 @@ meta {
 
 canvas {
   fill-color: #C4D4F5;
-  -x-mapnik-dem-hack: true;
+
 }
 
 canvas {
