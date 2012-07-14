@@ -120,7 +120,7 @@ if options.osm2pgsqlstyle != "-":
   mf = open(options.osm2pgsqlstyle, "r")
   for line in mf:
     line = line.strip().split()
-    if line and line[0][0] != "#":
+    if line and line[0][0] != "#" and not ("phstore" in line):
       osm2pgsql_avail_keys[line[1]] = tuple(line[0].split(","))
   osm2pgsql_avail_keys["tags"] = ("node","way")
 
