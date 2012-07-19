@@ -329,13 +329,12 @@ def xml_layer(type="postgis", geom="point", interesting_tags = "*", sql = "true"
     else:
       interesting_tags = ", ".join(interesting_tags)
     
-    
     return """
     <Layer name="l%s" status="on" srs="%s">
       %s
       <Datasource>
         <Parameter name="table">
-        (select %s, way
+        (select %s, ST_Simplify(way, %s)
         from %s%s
         where %s
         ) as text
@@ -351,7 +350,7 @@ def xml_layer(type="postgis", geom="point", interesting_tags = "*", sql = "true"
         <Parameter name="estimate_extent">false</Parameter>
         <Parameter name="extent">-20037508.342789244, -20037508.342780735, 20037508.342789244, 20037508.342780709</Parameter>
       </Datasource>
-    </Layer>"""%(layer_id, db_proj, subs, interesting_tags, table_prefix, geom, sql, intersection_SQL, db_user, db_name, db_srid,  table_prefix, geom)
+    </Layer>"""%(layer_id, db_proj, subs, interesting_tags, 0.6*pixel_size_at_zoom(zoom), table_prefix, geom, sql, intersection_SQL, db_user, db_name, db_srid,  table_prefix, geom)
   elif type == "postgis-process":
     return """
     <Layer name="l%s" status="on" srs="%s">
