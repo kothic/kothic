@@ -325,7 +325,7 @@ def xml_layer(type="postgis", geom="point", interesting_tags = "*", sql = "true"
     
   if type == "postgis":
     if zoom >= 5:
-        sql = '('+ sql + ') and way &amp;&amp; !bbox!'
+        sql = 'way &amp;&amp; !bbox! and '+ sql
     interesting_tags = list(interesting_tags)
     if '"' not in "".join(interesting_tags) and "->" not in "".join(interesting_tags):
       interesting_tags = "\", \"".join(interesting_tags)
