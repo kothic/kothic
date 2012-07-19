@@ -334,7 +334,7 @@ def xml_layer(type="postgis", geom="point", interesting_tags = "*", sql = "true"
       %s
       <Datasource>
         <Parameter name="table">
-        (select %s, ST_Simplify(way, %s)
+        (select %s, ST_Simplify(way, %s) as way
         from %s%s
         where %s
         ) as text
