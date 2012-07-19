@@ -321,7 +321,11 @@ def xml_layer(type="postgis", geom="point", interesting_tags = "*", sql = "true"
     intersection_SQL = '<Parameter name="intersect_max_scale">1</Parameter>'
   elif zoom > 16:
     intersection_SQL = '<Parameter name="intersect_min_scale">500000000000</Parameter>'
+  
+    
   if type == "postgis":
+    if zoom >= 5:
+        sql = '('+ sql + ') and way &amp;&amp; !bbox!'
     interesting_tags = list(interesting_tags)
     if '"' not in "".join(interesting_tags) and "->" not in "".join(interesting_tags):
       interesting_tags = "\", \"".join(interesting_tags)
