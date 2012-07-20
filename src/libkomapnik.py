@@ -212,7 +212,7 @@ def xml_cleantopo(zoom, x_scale, demramp):
   return """
 <Style name="elevation1z%s">
   <Rule>%s
-    <RasterSymbolizer>
+    <RasterSymbolizer mesh-size="1">
       <RasterColorizer default-mode="linear" epsilon="0.001">
         %s
       </RasterColorizer>
@@ -235,7 +235,7 @@ def xml_srtm(zoom, x_scale, demramp):
   return """
 <Style name="elevationz%s">
   <Rule>%s
-    <RasterSymbolizer>
+    <RasterSymbolizer mesh-size="1">
       <RasterColorizer default-mode="linear" epsilon="0.001">
         %s
      </RasterColorizer>
@@ -262,7 +262,7 @@ def xml_hillshade(zoom, x_scale):
   return """
 <Style name="hillshade%s">
   <Rule>%s
-    <RasterSymbolizer opacity="0.3">
+    <RasterSymbolizer opacity="0.3" mesh-size="1">
       <RasterColorizer  default-mode="linear">
         <stop value="0"   color="rgba(0,0,0,1)" />
         <stop value="128"   color="rgba(128,128,128,0.4)" />
