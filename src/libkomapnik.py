@@ -146,7 +146,7 @@ def xml_textsymbolizer(
     dy = 0
   
   return """
-  <TextSymbolizer name="%s" fontset_name="%s" size="%s" fill="%s" halo_fill= "%s" halo_radius="%s" placement="%s" dx="%s" dy="%s" max_char_angle_delta="17" allow_overlap="%s" wrap_width="%s" min_distance="%s" vertical_alignment="middle" horizontal_alignment="%s" opacity="%s" placement-type="simple" placements="%s" text-transform="%s" minimum-path-length="5" spacing="%s" />
+  <TextSymbolizer name="%s" fontset-name="%s" size="%s" fill="%s" halo-fill= "%s" halo-radius="%s" placement="%s" dx="%s" dy="%s" max-char-angle-delta="17" allow-overlap="%s" wrap-width="%s" min-distance="%s" vertical-alignment="middle" horizontal-alignment="%s" opacity="%s" placement-type="simple" placements="%s" text-transform="%s" minimum-path-length="5" spacing="%s" />
   """%(text,face,int(float(size)),color,halo_color,halo_radius,placement,dx,dy,overlap,wrap_width,distance,align,opacity,pos, transform, spacing)
 
 def xml_shieldsymbolizer(path="", width="", height="",
@@ -161,7 +161,7 @@ def xml_shieldsymbolizer(path="", width="", height="",
   if height:
     height =' height="%s" '%height
   return """
-    <ShieldSymbolizer file="%s%s" %s %s name="%s" fontset_name="%s" size="%s" fill="%s" halo_fill= "%s" halo_radius="%s" placement="%s" dy="%s" allow_overlap="%s" wrap_width="%s" min_distance="%s" horizontal_alignment="%s" opacity="%s" text-transform="%s" unlock-image="%s" spacing="%s" />
+    <ShieldSymbolizer file="%s%s" %s %s name="%s" fontset-name="%s" size="%s" fill="%s" halo-fill= "%s" halo-radius="%s" placement="%s" dy="%s" allow-overlap="%s" wrap-width="%s" min-distance="%s" horizontal-alignment="%s" opacity="%s" text-transform="%s" unlock-image="%s" spacing="%s" />
   """%(icons_path, \
     path, width, height,text,face,int(float(size)*text_scale),color,halo_color,halo_radius,placement,offset,overlap,wrap_width,distance,align,opacity, transform, unlock_image, spacing )
 
