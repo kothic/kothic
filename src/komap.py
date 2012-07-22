@@ -645,7 +645,7 @@ if options.renderer == "mapnik":
               oitags = '"'+ "\", \"".join(oitags) +'"'
               sqlz = """select %s, ST_LineMerge(ST_Union(way)) as way from (SELECT %s, ST_SnapToGrid(way, %s) as way from planet_osm_line where way &amp;&amp; !bbox! and (%s)) as tex
               group by %s
-              """%(itags, oitags,pixel_size_at_zoom(zoom, 0.7),sql,oitags)
+              """%(itags, oitags,pixel_size_at_zoom(zoom),sql,oitags)
               mfile.write(xml_layer("postgis-process", layer_type, itags, sqlz, zoom=zoom ))
             else:
               if roads:
