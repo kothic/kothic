@@ -640,11 +640,11 @@ if options.renderer == "mapnik":
                               #(SELECT %s, ST_Boundary(way) as way from planet_osm_polygon where (%s) and way &amp;&amp; !bbox! and ST_IsValid(way)  ) tex
                 #group by %s
                 #"""%(itags,oitags,sql,oitags)
-              ##elif layer_type == "line" and there_are_dashed_lines:
-              ##  sqlz = """select %s, ST_Union(way) as way from (SELECT * from planet_osm_line where way &amp;&amp; !bbox! #and (%s)) as tex
-              ##  group by %s
-              ##  """%(itags,sql,oitags)
-              #mfile.write(xml_layer("postgis-process", layer_type, itags, sqlz, zoom=zoom ))
+            elif layer_type == "line" and there_are_dashed_lines:
+              sqlz = """select %s, ST_LineMerge(ST_UnaryUnion(ST_SnapToGrid(ST_Collect(way),%s))) as way from (SELECT * from planet_osm_line where way &amp;&amp; !bbox! and (%s)) as tex
+              group by %s
+              """%(itags,pixel_size_at_zoom(zoom, 0.5),sql,oitags)
+              mfile.write(xml_layer("postgis-process", layer_type, itags, sqlz, zoom=zoom ))
             else:
               if roads:
                 layer_type = 'roads'
