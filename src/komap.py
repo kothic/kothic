@@ -641,6 +641,8 @@ if options.renderer == "mapnik":
                 #group by %s
                 #"""%(itags,oitags,sql,oitags)
             elif layer_type == "line" and there_are_dashed_lines:
+              itags = ", ".join(itags)
+              oitags = '"'+ "\", \"".join(oitags) +'"'
               sqlz = """select %s, ST_LineMerge(ST_UnaryUnion(ST_SnapToGrid(ST_Collect(way),%s))) as way from (SELECT * from planet_osm_line where way &amp;&amp; !bbox! and (%s)) as tex
               group by %s
               """%(itags,pixel_size_at_zoom(zoom, 0.5),sql,oitags)
