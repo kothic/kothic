@@ -640,7 +640,7 @@ if options.renderer == "mapnik":
                               #(SELECT %s, ST_Boundary(way) as way from planet_osm_polygon where (%s) and way &amp;&amp; !bbox! and ST_IsValid(way)  ) tex
                 #group by %s
                 #"""%(itags,oitags,sql,oitags)
-            elif layer_type == "line" and there_are_dashed_lines:
+            elif layer_type == "line" and there_are_dashed_lines and zoom < 10:
               itags = ", ".join(itags)
               oitags = '"'+ "\", \"".join(oitags) +'"'
               sqlz = """select %s, ST_LineMerge(ST_Union(way)) as way from (SELECT %s, ST_SnapToGrid(way, %s) as way from planet_osm_line where way &amp;&amp; !bbox! and (%s)) as tex
