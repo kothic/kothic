@@ -146,7 +146,7 @@ def xml_textsymbolizer(
     dy = 0
   
   return """
-  <TextSymbolizer fontset-name="%s" size="%s" fill="%s" halo-fill= "%s" halo-radius="%s" placement="%s" dx="%s" dy="%s" max-char-angle-delta="17" allow-overlap="%s" wrap-width="%s" min-distance="%s" vertical-alignment="middle" horizontal-alignment="%s" opacity="%s" placement-type="simple" placements="%s" text-transform="%s" minimum-path-length="5" spacing="%s">[%s]</TextSymbolizer>
+  <TextSymbolizer fontset-name="%s" size="%s" fill="%s" halo-fill= "%s" halo-radius="%s" placement="%s" dx="%s" dy="%s" max-char-angle-delta="17" allow-overlap="%s" wrap-width="%s" minimum-distance="%s" vertical-alignment="middle" horizontal-alignment="%s" opacity="%s" placement-type="simple" placements="%s" text-transform="%s" minimum-path-length="5" spacing="%s">[%s]</TextSymbolizer>
   """%(face,int(float(size)),color,halo_color,halo_radius,placement,dx,dy,overlap,wrap_width,distance,align,opacity,pos, transform, spacing,text)
 
 def xml_shieldsymbolizer(path="", width="", height="",
@@ -161,7 +161,7 @@ def xml_shieldsymbolizer(path="", width="", height="",
   if height:
     height =' height="%s" '%height
   return """
-    <ShieldSymbolizer file="%s%s" %s %s fontset-name="%s" size="%s" fill="%s" halo-fill= "%s" halo-radius="%s" placement="%s" dy="%s" allow-overlap="%s" wrap-width="%s" min-distance="%s" horizontal-alignment="%s" opacity="%s" text-transform="%s" unlock-image="%s" spacing="%s">[%s]</ShieldSymbolizer>
+    <ShieldSymbolizer file="%s%s" %s %s fontset-name="%s" size="%s" fill="%s" halo-fill= "%s" halo-radius="%s" placement="%s" dy="%s" allow-overlap="%s" wrap-width="%s" minimum-distance="%s" horizontal-alignment="%s" opacity="%s" text-transform="%s" unlock-image="%s" spacing="%s">[%s]</ShieldSymbolizer>
   """%(icons_path, \
     path, width, height,face,int(float(size)*text_scale),color,halo_color,halo_radius,placement,offset,overlap,wrap_width,distance,align,opacity, transform, unlock_image, spacing,text )
 
@@ -180,7 +180,7 @@ def xml_start(bgcolor="transparent"):
     bgcolor = nicecolor(bgcolor)
   return """<?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE Map>
-<Map bgcolor="%s" srs="%s" minimum-version="0.7.1" buffer-size="512" maximum-extent="-20037508.342789244,-20037508.342780735,20037508.342789244,20037508.342780709" >
+<Map background-color="%s" srs="%s" minimum-version="0.7.1" buffer-size="512" maximum-extent="-20037508.342789244,-20037508.342780735,20037508.342789244,20037508.342780709" >
 """%(bgcolor, map_proj)
 
 def xml_end():
