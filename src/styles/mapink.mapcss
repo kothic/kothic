@@ -1,21 +1,34 @@
   
-canvas{fill-color:#F1EEE8} 
+canvas{fill-color:#B5D0D0} 
  
 area[natural=ocean]{fill-color:#B5D0D0}
+area[natural=coastline]{fill-color:#F1EEE8}
 
-line|z3[boundary=administrative][admin_level=2] {color:#B2B0AE; width:.3}
-line|z4-6[boundary=administrative][admin_level=2] {color:#9d6c9d; width:.4}
-line|z7-[boundary=administrative][admin_level=2] {color:#9d6c9d; width: 1}
+
+area|z10-[landuse=military]{fill-color:#F1EEE8; z-index:100}
+
+
+line|z2-3[boundary=administrative][admin_level=2]       {color:#B2B0AE; width:.3}
+line|z4-6[boundary=administrative][admin_level=2]       {color:#9d6c9d; width:.5}
+line|z7-[boundary=administrative][admin_level=2]        {color:#9d6c9d; width: 1}
+line|z10-[boundary=administrative][admin_level=2]::halo {color:#9d6c9d; width: 6; opacity:0.3}
 line|z4-6[boundary=administrative][admin_level=3] {color:#9d6c9d; width:.3}
 line|z7-[boundary=administrative][admin_level=3] {color:#9d6c9d; width:.5}
 line|z4-6[boundary=administrative][admin_level=4] {color:#9d6c9d; width:.2}
 line|z7-[boundary=administrative][admin_level=4] {color:#9d6c9d; width:.3}
 
-node|z3-6[place=country]{text-color:#9d6c9d; 
+node|z2-4[place=country]{text-color:#9d6c9d; 
 text: name; collision-sort-by: population; font-size: 10,9,8,7; 
 text-halo-radius: 1; text-halo-color: white;
 -x-mapnik-min-distance: 5; max-width: 20; z-index: 15
 }
+
+node|z5-6[place=country]{text-color:#9d6c9d; 
+text: name; collision-sort-by: population; font-size: 12,11,10,9,8,7; 
+text-halo-radius: 1.5; text-halo-color: white;
+-x-mapnik-min-distance: 5; max-width: 20; z-index: 15
+}
+
 
 node|z4[place=state]{text-color:#9d6c9d; 
 font-family: "DejaVu Sans Oblique";
@@ -26,9 +39,9 @@ text-halo-radius: 1; text-halo-color: white;
 
 node|z5-6[place=state]{text-color:#9d6c9d; 
 font-family: "DejaVu Sans Oblique";
-text: name; collision-sort-by: population; font-size: 9,8,7; 
+text: name; collision-sort-by: population; font-size: 9,8,7,6; 
 text-halo-radius: 1; text-halo-color: white;
--x-mapnik-min-distance: 2; max-width: 20; z-index: 10
+-x-mapnik-min-distance: 3; max-width: 30; z-index: 10
 }
 
 node|z7-[place=state]{text-color:#9d6c9d; 
@@ -37,8 +50,6 @@ text: name; collision-sort-by: population; font-size: 11,10,9,8,7;
 text-halo-radius: 1; text-halo-color: white;
 -x-mapnik-min-distance: 2; max-width: 80; z-index: 10
 }
-
-
 
 node|z3-4[place=city]{text-color:grey; 
 text: name; collision-sort-by: population; font-size: 9,8,7; 
@@ -49,18 +60,18 @@ text-halo-radius: 1; text-halo-color: white;
 node|z5[place=city]{text-color:black; 
 text: name; collision-sort-by: population; font-size: 9,8,7; 
 text-halo-radius: 1; text-halo-color: white;
--x-mapnik-min-distance: 5; max-width: 20; z-index: 5
+-x-mapnik-min-distance: 7; max-width: 20; z-index: 5
 }  
 
-node|z7-[place=city][capital?]
+node|z6-8[place=city][capital?]
 {text-color:black; 
 text: name; collision-sort-by: population; font-size: 13,12,11,10,9,8,7; 
 text-halo-radius: 1; text-halo-color: white;
--x-mapnik-min-distance: 25; max-width: 20; z-index: 5
+-x-mapnik-min-distance: 2; max-width: 20; z-index: 7
 }
 
 
-node|z6-[place=city][!capital?]
+node|z6-8[place=city][!capital?]
 {text-color:black; 
 text: name; collision-sort-by: population; font-size: 9,8,7; 
 text-halo-radius: 1; text-halo-color: white;
@@ -74,25 +85,64 @@ text-halo-radius: 1; text-halo-color: white;
 -x-mapnik-min-distance: 5; max-width: 20; z-index: 5
 }
 
+node|z9-[place=city]
+{text-color:black; 
+text: name; collision-sort-by: population; font-size: 12,11,10,9,8,7; 
+text-halo-radius: 1; text-halo-color: white;
+-x-mapnik-min-distance: 2; max-width: 20; z-index: 7
+}
+
+
+node|z10-[place=village]
+{text-color:black; 
+text: name; collision-sort-by: population; font-size: 7,6,5; 
+text-halo-radius: 1; text-halo-color: white;
+-x-mapnik-min-distance: 2; max-width: 20; z-index: 7
+}
+
 
 line|z5-6[highway=motorway]{color: #d6dfea; width: 0.35}
-line|z7[highway=motorway]{color: #809bc0; width: 1}
-line|z8-[highway=motorway]{color: #809bc0; width: 1; casing-width:0;
-casing-color:#F1EEE8}
-line|z5-6[highway=trunk]   {color: #cdeacd; width: 0.35}
-line|z7[highway=trunk]     {color: #a9dba9; width: 1}
-line|z8-[highway=trunk]    {color: #a9dba9; width: 1; casing-width:3;
-casing-color:#F1EEE8}
+line|z7[highway=motorway]  {color: #809bc0; width: 1}
+line|z8[highway=motorway]  {color: #809bc0; width: 1}
+line|z9-[highway=motorway] {color: #809bc0; width: 1.5}
+area|z14-[area:highway=motorway]   {fill-color: #809bc0}
+
+line|z5-6[highway=trunk]      {color: #cdeacd; width: 0.35}
+line|z7[highway=trunk]        {color: #a9dba9; width: 1; casing-width:.3; casing-color:#F1EEE8}
+line|z8[highway=trunk]        {color: #a9dba9; width: 1; casing-width:3; casing-color:#F1EEE8}
+line|z9-[highway=trunk]       {color: #98D296; width: 1.5; casing-width:1; casing-color:#F1EEE8}
+line|z10-[highway=trunk_link] {color: #98D296; width: 1.5; casing-width:1; casing-color:#F1EEE8}
+area|z14-[area:highway=trunk]   {fill-color: #98D296}
+
+
 line|z7[highway=primary]    {color: #ec989a; width: 0.5}
-line|z8-[highway=primary]   {color: #ec989a; width: 0.5; casing-width:1;
-casing-color:#F1EEE8}
+line|z8[highway=primary]    {color: #ec989a; width: 0.5; casing-width:1; casing-color:#F1EEE8}
+line|z9-[highway=primary]   {color: #ec989a; width: 1.2}
+area|z14-[area:highway=primary]   {fill-color: #ec989a}
 
+line|z9-[highway=secondary]   {color: #fed7a5; width: 1.2}
+area|z14-[area:highway=secondary]   {fill-color: #fed7a5}
 
-line|z6-[railway=rail]    {color: grey; width: 0.35}
+line|z10-[highway=tertiary],
+line|z10-[highway=tertiary_link],
+line|z10-[highway=residential],
+line|z10-[highway=unclassified],
+line|z10-[highway=living_street] {color: #BCBCBC; width: .7}
 
+ 
+ 
+ 
+ 
+line|z6-9[railway=rail]    {color: grey; width: 0.27}
+line|z10-[railway=rail]    {color: #aaa; width: 1}
+ 
 area|z6-[natural=water],
 area|z6-[waterway=riverbank],
+area|z8-[landuse=reservoir],
 {fill-color:#B5D0D0}
+
+line|z9-[waterway=river]{color:#B5D0D0; width:1.2}
+
 
 area|z8-[landuse=forest],
 area|z8-[natural=wood]
@@ -105,5 +155,27 @@ area|z8-[place=hamlet]
 {fill-color:#dddddd; fill-position: background}
 
 
-area|z7-[boundary=national_park]{fill-color:#E5E8DD;fill-position:background}
+area|z7-[boundary=national_park]{fill-color:#E5E8DD;fill-position:background; color:green; width:.3; dashes:2,2}
 
+area|z8-[boundary=national_park]{text: name; font-family: DejaVu Sans Bold; font-size:8; 
+text-halo-radius: 1.5; text-halo-color: white; text-color: #9c9; z-index:6; max-width: 40}
+
+
+line|z7-[route=ferry] {color:#66f; width:0.4; dashes:4,4; z-index:5}
+
+
+area|z9-[landuse=farmland],
+area|z9-[landuse=farm]{fill-color:#E9D8BD;fill-position:background}
+
+area|z10-[landuse=construction],
+area|z10-[landuse=brownfield]{fill-color:#B3B592;fill-position:background}
+
+area|z10-[landuse=industrial]{fill-color:#DED1D5;fill-position:background}
+area|z10-[landuse=grass]{fill-color:#CEEBA8;fill-position:background}
+area|z10-[leisure=park]{fill-color:#CCF5C9;fill-position:background}
+
+area|z12-[building][building!=no][building!=planned]{fill-color:#C1B0AE}
+
+area|z15-[building]{text: addr:housenumber;
+font-size:8; 
+text-halo-radius: 1; text-halo-color: white; text-position:line; -x-mapnik-snap-to-street: true}
