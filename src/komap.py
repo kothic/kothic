@@ -641,7 +641,7 @@ if options.renderer == "mapnik":
                 #group by %s
                 #"""%(itags,oitags,sql,oitags)
             elif layer_type == "line" and there_are_dashed_lines and zoom < 10:
-              itags = ", ".join(itags)
+              itags = ", ".join(itags) # FIXME: wrong when working with hstore
               oitags = '"'+ "\", \"".join(oitags) +'"'
               sqlz = """select %s, ST_LineMerge(ST_Union(way)) as way from (SELECT %s, ST_SnapToGrid(way, %s) as way from planet_osm_line where way &amp;&amp; !bbox! and (%s)) as tex
               group by %s

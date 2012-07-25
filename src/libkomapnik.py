@@ -146,7 +146,7 @@ def xml_textsymbolizer(
     dy = 0
   
   return """
-  <TextSymbolizer fontset-name="%s" size="%s" fill="%s" halo-fill= "%s" halo-radius="%s" placement="%s" dx="%s" dy="%s" max-char-angle-delta="17" allow-overlap="%s" wrap-width="%s" min_distance="%s" vertical-alignment="middle" horizontal-alignment="%s" opacity="%s" placement-type="simple" placements="%s" text-transform="%s" minimum-path-length="5" spacing="%s">[%s]</TextSymbolizer>
+  <TextSymbolizer fontset-name="%s" size="%s" fill="%s" halo-fill= "%s" halo-radius="%s" placement="%s" dx="%s" dy="%s" max-char-angle-delta="17" allow-overlap="%s" wrap-width="%s" min-distance="%s" vertical-alignment="middle" horizontal-alignment="%s" opacity="%s" placement-type="simple" placements="%s" text-transform="%s" minimum-path-length="5" spacing="%s">[%s]</TextSymbolizer>
   """%(face,int(float(size)),color,halo_color,halo_radius,placement,dx,dy,overlap,wrap_width,distance,align,opacity,pos, transform, spacing,text)
 
 def xml_shieldsymbolizer(path="", width="", height="",
@@ -161,7 +161,7 @@ def xml_shieldsymbolizer(path="", width="", height="",
   if height:
     height =' height="%s" '%height
   return """
-    <ShieldSymbolizer file="%s%s" %s %s fontset-name="%s" size="%s" fill="%s" halo-fill= "%s" halo-radius="%s" placement="%s" dy="%s" allow-overlap="%s" wrap-width="%s" min_distance="%s" horizontal-alignment="%s" opacity="%s" text-transform="%s" unlock-image="%s" spacing="%s">[%s]</ShieldSymbolizer>
+    <ShieldSymbolizer file="%s%s" %s %s fontset-name="%s" size="%s" fill="%s" halo-fill= "%s" halo-radius="%s" placement="%s" dy="%s" allow-overlap="%s" wrap-width="%s" min-distance="%s" horizontal-alignment="%s" opacity="%s" text-transform="%s" unlock-image="%s" spacing="%s">[%s]</ShieldSymbolizer>
   """%(icons_path, \
     path, width, height,face,int(float(size)*text_scale),color,halo_color,halo_radius,placement,offset,overlap,wrap_width,distance,align,opacity, transform, unlock_image, spacing,text )
 
@@ -286,30 +286,11 @@ def xml_hillshade(zoom, x_scale):
       
 def xml_hardcoded_arrows():
   return """
-  <LineSymbolizer>
-    <CssParameter name="stroke">#6c70d5</CssParameter>
-    <CssParameter name="stroke-width">1</CssParameter>
-    <CssParameter name="stroke-linejoin">bevel</CssParameter>
-    <CssParameter name="stroke-dasharray">0,12,10,152</CssParameter>
-  </LineSymbolizer>
-  <LineSymbolizer>
-    <CssParameter name="stroke">#6c70d5</CssParameter>
-    <CssParameter name="stroke-width">2</CssParameter>
-    <CssParameter name="stroke-linejoin">bevel</CssParameter>
-    <CssParameter name="stroke-dasharray">0,12,9,153</CssParameter>
-  </LineSymbolizer>
-  <LineSymbolizer>
-    <CssParameter name="stroke">#6c70d5</CssParameter>
-    <CssParameter name="stroke-width">3</CssParameter>
-    <CssParameter name="stroke-linejoin">bevel</CssParameter>
-    <CssParameter name="stroke-dasharray">0,18,2,154</CssParameter>
-  </LineSymbolizer>
-  <LineSymbolizer>
-    <CssParameter name="stroke">#6c70d5</CssParameter>
-    <CssParameter name="stroke-width">4</CssParameter>
-    <CssParameter name="stroke-linejoin">bevel</CssParameter>
-    <CssParameter name="stroke-dasharray">0,18,1,155</CssParameter>
-  </LineSymbolizer>"""
+  <LineSymbolizer stroke="#6c70d5" stroke-width="1" stroke-linejoin="bevel" stroke-dasharray="0,12,10,152" />
+  <LineSymbolizer stroke="#6c70d5" stroke-width="2" stroke-linejoin="bevel" stroke-dasharray="0,12,9,153" />
+  <LineSymbolizer stroke="#6c70d5" stroke-width="3" stroke-linejoin="bevel" stroke-dasharray="0,18,2,154" />
+  <LineSymbolizer stroke="#6c70d5" stroke-width="4" stroke-linejoin="bevel" stroke-dasharray="0,18,1,155" />
+"""
 
 def xml_layer(type="postgis", geom="point", interesting_tags = "*", sql = "true", zoom=0 ):
   layer_id = get_id(1)
