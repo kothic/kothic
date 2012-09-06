@@ -350,9 +350,7 @@ if options.renderer == "mapnik":
         (color, opacity) = demcolors[ele]
         demramp["ocean"] += '<stop value="%s"  color="rgba(%s,%s,%s,%s)"/>' %(ele+10701, int(color[1:3],16), int(color[3:5],16), int(color[5:7],16), opacity)
         demramp["ground"] += '<stop value="%s"  color="rgba(%s,%s,%s,%s)"/>' %(ele, int(color[1:3],16), int(color[3:5],16), int(color[5:7],16), opacity)
-        
-            
-    
+
     if demhack and zoom >= 7:
       xml = xml_cleantopo(zoom, x_scale, demramp["ocean"])
       mfile.write(xml)

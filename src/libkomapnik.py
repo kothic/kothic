@@ -196,7 +196,6 @@ def xml_style_start():
   <Style name="s%s">"""%(layer_id)
 
 def xml_style_end():
-
   return """
   </Style>"""
 
@@ -310,6 +309,8 @@ def xml_layer(type="postgis", geom="point", interesting_tags = "*", sql = "true"
         waystring = "ST_Simplify(way, %s) as way"%(pixel_size_at_zoom(zoom,0.6))
         if zoom >= 5:
             sql = 'way &amp;&amp; !bbox! and '+ sql
+        if geom == "polygon":
+            sql = 'way_area &gt; %s and '%(pixel_size_at_zoom(zoom,0.1)**2)+ sql
     interesting_tags = list(interesting_tags)
     if '"' not in "".join(interesting_tags) and "->" not in "".join(interesting_tags):
       interesting_tags = "\", \"".join(interesting_tags)
