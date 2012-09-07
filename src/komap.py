@@ -447,7 +447,7 @@ if options.renderer == "mapnik":
         there_are_dashed_lines = False
         itags_g = set()
         xml_g = ""
-        roads = (layer_type == 'line') and (zoom < 9) # whether to use planet_osm_roads
+        roads = (layer_type == 'line') # whether to use planet_osm_roads
         ## casings pass
         for zindex in ta:
           sql = set()
