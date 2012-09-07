@@ -17,6 +17,7 @@
 
 
 import os
+import math
 from debug import debug, Timer
 
 from mapcss.webcolors.webcolors import whatever_to_hex as nicecolor
@@ -63,7 +64,7 @@ def pixel_size_at_zoom(z, l=1):
   """
   Converts l pixels on tiles into length on zoom z
   """
-  return l* 20037508.342789244 / 256 * 2 / (2**z)
+  return int(math.ceil(l* 20037508.342789244 / 256 * 2 / (2**z)))
 
 
 def xml_fontset(name, unicode=True):
@@ -323,10 +324,11 @@ def xml_layer(type="postgis", geom="point", interesting_tags = "*", sql = "true"
       %s
       <Datasource>
         <Parameter name="table">
-        (select %s, %s
+        ( -- zoom %s
+        select %s, %s
         from %s%s
         where %s
-        ) as text
+        ) as k_layer
         </Parameter>
         %s
         <Parameter name="type">postgis</Parameter>
@@ -339,15 +341,16 @@ def xml_layer(type="postgis", geom="point", interesting_tags = "*", sql = "true"
         <Parameter name="estimate_extent">false</Parameter>
         <Parameter name="extent">-20037508.342789244, -20037508.342780735, 20037508.342789244, 20037508.342780709</Parameter>
       </Datasource>
-    </Layer>"""%(layer_id, db_proj, subs, interesting_tags, waystring, table_prefix, geom, sql, intersection_SQL, db_user, db_name, db_srid,  table_prefix, geom)
+    </Layer>"""%(layer_id, db_proj, subs, zoom, interesting_tags, waystring, table_prefix, geom, sql, intersection_SQL, db_user, db_name, db_srid,  table_prefix, geom)
   elif type == "postgis-process":
     return """
     <Layer name="l%s" status="on" srs="%s">
       %s
       <Datasource>
         <Parameter name="table">
-        (%s
-        ) as text
+        ( -- zoom %s
+        %s
+        ) as k_layer
         </Parameter>
         %s
         <Parameter name="type">postgis</Parameter>
@@ -360,7 +363,7 @@ def xml_layer(type="postgis", geom="point", interesting_tags = "*", sql = "true"
         <Parameter name="estimate_extent">false</Parameter>
         <Parameter name="extent">-20037508.342789244, -20037508.342780735, 20037508.342789244, 20037508.342780709</Parameter>
       </Datasource>
-    </Layer>"""%(layer_id, db_proj, subs, sql, intersection_SQL, db_user, db_name, db_srid,  table_prefix, geom)
+    </Layer>"""%(layer_id, db_proj, subs, zoom, sql, intersection_SQL, db_user, db_name, db_srid,  table_prefix, geom)
   elif type == "coast":
     if zoom < 9:
       return """
