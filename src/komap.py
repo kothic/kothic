@@ -517,7 +517,7 @@ if options.renderer == "mapnik":
           there_are_dashed_lines = False
           there_are_line_patterns = False
           itags_g = set()
-          roads = (layer_type == 'line') and (zoom < 9) # whether to use planet_osm_roads
+          roads = (layer_type == 'line')# whether to use planet_osm_roads
           xml_g = ""
         
           sql = set()
