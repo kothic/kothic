@@ -837,7 +837,7 @@ if options.renderer == "mapnik":
                   neitags = add_numerics_to_itags(fitags, escape = False) # for complex polygons, no escapng needed
                   del fitags
 
-                  ttext = " OR ".join(['"'+i+ "\" is not NULL " for i in texttags])
+                  ttext = " OR ".join([escape_sql_column(i)+ " is not NULL" for i in texttags])
 
                   if placement == "center" and layer_type == "polygon" and snap_to_street == 'false':
                     sqlz = " OR ".join(sql)
