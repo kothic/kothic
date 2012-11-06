@@ -237,9 +237,9 @@ if options.renderer == "mapnik":
 #    a = "replace(" + a + ", '"+ i+ j + "', '"+ i+ k + "')"
   elif locale == "be":
     columnmap["name"] =  ("""COALESCE("name:be", 
-      (select kot__nab from (select "name:be" as kot__nab, name as kot__name from %sline) z where kot__name = name and kot__nab is not null order by st_distance(way, !bbox!) limit 1), 
-      (select kot__nab from (select "name:be" as kot__nab, name as kot__name from %spoint) z where kot__name = name and kot__nab is not null order by st_distance(way, !bbox!) limit 1),
-      (select kot__nab from (select "name:be" as kot__nab, name as kot__name from %spolygon) z where kot__name = name and kot__nab is not null order by st_distance(way, !bbox!) limit 1), 
+      (select kot__nab from (select "name:be" as kot__nab, name as kot__name, way as kot__way from %sline) z where kot__name = name and kot__nab is not null order by st_distance(kot__way, !bbox!) limit 1), 
+      (select kot__nab from (select "name:be" as kot__nab, name as kot__name, way as kot__way from %spoint) z where kot__name = name and kot__nab is not null order by st_distance(kot__way, !bbox!) limit 1),
+      (select kot__nab from (select "name:be" as kot__nab, name as kot__name, way as kot__way from %spolygon) z where kot__name = name and kot__nab is not null order by st_distance(kot__way, !bbox!) limit 1), 
       "name:ru",
       "int_name",
       "name:en",
