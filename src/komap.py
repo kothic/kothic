@@ -216,7 +216,6 @@ if options.renderer == "mapnik":
     columnmap["name"] = (u"""COALESCE(
     "name:en",
     "int_name",
-    
     replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace
     (replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace
     (replace(replace
@@ -237,7 +236,15 @@ if options.renderer == "mapnik":
 #  for j, k in [("Е", "Ie"), ("Ё", "Io"), ("Ю", "Iu"), ("Я", "Ia"), ("е", "ie"), ("ё", "io"), ("ю", "iu"), ("я", "ia")]:
 #    a = "replace(" + a + ", '"+ i+ j + "', '"+ i+ k + "')"
   elif locale == "be":
-    columnmap["name"] =  ('COALESCE("name:be", "name:ru", "int_name", "name:en", "name") AS name',('name:be', "name:ru", "int_name", "name:en"))
+    columnmap["name"] =  ("""COALESCE("name:be", 
+      (select kot__nab from (select "name:be" as kot__nab, name as kot__name, way as kot__way from %sline) z where kot__name = name and kot__nab is not null order by st_distance(way, kot__way) limit 1), 
+      (select kot__nab from (select "name:be" as kot__nab, name as kot__name, way as kot__way from %spoint) z where kot__name = name and kot__nab is not null order by st_distance(way, kot__way) limit 1),
+      (select kot__nab from (select "name:be" as kot__nab, name as kot__name, way as kot__way from %spolygon) z where kot__name = name and kot__nab is not null order by st_distance(way, kot__way) limit 1), 
+      "name:ru",
+      "int_name",
+      "name:en",
+      "name"
+    ) AS name"""%(table_prefix,table_prefix,table_prefix),('name:be', "name:ru", "int_name", "name:en"))
   elif locale and ("name:"+locale in osm2pgsql_avail_keys or not osm2pgsql_avail_keys):
     columnmap["name"] =  ('COALESCE("name:'+locale+'", "name") AS name',('name:'+locale,))
   elif locale:
