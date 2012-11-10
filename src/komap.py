@@ -444,10 +444,11 @@ if options.renderer == "mapnik":
         "[boundary] = 'administrative'",
         "[railway] "
         ])
-      for r in roads:
-        if r in rulestring:
-          return True
-      return False
+      for a in rulestring.split(') or ('):
+        for r in roads:
+          if r not in a:
+            return False
+      return True
     for zlayer in index_range:
       for layer_type, entry_types in [("line",("way", "line")),("polygon",("way","area"))]:
         sql_g = set()
