@@ -16,6 +16,7 @@
 #   along with kothic.  If not, see <http://www.gnu.org/licenses/>.
 
 import os
+import sqlite3
 import sys
 from lxml import etree
 from twms import projections
@@ -31,6 +32,8 @@ except ImportError:
   pass
 
 MAXZOOM = 16
+TEMPORARY_FILE_PATH = 'temp_file.bin'
+
 proj = "EPSG:4326"
 
 style = Styling()
@@ -58,7 +61,7 @@ def tilelist_by_geometry(way, start_zoom = 0, ispoly = False):
 
 def pix_distance(a,b,z):
   """
-  Calculates onscreen disatnce between 2 points on given zoom.
+  Calculates onscreen distance between 2 points on given zoom.
   """
   return 2**z*256*(((a[0]-b[0])/360.)**2+((a[1]-b[1])/180.)**2)**0.5
 
@@ -69,6 +72,25 @@ def sanitize(string):
   return string
 
 print sanitize (" ;=")
+
+def initDB(filename):
+  conn = sqlite3.connect(filename)
+  c = conn.cursor()
+  # create table
+  c.execute('''CREATE TABLE nodes (id integer, lat real, lon real)''')
+  # create index in the id column
+  # - this makes node id lookup MUCH faster
+  c.execute('''CREATE INDEX id_idx ON nodes(id)''')
+  return conn
+
+def storeNode(conn, id, lat, lon):
+#  conn.execute("INSERT INTO nodes VALUES ('%d', %f, %f)" % (id, lat, lon))
+  conn.execute("INSERT INTO nodes(id, lat, lon) values (?, ?, ?)", (id, lat, lon))
+
+def getNode(conn, id):
+#  conn.execute("SELECT * FROM nodes WHERE id = '%s'" % id)
+  return conn.execute("SELECT lat, lon FROM nodes WHERE id = '%s'" % id).fetchone()
+
 def main ():
   DROPPED_POINTS = 0
   WAYS_WRITTEN = 0
@@ -78,7 +100,13 @@ def main ():
   tilefiles_hist = []
   #osm_infile = open("minsk.osm", "rb")
   osm_infile = sys.stdin
-  nodes = {}
+
+  # remove any stale temporary files
+  if os.path.exists(TEMPORARY_FILE_PATH):
+    os.remove(TEMPORARY_FILE_PATH)
+  conn = initDB(TEMPORARY_FILE_PATH)
+
+#  nodes = {}
   curway = []
   tags = {}
   context = etree.iterparse(osm_infile)
@@ -88,13 +116,22 @@ def main ():
       NODES_READ += 1
       if NODES_READ % 10000 == 0:
         print "Nodes read:", NODES_READ
-      nodes[int(items["id"])] = (float(items["lon"]), float(items["lat"]))
+        print len(curway), len(tags), len(tilefiles), len(tilefiles_hist)
+      if NODES_READ % 100000 == 0:
+        conn.commit()
+        print "flushing to temporary storage"
+
+#      nodes[str(items["id"])] = (float(items["lon"]), float(items["lat"]))
+      storeNode(conn, int(items["id"]), float(items["lon"]), float(items["lat"]))
       tags = {}
     elif elem.tag == "nd":
-      try:
-        curway.append(nodes[int(items["ref"])])
-      except KeyError:
-        pass
+      result = getNode(conn, int(items["ref"]))
+      if result:
+        curway.append(result)
+#      try:
+#        curway.append(nodes[str(items["ref"])])
+#      except KeyError:
+#        pass
     elif elem.tag == "tag":
       tags[sanitize(items["k"])] = sanitize(items["v"])
     elif elem.tag == "way":
@@ -162,10 +199,21 @@ def main ():
       curway = []
       tags = {}
     elem.clear()
+    # extra insurance
+    del elem
         #user = default_user
         #ts = ""
   print "Tiles generated:",len(tilefiles)
   print "Nodes dropped when generalizing:", DROPPED_POINTS
-  print "Nodes in memory:", len(nodes)
+#  print "Nodes in memory:", len(nodes)
+  c = conn.cursor()
+  c.execute('SELECT * from nodes')
+  print "Nodes in memory:", len(c.fetchall())
+
+  # report temporary file size
+  print "Temporary file size:", os.path.getsize(TEMPORARY_FILE_PATH)
+
+  # remove temporary files
+  os.remove(TEMPORARY_FILE_PATH)
 
 main()
