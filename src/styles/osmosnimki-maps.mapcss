@@ -2148,49 +2148,49 @@ width: 0.5; color: #808080; dashes: 2,2; opacity:0.3; z-index:16}*/
 line|z13-[railway=tram]{pattern-image:"rway44.png";z-index:17}
 
 
-node|z11-14[railway=station][transport!=subway][station!=subway]
+node|z11-14[railway=station][railway!=subway][station!=subway]
 {icon-image:"rw_stat_stanzii_2_blue.png";
 text:name; text-offset:7; font-size:9;
 font-family: "DejaVu Sans Mono Book"; text-halo-radius:1;
 text-color:#000d6c;text-halo-color:#ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0}
 
-node|z15-[railway=station][transport!=subway][station!=subway]
+node|z15-[railway=station][railway!=subway][station!=subway]
 {icon-image:"rw_stat_stanzii_2_blue.png";
 text:name; text-offset:7; font-size:9; font-family: "DejaVu Sans Mono Book"; text-halo-radius:1; text-color:#000d6c;text-halo-color:#ffffff; text-allow-overlap: false; -x-mapnik-min-distance:0}
 
 /*     Minsk        */
-node|z12-15[railway=station][transport=subway][colour=red][operator=Минский метрополитен] {icon-image:"minsk_metro_red.png"; z-index:17;}
-node|z12-15[railway=station][transport=subway][colour=blue][operator=Минский метрополитен]{icon-image:"minsk_metro_blue.png"; z-index:17;}
+node|z12-15[railway=station][railway=subway][colour=red][operator=Минский метрополитен] {icon-image:"minsk_metro_red.png"; z-index:17;}
+node|z12-15[railway=station][railway=subway][colour=blue][operator=Минский метрополитен]{icon-image:"minsk_metro_blue.png"; z-index:17;}
 
 
 /*     Vienna       */
-node|z12-15[railway=station][transport=subway][colour=red][operator=Wiener Linien]{icon-image:"vienna-ubahn-red.png";z-index:17;}
-node|z12-15[railway=station][transport=subway][colour=orange][operator=Wiener Linien]{icon-image:"vienna-ubahn-orange.png";z-index:17;}
-node|z12-15[railway=station][transport=subway][colour=purple][operator=Wiener Linien]{icon-image:"vienna-ubahn-purple.png";z-index:17;}
-node|z12-15[railway=station][transport=subway][colour=green][operator=Wiener Linien]{icon-image:"vienna-ubahn-green.png";z-index:17;}
-node|z12-15[railway=station][transport=subway][colour=brown][operator=Wiener Linien]{icon-image:"vienna-ubahn-brown.png";z-index:17;}
-node|z12-15[railway=station][transport=subway][!colour][operator=Wiener Linien]{icon-image:"vienna-ubahn-blue.png";z-index:17;}
+node|z12-15[railway=station][railway=subway][colour=red][operator=Wiener Linien]{icon-image:"vienna-ubahn-red.png";z-index:17;}
+node|z12-15[railway=station][railway=subway][colour=orange][operator=Wiener Linien]{icon-image:"vienna-ubahn-orange.png";z-index:17;}
+node|z12-15[railway=station][railway=subway][colour=purple][operator=Wiener Linien]{icon-image:"vienna-ubahn-purple.png";z-index:17;}
+node|z12-15[railway=station][railway=subway][colour=green][operator=Wiener Linien]{icon-image:"vienna-ubahn-green.png";z-index:17;}
+node|z12-15[railway=station][railway=subway][colour=brown][operator=Wiener Linien]{icon-image:"vienna-ubahn-brown.png";z-index:17;}
+node|z12-15[railway=station][railway=subway][!colour][operator=Wiener Linien]{icon-image:"vienna-ubahn-blue.png";z-index:17;}
 
 
 /*     Prague       */
-node|z12-15[railway=station][transport=subway][colour=red][operator=cz:DPP]{icon-image:"praha-metro-red.png";z-index:17;}
-node|z12-15[railway=station][transport=subway][colour=yellow][operator=cz:DPP]{icon-image:"praha-metro-yellow.png";z-index:17;}
-node|z12-15[railway=station][transport=subway][colour=green][operator=cz:DPP]{icon-image:"praha-metro-green.png";z-index:17;}
+node|z12-15[railway=station][railway=subway][colour=red][operator=cz:DPP]{icon-image:"praha-metro-red.png";z-index:17;}
+node|z12-15[railway=station][railway=subway][colour=yellow][operator=cz:DPP]{icon-image:"praha-metro-yellow.png";z-index:17;}
+node|z12-15[railway=station][railway=subway][colour=green][operator=cz:DPP]{icon-image:"praha-metro-green.png";z-index:17;}
 
 
 /*     Ekaterinburg */
-node|z12-15[railway=station][transport=subway][colour=green][operator=ЕМУП «Екатеринбургский метрополитен»]{icon-image:"ekaterinburg-metro-green.png";z-index:17;}
-node|z12-15[railway=station][transport=subway][colour=green][operator=Екатеринбургский метрополитен]{icon-image:"ekaterinburg-metro-green.png";z-index:17;}
+node|z12-15[railway=station][railway=subway][colour=green][operator=ЕМУП «Екатеринбургский метрополитен»]{icon-image:"ekaterinburg-metro-green.png";z-index:17;}
+node|z12-15[railway=station][railway=subway][colour=green][operator=Екатеринбургский метрополитен]{icon-image:"ekaterinburg-metro-green.png";z-index:17;}
 
 /*  Others  */
-node|z12[railway=station][transport=subway][!colour] {icon-image:"metro_others6_copy.png";z-index:17;}
-node|z13[railway=station][transport=subway][!colour] {icon-image:"metro_others12_z.png";z-index:17;}
-node|z14-15[railway=station][transport=subway][!colour] {icon-image:"metro_others6.png";z-index:17;}
-node|z13-14[railway=station][transport=subway]::label
+node|z12[railway=station][railway=subway][!colour] {icon-image:"metro_others6_copy.png";z-index:17;}
+node|z13[railway=station][railway=subway][!colour] {icon-image:"metro_others12_z.png";z-index:17;}
+node|z14-15[railway=station][railway=subway][!colour] {icon-image:"metro_others6.png";z-index:17;}
+node|z13-14[railway=station][railway=subway]::label
 {text:name; text-offset:13; font-size:9; font-family: "DejaVu Sans Book"; text-halo-radius:1.5;
 text-color:#BE1E2D;text-halo-color:#ffffff; text-allow-overlap: false;
 -x-mapnik-min-distance:0; text-placement:any; z-index:20}
-node|z15[railway=station][transport=subway]::label {text:name; text-offset:13;
+node|z15[railway=station][railway=subway]::label {text:name; text-offset:13;
 font-size:10; font-family: "DejaVu Sans Book";
 text-halo-radius:1.5; text-color:#BE1E2D; text-halo-color:#ffffff; text-allow-overlap: false;
 -x-mapnik-min-distance:0; text-placement:any; z-index:20}
