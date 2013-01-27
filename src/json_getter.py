@@ -9,6 +9,8 @@ import os
 import sys
 reload(sys)
 sys.setdefaultencoding("utf-8")          # a hack to support UTF-8
+import ConfigParser
+
 
 try:
   import psyco
@@ -21,11 +23,17 @@ def get_vectors(bbox, zoom, style, vec = "polygon"):
   bbox_p = projections.from4326(bbox, "EPSG:3857")
   geomcolumn = "way"
 
-  database = "dbname=gis user=gis"
+  config = ConfigParser.RawConfigParser()
+  config.read('connection.cfg')
+  dbname = config.get('osm', 'dbname')
+  user = config.get('osm', 'user')
+  password = config.get('osm', 'password')
+  host = config.get('osm', 'host')
+  database = "dbname=%s user=%s password=%s host=%s" % (dbname, user, password, host)
   pxtolerance = 1.8
   intscalefactor = 10000
   ignore_columns = set(["way_area", "osm_id", geomcolumn, "tags", "z_order"])
-  table = {"polygon":"planet_osm_polygon", "line":"planet_osm_line","point":"planet_osm_point", "coastline": "coastlines"}
+  table = {"polygon":"planet_osm_polygon", "line":"planet_osm_line","point":"planet_osm_point"}
 
   a = psycopg2.connect(database)
   b = a.cursor()
@@ -40,10 +48,10 @@ def get_vectors(bbox, zoom, style, vec = "polygon"):
 
     taghint = "*"
     types = {"line":"line","polygon":"area", "point":"node"}
-    adp = ""
+    adp = "true"
     if "get_sql_hints" in dir(style):
       sql_hint = style.get_sql_hints(types[vec], zoom)
-      adp = []
+      adp = ['true']
       for tp in sql_hint:
         add = []
         for j in tp[0]:
@@ -157,7 +165,7 @@ def get_vectors(bbox, zoom, style, vec = "polygon"):
           bbox_p[0],bbox_p[1],bbox_p[2],bbox_p[3],
           pixel_size_at_zoom(zoom, pxtolerance)**2
           )
-  #print query
+  #print '=======\n' + query
   a = psycopg2.connect(database)
   b = a.cursor()
   b.execute(query)
@@ -201,7 +209,7 @@ def get_vectors(bbox, zoom, style, vec = "polygon"):
 print "Content-Type: text/html"
 print
 
-form = cgi.FieldStorage()
+form = {'x':0,'y':0,'z':0}#cgi.FieldStorage()
 if "z" not in form:
   print "need z"
   exit()
@@ -211,9 +219,9 @@ if "x" not in form:
 if "y" not in form:
   print "need y"
   exit()
-z = int(form["z"].value)
-x = int(form["x"].value)
-y = int(form["y"].value)
+z = int(form["z"])
+x = int(form["x"])
+y = int(form["y"])
 if z>22:
   exit()
 callback = "onKothicDataResponse"
@@ -223,15 +231,15 @@ bbox = projections.bbox_by_tile(z+1,x,y,"EPSG:3857")
 style = MapCSS(0,30)
 style.parse(open("styles/osmosnimki-maps.mapcss","r").read())
 zoom = z+2
-aaaa = get_vectors(bbox,zoom,style,"coastline")
+aaaa = get_vectors(bbox,zoom,style)
 aaaa["features"].extend(get_vectors(bbox,zoom,style,"polygon")["features"])
 aaaa["features"].extend(get_vectors(bbox,zoom,style,"line")["features"])
 aaaa["features"].extend(get_vectors(bbox,zoom,style,"point")["features"])
 
 aaaa = callback+"("+json.dumps(aaaa,True,False,separators=(',', ':'))+",%s,%s,%s);"%(z,x,y)
-print aaaa
+#print aaaa
 
-dir = "/var/www/vtile/%s/%s/"%(z,x)
+dir = "vtile/%s/%s/"%(z,x)
 file = "%s.js"%y
 
 try:
