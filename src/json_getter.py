@@ -20,7 +20,8 @@ except ImportError:
   #print >>sys.stderr, "Psyco import failed. Program may run slower. If you run it on i386 machine, please install Psyco to get best performance."
 
 def get_vectors(bbox, zoom, style, vec = "polygon"):
-  bbox_p = projections.from4326(bbox, "EPSG:3857")
+  bbox_p = projections.from4326(bbox, "EPSG:900913")
+  print bbox_p
   geomcolumn = "way"
 
   config = ConfigParser.RawConfigParser()
@@ -206,8 +207,8 @@ def get_vectors(bbox, zoom, style, vec = "polygon"):
 
 
 
-print "Content-Type: text/html"
-print
+#print "Content-Type: text/html"
+#print
 
 form = {'x':0,'y':0,'z':0}#cgi.FieldStorage()
 if "z" not in form:
@@ -222,15 +223,23 @@ if "y" not in form:
 z = int(form["z"])
 x = int(form["x"])
 y = int(form["y"])
+
+import sys
+coords = sys.argv[1] #'12/10590/1450'
+z, x, y = coords.split('/')
+z = int(z)
+x = int(x)
+y = int(y)
+print z, x, y
 if z>22:
   exit()
 callback = "onKothicDataResponse"
 
-bbox = projections.bbox_by_tile(z+1,x,y,"EPSG:3857")
+bbox = projections.bbox_by_tile(z+1,x,y,"EPSG:900913")
 
 style = MapCSS(0,30)
 style.parse(open("styles/osmosnimki-maps.mapcss","r").read())
-zoom = z+2
+zoom = z
 aaaa = get_vectors(bbox,zoom,style)
 aaaa["features"].extend(get_vectors(bbox,zoom,style,"polygon")["features"])
 aaaa["features"].extend(get_vectors(bbox,zoom,style,"line")["features"])
@@ -241,6 +250,8 @@ aaaa = callback+"("+json.dumps(aaaa,True,False,separators=(',', ':'))+",%s,%s,%s
 
 dir = "vtile/%s/%s/"%(z,x)
 file = "%s.js"%y
+
+print z, x, y
 
 try:
   if not os.path.exists(dir):
