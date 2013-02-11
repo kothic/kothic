@@ -616,6 +616,13 @@ def hex_to_name(hex_value, spec='css3'):
         raise ValueError("'%s' has no defined color name in %s." % (hex_value, spec))
     return name
 
+def any_hex_to_name(hex_value):
+    try:
+        return hex_to_name(hex_value)
+    except ValueError:
+        return hex_value
+
+
 def hex_to_rgb(hex_value):
     """
     Convert a hexadecimal color value to a 3-tuple of integers
@@ -826,15 +833,6 @@ def rgb_percent_to_rgb(rgb_percent_triplet):
 
 
 
-
-
-
-
-
-
-
-
-
 def whatever_to_rgb(string):
   """
   Converts CSS3 color or a hex into rgb triplet; hash of string if fails.
@@ -849,14 +847,13 @@ def whatever_to_rgb(string):
       try:
         if string[:3] == "rgb":
           return tuple([float(i) for i in string[4:-1].split(",")][0:3])
-          
       except:
         return hex_to_rgb("#"+md5(string).hexdigest()[:6])
 
 def whatever_to_hex(string):
   if type(string) == tuple:
-    return cairo_to_hex(string)
-  return rgb_to_hex(whatever_to_rgb(string))
+    return cairo_to_hex(string).upper()
+  return rgb_to_hex(whatever_to_rgb(string)).upper()
 def whatever_to_cairo(string):
   a = whatever_to_rgb(string)
   return a[0]/255.,a[1]/255.,a[2]/255.,

@@ -53,25 +53,28 @@ class Rule():
 
   def get_interesting_tags(self, obj, zoom):
     if obj:
-      if (self.subject!='') and not _test_feature_compatibility(obj, self.subject, {}):
+      if (self.subject != '') and not _test_feature_compatibility(obj, self.subject, {}):
         return set()
-    if not self.test_zoom(zoom):
+    
+    if zoom and not self.test_zoom(zoom):
         return set()
+
     a = set()
     for condition in self.conditions:
       a.update(condition.get_interesting_tags())
     return a
+
   def get_numerics(self):
     a = set()
     for condition in self.conditions:
       a.add(condition.get_numerics())
     a.discard(False)
     return a
+
   def get_sql_hints(self, obj, zoom):
     if obj:
       if (self.subject!='') and not _test_feature_compatibility(obj, self.subject, {":area":"yes"}):
         return set()
-    
     if not self.test_zoom(zoom):
         return set()
     a = set()
@@ -85,13 +88,10 @@ class Rule():
     b = " AND ".join(b)
     return a,b
 
-
-
 def _test_feature_compatibility (f1, f2, tags={}):
     """
     Checks if feature of type f1 is compatible with f2.
     """
-    
     if f2 == f1:
       return True
     elif f2 == "way"  and f1 == "line":
@@ -99,14 +99,14 @@ def _test_feature_compatibility (f1, f2, tags={}):
     elif f2 == "way"  and f1 == "area":
       return True
     elif f2 == "area" and f1 in ("way", "area", "POLYGON"):
-      if ":area" in tags:
-        pass
-      else:
-        return False
+#      if ":area" in tags:
+        return True
+#      else:
+#        return False
     elif f2 == "line" and f1 in ("way", "line", "LINESTRING"):
-      pass
+      return True
     elif f2 == "point" and f1 in ("node", "POINT"):
-      pass
+      return True
     else:
       return False
     #print f1, f2, True
