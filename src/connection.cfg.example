@@ -1,0 +1,6 @@
+# this file is for json_getter.py
+[osm]
+dbname = 'gis'
+user = 'postgres'
+password = ''
+host = 'localhost'
