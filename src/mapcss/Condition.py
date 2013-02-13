@@ -35,28 +35,27 @@ class Condition:
       self.regex = re.compile(self.params[0], re.I)
 
     self.compiled_regex = ""
-    
+
   def get_interesting_tags(self):
     if self.params[0][:2] == "::":
       return []
     return set([self.params[0]])
+
   def get_numerics(self):
     if self.type in ("<", ">", ">=", "<="):
       return self.params[0]
     else:
       return False
+
   def test(self, tags):
     """
     Test a hash against this condition
     """
-    
-    
-
     t = self.type
     params = self.params
     if t == 'eq':   # don't compare tags against sublayers
       if params[0][:2] == "::":
-        return True
+        return params[1]
     try:
       if t == 'eq':
         return tags[params[0]]==params[1]
@@ -65,16 +64,16 @@ class Condition:
       if t == 'regex':
         return bool(self.regex.match(tags[params[0]]))
       if t == 'true':
-        return (tags[params[0]]=='true') | (tags[params[0]]=='yes') | (tags[params[0]]=='1')
-      if t == 'false':
-        return (tags.get(params[0], "")=='false') | (tags.get(params[0], "")=='no') | (tags.get(params[0], "")=='')
+        return tags.get(params[0]) == 'yes'
+      if t == 'untrue':
+        return tags.get(params[0]) == 'no'
       if t == 'set':
         if params[0] in tags:
-          return tags[params[0]]!=''
+          return tags[params[0]] != ''
         return False
       if t == 'unset':
         if params[0] in tags:
-          return tags[params[0]]==''
+          return tags[params[0]] == ''
         return True
 
       if t == '<':
@@ -121,9 +120,9 @@ class Condition:
       if t == 'regex':
         return params[0], '"%s" ~ \'%s\''%(params[0],params[1].replace("'","\\'"))
       if t == 'true':
-        return params[0], '"%s" IN (\'true\', \'yes\', \'1\')'%(params[0])
+        return params[0], '"%s" = \'yes\''%(params[0])
       if t == 'untrue':
-        return params[0], '"%s" NOT IN (\'true\', \'yes\', \'1\')'%(params[0])
+        return params[0], '"%s" = \'no\''%(params[0])
       if t == 'set':
         return params[0], '"%s" IS NOT NULL'%(params[0])
       if t == 'unset':
@@ -189,7 +188,6 @@ class Condition:
           return False
         if c2.type == self.type:
           return (self,)
-
 
         if self.type == ">=" and c2.type == "<=": # a<=2 and a>=2 --> a=2
           return (Condition ("eq", self.params),)

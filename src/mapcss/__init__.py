@@ -28,12 +28,12 @@ from Condition import Condition
 WHITESPACE = re.compile(r'^ \s+ ', re.S | re.X)
 
 COMMENT = re.compile(r'^ \/\* .+? \*\/ \s* ', re.S | re.X)
-CLASS = re.compile(r'^ ([\.:]:?\w+) \s* ', re.S | re.X)
+CLASS = re.compile(r'^ ([\.:]:?[*\w]+) \s* ', re.S | re.X)
 NOT_CLASS = re.compile(r'^ !([\.:]\w+) \s* ', re.S | re.X)
 ZOOM = re.compile(r'^ \| \s* z([\d\-]+) \s* ', re.I | re.S | re.X)
 GROUP = re.compile(r'^ , \s* ', re.I | re.S | re.X)
 CONDITION = re.compile(r'^ \[(.+?)\] \s* ', re.S | re.X)
-OBJECT = re.compile(r'^ (\w+) \s* ', re.S | re.X)
+OBJECT = re.compile(r'^ (\*|[\w]+) \s* ', re.S | re.X)
 DECLARATION = re.compile(r'^ \{(.+?)\} \s* ', re.S | re.X)
 UNKNOWN = re.compile(r'^ (\S+) \s* ', re.S | re.X)
 
@@ -114,9 +114,9 @@ class MapCSS():
         return float(ZOOM_SINGLE.match(s).groups()[0]),float(ZOOM_SINGLE.match(s).groups()[0])
       else:
         logging.error("unparsed zoom: %s" %s)
+
     def precompile_style (self):
         # TODO: styleshees precompilation
-        
         subjs = {"canvas": ("canvas",),"way": ("Polygon","LineString"), "line":("Polygon","LineString"), "area": ("Polygon",), "node": ("Point",), "*":("Point","Polygon","LineString") }
         mfile.write("function restyle (prop, zoom, type){")
         mfile.write("style = new Object;")
@@ -185,10 +185,12 @@ class MapCSS():
       if shash in self.cache["style"]:
         return self.cache["style"][shash]
       style = []
-      
-      #return [{"width": 1, "color":(0,0,0), "layer": 1}, {"width": 3, "color":(1,1,1), "layer":0}]
+      dbg = False
+      if tags.get('highway') == 'footway' and zoom == 17:
+          dbg = True
       for chooser in self.choosers:
         style = chooser.updateStyles(style, type, tags, zoom, scale, zscale)
+      style = [x for x in style if x["object-id"] != "::*"]
       self.cache["style"][shash] = style
       return style
 
@@ -210,10 +212,7 @@ class MapCSS():
         p = chooser.get_sql_hints(type, zoom)
         if p:
           if p[0] and p[1]:
-           # print chooser.get_sql_hints(type, zoom)
-          
             hints.append(p)
-      #print hints
       return hints
 
 
@@ -249,9 +248,7 @@ class MapCSS():
                 cond = CLASS.match(css).groups()[0]
                 log.debug("class found: %s"% (cond))
                 css = CLASS.sub("", css)
-                
 
-                      
                 sc.addCondition(Condition('eq',("::class",cond)))
                 previous=oCONDITION;
 
@@ -280,11 +277,6 @@ class MapCSS():
                 css=ZOOM.sub("",css)
                 sc.addZoom(self.parseZoom(cond))
                 previous=oZOOM;
-
-                      #css=css.replace(ZOOM,'');
-                      #var z:Array=parseZoom(o[1]);
-                      #sc.addZoom(z[0],z[1]);
-                      #previous=oZOOM;
 
               #// Grouping - just a comma
               elif GROUP.match(css):
@@ -333,13 +325,9 @@ class MapCSS():
                 log.warning("choked on: %s"%(css))
                 return 
 
-      #print sc
       if (previous==oDECLARATION):
         self.choosers.append(sc)
         sc= StyleChooser(self.scalepair)
-      #print self.choosers
-      return 
-#}
 
 
 
@@ -360,12 +348,10 @@ def parseCondition(s):
               log.debug("condition false: %s"%(a[0]))
               return  Condition('false'     ,a)
 
-
             if      CONDITION_SET.match(s):
               a = CONDITION_SET.match(s).groups()
               log.debug("condition set: %s"%(a))
               return  Condition('set'     ,a)
-
 
             if      CONDITION_UNSET.match(s):
               a = CONDITION_UNSET.match(s).groups()
@@ -377,18 +363,22 @@ def parseCondition(s):
               log.debug("condition NE: %s = %s"%(a[0], a[1]))
               return  Condition('ne'     ,a)
               ## FIXME: convert other conditions to python
+
             if      CONDITION_LE.match(s):
               a = CONDITION_LE.match(s).groups()
               log.debug("condition LE: %s <= %s"%(a[0], a[1]))
               return  Condition('<='     ,a)
+
             if      CONDITION_GE.match(s):
               a = CONDITION_GE.match(s).groups()
               log.debug("condition GE: %s >= %s"%(a[0], a[1]))
               return  Condition('>='     ,a)
+
             if      CONDITION_LT.match(s):
               a = CONDITION_LT.match(s).groups()
               log.debug("condition LT: %s < %s"%(a[0], a[1]))
               return  Condition('<'     ,a)
+
             if      CONDITION_GT.match(s):
               a = CONDITION_GT.match(s).groups()
               log.debug("condition GT: %s > %s"%(a[0], a[1]))
@@ -398,7 +388,6 @@ def parseCondition(s):
               a = CONDITION_REGEX.match(s).groups()
               log.debug("condition REGEX: %s = %s"%(a[0], a[1]))
               return  Condition('regex'     ,a)
-              #else if ((o=CONDITION_REGEX.exec(s))) { return new Condition('regex',o[1],o[2]); }
 
             if      CONDITION_EQ.match(s):
               a = CONDITION_EQ.match(s).groups()
@@ -425,71 +414,7 @@ def parseDeclaration(s):
                           else:
                             logging.debug("unknown %s" % (a) )
                   return [t]
-                          #else if ((o=SET_TAG_EVAL.exec(a))) { xs.addSetTag(o[1],new Eval(o[2])); }
-                          #else if ((o=SET_TAG.exec(a)))      { xs.addSetTag(o[1],o[2]); }
-                          #else if ((o=SET_TAG_TRUE.exec(a))) { xs.addSetTag(o[1],true); }
-                          #else if ((o=EXIT.exec(a))) { xs.setPropertyFromString('breaker',true); }
-                  #}
 
-                  #// Find sublayer
-                  #var sub:uint=5;
-                  #if (t['z_index']) { sub=Number(t['z_index']); delete t['z_index']; }
-                  #ss.sublayer=ps.sublayer=ts.sublayer=hs.sublayer=sub;
-                  #xs.sublayer=10;
-
-                  #// Munge special values
-                  #if (t['font_weight']    ) { t['font_bold'  ]    = t['font_weight'    ].match(BOLD  )    ? true : false; delete t['font_weight']; }
-                  #if (t['font_style']     ) { t['font_italic']    = t['font_style'     ].match(ITALIC)    ? true : false; delete t['font_style']; }
-                  #if (t['text_decoration']) { t['font_underline'] = t['text_decoration'].match(UNDERLINE) ? true : false; delete t['text_decoration']; }
-                  #if (t['text_position']  ) { t['text_center']    = t['text_position'  ].match(CENTER)    ? true : false; delete t['text_position']; }
-                  #if (t['text_transform']) {
-                          #// ** needs other transformations, e.g. lower-case, sentence-case
-                          #if (t['text_transform'].match(CAPS)) { t['font_caps']=true; } else { t['font_caps']=false; }
-                          #delete t['text_transform'];
-                  #}
-
-                  #// ** Do compound settings (e.g. line: 5px dotted blue;)
-
-                  #// Assign each property to the appropriate style
-                  #for (a in t) {
-                          #// Parse properties
-                          #// ** also do units, e.g. px/pt
-                          #if (a.match(COLOR)) {
-                                  #t[a] = parseCSSColor(t[a]);
-                          #}
-
-                          #// Set in styles
-                          #if      (ss.hasOwnProperty(a)) { ss.setPropertyFromString(a,t[a]); }
-                          #else if (ps.hasOwnProperty(a)) { ps.setPropertyFromString(a,t[a]); }
-                          #else if (ts.hasOwnProperty(a)) { ts.setPropertyFromString(a,t[a]); }
-                          #else if (hs.hasOwnProperty(a)) { hs.setPropertyFromString(a,t[a]); }
-                  #}
-
-                  #// Add each style to list
-                  #if (ss.edited) { styles.push(ss); }
-                  #if (ps.edited) { styles.push(ps); }
-                  #if (ts.edited) { styles.push(ts); }
-                  #if (hs.edited) { styles.push(hs); }
-                  #if (xs.edited) { styles.push(xs); }
-                  #return styles;
-          #}
-
-
-
-
-  #public static function parseCSSColor(colorStr:String):uint {
-      #colorStr = colorStr.toLowerCase();
-      #if (CSSCOLORS[colorStr])
-          #return CSSCOLORS[colorStr];
-      #else {
-          #var match:Object = HEX.exec(colorStr);
-          #if ( match )
-              #return Number("0x"+match[1]);
-      #}
-      #return 0;
-  #}
-  #}
-#}
 
 if __name__ == "__main__":
   logging.basicConfig(level=logging.WARNING)

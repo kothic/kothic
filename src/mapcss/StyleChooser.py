@@ -100,32 +100,31 @@ class StyleChooser:
             a.update(p[0])
     # no need to check for eval's
     return a,b
+    
   # // Update the current StyleList from this StyleChooser
 
-  def updateStyles(self,sl,type, tags, zoom, scale, zscale):
+  def updateStyles(self, sl, ftype, tags, zoom, scale, zscale):
                   # Are any of the ruleChains fulfilled?
-                  w = 0
+                  object_id = False
                   for c in self.ruleChains:
-                    if (self.testChain(c,type,tags,zoom)):
+                    object_id = self.testChain(c,ftype,tags,zoom)
+                    if object_id:
                       break
                   else:
                     return sl
-
-                  ## Update StyleList
-                  object_id = 1
-
+                  w = 0
                   for r in self.styles:
                     ra = {}
                     for a,b in r.iteritems():
                       "calculating eval()'s"
-                      if __builtins__["type"](b) == self.eval_type:
+                      if type(b) == self.eval_type:
                         combined_style = {}
                         for t in sl:
                           combined_style.update(t)
                         for p,q in combined_style.iteritems():
                           if "color" in p:
                             combined_style[p] = cairo_to_hex(q)
-                        b = b.compute(tags,combined_style, scale, zscale)
+                        b = b.compute(tags, combined_style, scale, zscale)
                       ra[a] = b
                     r = ra
                     ra = {}
@@ -150,83 +149,31 @@ class StyleChooser:
                           pass
                       else:
                         ra[a]=b
-                    
-                    ra["layer"] = float(tags.get("layer",0))*1000+ra.get("z-index",1) # calculating z-index
+                    ra["layer"] = float(tags.get("layer",0))*2000+ra.get("z-index",1) # calculating z-index
                     for k,v in ra.items():  # if a value is empty, we don't need it - renderer will do as default.
-                      if not v:
-                        del ra[k]
-                    if "object-id" not in ra:
-                      ra["object-id"] = str(object_id)
+                        if not v:
+                            del ra[k]
+                    ra["object-id"] = str(object_id)
+                    hasall = False
+                    allinit = {}
                     for x in sl:
-                      if x.get("object-id","1") == ra["object-id"]:
-                        x.update(ra)
-                        break
+                        if x.get("object-id") == "::*":
+                            allinit = x.copy()
+                        if ra["object-id"] == "::*":
+                            oid = x.get("object-id")
+                            x.update(ra)
+                            x["object-id"] = oid
+                            if oid == "::*":
+                                hasall = True
+                        if x.get("object-id") == ra["object-id"]:
+                            x.update(ra)
+                            break
                     else:
-                      sl.append(ra)
-                    object_id += 1
+                        if not hasall:
+                            allinit.update(ra)
+                            sl.append(allinit)
+                 # 
                   return sl
-                          #a = ""
-                          #if (r is ShapeStyle) {
-                                  #a=sl.shapeStyles;
-                                  #if (ShapeStyle(r).width>sl.maxwidth && !r.evals['width']) { sl.maxwidth=ShapeStyle(r).width; }
-                          #} else if (r is ShieldStyle) {
-                                  #a=sl.shieldStyles;
-                          #} else if (r is TextStyle) {
-                                  #a=sl.textStyles;
-                          #} else if (r is PointStyle) {
-                                  #a=sl.pointStyles;
-                                  #w=0;
-                                  #if (PointStyle(r).icon_width && !PointStyle(r).evals['icon_width']) {
-                                          #w=PointStyle(r).icon_width;
-                                  #} else if (PointStyle(r).icon_image && imageWidths[PointStyle(r).icon_image]) {
-                                          #w=imageWidths[PointStyle(r).icon_image];
-                                  #}
-                                  #if (w>sl.maxwidth) { sl.maxwidth=w; }
-                          #} else if (r is InstructionStyle) {
-                                  #if (InstructionStyle(r).breaker) { return; }
-                                  #if (InstructionStyle(r).set_tags) {
-                                          #for (var k:String in InstructionStyle(r).set_tags) { tags[k]=InstructionStyle(r).set_tags[k]; }
-                                  #}
-                                  #continue;
-                          #}
-                          #if (r.drawn) { tags[':drawn']='yes'; }
-                          #tags['_width']=sl.maxwidth;
-
-                          #r.runEvals(tags);
-                          #if (a[r.sublayer]) {
-                                  ## // If there's already a style on this sublayer, then merge them
-                                  ## // (making a deep copy if necessary to avoid altering the root style)
-                                  #if (!a[r.sublayer].merged) { a[r.sublayer]=a[r.sublayer].deepCopy(); }
-                                  #a[r.sublayer].mergeWith(r);
-                          #} else {
-                                  ## // Otherwise, just assign it
-                                  #a[r.sublayer]=r;
-                          #}
-                  #}
-          #}
-
-
-          ## // Test a ruleChain
-          ## // - run a set of tests in the chain
-          ## //              works backwards from at position "pos" in array, or -1  for the last
-          ## //              separate tags object is required in case they've been dynamically retagged
-          ## // - if they fail, return false
-          ## // - if they succeed, and it's the last in the chain, return happily
-          ## // - if they succeed, and there's more in the chain, rerun this for each parent until success
-
-          #private function testChain(chain:Array,pos:int,obj:Entity,tags:Object):Boolean {
-                  #if (pos==-1) { pos=chain.length-1; }
-
-                  #var r:Rule=chain[pos];
-                  #if (!r.test(obj, tags)) { return false; }
-                  #if (pos==0) { return true; }
-
-                  #var o:Array=obj.parentObjects;
-                  #for each (var p:Entity in o) {
-                          #if (testChain(chain, pos-1, p, p.getTagsHash() )) { return true; }
-                  #}
-                  #return false;
-          #}
 
   def testChain(self,chain, obj, tags, zoom):
     """
@@ -234,50 +181,41 @@ class StyleChooser:
     """
     ### FIXME: total MapCSS misreading
     for r in chain:
-      if r.test(obj,tags,zoom):
-        return True
+      return r.test(obj,tags,zoom)
     return False
 
 
-          ## // ---------------------------------------------------------------------------------------------
-          ## // Methods to add properties (used by parsers such as MapCSS)
-
-          
   def newGroup(self):
     """
     starts a new ruleChain in this.ruleChains
     """
-    if (len(self.ruleChains[self.rcpos])>0): 
-                          self.ruleChains.append([])
-                  #}
-          #}
+    if self.ruleChains[self.rcpos]: 
+        self.ruleChains.append([])
 
 
   def newObject(self,e=''):
     """
     adds into the current ruleChain (starting a new Rule)
     """
-    self.ruleChains[self.rcpos].append(Rule(e))
-    self.ruleChains[self.rcpos][-1].minZoom=float(self.scalepair[0])
-    self.ruleChains[self.rcpos][-1].maxZoom=float(self.scalepair[1])
+    rule = Rule(e)
+    rule.minZoom=float(self.scalepair[0])
+    rule.maxZoom=float(self.scalepair[1])
+    self.ruleChains[self.rcpos].append(rule)
 
-
-          
   def addZoom(self,z):
     """
     adds into the current ruleChain (existing Rule)
     """
-          
-    self.ruleChains[self.rcpos][len(self.ruleChains[self.rcpos])-1].minZoom=float(z[0])
-    self.ruleChains[self.rcpos][len(self.ruleChains[self.rcpos])-1].maxZoom=float(z[1])
-          
+
+    self.ruleChains[self.rcpos][-1].minZoom=float(z[0])
+    self.ruleChains[self.rcpos][-1].maxZoom=float(z[1])
 
 
   def addCondition(self,c):
     """
     adds into the current ruleChain (existing Rule)
     """
-    self.ruleChains[self.rcpos][len(self.ruleChains[self.rcpos])-1].conditions.append(c)
+    self.ruleChains[self.rcpos][-1].conditions.append(c)
 
 
   def addStyles(self, a):

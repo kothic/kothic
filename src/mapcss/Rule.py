@@ -20,33 +20,29 @@
 class Rule():
   def __init__(self, s=''):
     self.conditions = []
-    self.isAnd = True
-    self.minZoom = 0   
+    #self.isAnd = True
+    self.minZoom = 0 
     self.maxZoom = 19
+    if s == "*":
+        s = ""
     self.subject = s    # "", "way", "node" or "relation"
+
   def __repr__(self):
-    return "%s|z%s-%s %s"%(self.subject,self.minZoom,self.maxZoom, self.conditions)
+    return "%s|z%s-%s %s"%(self.subject, self.minZoom, self.maxZoom, self.conditions)
 
-  #public function test(obj:Entity,tags:Object):Boolean {
-
-
-  
   def test(self, obj, tags, zoom):
-    if (self.subject!='') and not _test_feature_compatibility(obj, self.subject, tags):
-      return False
-    #print _test_feature_compatibility(obj, self.subject, tags), obj, self.subject
     if not self.test_zoom(zoom):
       return False
-    v="a"
+    if (self.subject != '') and not _test_feature_compatibility(obj, self.subject, tags):
+      return False
+    subpart = "::default"
     for condition in self.conditions:
-      r = condition.test(tags)
-      if v=="a":
-        v = r
-      elif self.isAnd:
-        v = v & r
-      else:
-        v = v | r
-    return v
+        res = condition.test(tags)
+        if not res:
+            return False
+        if type(res) != bool:
+            subpart = res
+    return subpart
 
   def test_zoom(self, zoom):
     return (zoom >= self.minZoom) and (zoom <= self.maxZoom)
@@ -55,7 +51,7 @@ class Rule():
     if obj:
       if (self.subject != '') and not _test_feature_compatibility(obj, self.subject, {}):
         return set()
-    
+
     if zoom and not self.test_zoom(zoom):
         return set()
 
