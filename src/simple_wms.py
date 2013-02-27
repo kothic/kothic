@@ -40,10 +40,10 @@ db = DataBackend()
 
 
 try:
-        import psyco
-        psyco.full()
+    import psyco
+    psyco.full()
 except ImportError:
-        pass
+    pass
 
 OK = 200
 ERROR = 500
@@ -63,8 +63,8 @@ urls = (
       '/(.*)', 'mainhandler'
 )
 class mainhandler:
-   def GET(self, crap):
-       return handler()
+    def GET(self, crap):
+        return handler()
 
 
 
@@ -85,7 +85,7 @@ def twms_main(req):
     height=0
     req_bbox = ()
     if data.get("bbox",data.get("BBOX",None)):
-      req_bbox = tuple(map(float,data.get("bbox",data.get("BBOX",req_bbox)).split(",")))
+        req_bbox = tuple(map(float,data.get("bbox",data.get("BBOX",req_bbox)).split(",")))
 
     req_bbox = projections.to4326(req_bbox, srs)
 
@@ -102,11 +102,10 @@ def twms_main(req):
     image_content = StringIO.StringIO()
 
 
-    
+
     res.surface.write_to_png(image_content)
-  
+
 
 
     resp = image_content.getvalue()
     return (OK, content_type, resp)
-

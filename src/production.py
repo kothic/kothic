@@ -23,7 +23,7 @@ This is a module to substitute debug.py in porduction mode.
 
 debug = lambda st: None
 class Timer:
-  def __init__(self, comment):
-    pass
-  def stop(self):
-    pass
+    def __init__(self, comment):
+        pass
+    def stop(self):
+        pass

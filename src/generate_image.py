@@ -27,7 +27,7 @@ from render import RasterTile
 svg = False
 
 if svg:
-  import cairo
+    import cairo
 
 
 style = MapCSS(1, 19)     #zoom levels
@@ -44,12 +44,12 @@ db = DataBackend()
 
 res = RasterTile(w, h, z, db)
 if svg:
-  file = open("test.svg", "wb")
-  res.surface = cairo.SVGSurface(file.name, w,h)
+    file = open("test.svg", "wb")
+    res.surface = cairo.SVGSurface(file.name, w,h)
 res.update_surface(bbox, z, style)
 
 
 if not svg:
-  res.surface.write_to_png("test.png")
+    res.surface.write_to_png("test.png")
 else:
-  res.surface.finish()
+    res.surface.finish()
