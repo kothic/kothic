@@ -73,6 +73,9 @@ parser.add_option("-c", "--config", dest="conffile", default="komap.conf",
 
 (options, args) = parser.parse_args()
 #print (options, args)
+if (options.filename == None):
+    parser.error("MapCSS stylesheet filename is required")
+
 import libkomapnik
 config.read(['komap.conf', os.path.expanduser('~/.komap/komap.conf'), options.conffile])
 libkomapnik.map_proj = config.get("mapnik", "map_proj")
