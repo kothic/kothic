@@ -18,92 +18,92 @@
 
 
 class Rule():
-  def __init__(self, s=''):
-    self.conditions = []
-    #self.isAnd = True
-    self.minZoom = 0 
-    self.maxZoom = 19
-    if s == "*":
-        s = ""
-    self.subject = s    # "", "way", "node" or "relation"
+    def __init__(self, s=''):
+        self.conditions = []
+        #self.isAnd = True
+        self.minZoom = 0
+        self.maxZoom = 19
+        if s == "*":
+            s = ""
+        self.subject = s    # "", "way", "node" or "relation"
 
-  def __repr__(self):
-    return "%s|z%s-%s %s"%(self.subject, self.minZoom, self.maxZoom, self.conditions)
+    def __repr__(self):
+        return "%s|z%s-%s %s"%(self.subject, self.minZoom, self.maxZoom, self.conditions)
 
-  def test(self, obj, tags, zoom):
-    if not self.test_zoom(zoom):
-      return False
-    if (self.subject != '') and not _test_feature_compatibility(obj, self.subject, tags):
-      return False
-    subpart = "::default"
-    for condition in self.conditions:
-        res = condition.test(tags)
-        if not res:
+    def test(self, obj, tags, zoom):
+        if not ((zoom >= self.minZoom) and (zoom <= self.maxZoom)):
             return False
-        if type(res) != bool:
-            subpart = res
-    return subpart
+        if (self.subject != '') and not _test_feature_compatibility(obj, self.subject, tags):
+            return False
+        subpart = "::default"
+        for condition in self.conditions:
+            res = condition.test(tags)
+            if not res:
+                return False
+            if type(res) != bool:
+                subpart = res
+        return subpart
 
-  def test_zoom(self, zoom):
-    return (zoom >= self.minZoom) and (zoom <= self.maxZoom)
+    def test_zoom(self, zoom):
+        return (zoom >= self.minZoom) and (zoom <= self.maxZoom)
 
-  def get_interesting_tags(self, obj, zoom):
-    if obj:
-      if (self.subject != '') and not _test_feature_compatibility(obj, self.subject, {}):
-        return set()
+    def get_interesting_tags(self, obj, zoom):
+        if obj:
+            if (self.subject != '') and not _test_feature_compatibility(obj, self.subject, {}):
+                return set()
 
-    if zoom and not self.test_zoom(zoom):
-        return set()
+        if zoom and not self.test_zoom(zoom):
+            return set()
 
-    a = set()
-    for condition in self.conditions:
-      a.update(condition.get_interesting_tags())
-    return a
+        a = set()
+        for condition in self.conditions:
+            a.update(condition.get_interesting_tags())
+        return a
 
-  def get_numerics(self):
-    a = set()
-    for condition in self.conditions:
-      a.add(condition.get_numerics())
-    a.discard(False)
-    return a
+    def get_numerics(self):
+        a = set()
+        for condition in self.conditions:
+            a.add(condition.get_numerics())
+        a.discard(False)
+        return a
 
-  def get_sql_hints(self, obj, zoom):
-    if obj:
-      if (self.subject!='') and not _test_feature_compatibility(obj, self.subject, {":area":"yes"}):
-        return set()
-    if not self.test_zoom(zoom):
-        return set()
-    a = set()
-    b = set()
-    for condition in self.conditions:
-      q = condition.get_sql()
-      if q:
-        if q[1]:
-          a.add(q[0])
-          b.add(q[1])
-    b = " AND ".join(b)
-    return a,b
+    def get_sql_hints(self, obj, zoom):
+        if obj:
+            if (self.subject!='') and not _test_feature_compatibility(obj, self.subject, {":area":"yes"}):
+                return set()
+        if not self.test_zoom(zoom):
+            return set()
+        a = set()
+        b = set()
+        for condition in self.conditions:
+            q = condition.get_sql()
+            if q:
+                if q[1]:
+                    a.add(q[0])
+                    b.add(q[1])
+        b = " AND ".join(b)
+        return a,b
 
 def _test_feature_compatibility (f1, f2, tags={}):
     """
     Checks if feature of type f1 is compatible with f2.
     """
     if f2 == f1:
-      return True
+        return True
+    if f2 not in ("way", "area", "line"):
+        return False
     elif f2 == "way"  and f1 == "line":
-      return True
+        return True
     elif f2 == "way"  and f1 == "area":
-      return True
-    elif f2 == "area" and f1 in ("way", "area", "POLYGON"):
+        return True
+    elif f2 == "area" and f1 in ("way", "area"):
 #      if ":area" in tags:
         return True
 #      else:
 #        return False
-    elif f2 == "line" and f1 in ("way", "line", "LINESTRING"):
-      return True
-    elif f2 == "point" and f1 in ("node", "POINT"):
-      return True
+    elif f2 == "line" and f1 in ("way", "line"):
+        return True
     else:
-      return False
+        return False
     #print f1, f2, True
     return True

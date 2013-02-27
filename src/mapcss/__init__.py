@@ -90,33 +90,33 @@ way {width: 1; casing-width:1; casing-color: white}
 
 class MapCSS():
     def __init__(self,minscale=0,maxscale=19):
-      """
-      """
-      self.cache = {}
-      self.cache["style"] = {}
-      self.minscale=minscale
-      self.maxscale=maxscale
-      self.scalepair = (minscale, maxscale)
-      self.choosers = []
-      self.style_loaded = False
-      self.parse(builtin_style)
-      self.style_loaded = False #override one after loading
+        """
+        """
+        self.cache = {}
+        self.cache["style"] = {}
+        self.minscale=minscale
+        self.maxscale=maxscale
+        self.scalepair = (minscale, maxscale)
+        self.choosers = []
+        self.style_loaded = False
+        self.parse(builtin_style)
+        self.style_loaded = False #override one after loading
 
     def parseZoom(self, s):
 
-      if ZOOM_MINMAX.match(s):
-        return tuple([float(i) for i in ZOOM_MINMAX.match(s).groups()])
-      elif ZOOM_MIN.match(s):
-        return float(ZOOM_MIN.match(s).groups()[0]), self.maxscale
-      elif ZOOM_MAX.match(s):
-        return float(self.minscale),float(ZOOM_MAX.match(s).groups()[0])
-      elif ZOOM_SINGLE.match(s):
-        return float(ZOOM_SINGLE.match(s).groups()[0]),float(ZOOM_SINGLE.match(s).groups()[0])
-      else:
-        logging.error("unparsed zoom: %s" %s)
+        if ZOOM_MINMAX.match(s):
+            return tuple([float(i) for i in ZOOM_MINMAX.match(s).groups()])
+        elif ZOOM_MIN.match(s):
+            return float(ZOOM_MIN.match(s).groups()[0]), self.maxscale
+        elif ZOOM_MAX.match(s):
+            return float(self.minscale),float(ZOOM_MAX.match(s).groups()[0])
+        elif ZOOM_SINGLE.match(s):
+            return float(ZOOM_SINGLE.match(s).groups()[0]),float(ZOOM_SINGLE.match(s).groups()[0])
+        else:
+            logging.error("unparsed zoom: %s" %s)
 
     def precompile_style (self):
-        # TODO: styleshees precompilation
+            # TODO: styleshees precompilation
         subjs = {"canvas": ("canvas",),"way": ("Polygon","LineString"), "line":("Polygon","LineString"), "area": ("Polygon",), "node": ("Point",), "*":("Point","Polygon","LineString") }
         mfile.write("function restyle (prop, zoom, type){")
         mfile.write("style = new Object;")
@@ -166,7 +166,7 @@ class MapCSS():
             #if subclass != "default":
             #styles = 'if(!("%s" in style)){style["%s"] = new Object;}'%(subclass,subclass)
             #for k, v in chooser.styles[0].iteritems():
-            
+
             if type(v) == str:
                 try:
                     v = str(float(v))
@@ -178,73 +178,70 @@ class MapCSS():
         mfile.write("return style;}")
 
     def get_style (self, type, tags={}, zoom=0, scale=1, zscale=.5):
-      """
-      Kothic styling API
-      """
-      shash = md5(repr(type)+repr(tags)+repr(zoom)).digest()
-      if shash in self.cache["style"]:
-        return self.cache["style"][shash]
-      style = []
-      dbg = False
-      if tags.get('highway') == 'footway' and zoom == 17:
-          dbg = True
-      for chooser in self.choosers:
-        style = chooser.updateStyles(style, type, tags, zoom, scale, zscale)
-      style = [x for x in style if x["object-id"] != "::*"]
-      self.cache["style"][shash] = style
-      return style
+        """
+        Kothic styling API
+        """
+        shash = md5(repr(type)+repr(tags)+repr(zoom)).digest()
+        if shash in self.cache["style"]:
+            return self.cache["style"][shash]
+        style = []
+        for chooser in self.choosers:
+            style = chooser.updateStyles(style, type, tags, zoom, scale, zscale)
+        style = [x for x in style if x["object-id"] != "::*"]
+        self.cache["style"][shash] = style
+        return style
 
     def get_interesting_tags(self, type=None, zoom=None):
-      """
-      Get set of interesting tags.
-      """
-      tags = set()
-      for chooser in self.choosers:
-        tags.update(chooser.get_interesting_tags(type, zoom))
-      return tags
+        """
+        Get set of interesting tags.
+        """
+        tags = set()
+        for chooser in self.choosers:
+            tags.update(chooser.get_interesting_tags(type, zoom))
+        return tags
 
     def get_sql_hints(self, type=None, zoom=None):
-      """
-      Get set of interesting tags.
-      """
-      hints = []
-      for chooser in self.choosers:
-        p = chooser.get_sql_hints(type, zoom)
-        if p:
-          if p[0] and p[1]:
-            hints.append(p)
-      return hints
+        """
+        Get set of interesting tags.
+        """
+        hints = []
+        for chooser in self.choosers:
+            p = chooser.get_sql_hints(type, zoom)
+            if p:
+                if p[0] and p[1]:
+                    hints.append(p)
+        return hints
 
 
     def parse(self, css):
-      """
-      Parses MapCSS given as string
-      """
-      if not self.style_loaded:
-        self.choosers = []
-      log = logging.getLogger('mapcss.parser')
-      previous = 0  # what was the previous CSS word?
-      sc=StyleChooser(self.scalepair) #currently being assembled
-      #choosers=[]
-      #o = []
-      while (css): 
+        """
+        Parses MapCSS given as string
+        """
+        if not self.style_loaded:
+            self.choosers = []
+        log = logging.getLogger('mapcss.parser')
+        previous = 0  # what was the previous CSS word?
+        sc=StyleChooser(self.scalepair) #currently being assembled
+        #choosers=[]
+        #o = []
+        while (css):
 
-              # CSS comment
-              if COMMENT.match(css):
+            # CSS comment
+            if COMMENT.match(css):
                 log.debug("comment found")
                 css=COMMENT.sub("", css)
 
-              #// Whitespace (probably only at beginning of file)
-              elif WHITESPACE.match(css):
+            #// Whitespace (probably only at beginning of file)
+            elif WHITESPACE.match(css):
                 log.debug("whitespace found")
                 css=WHITESPACE.sub("",css)
 
-              #// Class - .motorway, .builtup, :hover
-              elif CLASS.match(css):
+            #// Class - .motorway, .builtup, :hover
+            elif CLASS.match(css):
                 if previous==oDECLARATION:
-                  self.choosers.append(sc)
-                  sc = StyleChooser(self.scalepair)
-                
+                    self.choosers.append(sc)
+                    sc = StyleChooser(self.scalepair)
+
                 cond = CLASS.match(css).groups()[0]
                 log.debug("class found: %s"% (cond))
                 css = CLASS.sub("", css)
@@ -252,11 +249,11 @@ class MapCSS():
                 sc.addCondition(Condition('eq',("::class",cond)))
                 previous=oCONDITION;
 
-              #// Not class - !.motorway, !.builtup, !:hover
-              elif NOT_CLASS.match(css):
+            #// Not class - !.motorway, !.builtup, !:hover
+            elif NOT_CLASS.match(css):
                 if (previous==oDECLARATION):
-                  self.choosers.append(sc)
-                  sc = StyleChooser(self.scalepair)
+                    self.choosers.append(sc)
+                    sc = StyleChooser(self.scalepair)
 
                 cond = NOT_CLASS.match(css).groups()[0]
                 log.debug("not_class found: %s"% (cond))
@@ -267,10 +264,10 @@ class MapCSS():
                       #sc.addCondition(new Condition('unset',o[1]));
                       #previous=oCONDITION;
 
-              #// Zoom
-              elif ZOOM.match(css):
+            #// Zoom
+            elif ZOOM.match(css):
                 if (previous!=oOBJECT & previous!=oCONDITION):
-                  sc.newObject()
+                    sc.newObject()
 
                 cond = ZOOM.match(css).groups()[0]
                 log.debug("zoom found: %s"% (cond))
@@ -278,144 +275,144 @@ class MapCSS():
                 sc.addZoom(self.parseZoom(cond))
                 previous=oZOOM;
 
-              #// Grouping - just a comma
-              elif GROUP.match(css):
+            #// Grouping - just a comma
+            elif GROUP.match(css):
                 css=GROUP.sub("",css)
                 sc.newGroup()
                 previous=oGROUP
 
-              #// Condition - [highway=primary]
-              elif CONDITION.match(css):
+            #// Condition - [highway=primary]
+            elif CONDITION.match(css):
                 if (previous==oDECLARATION):
-                  self.choosers.append(sc)
-                  sc = StyleChooser(self.scalepair)
+                    self.choosers.append(sc)
+                    sc = StyleChooser(self.scalepair)
                 if (previous!=oOBJECT) and (previous!=oZOOM) and (previous!=oCONDITION):
-                  sc.newObject()
+                    sc.newObject()
                 cond = CONDITION.match(css).groups()[0]
                 log.debug("condition found: %s"% (cond))
                 css=CONDITION.sub("",css)
                 sc.addCondition(parseCondition(cond))
                 previous=oCONDITION;
 
-              #// Object - way, node, relation
-              elif OBJECT.match(css):
+            #// Object - way, node, relation
+            elif OBJECT.match(css):
                 if (previous==oDECLARATION):
-                  self.choosers.append(sc)
-                  sc = StyleChooser(self.scalepair)
+                    self.choosers.append(sc)
+                    sc = StyleChooser(self.scalepair)
                 obj = OBJECT.match(css).groups()[0]
                 log.debug("object found: %s"% (obj))
                 css=OBJECT.sub("",css)
                 sc.newObject(obj)
                 previous=oOBJECT
 
-              #// Declaration - {...}
-              elif DECLARATION.match(css):
+            #// Declaration - {...}
+            elif DECLARATION.match(css):
                 decl = DECLARATION.match(css).groups()[0]
                 log.debug("declaration found: %s"% (decl))
                 sc.addStyles(parseDeclaration(decl))
                 css=DECLARATION.sub("",css)
                 previous=oDECLARATION
 
-              #// Unknown pattern
-              elif UNKNOWN.match(css):
+            #// Unknown pattern
+            elif UNKNOWN.match(css):
                 log.warning("unknown thing found: %s"%(UNKNOWN.match(css).group()))
                 css=UNKNOWN.sub("",css)
 
-              else:
+            else:
                 log.warning("choked on: %s"%(css))
-                return 
+                return
 
-      if (previous==oDECLARATION):
-        self.choosers.append(sc)
-        sc= StyleChooser(self.scalepair)
+        if (previous==oDECLARATION):
+            self.choosers.append(sc)
+            sc= StyleChooser(self.scalepair)
 
 
 
 
 def parseCondition(s):
-            log = logging.getLogger('mapcss.parser.condition')
-            if      CONDITION_TRUE.match(s):
-              a = CONDITION_TRUE.match(s).groups()
-              log.debug("condition true: %s"%(a[0]))
-              return  Condition('true'     ,a)
-            if      CONDITION_invTRUE.match(s):
-              a = CONDITION_invTRUE.match(s).groups()
-              log.debug("condition invtrue: %s"%(a[0]))
-              return  Condition('ne'     ,(a[0],"yes"))
+    log = logging.getLogger('mapcss.parser.condition')
+    if      CONDITION_TRUE.match(s):
+        a = CONDITION_TRUE.match(s).groups()
+        log.debug("condition true: %s"%(a[0]))
+        return  Condition('true'     ,a)
+    if      CONDITION_invTRUE.match(s):
+        a = CONDITION_invTRUE.match(s).groups()
+        log.debug("condition invtrue: %s"%(a[0]))
+        return  Condition('ne'     ,(a[0],"yes"))
 
-            if      CONDITION_FALSE.match(s):
-              a = CONDITION_FALSE.match(s).groups()
-              log.debug("condition false: %s"%(a[0]))
-              return  Condition('false'     ,a)
+    if      CONDITION_FALSE.match(s):
+        a = CONDITION_FALSE.match(s).groups()
+        log.debug("condition false: %s"%(a[0]))
+        return  Condition('false'     ,a)
 
-            if      CONDITION_SET.match(s):
-              a = CONDITION_SET.match(s).groups()
-              log.debug("condition set: %s"%(a))
-              return  Condition('set'     ,a)
+    if      CONDITION_SET.match(s):
+        a = CONDITION_SET.match(s).groups()
+        log.debug("condition set: %s"%(a))
+        return  Condition('set'     ,a)
 
-            if      CONDITION_UNSET.match(s):
-              a = CONDITION_UNSET.match(s).groups()
-              log.debug("condition unset: %s"%(a))
-              return  Condition('unset'     ,a)
+    if      CONDITION_UNSET.match(s):
+        a = CONDITION_UNSET.match(s).groups()
+        log.debug("condition unset: %s"%(a))
+        return  Condition('unset'     ,a)
 
-            if      CONDITION_NE.match(s):
-              a = CONDITION_NE.match(s).groups()
-              log.debug("condition NE: %s = %s"%(a[0], a[1]))
-              return  Condition('ne'     ,a)
-              ## FIXME: convert other conditions to python
+    if      CONDITION_NE.match(s):
+        a = CONDITION_NE.match(s).groups()
+        log.debug("condition NE: %s = %s"%(a[0], a[1]))
+        return  Condition('ne'     ,a)
+        ## FIXME: convert other conditions to python
 
-            if      CONDITION_LE.match(s):
-              a = CONDITION_LE.match(s).groups()
-              log.debug("condition LE: %s <= %s"%(a[0], a[1]))
-              return  Condition('<='     ,a)
+    if      CONDITION_LE.match(s):
+        a = CONDITION_LE.match(s).groups()
+        log.debug("condition LE: %s <= %s"%(a[0], a[1]))
+        return  Condition('<='     ,a)
 
-            if      CONDITION_GE.match(s):
-              a = CONDITION_GE.match(s).groups()
-              log.debug("condition GE: %s >= %s"%(a[0], a[1]))
-              return  Condition('>='     ,a)
+    if      CONDITION_GE.match(s):
+        a = CONDITION_GE.match(s).groups()
+        log.debug("condition GE: %s >= %s"%(a[0], a[1]))
+        return  Condition('>='     ,a)
 
-            if      CONDITION_LT.match(s):
-              a = CONDITION_LT.match(s).groups()
-              log.debug("condition LT: %s < %s"%(a[0], a[1]))
-              return  Condition('<'     ,a)
+    if      CONDITION_LT.match(s):
+        a = CONDITION_LT.match(s).groups()
+        log.debug("condition LT: %s < %s"%(a[0], a[1]))
+        return  Condition('<'     ,a)
 
-            if      CONDITION_GT.match(s):
-              a = CONDITION_GT.match(s).groups()
-              log.debug("condition GT: %s > %s"%(a[0], a[1]))
-              return  Condition('>'     ,a)
+    if      CONDITION_GT.match(s):
+        a = CONDITION_GT.match(s).groups()
+        log.debug("condition GT: %s > %s"%(a[0], a[1]))
+        return  Condition('>'     ,a)
 
-            if      CONDITION_REGEX.match(s):
-              a = CONDITION_REGEX.match(s).groups()
-              log.debug("condition REGEX: %s = %s"%(a[0], a[1]))
-              return  Condition('regex'     ,a)
+    if      CONDITION_REGEX.match(s):
+        a = CONDITION_REGEX.match(s).groups()
+        log.debug("condition REGEX: %s = %s"%(a[0], a[1]))
+        return  Condition('regex'     ,a)
 
-            if      CONDITION_EQ.match(s):
-              a = CONDITION_EQ.match(s).groups()
-              log.debug("condition EQ: %s = %s"%(a[0], a[1]))
-              return  Condition('eq'     ,a)
+    if      CONDITION_EQ.match(s):
+        a = CONDITION_EQ.match(s).groups()
+        log.debug("condition EQ: %s = %s"%(a[0], a[1]))
+        return  Condition('eq'     ,a)
 
-            else:
-              log.warning("condition UNKNOWN: %s"%(s))
+    else:
+        log.warning("condition UNKNOWN: %s"%(s))
 
 
 def parseDeclaration(s):
-                  """
-                  Parse declaration string into list of styles
-                  """
-                  styles=[]
-                  t = {}
+    """
+    Parse declaration string into list of styles
+    """
+    styles=[]
+    t = {}
 
-                  for a in s.split(';'):
-                          #if ((o=ASSIGNMENT_EVAL.exec(a)))   { t[o[1].replace(DASH,'_')]=new Eval(o[2]); }
-                          if ASSIGNMENT.match(a):
-                            tzz = ASSIGNMENT.match(a).groups()
-                            t[tzz[0]]=tzz[1].strip().strip('"')
-                            logging.debug("%s == %s" % (tzz[0],tzz[1]) )
-                          else:
-                            logging.debug("unknown %s" % (a) )
-                  return [t]
+    for a in s.split(';'):
+        #if ((o=ASSIGNMENT_EVAL.exec(a)))   { t[o[1].replace(DASH,'_')]=new Eval(o[2]); }
+        if ASSIGNMENT.match(a):
+            tzz = ASSIGNMENT.match(a).groups()
+            t[tzz[0]]=tzz[1].strip().strip('"')
+            logging.debug("%s == %s" % (tzz[0],tzz[1]) )
+        else:
+            logging.debug("unknown %s" % (a) )
+    return [t]
 
 
 if __name__ == "__main__":
-  logging.basicConfig(level=logging.WARNING)
-  mc = MapCSS(0,19)
+    logging.basicConfig(level=logging.WARNING)
+    mc = MapCSS(0,19)
