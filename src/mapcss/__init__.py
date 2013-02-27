@@ -325,6 +325,20 @@ class MapCSS():
         if (previous==oDECLARATION):
             self.choosers.append(sc)
             sc= StyleChooser(self.scalepair)
+        try:
+            "clamp z-indexes, so they're tightly following integers"
+            zindex = set()
+            for chooser in self.choosers:
+                for stylez in chooser.styles:
+                    zindex.add(float(stylez.get('z-index',0)))
+            zindex = list(zindex)
+            zindex.sort()
+            for chooser in self.choosers:
+                for stylez in chooser.styles:
+                    if 'z-index' in stylez:
+                        stylez['z-index'] = zindex.index(float(stylez.get('z-index',0)))
+        except TypeError:
+            pass
 
 
 
