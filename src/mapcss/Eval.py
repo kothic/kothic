@@ -57,7 +57,6 @@ class Eval():
           "min": fake_compute,
           "max": fake_compute,
         })
-
         return tags
 
 
@@ -86,7 +85,6 @@ class Eval():
               }))
         except:
             return ""
-
 
     def __repr__(self):
         return "eval(%s)"%self.expr_text

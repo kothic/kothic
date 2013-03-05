@@ -23,32 +23,30 @@ from Eval import Eval
 
 class StyleChooser:
     """
-                        A StyleChooser object is equivalent to one CSS selector+declaration.
+					A StyleChooser object is equivalent to one CSS selector+declaration.
 
-                        Its ruleChains property is an array of all the selectors, which would
-                        traditionally be comma-separated. For example:
-                                 h1, h2, h3 em
-                        is three ruleChains.
+					Its ruleChains property is an array of all the selectors, which would
+					traditionally be comma-separated. For example:
+										h1, h2, h3 em
+					is three ruleChains.
 
-                          Each ruleChain is itself an array of nested selectors. So the above
-                          example would roughly be encoded as:
-                                  [[h1],[h2],[h3,em]]
-                                    ^^   ^^   ^^ ^^   each of these is a Rule
+						Each ruleChain is itself an array of nested selectors. So the above
+						example would roughly be encoded as:
+										[[h1],[h2],[h3,em]]
+											^^   ^^   ^^ ^^   each of these is a Rule
 
-                          The styles property is an array of all the style objects to be drawn
-                          if any of the ruleChains evaluate to true.
+						The styles property is an array of all the style objects to be drawn
+						if any of the ruleChains evaluate to true.
     """
     def __repr__(self):
         return "{(%s) : [%s] }\n"%(self.ruleChains, self.styles)
+
     def __init__(self, scalepair):
-        self.ruleChains = [[],]
+        self.ruleChains = []
         self.styles = []
         self.eval_type = type(Eval())
         self.scalepair = scalepair
         self.selzooms = None
-        self.rcpos=0
-        self.stylepos=0
-
 
     def get_numerics(self):
         """
@@ -101,19 +99,13 @@ class StyleChooser:
         # no need to check for eval's
         return a,b
 
-    # // Update the current StyleList from this StyleChooser
-
     def updateStyles(self, sl, ftype, tags, zoom, scale, zscale):
         # Are any of the ruleChains fulfilled?
         if self.selzooms:
             if zoom < self.selzooms[0] or zoom > self.selzooms[1]:
                 return sl
-        object_id = False
-        for c in self.ruleChains:
-            object_id = self.testChain(c,ftype,tags,zoom)
-            if object_id:
-                break
-        else:
+        object_id = self.testChain(self.ruleChains,ftype,tags,zoom)
+        if not object_id:
             return sl
         w = 0
         for r in self.styles:
@@ -135,7 +127,12 @@ class StyleChooser:
                 "checking and nicifying style table"
                 if "color" in a:
                     "parsing color value to 3-tuple"
-                    ra[a] = colorparser(b)
+                    #print "res:", b
+                    if b:
+                    #if not b:
+                    #    print sl, ftype, tags, zoom, scale, zscale
+                    #else:
+                        ra[a] = colorparser(b)
                 elif any(x in a for x in ("width", "z-index", "opacity", "offset", "radius", "extrude")):
                     "these things are float's or not in table at all"
                     try:
@@ -175,15 +172,14 @@ class StyleChooser:
                 if not hasall:
                     allinit.update(ra)
                     sl.append(allinit)
-         #
         return sl
 
-    def testChain(self,chain, obj, tags, zoom):
+    def testChain(self, chain, obj, tags, zoom):
         """
         Tests an object against a chain
         """
         for r in chain:
-            tt = r.test(obj,tags,zoom)
+            tt = r.test(obj, tags, zoom)
             if tt:
                 return tt
         return False
@@ -193,9 +189,7 @@ class StyleChooser:
         """
         starts a new ruleChain in this.ruleChains
         """
-        if self.ruleChains[self.rcpos]:
-            self.ruleChains.append([])
-
+        pass
 
     def newObject(self,e=''):
         """
@@ -204,32 +198,31 @@ class StyleChooser:
         rule = Rule(e)
         rule.minZoom=float(self.scalepair[0])
         rule.maxZoom=float(self.scalepair[1])
-        self.ruleChains[self.rcpos].append(rule)
+        self.ruleChains.append(rule)
 
     def addZoom(self,z):
         """
         adds into the current ruleChain (existing Rule)
         """
-
-        self.ruleChains[self.rcpos][-1].minZoom=float(z[0])
-        self.ruleChains[self.rcpos][-1].maxZoom=float(z[1])
-        if not self.selzooms:
-            self.selzooms = list(z)
-        else:
-            self.selzooms[0] = min(self.selzooms[0], z[0])
-            self.selzooms[1] = min(self.selzooms[1], z[1])
+        self.ruleChains[-1].minZoom=float(z[0])
+        self.ruleChains[-1].maxZoom=float(z[1])
 
     def addCondition(self,c):
         """
         adds into the current ruleChain (existing Rule)
         """
-        self.ruleChains[self.rcpos][-1].conditions.append(c)
-
+        self.ruleChains[-1].conditions.append(c)
 
     def addStyles(self, a):
         """
         adds to this.styles
         """
+        for r in self.ruleChains:
+            if not self.selzooms:
+                self.selzooms = [r.minZoom, r.maxZoom]
+            else:
+                self.selzooms[0] = min(self.selzooms[0], r.minZoom)
+                self.selzooms[1] = max(self.selzooms[1], r.maxZoom)
         rb = []
         for r in a:
             ra = {}

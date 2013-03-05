@@ -19,10 +19,14 @@ import re
 import logging
 from hashlib import md5
 
+from copy import copy, deepcopy
 
 
 from StyleChooser import StyleChooser
 from Condition import Condition
+
+
+NEEDED_KEYS = set(["width", "casing-width", "fill-color", "fill-image", "icon-image", "text", "extrude", "background-image", "background-color", "pattern-image", "shield-text", "symbol-shape"])
 
 
 WHITESPACE = re.compile(r'^ \s+ ', re.S | re.X)
@@ -115,81 +119,40 @@ class MapCSS():
         else:
             logging.error("unparsed zoom: %s" %s)
 
-    def precompile_style (self):
-            # TODO: styleshees precompilation
-        subjs = {"canvas": ("canvas",),"way": ("Polygon","LineString"), "line":("Polygon","LineString"), "area": ("Polygon",), "node": ("Point",), "*":("Point","Polygon","LineString") }
-        mfile.write("function restyle (prop, zoom, type){")
-        mfile.write("style = new Object;")
-        mfile.write('style["default"] = new Object;')
-        for chooser in style.choosers:
-            condition = ""
-            subclass = "default"
-            for i in chooser.ruleChains[0]:
-                if condition:
-                    condition += "||"
-                rule = " zoom >= %s && zoom <= %s"%(i.minZoom, i.maxZoom)
-                for z in  i.conditions:
-                    t = z.type
-                params = z.params
-                if params[0] == "::class":
-                    subclass = params[1][2:]
-                    continue
-                if rule:
-                    rule += " && "
-                if t == 'eq':
-                    rule += 'prop["%s"] == "%s"'%(params[0], params[1])
-                if t == 'ne':
-                    rule += 'prop["%s"] != "%s"'%(params[0], params[1])
-                if t == 'regex':
-                    rule += 'prop["%s"].match(RegExp("%s"))'%(params[0], params[1])
-                if t == 'true':
-                    rule += 'prop["%s"] == "yes"'%(params[0])
-                if t == 'untrue':
-                    rule += 'prop["%s"] != "yes"'%(params[0])
-                if t == 'set':
-                    rule += '"%s" in prop'%(params[0])
-                if t == 'unset':
-                    rule += '!("%s"in prop)'%(params[0])
-                if t == '<':
-                    rule += 'prop["%s"] < %s'%(params[0], params[1])
-                if t == '<=':
-                    rule += 'prop["%s"] <= %s'%(params[0], params[1])
-                if t == '>':
-                    rule += 'prop["%s"] > %s'%(params[0], params[1])
-                if t == '>=':
-                    rule += 'prop["%s"] >= %s'%(params[0], params[1])
-                if rule:
-                    rule = "&&" + rule
-                condition += "(("+"||".join(['type == "%s"'%z for z in subjs[i.subject]])+") "+ rule + ")"
-            #print chooser.styles
-            styles = ""
-            #if subclass != "default":
-            #styles = 'if(!("%s" in style)){style["%s"] = new Object;}'%(subclass,subclass)
-            #for k, v in chooser.styles[0].iteritems():
-
-            if type(v) == str:
-                try:
-                    v = str(float(v))
-                    styles += 'style["'+subclass+'"]["'+k+'"] = '+v + ';'
-                except:
-                    styles += 'style["'+subclass+'"]["'+k+'"] = "' + v + '";'
-
-            mfile.write("if(%s) {%s};\n"%(condition,styles))
-        mfile.write("return style;}")
-
     def get_style (self, type, tags={}, zoom=0, scale=1, zscale=.5):
         """
         Kothic styling API
         """
         shash = md5(repr(type)+repr(tags)+repr(zoom)).digest()
         if shash in self.cache["style"]:
-            return self.cache["style"][shash]
+            return deepcopy(self.cache["style"][shash])
         style = []
         for chooser in self.choosers:
             style = chooser.updateStyles(style, type, tags, zoom, scale, zscale)
         style = [x for x in style if x["object-id"] != "::*"]
+        st = []
+        for x in style:
+            for k,v in [('width',0), ('casing-width',0)]:
+                if k in x:
+                    if x[k] == v:
+                        del x[k]
+        st = []
+        for x in style:
+            if not NEEDED_KEYS.isdisjoint(x):
+                st.append(x)
+        style = st
+       
         self.cache["style"][shash] = style
-        return style
+        return deepcopy(style)
+
+    def get_style_dict (self, type, tags={}, zoom=0, scale=1, zscale=.5, olddict = {}):
+        r = self.get_style(type, tags, zoom, scale, zscale)
+        d = olddict
+        for x in r:
+            if x.get('object-id','') not in d:
+                d[x.get('object-id','')] = {}
+            d[x.get('object-id','')].update(x)
+        return d
 
     def get_interesting_tags(self, type=None, zoom=None):
         """
@@ -213,7 +176,7 @@ class MapCSS():
         return hints
 
 
-    def parse(self, css):
+    def parse(self, css, clamp=True):
         """
         Parses MapCSS given as string
         """
@@ -326,22 +289,20 @@ class MapCSS():
             self.choosers.append(sc)
             sc= StyleChooser(self.scalepair)
         try:
-            "clamp z-indexes, so they're tightly following integers"
-            zindex = set()
-            for chooser in self.choosers:
-                for stylez in chooser.styles:
-                    zindex.add(float(stylez.get('z-index',0)))
-            zindex = list(zindex)
-            zindex.sort()
-            for chooser in self.choosers:
-                for stylez in chooser.styles:
-                    if 'z-index' in stylez:
-                        stylez['z-index'] = zindex.index(float(stylez.get('z-index',0)))
+            if clamp:
+                "clamp z-indexes, so they're tightly following integers"
+                zindex = set()
+                for chooser in self.choosers:
+                    for stylez in chooser.styles:
+                        zindex.add(float(stylez.get('z-index',0)))
+                zindex = list(zindex)
+                zindex.sort()
+                for chooser in self.choosers:
+                    for stylez in chooser.styles:
+                        if 'z-index' in stylez:
+                            stylez['z-index'] = zindex.index(float(stylez.get('z-index',0)))
         except TypeError:
             pass
-
-
-
 
 def parseCondition(s):
     log = logging.getLogger('mapcss.parser.condition')

@@ -101,7 +101,7 @@ def _test_feature_compatibility (f1, f2, tags={}):
         return True
 #      else:
 #        return False
-    elif f2 == "line" and f1 in ("way", "line"):
+    elif f2 == "line" and f1 in ("way", "line", "area"):
         return True
     else:
         return False
