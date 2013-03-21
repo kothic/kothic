@@ -176,7 +176,7 @@ class MapCSS():
         return hints
 
 
-    def parse(self, css, clamp=True):
+    def parse(self, css, clamp=True, stretch=1000):
         """
         Parses MapCSS given as string
         """
@@ -300,7 +300,11 @@ class MapCSS():
                 for chooser in self.choosers:
                     for stylez in chooser.styles:
                         if 'z-index' in stylez:
-                            stylez['z-index'] = zindex.index(float(stylez.get('z-index',0)))
+                            if stretch:
+                                stylez['z-index'] = 1.*zindex.index(float(stylez.get('z-index',0)))/len(zindex)*stretch
+                            else:
+                                stylez['z-index'] = zindex.index(float(stylez.get('z-index',0)))
+
         except TypeError:
             pass
 
