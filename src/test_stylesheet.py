@@ -28,7 +28,7 @@ def compare_zoom(a, function, b):
                 la = min(sa)
                 lb = max(sb)
                 TOTAL_TESTS += 1
-                if la < lb:
+                if la <= lb:
                     print "BAD: z%s\t[%s %s %s %s %s]\t[%s, %s], " % (zoom,typ1,la,function, typ2,lb, repr(a), repr(b))
                     FAILED_TESTS += 1
 
@@ -37,6 +37,7 @@ def compare_zoom(a, function, b):
 compare_zoom({'area:highway': 'primary'},   "over", {'highway': 'primary'})
 
 compare_zoom({'highway': 'primary'},        "over", {'waterway': 'river'})
+compare_zoom({'highway': 'primary'},        "over", {'waterway': 'canal'})
 compare_zoom({'highway': 'path'},           "over", {'waterway': 'river'})
 
 
@@ -44,6 +45,7 @@ compare_zoom({"highway": "motorway"},       "over", {'highway': 'primary'})
 compare_zoom({"highway": "motorway_link"},  "over", {'highway': 'primary_link'})
 compare_zoom({"highway": "trunk"},          "over", {'highway': 'primary'})
 compare_zoom({"highway": "trunk_link"},     "over", {'highway': 'primary_link'})
+compare_zoom({'highway': 'primary'},        "over", {'highway': 'residential'})
 compare_zoom({'highway': 'primary'},        "over", {'highway': 'secondary'})
 compare_zoom({'highway': 'primary_link'},   "over", {'highway': 'secondary_link'})
 compare_zoom({'highway': 'secondary'},      "over", {'highway': 'tertiary'})
@@ -51,22 +53,35 @@ compare_zoom({'highway': 'secondary_link'}, "over", {'highway': 'tertiary_link'}
 compare_zoom({'highway': 'tertiary'},       "over", {'highway': 'residential'})
 compare_zoom({'highway': 'tertiary'},       "over", {'highway': 'service'})
 compare_zoom({'highway': 'tertiary'},       "over", {'highway': 'unclassified'})
-compare_zoom({'highway': 'tertiary'},       "over", {"highway": "living_street"})
+
 compare_zoom({'highway': 'tertiary'},       "over", {"highway": "road"})
 compare_zoom({'highway': 'residential'},    "over", {'highway': "track"})
-compare_zoom({'highway': 'residential'},    "over", {'highway': "service"})
+compare_zoom({'highway': 'residential'},    "over", {"highway": "living_street"})
 compare_zoom({'highway': 'unclassified'},   "over", {'highway': "track"})
+compare_zoom({'highway': 'unclassified'},   "over", {'highway': "construction"})
+compare_zoom({'highway': 'residential'},    "over", {'highway': "path", "bicycle": "yes"})
 compare_zoom({'highway': 'track'},          "over", {'highway': "path"})
 compare_zoom({"highway": "steps"},          "over", {'highway': "pedestrian"})
 compare_zoom({"highway": "steps"},          "over", {'highway': "footway"})
+compare_zoom({"highway": "steps"},          "over", {'highway': "footway", "tunnel": "yes"})
 compare_zoom({"highway": "steps"},          "over", {'highway': "cycleway"})
 compare_zoom({"highway": "cycleway"},       "over", {'highway': "footway"})
 
+compare_zoom({"highway": "service"},        "over", {'building': "yes"})
 
+compare_zoom({"railway": "rail"},           "over", {"waterway": "riverbank"})
+
+
+compare_zoom({"amenity": "cafe"},           "over", {'amenity': "parking"})
 compare_zoom({"amenity": "bank"},           "over", {'amenity': "atm"})
 compare_zoom({"amenity": "bank"},           "over", {'amenity': "atm"})
 compare_zoom({"railway": "station"},        "over", {'leisure': "park"})
-
+compare_zoom({"railway": "station"},        "over", {"highway": "bus_stop"})
+compare_zoom({"highway": "tertiary"},       "over", {"highway": "bus_stop"})
+compare_zoom({"highway": "secondary"},      "over", {"highway": "bus_stop"})
+compare_zoom({"highway": "bus_stop"},       "over", {"amenity": "police"})
+compare_zoom({"place": "suburb"},           "over", {'leisure': "park"})
+#compare_zoom({"highway": "bus_stop"},       "over", {'highway': "trunk"})
 
 
 print "Failed tests: %s (%s%%)" % (FAILED_TESTS, 100*FAILED_TESTS/TOTAL_TESTS)
