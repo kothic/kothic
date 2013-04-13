@@ -187,6 +187,7 @@ class MapCSS():
         sc=StyleChooser(self.scalepair) #currently being assembled
         #choosers=[]
         #o = []
+        css_orig = css
         while (css):
 
             # CSS comment
@@ -223,9 +224,6 @@ class MapCSS():
                 css = NOT_CLASS.sub("", css)
                 sc.addCondition(Condition('ne',("::class",cond)))
                 previous=oCONDITION;
-                      #css=css.replace(NOT_CLASS,'');
-                      #sc.addCondition(new Condition('unset',o[1]));
-                      #previous=oCONDITION;
 
             #// Zoom
             elif ZOOM.match(css):
@@ -278,7 +276,7 @@ class MapCSS():
 
             #// Unknown pattern
             elif UNKNOWN.match(css):
-                log.warning("unknown thing found: %s"%(UNKNOWN.match(css).group()))
+                log.warning("unknown thing found on line %s: %s"%(unicode(css_orig[:-len(unicode(css))]).count("\n")+1, UNKNOWN.match(css).group()))
                 css=UNKNOWN.sub("",css)
 
             else:
