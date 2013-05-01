@@ -192,7 +192,7 @@ if options.renderer == "mapnik":
                     zsheet[zindex] = []
                 chooser_entry = {}
 
-                chooser_entry["type"] = chooser.ruleChains[0].subject
+                ttypes = list(set([x.subject for x in chooser.ruleChains]))
 
                 sql = "("+ chooser.get_sql_hints(chooser.ruleChains[0].subject,zoom)[1] +")"
                 sql = sql.split('"')
@@ -200,7 +200,7 @@ if options.renderer == "mapnik":
                 odd = True
                 for i in sql:
                     if not odd:
-                        sq += escape_sql_column(i, chooser_entry["type"])
+                        sq += escape_sql_column(i)
                     else:
                         sq += i
                     odd = not odd
@@ -214,12 +214,15 @@ if options.renderer == "mapnik":
                 #print chooser_entry["rule"]
                 chooser_entry["rulestring"] = " or ".join([ "("+ " and ".join([i.get_mapnik_filter() for i in rule if i.get_mapnik_filter()]) + ")" for rule in chooser_entry["rule"]])
                 chooser_entry["chooser"] = chooser
-                if chooser_entry["type"] == "ele":
-                    demhack = True
-                if chooser_entry["type"] == "area" and "[natural] = 'coastline'" in chooser_entry["rulestring"]:
-                    coast[zoom] = chooser_entry["style"]
-                else:
-                    zsheet[zindex].append(chooser_entry)
+                for ttype in ttypes:
+                    if ttype == "ele":
+                        demhack = True
+                    if ttype == "area" and "[natural] = 'coastline'" in chooser_entry["rulestring"]:
+                        coast[zoom] = chooser_entry["style"]
+                    else:
+                        che = chooser_entry.copy()
+                        che["type"] = ttype
+                        zsheet[zindex].append(che)
 
     #sys.stderr.write(str(numerics)+"\n")
     #print mapniksheet
@@ -573,7 +576,7 @@ if options.renderer == "mapnik":
                             oitags = '"'+ "\", \"".join(oitags) +'"'
                             sqlz = """select %s, ST_LineMerge(ST_Union(way)) as way from (SELECT %s, ST_SnapToGrid(way, %s) as way from %sline where way &amp;&amp; !bbox! and (%s)) as tex
                             group by %s
-                            """%(itags, oitags,pixel_size_at_zoom(zoom,1.5),libkomapnik.table_prefix,sql,oitags)
+                            """%(oitags, itags,pixel_size_at_zoom(zoom,1.5),libkomapnik.table_prefix,sql,oitags)
                             mfile.write(xml_layer("postgis-process", layer_type, itags, sqlz, zoom=zoom ))
                         else:
                             if roads:
@@ -654,7 +657,7 @@ if options.renderer == "mapnik":
 
             ta.reverse()
             for zindex in ta:
-                for layer_type, entry_types in [ ("polygon",("way","area")),("point", ("node", "point")),("line",("way", "line"))]:
+                for layer_type, entry_types in [("point", ("node", "point")), ("polygon",("way","area")), ("line",("way", "line"))]:
                     for placement in ("center","line"):
                         ## text pass
                         collhere = set()
@@ -744,6 +747,7 @@ if options.renderer == "mapnik":
                                     if csb:
                                         if cso != "desc":
                                             cso = "asc"
+                                        itags.add(csb)
                                         order = """ order by (CASE WHEN "%s" ~ E'^[[:digit:]]+([.][[:digit:]]+)?$' THEN to_char(CAST ("%s" AS FLOAT) ,'000000000000000.99999999999') else "%s" end) %s nulls last """%(csb,csb,csb,cso)
 
                                     mfile.write(xml)
