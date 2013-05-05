@@ -28,6 +28,9 @@ db_proj = ""
 table_prefix = ""
 db_user = ""
 db_name = ""
+db_passwd = ""
+db_host = ""
+db_port = ""
 db_srid = ""
 icons_path = ""
 world_bnd_path = ""
@@ -335,13 +338,17 @@ def xml_layer(type="postgis", geom="point", interesting_tags = "*", sql = "true"
             <Parameter name="st_prefix">true</Parameter>
             <Parameter name="user">%s</Parameter>
             <Parameter name="dbname">%s</Parameter>
+            <Parameter name="password">%s</Parameter>
+            <Parameter name="host">%s</Parameter>
+            <Parameter name="port">%s</Parameter>
             <Parameter name="srid">%s</Parameter>
             <Parameter name="geometry_field">way</Parameter>
             <Parameter name="geometry_table">%s%s</Parameter>
             <Parameter name="estimate_extent">false</Parameter>
             <Parameter name="extent">-20037508.342789244, -20037508.342780735, 20037508.342789244, 20037508.342780709</Parameter>
           </Datasource>
-        </Layer>"""%(layer_id, db_proj, subs, zoom, interesting_tags, waystring, table_prefix, geom, sql, intersection_SQL, db_user, db_name, db_srid,  table_prefix, geom)
+        </Layer>"""%(layer_id, db_proj, subs, zoom, interesting_tags, waystring, table_prefix, geom, sql, intersection_SQL, db_user, db_name, db_passwd, db_host, db_port, db_srid,  table_prefix, geom)
+
     elif type == "postgis-process":
         return """
         <Layer name="l%s" status="on" srs="%s">
@@ -357,13 +364,16 @@ def xml_layer(type="postgis", geom="point", interesting_tags = "*", sql = "true"
             <Parameter name="st_prefix">true</Parameter>
             <Parameter name="user">%s</Parameter>
             <Parameter name="dbname">%s</Parameter>
+            <Parameter name="password">%s</Parameter>
+            <Parameter name="host">%s</Parameter>
+            <Parameter name="port">%s</Parameter>
             <Parameter name="srid">%s</Parameter>
             <Parameter name="geometry_field">way</Parameter>
             <Parameter name="geometry_table">%s%s</Parameter>
             <Parameter name="estimate_extent">false</Parameter>
             <Parameter name="extent">-20037508.342789244, -20037508.342780735, 20037508.342789244, 20037508.342780709</Parameter>
           </Datasource>
-        </Layer>"""%(layer_id, db_proj, subs, zoom, sql, intersection_SQL, db_user, db_name, db_srid,  table_prefix, geom)
+        </Layer>"""%(layer_id, db_proj, subs, zoom, sql, intersection_SQL, db_user, db_name, db_passwd, db_host, db_port, db_srid,  table_prefix, geom)
     elif type == "coast":
         if zoom < 9:
             return """
