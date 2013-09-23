@@ -34,10 +34,12 @@ cr.translate(0,0.5)
 
 
 i = 0
+icons = {}
 for tag in tags:
   had_lines = False
   for zoom in range (minzoom, maxzoom):
-    styles = style.get_style_dict("area", tag, zoom, olddict = {})
+    styles = style.get_style_dict("node", tag, zoom, olddict = {})
+    styles = style.get_style_dict("area", tag, zoom, olddict = styles.copy())
     styles = style.get_style_dict("line", tag, zoom, olddict = styles.copy())
     
     styles = styles.values()
@@ -73,6 +75,10 @@ for tag in tags:
             cr.line_to(sample_width+sample_width*zoom, 50+50*i)
             had_lines = True
             cr.stroke()
+        if "icon-image" in st:
+					icons[st["icon-image"]] = icons.get(st["icon-image"], set())
+					icons[st["icon-image"]].add('[' + ']['.join([ k+"="+v for k,v in tag.iteritems()])+']')
+      
 
       if had_lines:
             cr.move_to(0+sample_width*zoom, 25+50*i)
@@ -91,5 +97,10 @@ for tag in tags:
         
         cr.stroke()
         i += 1
-#a.finish()
+#a.finish()\
+ss = open("icons.html","w")
+print >> ss, "<html><body><table border=1>"
+for k, v in icons.iteritems():
+	print >> ss, "<tr><td><img src='%s' width='24' height='24'></td><td>%s</td><td>%s</td></tr>\n"%(k.lower(), k.lower(), "<br>".join(list(v)))
+print >> ss, "</table></body></html>"
 a.write_to_png ("legend.png") 
