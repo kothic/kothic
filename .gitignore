@@ -1,0 +1,7 @@
+src/data/
+src/tiles/
+*~
+*.pyc
+*pycache*
+*swp
+*bak
