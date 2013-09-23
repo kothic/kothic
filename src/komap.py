@@ -33,10 +33,6 @@ try:
 except ImportError:
     pass
 
-
-    
-
-    
 from optparse import OptionParser
 import ConfigParser
 import csv
