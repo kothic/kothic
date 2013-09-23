@@ -101,10 +101,14 @@ class StyleChooser:
         if self.selzooms:
             if zoom < self.selzooms[0] or zoom > self.selzooms[1]:
                 return sl
+
         object_id = self.testChain(self.ruleChains,ftype,tags,zoom)
+
         if not object_id:
             return sl
+
         w = 0
+
         for r in self.styles:
             ra = {}
             for a,b in r.iteritems():
@@ -120,6 +124,7 @@ class StyleChooser:
                 ra[a] = b
             r = ra
             ra = {}
+
             for a, b in r.iteritems():
                 "checking and nicifying style table"
                 if "color" in a:
@@ -146,7 +151,6 @@ class StyleChooser:
                         ra[a] = []
                 else:
                     ra[a]=b
-            ra["layer"] = float(tags.get("layer",0))*2000+ra.get("z-index",1) # calculating z-index
             #for k,v in ra.items():  # if a value is empty, we don't need it - renderer will do as default.
             #    if not v:
             #        del ra[k]
@@ -240,5 +244,4 @@ class StyleChooser:
                     b = Eval(b)
                 ra[a] = b
             rb.append(ra)
-         # print rb
         self.styles = self.styles + rb

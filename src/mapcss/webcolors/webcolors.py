@@ -200,7 +200,7 @@ def _reversedict(d):
     """
     return dict(zip(d.values(), d.keys()))
 
-HEX_COLOR_RE = re.compile(r'^#([a-fA-F0-9]{3}|[a-fA-F0-9]{6})$')
+HEX_COLOR_RE = re.compile(r'^#([a-fA-F0-9]|[a-fA-F0-9]{3}|[a-fA-F0-9]{6})$')
 
 SUPPORTED_SPECIFICATIONS = ('html4', 'css2', 'css21', 'css3')
 
@@ -455,6 +455,8 @@ def normalize_hex(hex_value):
         raise ValueError("'%s' is not a valid hexadecimal color value." % hex_value)
     if len(hex_digits) == 3:
         hex_digits = ''.join(map(lambda s: 2 * s, hex_digits))
+    elif len(hex_digits) == 1:
+        hex_digits = hex_digits * 6
     return '#%s' % hex_digits.lower()
 
 
@@ -831,8 +833,6 @@ def rgb_percent_to_rgb(rgb_percent_triplet):
     """
     return tuple(map(_percent_to_integer, rgb_percent_triplet))
 
-
-
 def whatever_to_rgb(string):
     """
     Converts CSS3 color or a hex into rgb triplet; hash of string if fails.
@@ -854,14 +854,13 @@ def whatever_to_hex(string):
     if type(string) == tuple:
         return cairo_to_hex(string).upper()
     return rgb_to_hex(whatever_to_rgb(string)).upper()
+
 def whatever_to_cairo(string):
     a = whatever_to_rgb(string)
-    return a[0]/255.,a[1]/255.,a[2]/255.,
+    return a[0]/255.,a[1]/255.,a[2]/255.
+
 def cairo_to_hex (cairo):
-    return rgb_to_hex((cairo[0]*255,cairo[1]*255,cairo[2]*255,))
-
-
-
+    return rgb_to_hex((cairo[0]*255.,cairo[1]*255.,cairo[2]*255.))
 
 if __name__ == '__main__':
     import doctest

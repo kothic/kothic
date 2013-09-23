@@ -31,11 +31,14 @@ class Rule():
         return "%s|z%s-%s %s"%(self.subject, self.minZoom, self.maxZoom, self.conditions)
 
     def test(self, obj, tags, zoom):
-        if not ((zoom >= self.minZoom) and (zoom <= self.maxZoom)):
+        if (zoom < self.minZoom) or (zoom > self.maxZoom):
             return False
+
         if (self.subject != '') and not _test_feature_compatibility(obj, self.subject, tags):
             return False
+
         subpart = "::default"
+
         for condition in self.conditions:
             res = condition.test(tags)
             if not res:
