@@ -15,6 +15,13 @@
 #   You should have received a copy of the GNU General Public License
 #   along with kothic.  If not, see <http://www.gnu.org/licenses/>.
 
+type_matches = {
+    "": ('area', 'line', 'way', 'node'),
+    "area": ("area", "way"),
+    "node": ("node",),
+    "way": ("line", "area", "way"),
+    "line": ("line", "area"),
+    }
 
 class Rule():
     def __init__(self, s=''):
@@ -48,6 +55,9 @@ class Rule():
 
     def test_zoom(self, zoom):
         return (zoom >= self.minZoom) and (zoom <= self.maxZoom)
+
+    def get_compatible_types(self):
+        return type_matches.get(self.subject, (self.subject,))
 
     def get_interesting_tags(self, obj, zoom):
         if obj:

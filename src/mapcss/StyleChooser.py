@@ -22,22 +22,57 @@ from webcolors.webcolors import cairo_to_hex
 from Eval import Eval
 
 
+def make_nice_style(r):
+    ra = {}
+    for a, b in r.iteritems():
+        "checking and nicifying style table"
+        if type(b) == type(Eval()):
+            ra[a] = b
+        elif "color" in a:
+            "parsing color value to 3-tuple"
+            # print "res:", b
+            if b and (type(b) != tuple):
+            # if not b:
+            #    print sl, ftype, tags, zoom, scale, zscale
+            # else:
+                ra[a] = colorparser(b)
+            elif b:
+                ra[a] = b
+        elif any(x in a for x in ("width", "z-index", "opacity", "offset", "radius", "extrude")):
+            "these things are float's or not in table at all"
+            try:
+                ra[a] = float(b)
+            except ValueError:
+                pass
+        elif "dashes" in a and type(b) != list:
+            "these things are arrays of float's or not in table at all"
+            try:
+                b = b.split(",")
+                b = [float(x) for x in b]
+                ra[a] = b
+            except ValueError:
+                ra[a] = []
+        else:
+            ra[a] = b
+    return ra
+
+
 class StyleChooser:
     """
-                                        A StyleChooser object is equivalent to one CSS selector+declaration.
+    A StyleChooser object is equivalent to one CSS selector+declaration.
 
-                                        Its ruleChains property is an array of all the selectors, which would
-                                        traditionally be comma-separated. For example:
-                                                                                h1, h2, h3 em
-                                        is three ruleChains.
+    Its ruleChains property is an array of all the selectors, which would
+    traditionally be comma-separated. For example:
+            h1, h2, h3 em
+    is three ruleChains.
 
-                                                Each ruleChain is itself an array of nested selectors. So the above
-                                                example would roughly be encoded as:
-                                                                                [[h1],[h2],[h3,em]]
-                                                                                        ^^   ^^   ^^ ^^   each of these is a Rule
+    Each ruleChain is itself an array of nested selectors. So the above
+    example would roughly be encoded as:
+            [[h1],[h2],[h3,em]]
+              ^^   ^^   ^^ ^^   each of these is a Rule
 
-                                                The styles property is an array of all the style objects to be drawn
-                                                if any of the ruleChains evaluate to true.
+    The styles property is an array of all the style objects to be drawn
+        if any of the ruleChains evaluate to true.
     """
     def __repr__(self):
         return "{(%s) : [%s] }\n" % (self.ruleChains, self.styles)
@@ -48,6 +83,8 @@ class StyleChooser:
         self.eval_type = type(Eval())
         self.scalepair = scalepair
         self.selzooms = None
+        self.compatible_types = set()
+        self.has_evals = False
 
     def get_numerics(self):
         """
@@ -103,6 +140,9 @@ class StyleChooser:
             if zoom < self.selzooms[0] or zoom > self.selzooms[1]:
                 return sl
 
+        #if ftype not in self.compatible_types:
+#            return sl
+
         object_id = self.testChain(self.ruleChains, ftype, tags, zoom)
 
         if not object_id:
@@ -111,50 +151,24 @@ class StyleChooser:
         w = 0
 
         for r in self.styles:
-            ra = {}
-            for a, b in r.iteritems():
-                "calculating eval()'s"
-                if type(b) == self.eval_type:
-                    combined_style = {}
-                    for t in sl:
-                        combined_style.update(t)
-                    for p, q in combined_style.iteritems():
-                        if "color" in p:
-                            combined_style[p] = cairo_to_hex(q)
-                    b = b.compute(tags, combined_style, scale, zscale)
-                ra[a] = b
-            r = ra
-            ra = {}
-
-            for a, b in r.iteritems():
-                "checking and nicifying style table"
-                if "color" in a:
-                    "parsing color value to 3-tuple"
-                    # print "res:", b
-                    if b:
-                    # if not b:
-                    #    print sl, ftype, tags, zoom, scale, zscale
-                    # else:
-                        ra[a] = colorparser(b)
-                elif any(x in a for x in ("width", "z-index", "opacity", "offset", "radius", "extrude")):
-                    "these things are float's or not in table at all"
-                    try:
-                        ra[a] = float(b)
-                    except ValueError:
-                        pass
-                elif "dashes" in a:
-                    "these things are arrays of float's or not in table at all"
-                    try:
-                        b = b.split(",")
-                        b = [float(x) for x in b]
-                        ra[a] = b
-                    except ValueError:
-                        ra[a] = []
-                else:
+            if self.has_evals:
+                ra = {}
+                for a, b in r.iteritems():
+                    "calculating eval()'s"
+                    if type(b) == self.eval_type:
+                        combined_style = {}
+                        for t in sl:
+                            combined_style.update(t)
+                        for p, q in combined_style.iteritems():
+                            if "color" in p:
+                                combined_style[p] = cairo_to_hex(q)
+                        b = b.compute(tags, combined_style, scale, zscale)
                     ra[a] = b
-            # for k,v in ra.items():  # if a value is empty, we don't need it - renderer will do as default.
-            #    if not v:
-            #        del ra[k]
+                #r = ra
+                ra = make_nice_style(ra)
+            else:
+                ra = r.copy()
+
             ra["object-id"] = str(object_id)
             hasall = False
             allinit = {}
@@ -224,6 +238,7 @@ class StyleChooser:
             else:
                 self.selzooms[0] = min(self.selzooms[0], r.minZoom)
                 self.selzooms[1] = max(self.selzooms[1], r.maxZoom)
+            self.compatible_types.update(r.get_compatible_types())
         rb = []
         for r in a:
             ra = {}
@@ -242,6 +257,8 @@ class StyleChooser:
                         b = "eval(tag(\"" + b + "\"))"
                 if b[:5] == "eval(":
                     b = Eval(b)
+                    self.has_evals = True
                 ra[a] = b
+            ra = make_nice_style(ra)
             rb.append(ra)
         self.styles = self.styles + rb

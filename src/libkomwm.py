@@ -9,7 +9,6 @@ whatever_to_cairo = mapcss.webcolors.webcolors.whatever_to_cairo
 
 WIDTH_SCALE = 1.0
 
-
 def komap_mapswithme(options, style):
     if options.outfile == "-":
         print "Please specify base output path."
@@ -58,8 +57,6 @@ def komap_mapswithme(options, style):
         if prefix:
             prefix += "-"
         opacity = hex(255 - int(255 * float(st.get(prefix + "opacity", 1))))
-        if opacity == "0x0":
-            opacity = "0x"
         color = whatever_to_hex(st.get(prefix + 'color', default))
         color = color[1] + color[1] + color[3] + color[3] + color[5] + color[5]
         return int(opacity + color, 16)
@@ -84,20 +81,20 @@ def komap_mapswithme(options, style):
             zstyle = {}
 
             if "area" not in txclass:
-                zstyle = style.get_style_dict("line", txclass, zoom, olddict=zstyle)
+                zstyle = style.get_style_dict("line", txclass, zoom, olddict=zstyle, cache=False)
                 # for st in zstyle:
                 #    if "fill-color" in st:
                 #        del st["fill-color"]
 
             if True:
-                areastyle = style.get_style_dict("area", txclass, zoom, olddict=zstyle)
+                areastyle = style.get_style_dict("area", txclass, zoom, olddict=zstyle, cache=False)
                 for st in areastyle.values():
                     if "icon-image" in st or 'symbol-shape' in st:
                         has_icons_for_areas = True
                 zstyle = areastyle
 
             if "area" not in txclass:
-                nodestyle = style.get_style_dict("node", txclass, zoom, olddict=zstyle)
+                nodestyle = style.get_style_dict("node", txclass, zoom, olddict=zstyle, cache=False)
                 # for st in nodestyle:
                 #    if "fill-color" in st:
                 #        del st["fill-color"]

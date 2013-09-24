@@ -85,15 +85,6 @@ CENTER = re.compile(r'^center$/i')
 
 HEX = re.compile(r'^#([0-9a-f]+)$/i')
 
-
-builtin_style = """
-canvas {fill-color: #cccccc}
-way {width: 1; casing-width:1; casing-color: white}
-"""
-
-
-  ## ** also needs to support @import rules
-
 class MapCSS():
     def __init__(self, minscale=0, maxscale=19):
         """
@@ -104,9 +95,8 @@ class MapCSS():
         self.maxscale = maxscale
         self.scalepair = (minscale, maxscale)
         self.choosers = []
+        self.choosers_by_type = {}
         self.style_loaded = False
-        self.parse(builtin_style)
-        self.style_loaded = False  # override one after loading
 
     def parseZoom(self, s):
         if ZOOM_MINMAX.match(s):
@@ -120,15 +110,16 @@ class MapCSS():
         else:
             logging.error("unparsed zoom: %s" % s)
 
-    def get_style(self, type, tags={}, zoom=0, scale=1, zscale=.5):
+    def get_style(self, type, tags={}, zoom=0, scale=1, zscale=.5, cache=True):
         """
         Kothic styling API
         """
-        shash = md5(repr(type) + repr(tags) + repr(zoom)).digest()
-        if shash in self.cache["style"]:
-            return deepcopy(self.cache["style"][shash])
+        if cache:
+            shash = md5(repr(type) + repr(tags) + repr(zoom)).digest()
+            if shash in self.cache["style"]:
+                return deepcopy(self.cache["style"][shash])
         style = []
-        for chooser in self.choosers:
+        for chooser in self.choosers_by_type[type]:
             style = chooser.updateStyles(style, type, tags, zoom, scale, zscale)
         style = [x for x in style if x["object-id"] != "::*"]
         st = []
@@ -143,11 +134,12 @@ class MapCSS():
                 st.append(x)
         style = st
 
-        self.cache["style"][shash] = style
-        return deepcopy(style)
+        if cache:
+            self.cache["style"][shash] = deepcopy(style)
+        return style
 
-    def get_style_dict(self, type, tags={}, zoom=0, scale=1, zscale=.5, olddict={}):
-        r = self.get_style(type, tags, zoom, scale, zscale)
+    def get_style_dict(self, type, tags={}, zoom=0, scale=1, zscale=.5, olddict={}, cache=True):
+        r = self.get_style(type, tags, zoom, scale, zscale, cache)
         d = olddict
         for x in r:
             if x.get('object-id', '') not in d:
@@ -315,6 +307,12 @@ class MapCSS():
 
         except TypeError:
             pass
+        for chooser in self.choosers:
+            for t in chooser.compatible_types:
+                if t not in self.choosers_by_type:
+                    self.choosers_by_type[t] = [chooser]
+                else:
+                    self.choosers_by_type[t].append(chooser)
 
 
 def parseCondition(s):
@@ -347,7 +345,6 @@ def parseCondition(s):
         a = CONDITION_NE.match(s).groups()
         log.debug("condition NE: %s = %s" % (a[0], a[1]))
         return Condition('ne', a)
-        ## FIXME: convert other conditions to python
 
     if CONDITION_LE.match(s):
         a = CONDITION_LE.match(s).groups()

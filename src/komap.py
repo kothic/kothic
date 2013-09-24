@@ -18,6 +18,9 @@
 from debug import debug, Timer
 from mapcss import MapCSS
 
+import gc
+gc.disable()
+
 import mapcss.webcolors
 whatever_to_hex = mapcss.webcolors.webcolors.whatever_to_hex
 
