@@ -89,7 +89,7 @@ def escape_sql_column(name, type="way", asname=False):
         return "(tags->'" + name + "') as \"" + name + '"'
 
 style = MapCSS(options.minzoom, options.maxzoom + 1)  # zoom levels
-style.parse(open(options.filename, "r").read())
+style.parse(filename=options.filename)
 
 if options.renderer == "mapswithme":
     from libkomwm import *

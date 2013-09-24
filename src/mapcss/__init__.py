@@ -16,6 +16,7 @@
 #   along with kothic.  If not, see <http://www.gnu.org/licenses/>.
 
 import re
+import os
 import logging
 from hashlib import md5
 
@@ -33,12 +34,13 @@ WHITESPACE = re.compile(r'^ \s+ ', re.S | re.X)
 
 COMMENT = re.compile(r'^ \/\* .+? \*\/ \s* ', re.S | re.X)
 CLASS = re.compile(r'^ ([\.:]:?[*\w]+) \s* ', re.S | re.X)
-NOT_CLASS = re.compile(r'^ !([\.:]\w+) \s* ', re.S | re.X)
+#NOT_CLASS = re.compile(r'^ !([\.:]\w+) \s* ', re.S | re.X)
 ZOOM = re.compile(r'^ \| \s* z([\d\-]+) \s* ', re.I | re.S | re.X)
 GROUP = re.compile(r'^ , \s* ', re.I | re.S | re.X)
 CONDITION = re.compile(r'^ \[(.+?)\] \s* ', re.S | re.X)
 OBJECT = re.compile(r'^ (\*|[\w]+) \s* ', re.S | re.X)
 DECLARATION = re.compile(r'^ \{(.+?)\} \s* ', re.S | re.X)
+IMPORT = re.compile(r'^@import\("(.+?)"\); \s* ', re.S | re.X)
 UNKNOWN = re.compile(r'^ (\S+) \s* ', re.S | re.X)
 
 ZOOM_MINMAX = re.compile(r'^ (\d+)\-(\d+) $', re.S | re.X)
@@ -174,32 +176,26 @@ class MapCSS():
                     hints.append(p)
         return hints
 
-    def parse(self, css, clamp=True, stretch=1000):
+    def parse(self, css=None, clamp=True, stretch=1000, filename=None):
         """
         Parses MapCSS given as string
         """
+        basepath = os.curdir
+        if filename:
+            basepath = os.path.dirname(filename)
+        if not css:
+            css = open(filename).read()
         if not self.style_loaded:
             self.choosers = []
         log = logging.getLogger('mapcss.parser')
         previous = 0  # what was the previous CSS word?
         sc = StyleChooser(self.scalepair)  # currently being assembled
-        # choosers=[]
-        # o = []
         css_orig = css
+        css = css.strip()
         while (css):
 
-            # CSS comment
-            if COMMENT.match(css):
-                log.debug("comment found")
-                css = COMMENT.sub("", css)
-
-            #// Whitespace (probably only at beginning of file)
-            elif WHITESPACE.match(css):
-                log.debug("whitespace found")
-                css = WHITESPACE.sub("", css)
-
-            #// Class - .motorway, .builtup, :hover
-            elif CLASS.match(css):
+            # Class - :motorway, :builtup, :hover
+            if CLASS.match(css):
                 if previous == oDECLARATION:
                     self.choosers.append(sc)
                     sc = StyleChooser(self.scalepair)
@@ -211,19 +207,19 @@ class MapCSS():
                 sc.addCondition(Condition('eq', ("::class", cond)))
                 previous = oCONDITION
 
-            #// Not class - !.motorway, !.builtup, !:hover
-            elif NOT_CLASS.match(css):
-                if (previous == oDECLARATION):
-                    self.choosers.append(sc)
-                    sc = StyleChooser(self.scalepair)
+            ## Not class - !.motorway, !.builtup, !:hover
+            #elif NOT_CLASS.match(css):
+                #if (previous == oDECLARATION):
+                    #self.choosers.append(sc)
+                    #sc = StyleChooser(self.scalepair)
 
-                cond = NOT_CLASS.match(css).groups()[0]
-                log.debug("not_class found: %s" % (cond))
-                css = NOT_CLASS.sub("", css)
-                sc.addCondition(Condition('ne', ("::class", cond)))
-                previous = oCONDITION
+                #cond = NOT_CLASS.match(css).groups()[0]
+                #log.debug("not_class found: %s" % (cond))
+                #css = NOT_CLASS.sub("", css)
+                #sc.addCondition(Condition('ne', ("::class", cond)))
+                #previous = oCONDITION
 
-            #// Zoom
+            # Zoom
             elif ZOOM.match(css):
                 if (previous != oOBJECT & previous != oCONDITION):
                     sc.newObject()
@@ -234,13 +230,13 @@ class MapCSS():
                 sc.addZoom(self.parseZoom(cond))
                 previous = oZOOM
 
-            #// Grouping - just a comma
+            # Grouping - just a comma
             elif GROUP.match(css):
                 css = GROUP.sub("", css)
                 sc.newGroup()
                 previous = oGROUP
 
-            #// Condition - [highway=primary]
+            # Condition - [highway=primary]
             elif CONDITION.match(css):
                 if (previous == oDECLARATION):
                     self.choosers.append(sc)
@@ -253,7 +249,7 @@ class MapCSS():
                 sc.addCondition(parseCondition(cond))
                 previous = oCONDITION
 
-            #// Object - way, node, relation
+            # Object - way, node, relation
             elif OBJECT.match(css):
                 if (previous == oDECLARATION):
                     self.choosers.append(sc)
@@ -264,7 +260,7 @@ class MapCSS():
                 sc.newObject(obj)
                 previous = oOBJECT
 
-            #// Declaration - {...}
+            # Declaration - {...}
             elif DECLARATION.match(css):
                 decl = DECLARATION.match(css).groups()[0]
                 log.debug("declaration found: %s" % (decl))
@@ -272,7 +268,23 @@ class MapCSS():
                 css = DECLARATION.sub("", css)
                 previous = oDECLARATION
 
-            #// Unknown pattern
+            # CSS comment
+            elif COMMENT.match(css):
+                log.debug("comment found")
+                css = COMMENT.sub("", css)
+
+            # @import("filename.css");
+            elif IMPORT.match(css):
+                log.debug("import found")
+                filename = os.path.join(basepath, IMPORT.match(css).groups()[0])
+                try:
+                    css = IMPORT.sub("", css)
+                    import_text = open(os.path.join(basepath, filename), "r").read().strip()
+                    css = import_text + css
+                except IOError:
+                    log.warning("cannot import file %s" % (filename))
+
+            # Unknown pattern
             elif UNKNOWN.match(css):
                 log.warning("unknown thing found on line %s: %s" % (unicode(css_orig[:-len(unicode(css))]).count("\n") + 1, UNKNOWN.match(css).group()))
                 css = UNKNOWN.sub("", css)

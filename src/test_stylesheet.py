@@ -12,7 +12,7 @@ minzoom = 0
 maxzoom = 19
 
 style = MapCSS(minzoom, maxzoom)
-style.parse(open(sys.argv[1], "r").read(), clamp=False)
+style.parse(filename=sys.argv[1], clamp=False)
 TOTAL_TESTS = 0
 FAILED_TESTS = 0
 
