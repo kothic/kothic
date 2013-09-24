@@ -1,7 +1,8 @@
 canvas{fill-color:#B5D0D0} 
  
 area[natural=ocean]{fill-color:#B5D0D0}
-area[natural=coastline]{fill-color:#F1EEE8}
+area[natural=coastline]{fill-color:#B5D0D0}
+/*area[natural=coastline]{fill-color:#F1EEE8}*/
 
 
 area|z10-[landuse=military]{fill-color:#F1EEE8; z-index:100}
@@ -108,6 +109,7 @@ line|z11[highway=motorway]  {color: #809bc0; width: 2}
 line|z12-[highway=motorway]  {color: #809bc0; width: 2.5}
 area|z14-[area:highway=motorway]   {fill-color: #809bc0}
 
+line|z0[highway=trunk]      {color: #cdeacd; width: 0.35}
 line|z5-6[highway=trunk]      {color: #cdeacd; width: 0.35}
 line|z7[highway=trunk]        {color: #a9dba9; width: 1; casing-width:.3; casing-color:#F1EEE8}
 line|z8[highway=trunk]        {color: #a9dba9; width: 1; casing-width:3; casing-color:#F1EEE8}
@@ -127,6 +129,8 @@ area|z14-[area:highway=primary]   {fill-color: #ec989a}
 line|z9-10[highway=secondary]  {color: #fed7a5; width: 1.2}
 line|z11-[highway=secondary]   {color: #fed7a5; width: 2}
 area|z14-[area:highway=secondary]   {fill-color: #fed7a5}
+
+area[area:highway]{z-index:100}
 
 line|z10-[highway=tertiary],
 line|z10-[highway=tertiary_link],
@@ -198,6 +202,9 @@ area|z10-[leisure=park]{fill-color:#CCF5C9;fill-position:background}
 
 area|z12-[building][building!=no][building!=planned]{fill-color:#C1B0AE}
 
-area|z15-[building]{text: addr:housenumber;
+area|z15-[building]{text: "addr:housenumber";
 font-size:8; 
-text-halo-radius: 1; text-halo-color: white; text-position:line; -x-mapnik-snap-to-street: true}
+text-halo-radius: 1;
+text-halo-color: white;
+/* text-position:line; -x-mapnik-snap-to-street: true */
+}

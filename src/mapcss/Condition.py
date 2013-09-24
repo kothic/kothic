@@ -17,9 +17,9 @@
 
 import re
 
-INVERSIONS = {"eq":"ne",  "true":"false", "set":"unset", "<":">=", ">":"<="}
+INVERSIONS = {"eq": "ne", "true": "false", "set": "unset", "<": ">=", ">": "<="}
 in2 = {}
-for a,b in INVERSIONS.iteritems():
+for a, b in INVERSIONS.iteritems():
     in2[b] = a
 INVERSIONS.update(in2)
 del in2
@@ -27,10 +27,10 @@ del in2
 
 class Condition:
     def __init__(self, typez, params):
-        self.type=typez         # eq, regex, lt, gt etc.
+        self.type = typez         # eq, regex, lt, gt etc.
         if type(params) == type(str()):
             params = (params,)
-        self.params=params       # e.g. ('highway','primary')
+        self.params = params       # e.g. ('highway','primary')
         if typez == "regex":
             self.regex = re.compile(self.params[0], re.I)
 
@@ -58,9 +58,9 @@ class Condition:
                 return params[1]
         try:
             if t == 'eq':
-                return tags[params[0]]==params[1]
+                return tags[params[0]] == params[1]
             if t == 'ne':
-                return tags.get(params[0], "")!=params[1]
+                return tags.get(params[0], "") != params[1]
             if t == 'regex':
                 return bool(self.regex.match(tags[params[0]]))
             if t == 'true':
@@ -77,16 +77,17 @@ class Condition:
                 return True
 
             if t == '<':
-                return (Number(tags[params[0]])< Number(params[1]))
+                return (Number(tags[params[0]]) < Number(params[1]))
             if t == '<=':
-                return (Number(tags[params[0]])<=Number(params[1]))
+                return (Number(tags[params[0]]) <= Number(params[1]))
             if t == '>':
-                return (Number(tags[params[0]])> Number(params[1]))
+                return (Number(tags[params[0]]) > Number(params[1]))
             if t == '>=':
-                return (Number(tags[params[0]])>=Number(params[1]))
+                return (Number(tags[params[0]]) >= Number(params[1]))
         except KeyError:
             pass
-        return False;
+        return False
+
     def inverse(self):
         """
         Get a not-A for condition A
@@ -100,46 +101,44 @@ class Condition:
                 return Condition("regex", params)
         except KeyError:
             pass
-        return self;
-
-
-
+        return self
 
     def get_sql(self):
-        #params = [re.escape(x) for x in self.params]
+        # params = [re.escape(x) for x in self.params]
         params = self.params
         t = self.type
         if t == 'eq':   # don't compare tags against sublayers
             if params[0][:2] == "::":
-                return ("","")
+                return ("", "")
         try:
             if t == 'eq':
-                return params[0], '"%s" = \'%s\''%(params[0], params[1])
+                return params[0], '"%s" = \'%s\'' % (params[0], params[1])
             if t == 'ne':
-                return params[0], '("%s" != \'%s\' or "%s" IS NULL)'%(params[0], params[1],params[0])
+                return params[0], '("%s" != \'%s\' or "%s" IS NULL)' % (params[0], params[1], params[0])
             if t == 'regex':
-                return params[0], '"%s" ~ \'%s\''%(params[0],params[1].replace("'","\\'"))
+                return params[0], '"%s" ~ \'%s\'' % (params[0], params[1].replace("'", "\\'"))
             if t == 'true':
-                return params[0], '"%s" = \'yes\''%(params[0])
+                return params[0], '"%s" = \'yes\'' % (params[0])
             if t == 'untrue':
-                return params[0], '"%s" = \'no\''%(params[0])
+                return params[0], '"%s" = \'no\'' % (params[0])
             if t == 'set':
-                return params[0], '"%s" IS NOT NULL'%(params[0])
+                return params[0], '"%s" IS NOT NULL' % (params[0])
             if t == 'unset':
-                return params[0], '"%s" IS NULL'%(params[0])
+                return params[0], '"%s" IS NULL' % (params[0])
 
             if t == '<':
-                return params[0], """(CASE WHEN "%s"  ~  E'^[-]?[[:digit:]]+([.][[:digit:]]+)?$' THEN CAST ("%s" AS FLOAT) &lt; %s ELSE false END) """%(params[0],params[0],params[1])
+                return params[0], """(CASE WHEN "%s"  ~  E'^[-]?[[:digit:]]+([.][[:digit:]]+)?$' THEN CAST ("%s" AS FLOAT) &lt; %s ELSE false END) """ % (params[0], params[0], params[1])
             if t == '<=':
-                return params[0], """(CASE WHEN "%s"  ~  E'^[-]?[[:digit:]]+([.][[:digit:]]+)?$' THEN CAST ("%s" AS FLOAT) &lt;= %s ELSE false END)"""%(params[0],params[0],params[1])
+                return params[0], """(CASE WHEN "%s"  ~  E'^[-]?[[:digit:]]+([.][[:digit:]]+)?$' THEN CAST ("%s" AS FLOAT) &lt;= %s ELSE false END)""" % (params[0], params[0], params[1])
             if t == '>':
-                return params[0], """(CASE WHEN "%s"  ~  E'^[-]?[[:digit:]]+([.][[:digit:]]+)?$' THEN CAST ("%s" AS FLOAT) > %s ELSE false END) """%(params[0],params[0],params[1])
+                return params[0], """(CASE WHEN "%s"  ~  E'^[-]?[[:digit:]]+([.][[:digit:]]+)?$' THEN CAST ("%s" AS FLOAT) > %s ELSE false END) """ % (params[0], params[0], params[1])
             if t == '>=':
-                return params[0], """(CASE WHEN "%s"  ~  E'^[-]?[[:digit:]]+([.][[:digit:]]+)?$' THEN CAST ("%s" AS FLOAT) >= %s ELSE false END) """%(params[0],params[0],params[1])
+                return params[0], """(CASE WHEN "%s"  ~  E'^[-]?[[:digit:]]+([.][[:digit:]]+)?$' THEN CAST ("%s" AS FLOAT) >= %s ELSE false END) """ % (params[0], params[0], params[1])
         except KeyError:
             pass
+
     def get_mapnik_filter(self):
-        #params = [re.escape(x) for x in self.params]
+        # params = [re.escape(x) for x in self.params]
         params = self.params
         t = self.type
         if t == 'eq':   # don't compare tags against sublayers
@@ -147,33 +146,35 @@ class Condition:
                 return ''
         try:
             if t == 'eq':
-                return '[%s] = \'%s\''%(params[0], params[1])
+                return '[%s] = \'%s\'' % (params[0], params[1])
             if t == 'ne':
-                return 'not([%s] = \'%s\')'%(params[0], params[1])
+                return 'not([%s] = \'%s\')' % (params[0], params[1])
             if t == 'regex':
-                return '[%s].match(\'%s\')'%(params[0], params[1].replace("'","\\'"))
+                return '[%s].match(\'%s\')' % (params[0], params[1].replace("'", "\\'"))
             if t == 'true':
-                return '[%s] = \'yes\''%(params[0])
+                return '[%s] = \'yes\'' % (params[0])
             if t == 'untrue':
-                return '[%s] = \'no\''%(params[0])
+                return '[%s] = \'no\'' % (params[0])
             if t == 'set':
-                return '[%s] != \'\''%(params[0])
+                return '[%s] != \'\'' % (params[0])
             if t == 'unset':
-                return 'not([%s] != \'\')'%(params[0])
+                return 'not([%s] != \'\')' % (params[0])
 
             if t == '<':
-                return '[%s__num] &lt; %s'%(params[0], float(params[1]))
+                return '[%s__num] &lt; %s' % (params[0], float(params[1]))
             if t == '<=':
-                return '[%s__num] &lt;= %s'%(params[0], float(params[1]))
+                return '[%s__num] &lt;= %s' % (params[0], float(params[1]))
             if t == '>':
-                return '[%s__num] &gt; %s'%(params[0], float(params[1]))
+                return '[%s__num] &gt; %s' % (params[0], float(params[1]))
             if t == '>=':
-                return '[%s__num] &gt;= %s'%(params[0], float(params[1]))
-            #return ""
+                return '[%s__num] &gt;= %s' % (params[0], float(params[1]))
+            # return ""
         except KeyError:
             pass
+
     def __repr__(self):
-        return "%s %s "%(self.type, repr(self.params))
+        return "%s %s " % (self.type, repr(self.params))
+
     def __eq__(self, a):
         return (self.params == a.params) and (self.type == a.type)
 
@@ -181,7 +182,7 @@ class Condition:
         """
         merges two rules with AND.
         """
-        #TODO: possible other minimizations
+        # TODO: possible other minimizations
         if c2.params[0] == self.params[0]:
             if c2.params == self.params:
                 if c2.type == INVERSIONS[self.type]:  # for example,  eq AND ne = 0
@@ -189,10 +190,10 @@ class Condition:
                 if c2.type == self.type:
                     return (self,)
 
-                if self.type == ">=" and c2.type == "<=": # a<=2 and a>=2 --> a=2
-                    return (Condition ("eq", self.params),)
+                if self.type == ">=" and c2.type == "<=":  # a<=2 and a>=2 --> a=2
+                    return (Condition("eq", self.params),)
                 if self.type == "<=" and c2.type == ">=":
-                    return (Condition ("eq", self.params),)
+                    return (Condition("eq", self.params),)
                 if self.type == ">" and c2.type == "<":
                     return False
                 if self.type == "<" and c2.type == ">":
@@ -207,17 +208,18 @@ class Condition:
             if self.type == "eq" and c2.type == "eq":
                 if c2.params[1] != self.params[1]:
                     return False
-            if c2.type == "set" and self.type in ("eq","ne","regex", "<", "<=", ">", ">="): # a is set and a == b -> a == b
+            if c2.type == "set" and self.type in ("eq", "ne", "regex", "<", "<=", ">", ">="):  # a is set and a == b -> a == b
                 return (self,)
-            if c2.type == "unset" and self.type in ("eq","ne","regex", "<", "<=", ">", ">="): # a is unset and a == b -> impossible
+            if c2.type == "unset" and self.type in ("eq", "ne", "regex", "<", "<=", ">", ">="):  # a is unset and a == b -> impossible
                 return False
-            if self.type == "set" and c2.type in ("eq","ne","regex", "<", "<=", ">", ">="):
+            if self.type == "set" and c2.type in ("eq", "ne", "regex", "<", "<=", ">", ">="):
                 return (c2,)
-            if self.type == "unset" and c2.type in ("eq","ne","regex", "<", "<=", ">", ">="):
+            if self.type == "unset" and c2.type in ("eq", "ne", "regex", "<", "<=", ">", ">="):
                 return False
-
 
         return self, c2
+
+
 def Number(tt):
     """
     Wrap float() not to produce exceptions

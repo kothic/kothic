@@ -27,16 +27,16 @@ if len(sys.argv) < 2:
     print "Usage: make_postgis_style.py [stylesheet] [additional_tag,tag2,tag3]"
     exit()
 
-style = MapCSS(1, 19)     #zoom levels
-style.parse(open(sys.argv[1],"r").read())
+style = MapCSS(1, 19)  # zoom levels
+style.parse(open(sys.argv[1], "r").read())
 
 dct = {}
 
 if len(sys.argv) >= 3:
     langs.extend(sys.argv[2].split(","))
-    dct = dict([(k,set([("node", "linear"), ('way', 'linear')])) for k in langs])
+    dct = dict([(k, set([("node", "linear"), ('way', 'linear')])) for k in langs])
 
-t = {"node":("node", "linear"), "line":("way", "linear"), "area":("way", "polygon")}
+t = {"node": ("node", "linear"), "line": ("way", "linear"), "area": ("way", "polygon")}
 
 for a in t:
     for tag in style.get_interesting_tags(type=a):
@@ -46,7 +46,7 @@ for a in t:
 
 print """
 # OsmType  Tag                DataType      Flags"""
-for t in ("z_order","way_area",":area"):
+for t in ("z_order", "way_area", ":area"):
     if t in dct:
         del dct[t]
 
@@ -59,7 +59,7 @@ for k in keys:
     pol = "linear"
     if "polygon" in set([i[1] for i in v]):
         pol = "polygon"
-    print "%-10s %-20s %-13s %s"%(s, k, "text", pol)
+    print "%-10s %-20s %-13s %s" % (s, k, "text", pol)
 print """
 node,way   z_order              int4          linear # This is calculated during import
 way        way_area             real                 # This is calculated during import"""

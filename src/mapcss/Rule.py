@@ -16,11 +16,10 @@
 #   along with kothic.  If not, see <http://www.gnu.org/licenses/>.
 
 
-
 class Rule():
     def __init__(self, s=''):
         self.conditions = []
-        #self.isAnd = True
+        # self.isAnd = True
         self.minZoom = 0
         self.maxZoom = 19
         if s == "*":
@@ -28,7 +27,7 @@ class Rule():
         self.subject = s    # "", "way", "node" or "relation"
 
     def __repr__(self):
-        return "%s|z%s-%s %s"%(self.subject, self.minZoom, self.maxZoom, self.conditions)
+        return "%s|z%s-%s %s" % (self.subject, self.minZoom, self.maxZoom, self.conditions)
 
     def test(self, obj, tags, zoom):
         if (zoom < self.minZoom) or (zoom > self.maxZoom):
@@ -72,7 +71,7 @@ class Rule():
 
     def get_sql_hints(self, obj, zoom):
         if obj:
-            if (self.subject!='') and not _test_feature_compatibility(obj, self.subject, {":area":"yes"}):
+            if (self.subject != '') and not _test_feature_compatibility(obj, self.subject, {":area": "yes"}):
                 return set()
         if not self.test_zoom(zoom):
             return set()
@@ -85,9 +84,10 @@ class Rule():
                     a.add(q[0])
                     b.add(q[1])
         b = " AND ".join(b)
-        return a,b
+        return a, b
 
-def _test_feature_compatibility (f1, f2, tags={}):
+
+def _test_feature_compatibility(f1, f2, tags={}):
     """
     Checks if feature of type f1 is compatible with f2.
     """
@@ -95,9 +95,9 @@ def _test_feature_compatibility (f1, f2, tags={}):
         return True
     if f2 not in ("way", "area", "line"):
         return False
-    elif f2 == "way"  and f1 == "line":
+    elif f2 == "way" and f1 == "line":
         return True
-    elif f2 == "way"  and f1 == "area":
+    elif f2 == "way" and f1 == "area":
         return True
     elif f2 == "area" and f1 in ("way", "area"):
 #      if ":area" in tags:
@@ -108,5 +108,5 @@ def _test_feature_compatibility (f1, f2, tags={}):
         return True
     else:
         return False
-    #print f1, f2, True
+    # print f1, f2, True
     return True

@@ -40,6 +40,7 @@ import math
 
 config = ConfigParser.ConfigParser()
 
+
 def relaxedFloat(x):
     try:
         return float(x) if int(float(x)) != float(x) else int(x)
@@ -49,45 +50,46 @@ def relaxedFloat(x):
 
 parser = OptionParser()
 parser.add_option("-r", "--renderer", dest="renderer", default="mapnik",
-    help="which renderer stylesheet to generate", metavar="ENGINE")
+                  help="which renderer stylesheet to generate", metavar="ENGINE")
 parser.add_option("-s", "--stylesheet", dest="filename",
-    help="read MapCSS stylesheet from FILE", metavar="FILE")
+                  help="read MapCSS stylesheet from FILE", metavar="FILE")
 parser.add_option("-f", "--minzoom", dest="minzoom", default=0, type="int",
-    help="minimal available zoom level", metavar="ZOOM")
+                  help="minimal available zoom level", metavar="ZOOM")
 parser.add_option("-t", "--maxzoom", dest="maxzoom", default=19, type="int",
-    help="maximal available zoom level", metavar="ZOOM")
+                  help="maximal available zoom level", metavar="ZOOM")
 parser.add_option("-l", "--locale", dest="locale",
-    help="language that should be used for labels (ru, en, be, uk..)", metavar="LANG")
+                  help="language that should be used for labels (ru, en, be, uk..)", metavar="LANG")
 parser.add_option("-o", "--output-file", dest="outfile", default="-",
-    help="output filename (defaults to stdout)", metavar="FILE")
+                  help="output filename (defaults to stdout)", metavar="FILE")
 parser.add_option("-p", "--osm2pgsql-style", dest="osm2pgsqlstyle", default="-",
-    help="osm2pgsql stylesheet filename", metavar="FILE")
+                  help="osm2pgsql stylesheet filename", metavar="FILE")
 parser.add_option("-b", "--background-only", dest="bgonly", action="store_true", default=False,
-    help="Skip rendering of icons and labels", metavar="BOOL")
+                  help="Skip rendering of icons and labels", metavar="BOOL")
 parser.add_option("-T", "--text-scale", dest="textscale", default=1, type="float",
-    help="text size scale", metavar="SCALE")
+                  help="text size scale", metavar="SCALE")
 parser.add_option("-c", "--config", dest="conffile", default="komap.conf",
-    help="config file name", metavar="FILE")
+                  help="config file name", metavar="FILE")
 
 (options, args) = parser.parse_args()
 
-if (options.filename == None):
+if (options.filename is None):
     parser.error("MapCSS stylesheet filename is required")
 
-def escape_sql_column(name, type="way", asname = False):
-    if name in mapped_cols:
-        return name # already escaped
-    name = name.strip().strip('"')
-    type = {'line':'way', 'area':'way'}.get(type,type)
-    if type in osm2pgsql_avail_keys.get(name, ()) or not osm2pgsql_avail_keys:
-        return '"'+name+'"'
-    elif not asname:
-        return "(tags->'"+name+"')"
-    else:
-        return "(tags->'"+name+"') as \"" +name+'"'
 
-style = MapCSS(options.minzoom, options.maxzoom+1)     #zoom levels
-style.parse(open(options.filename,"r").read())
+def escape_sql_column(name, type="way", asname=False):
+    if name in mapped_cols:
+        return name  # already escaped
+    name = name.strip().strip('"')
+    type = {'line': 'way', 'area': 'way'}.get(type, type)
+    if type in osm2pgsql_avail_keys.get(name, ()) or not osm2pgsql_avail_keys:
+        return '"' + name + '"'
+    elif not asname:
+        return "(tags->'" + name + "')"
+    else:
+        return "(tags->'" + name + "') as \"" + name + '"'
+
+style = MapCSS(options.minzoom, options.maxzoom + 1)  # zoom levels
+style.parse(open(options.filename, "r").read())
 
 if options.renderer == "mapswithme":
     from libkomwm import *
@@ -97,7 +99,7 @@ if options.renderer == "mapswithme":
 if options.outfile == "-":
     mfile = sys.stdout
 else:
-    mfile = open(options.outfile,"w")
+    mfile = open(options.outfile, "w")
 
 if options.renderer == "js":
     from libkojs import *
@@ -121,19 +123,16 @@ if options.renderer == "mapnik":
     libkomapnik.srtm_hs_path = config.get("mapnik", "srtm_hs_path")
     libkomapnik.text_scale = options.textscale
 
-
     from libkomapnik import *
 
-
-
-    osm2pgsql_avail_keys = {} # "column" : ["node", "way"]
+    osm2pgsql_avail_keys = {}  # "column" : ["node", "way"]
     if options.osm2pgsqlstyle != "-":
         mf = open(options.osm2pgsqlstyle, "r")
         for line in mf:
             line = line.strip().split()
             if line and line[0][0] != "#" and not ("phstore" in line):
                 osm2pgsql_avail_keys[line[1]] = tuple(line[0].split(","))
-        osm2pgsql_avail_keys["tags"] = ("node","way")
+        osm2pgsql_avail_keys["tags"] = ("node", "way")
 
     columnmap = {}
 
@@ -154,7 +153,7 @@ if options.renderer == "mapnik":
         'lЁ', 'lIo'), 'lЮ', 'lIu'), 'lЯ', 'lIa'), 'lе', 'lie'), 'lё', 'lio'), 'lю', 'liu'), 'lя', 'lia'), 'mЕ', 'mIe'), 'mЁ', 'mIo'), 'mЮ', 'mIu'), 'mЯ', 'mIa'), 'mе', 'mie'), 'mё', 'mio'), 'mю', 'miu'), 'mя', 'mia'), 'nЕ', 'nIe'), 'nЁ', 'nIo'), 'nЮ', 'nIu'), 'nЯ', 'nIa'), 'nе', 'nie'), 'nё', 'nio'), 'nю', 'niu'), 'nя', 'nia'), 'pЕ', 'pIe'), 'pЁ', 'pIo'), 'pЮ', 'pIu'), 'pЯ', 'pIa'), 'pе', 'pie'), 'pё', 'pio'), 'pю', 'piu'), 'pя', 'pia'), 'rЕ', 'rIe'), 'rЁ', 'rIo'), 'rЮ', 'rIu'), 'rЯ', 'rIa'), 'rе', 'rie'), 'rё', 'rio'), 'rю', 'riu'), 'rя', 'ria'), 'sЕ', 'sIe'), 'sЁ',
         'sIo'), 'sЮ', 'sIu'), 'sЯ', 'sIa'), 'sе', 'sie'), 'sё', 'sio'), 'sю', 'siu'), 'sя', 'sia'), 'tЕ', 'tIe'), 'tЁ', 'tIo'), 'tЮ', 'tIu'), 'tЯ', 'tIa'), 'tе', 'tie'), 'tё', 'tio'), 'tю', 'tiu'), 'tя', 'tia'), 'ŭЕ', 'ŭIe'), 'ŭЁ', 'ŭIo'), 'ŭЮ', 'ŭIu'), 'ŭЯ', 'ŭIa'), 'ŭе', 'ŭie'), 'ŭё', 'ŭio'), 'ŭю', 'ŭiu'), 'ŭя', 'ŭia'), 'fЕ', 'fIe'), 'fЁ', 'fIo'), 'fЮ', 'fIu'), 'fЯ', 'fIa'), 'fе', 'fie'), 'fё', 'fio'), 'fю', 'fiu'), 'fя', 'fia'), 'сЕ', 'сIe'), 'сЁ', 'сIo'), 'сЮ', 'сIu'), 'сЯ', 'сIa'), 'се', 'сie'), 'сё', 'сio'), 'сю', 'сiu'), 'ся', 'сia'), 'čЕ', 'čIe'), 'čЁ', 'čIo'), 'čЮ', 'čIu'), 'čЯ', 'čIa'), 'čе', 'čie'), 'čё',
         'čio'), 'čю', 'čiu'), 'čя', 'čia'), 'šЕ', 'šIe'), 'šЁ', 'šIo'), 'šЮ', 'šIu'), 'šЯ', 'šIa'), 'šе', 'šie'), 'šё', 'šio'), 'šю', 'šiu'), 'šя', 'šia'), 'Е', 'Je'), 'Ё', 'Jo'), 'Ю', 'Ju'), 'Я', 'Ja'), 'е', 'je'), 'ё', 'jo'), 'ю', 'ju'), 'я', 'ja'), 'Ь', '\u0301'), 'ь', '\u0301'),'’', ''),
-        replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(translate("name",'абвгдезиклмнопрстуфьАБВГДЕЗИКЛМНОПРСТУФЬ','abvgdeziklmnoprstuf’ABVGDEZIKLMNOPRSTUF’'),'х','kh'),'Х','Kh'),'ц','ts'),'Ц','Ts'),'ч','ch'),'Ч','Ch'),'ш','sh'),'Ш','Sh'),'щ','shch'),'Щ','Shch'),'ъ','”'),'Ъ','”'),'ё','yo'),'Ё','Yo'),'ы','y'),'Ы','Y'),'э','·e'),'Э','E'),'ю','yu'),'Ю','Yu'),'й','y'),'Й','Y'),'я','ya'),'Я','Ya'),'ж','zh'),'Ж','Zh')) AS name""",('name:en','int_name','name:be'))
+        replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(translate("name",'абвгдезиклмнопрстуфьАБВГДЕЗИКЛМНОПРСТУФЬ','abvgdeziklmnoprstuf’ABVGDEZIKLMNOPRSTUF’'),'х','kh'),'Х','Kh'),'ц','ts'),'Ц','Ts'),'ч','ch'),'Ч','Ch'),'ш','sh'),'Ш','Sh'),'щ','shch'),'Щ','Shch'),'ъ','”'),'Ъ','”'),'ё','yo'),'Ё','Yo'),'ы','y'),'Ы','Y'),'э','·e'),'Э','E'),'ю','yu'),'Ю','Yu'),'й','y'),'Й','Y'),'я','ya'),'Я','Ya'),'ж','zh'),'Ж','Zh')) AS name""", ('name:en', 'int_name', 'name:be'))
 
     elif options.locale == "be":
         columnmap["name"] =  ("""COALESCE("name:be",
@@ -162,11 +161,11 @@ if options.renderer == "mapnik":
           "int_name",
           "name:en",
           "name"
-        ) AS name"""%(table_prefix,table_prefix,table_prefix),('name:be', "name:ru", "int_name", "name:en"))
-    elif options.locale and ("name:"+options.locale in osm2pgsql_avail_keys or not osm2pgsql_avail_keys):
-        columnmap["name"] =  ('COALESCE("name:'+options.locale+'", "name") AS name',('name:'+options.locale,))
+        ) AS name""" % (table_prefix, table_prefix, table_prefix), ('name:be', "name:ru", "int_name", "name:en"))
+    elif options.locale and ("name:" + options.locale in osm2pgsql_avail_keys or not osm2pgsql_avail_keys):
+        columnmap["name"] = ('COALESCE("name:' + options.locale + '", "name") AS name', ('name:' + options.locale,))
     elif options.locale:
-        columnmap["name"] =  ("COALESCE(tags->'name:"+options.locale+'\', "name") AS name',('tags',))
+        columnmap["name"] = ("COALESCE(tags->'name:" + options.locale + '\', "name") AS name', ('tags',))
 
     mapped_cols = [i[0] for i in columnmap.values()]
     numerics = set()  # set of number-compared things, like "population<10000" needs population as number, not text
@@ -176,21 +175,21 @@ if options.renderer == "mapnik":
     coast = {}
     fonts = set()
     demhack = False
-    for zoom in xrange (options.minzoom, options.maxzoom+1):
+    for zoom in xrange(options.minzoom, options.maxzoom + 1):
         mapniksheet[zoom] = {}
         zsheet = mapniksheet[zoom]
         for chooser in style.choosers:
             if chooser.get_sql_hints(chooser.ruleChains[0].subject, zoom)[1]:
-                #sys.stderr.write(str(chooser.get_sql_hints(chooser.ruleChains[0][0].subject, zoom)[1])+"\n")
+                # sys.stderr.write(str(chooser.get_sql_hints(chooser.ruleChains[0][0].subject, zoom)[1])+"\n")
                 styles = chooser.styles[0]
-                zindex = styles.get("z-index",0)
+                zindex = styles.get("z-index", 0)
                 if zindex not in zsheet:
                     zsheet[zindex] = []
                 chooser_entry = {}
 
                 ttypes = list(set([x.subject for x in chooser.ruleChains]))
 
-                sql = "("+ chooser.get_sql_hints(chooser.ruleChains[0].subject,zoom)[1] +")"
+                sql = "(" + chooser.get_sql_hints(chooser.ruleChains[0].subject, zoom)[1] + ")"
                 sql = sql.split('"')
                 sq = ""
                 odd = True
@@ -203,12 +202,12 @@ if options.renderer == "mapnik":
 
                 chooser_entry["sql"] = sq
                 chooser_entry["style"] = styles
-                fonts.add(styles.get("font-family","DejaVu Sans Book"))
+                fonts.add(styles.get("font-family", "DejaVu Sans Book"))
 
                 chooser_entry["rule"] = [i.conditions for i in chooser.ruleChains if i.test_zoom(zoom)]
                 numerics.update(chooser.get_numerics())
-                #print chooser_entry["rule"]
-                chooser_entry["rulestring"] = " or ".join([ "("+ " and ".join([i.get_mapnik_filter() for i in rule if i.get_mapnik_filter()]) + ")" for rule in chooser_entry["rule"]])
+                # print chooser_entry["rule"]
+                chooser_entry["rulestring"] = " or ".join(["(" + " and ".join([i.get_mapnik_filter() for i in rule if i.get_mapnik_filter()]) + ")" for rule in chooser_entry["rule"]])
                 chooser_entry["chooser"] = chooser
                 for ttype in ttypes:
                     if ttype == "ele":
@@ -220,10 +219,10 @@ if options.renderer == "mapnik":
                         che["type"] = ttype
                         zsheet[zindex].append(che)
 
-    #sys.stderr.write(str(numerics)+"\n")
-    #print mapniksheet
+    # sys.stderr.write(str(numerics)+"\n")
+    # print mapniksheet
 
-    def add_numerics_to_itags(itags, escape = True):
+    def add_numerics_to_itags(itags, escape=True):
         tt = set()
         nitags = set()
         if escape:
@@ -231,30 +230,26 @@ if options.renderer == "mapnik":
         else:
             def escape(i, asname=False):
                 if i in mapped_cols:
-                    return i # already escaped
-                return '"'+i+'"'
+                    return i  # already escaped
+                return '"' + i + '"'
         for i in itags:
             if i in numerics:
-                tt.add("""(CASE WHEN %s ~ E'^[[:digit:]]+([.][[:digit:]]+)?$' THEN CAST (%s AS FLOAT) ELSE NULL END) as %s__num"""%(escape(i),escape(i),i))
-            nitags.add(escape(i, asname = True))
+                tt.add("""(CASE WHEN %s ~ E'^[[:digit:]]+([.][[:digit:]]+)?$' THEN CAST (%s AS FLOAT) ELSE NULL END) as %s__num""" % (escape(i), escape(i), i))
+            nitags.add(escape(i, asname=True))
         itags = nitags
         itags.update(tt)
         return itags
 
-
-
-    bgcolor = style.get_style("canvas", {}, options.maxzoom+1)[0].get("fill-color", "")
-    opacity = style.get_style("canvas", {}, options.maxzoom+1)[0].get("opacity", 1)
-    hshack = style.get_style("canvas", {}, options.maxzoom+1)[0].get("-x-kot-hs-hack", False)
+    bgcolor = style.get_style("canvas", {}, options.maxzoom + 1)[0].get("fill-color", "")
+    opacity = style.get_style("canvas", {}, options.maxzoom + 1)[0].get("opacity", 1)
+    hshack = style.get_style("canvas", {}, options.maxzoom + 1)[0].get("-x-kot-hs-hack", False)
 
     if (opacity == 1) and bgcolor:
         mfile.write(xml_start(bgcolor))
     else:
         mfile.write(xml_start("transparent"))
 
-
-    conf_full_layering = style.get_style("canvas", {}, options.maxzoom+1)[0].get("-x-kot-true-layers", "true").lower() == 'true'
-
+    conf_full_layering = style.get_style("canvas", {}, options.maxzoom + 1)[0].get("-x-kot-true-layers", "true").lower() == 'true'
 
     for font in fonts:
         mfile.write(xml_fontset(font, True))
@@ -264,20 +259,20 @@ if options.renderer == "mapnik":
         ta = zsheet.keys()
         ta.sort(key=float)
         demcolors = {}
-        demramp = {"ground":"", "ocean":""}
+        demramp = {"ground": "", "ocean": ""}
 
         if demhack:
             for zindex in ta:
                 for entry in zsheet[zindex]:
                     if entry["type"] in ("ele",):
-                        ele =  int(entry["rule"][0][0].params[0])
+                        ele = int(entry["rule"][0][0].params[0])
                         demcolors[ele] = (whatever_to_hex(entry["style"].get('fill-color', '#ffffff')), entry["style"].get('fill-opacity', '1'))
             dk = demcolors.keys()
             dk.sort()
             for ele in dk:
                 (color, opacity) = demcolors[ele]
-                demramp["ocean"] += '<stop value="%s"  color="rgba(%s,%s,%s,%s)"/>' %(ele+10701, int(color[1:3],16), int(color[3:5],16), int(color[5:7],16), opacity)
-                demramp["ground"] += '<stop value="%s"  color="rgba(%s,%s,%s,%s)"/>' %(ele, int(color[1:3],16), int(color[3:5],16), int(color[5:7],16), opacity)
+                demramp["ocean"] += '<stop value="%s"  color="rgba(%s,%s,%s,%s)"/>' % (ele + 10701, int(color[1:3], 16), int(color[3:5], 16), int(color[5:7], 16), opacity)
+                demramp["ground"] += '<stop value="%s"  color="rgba(%s,%s,%s,%s)"/>' % (ele, int(color[1:3], 16), int(color[3:5], 16), int(color[5:7], 16), opacity)
 
         if demhack and zoom >= 7:
             xml = xml_cleantopo(zoom, x_scale, demramp["ocean"])
@@ -287,7 +282,7 @@ if options.renderer == "mapnik":
             xml += xml_rule_start()
             xml += x_scale
             if "fill-color" in coast[zoom]:
-                xml += xml_polygonsymbolizer(coast[zoom].get("fill-color", "#ffffff"), relaxedFloat(coast[zoom].get("fill-opacity", "1")), relaxedFloat(coast[zoom].get("smooth","0")))
+                xml += xml_polygonsymbolizer(coast[zoom].get("fill-color", "#ffffff"), relaxedFloat(coast[zoom].get("fill-opacity", "1")), relaxedFloat(coast[zoom].get("smooth", "0")))
             if "fill-image" in coast[zoom]:
                 xml += xml_polygonpatternsymbolizer(coast[zoom].get("fill-image", ""))
             xml += xml_rule_end()
@@ -314,12 +309,12 @@ if options.renderer == "mapnik":
             xml = xml_style_start()
             for entry in zsheet[zindex]:
                 if entry["type"] in ("way", "area", "polygon"):
-                    if ("fill-color" in entry["style"] or "fill-image" in entry["style"]) and (entry["style"].get("fill-position", "foreground")=="background"):
+                    if ("fill-color" in entry["style"] or "fill-image" in entry["style"]) and (entry["style"].get("fill-position", "foreground") == "background"):
                         xml += xml_rule_start()
                         xml += x_scale
                         xml += xml_filter(entry["rulestring"])
                         if "fill-color" in entry["style"]:
-                            xml += xml_polygonsymbolizer(entry["style"].get("fill-color", "black"), relaxedFloat(entry["style"].get("fill-opacity", "1")), relaxedFloat(entry["style"].get("smooth","0")))
+                            xml += xml_polygonsymbolizer(entry["style"].get("fill-color", "black"), relaxedFloat(entry["style"].get("fill-opacity", "1")), relaxedFloat(entry["style"].get("smooth", "0")))
                         if "fill-image" in entry["style"]:
                             xml += xml_polygonpatternsymbolizer(entry["style"].get("fill-image", ""))
                         sql.add(entry["sql"])
@@ -337,9 +332,9 @@ if options.renderer == "mapnik":
         itags = itags_g
         if sql:
             mfile.write(xml_g)
-            sql = "(" + " OR ".join(sql) + ")"# and way &amp;&amp; !bbox!"
+            sql = "(" + " OR ".join(sql) + ")"  # and way &amp;&amp; !bbox!"
             itags = add_numerics_to_itags(itags)
-            mfile.write(xml_layer("postgis", "polygon", itags, sql, zoom=zoom ))
+            mfile.write(xml_layer("postgis", "polygon", itags, sql, zoom=zoom))
         else:
             xml_nolayer()
 
@@ -347,36 +342,37 @@ if options.renderer == "mapnik":
             xml = xml_hillshade(zoom, x_scale)
             mfile.write(xml)
 
-        index_range = range(-6,7)
+        index_range = range(-6, 7)
         full_layering = conf_full_layering
-        if (zoom < 9) or not conf_full_layering :
-            index_range = (-6,0,6)
+        if (zoom < 9) or not conf_full_layering:
+            index_range = (-6, 0, 6)
             full_layering = False
+
         def check_if_roads_table(rulestring):
             roads = set([
-              "[highway] = 'secondary'",
-              "[highway] = 'secondary_link'",
-              "[highway] = 'primary'",
-              "[highway] = 'primary_link'",
-              "[highway] = 'trunk'",
-              "[highway] = 'trunk_link'",
-              "[highway] = 'motorway'",
-              "[highway] = 'motorway_link'",
-              "[boundary] = 'administrative'",
-              "[railway] "
-              ])
+                        "[highway] = 'secondary'",
+                        "[highway] = 'secondary_link'",
+                        "[highway] = 'primary'",
+                        "[highway] = 'primary_link'",
+                        "[highway] = 'trunk'",
+                        "[highway] = 'trunk_link'",
+                        "[highway] = 'motorway'",
+                        "[highway] = 'motorway_link'",
+                        "[boundary] = 'administrative'",
+                        "[railway] "
+                        ])
             for a in rulestring.split(') or ('):
                 for r in roads:
                     if r not in a:
                         return False
             return True
         for zlayer in index_range:
-            for layer_type, entry_types in [("line",("way", "line")),("polygon",("way","area"))]:
+            for layer_type, entry_types in [("line", ("way", "line")), ("polygon", ("way", "area"))]:
                 sql_g = set()
                 there_are_dashed_lines = False
                 itags_g = set()
                 xml_g = ""
-                roads = (layer_type == 'line') # whether to use planet_osm_roads
+                roads = (layer_type == 'line')  # whether to use planet_osm_roads
                 ## casings pass
                 for zindex in ta:
                     sql = set()
@@ -389,7 +385,7 @@ if options.renderer == "mapnik":
                                     continue
                                 if zlayer != 6 and entry["style"]["-x-kot-layer"] == "top":
                                     continue
-                            elif zlayer not in range(-5,6):
+                            elif zlayer not in range(-5, 6):
                                 continue
                             if "casing-width" in entry["style"]:
                                 xml += xml_rule_start()
@@ -397,18 +393,18 @@ if options.renderer == "mapnik":
                                 xml += xml_filter(entry["rulestring"])
                                 if not check_if_roads_table(entry["rulestring"]):
                                     roads = False
-                                twidth = 2*float(entry["style"].get("casing-width", 1))+float(entry["style"].get("width", 0));
+                                twidth = 2 * float(entry["style"].get("casing-width", 1)) + float(entry["style"].get("width", 0))
                                 tlinejoin = "round"
                                 if twidth < 3:
                                     tlinejoin = "miter"
                                 xml += xml_linesymbolizer(color=entry["style"].get("casing-color", "black"),
-                                  width=twidth,
-                                  opacity=relaxedFloat(entry["style"].get("casing-opacity", entry["style"].get("opacity","1"))),
-                                  linecap=entry["style"].get("casing-linecap", entry["style"].get("linecap","butt")),
-                                  linejoin=entry["style"].get("casing-linejoin", entry["style"].get("linejoin", "round")),
-                                  dashes=entry["style"].get("casing-dashes",entry["style"].get("dashes", "")),
-                                  smooth=relaxedFloat(entry["style"].get("smooth","0")),
-                                  zoom=zoom)
+                                                          width=twidth,
+                                                          opacity=relaxedFloat(entry["style"].get("casing-opacity", entry["style"].get("opacity", "1"))),
+                                                          linecap=entry["style"].get("casing-linecap", entry["style"].get("linecap", "butt")),
+                                                          linejoin=entry["style"].get("casing-linejoin", entry["style"].get("linejoin", "round")),
+                                                          dashes=entry["style"].get("casing-dashes", entry["style"].get("dashes", "")),
+                                                          smooth=relaxedFloat(entry["style"].get("smooth", "0")),
+                                                          zoom=zoom)
 
                                 sql.add(entry["sql"])
                                 itags.update(entry["chooser"].get_interesting_tags(entry["type"], zoom))
@@ -427,26 +423,26 @@ if options.renderer == "mapnik":
                 itags = itags_g
                 if sql:
                     mfile.write(xml_g)
-                    sql = "(" + " OR ".join(sql) + ")"# and way &amp;&amp; !bbox!"
+                    sql = "(" + " OR ".join(sql) + ")"  # and way &amp;&amp; !bbox!"
                     if zlayer == 0 and full_layering:
-                        sql = "("+ sql +') and ("layer" not in ('+ ", ".join(['\'%s\''%i for i in range(-5,6) if i != 0])+") or \"layer\" is NULL)"
-                    elif zlayer <=5 and zlayer >= -5 and full_layering:
-                        sql = "("+ sql +') and "layer" = \'%s\''%zlayer
+                        sql = "(" + sql + ') and ("layer" not in (' + ", ".join(['\'%s\'' % i for i in range(-5, 6) if i != 0]) + ") or \"layer\" is NULL)"
+                    elif zlayer <= 5 and zlayer >= -5 and full_layering:
+                        sql = "(" + sql + ') and "layer" = \'%s\'' % zlayer
                     itags = add_numerics_to_itags(itags)
                     if roads:
                         layer_type = 'roads'
-                    mfile.write(xml_layer("postgis", layer_type, itags, sql, zoom=zoom ))
+                    mfile.write(xml_layer("postgis", layer_type, itags, sql, zoom=zoom))
                 else:
                     xml_nolayer()
 
             for zindex in ta:
-                for layer_type, entry_types in [("line",("way", "line")),("polygon",("way","area"))]:
+                for layer_type, entry_types in [("line", ("way", "line")), ("polygon", ("way", "area"))]:
                     ## lines and polygons pass
                     sql_g = set()
                     there_are_dashed_lines = False
                     there_are_line_patterns = False
                     itags_g = set()
-                    roads = (layer_type == 'line')# whether to use planet_osm_roads
+                    roads = (layer_type == 'line')  # whether to use planet_osm_roads
                     xml_g = ""
 
                     sql = set()
@@ -459,17 +455,17 @@ if options.renderer == "mapnik":
                                     continue
                                 if zlayer != 6 and entry["style"]["-x-kot-layer"] == "top":
                                     continue
-                            elif zlayer not in range(-5,6):
+                            elif zlayer not in range(-5, 6):
                                 continue
-                            if "width" in entry["style"] or "pattern-image" in entry["style"] or (("fill-color" in entry["style"] or "fill-image" in entry["style"]) and (layer_type == "polygon") and (entry["style"].get("fill-position", "foreground")=="foreground")):
+                            if "width" in entry["style"] or "pattern-image" in entry["style"] or (("fill-color" in entry["style"] or "fill-image" in entry["style"]) and (layer_type == "polygon") and (entry["style"].get("fill-position", "foreground") == "foreground")):
                                 xml += xml_rule_start()
                                 xml += x_scale
                                 xml += xml_filter(entry["rulestring"])
                                 if not check_if_roads_table(entry["rulestring"]):
                                     roads = False
-                                if layer_type == "polygon" and (entry["style"].get("fill-position", "foreground")=="foreground"):
+                                if layer_type == "polygon" and (entry["style"].get("fill-position", "foreground") == "foreground"):
                                     if "fill-color" in entry["style"]:
-                                        xml += xml_polygonsymbolizer(entry["style"].get("fill-color", "black"), relaxedFloat(entry["style"].get("fill-opacity", "1")), relaxedFloat(entry["style"].get("smooth","0")))
+                                        xml += xml_polygonsymbolizer(entry["style"].get("fill-color", "black"), relaxedFloat(entry["style"].get("fill-opacity", "1")), relaxedFloat(entry["style"].get("smooth", "0")))
                                     if "fill-image" in entry["style"]:
                                         xml += xml_polygonpatternsymbolizer(entry["style"].get("fill-image", ""))
                                 if "width" in entry["style"]:
@@ -488,16 +484,16 @@ if options.renderer == "mapnik":
                                     tlinecap = entry["style"].get("linecap", tlinecap)
 
                                     xml += xml_linesymbolizer(color=entry["style"].get("color", "black"),
-                                      width=twidth,
-                                      opacity=relaxedFloat(entry["style"].get("opacity", "1")),
-                                      linecap=tlinecap,
-                                      linejoin=tlinejoin,
-                                      dashes=entry["style"].get("dashes", ""),
-                                      smooth=relaxedFloat(entry["style"].get("smooth","0")),
-                                      zoom=zoom)
+                                                              width=twidth,
+                                                              opacity=relaxedFloat(entry["style"].get("opacity", "1")),
+                                                              linecap=tlinecap,
+                                                              linejoin=tlinejoin,
+                                                              dashes=entry["style"].get("dashes", ""),
+                                                              smooth=relaxedFloat(entry["style"].get("smooth", "0")),
+                                                              zoom=zoom)
                                     if entry["style"].get("dashes", ""):
                                         there_are_dashed_lines = True
-                                        #print "dashes!!!"
+                                        # print "dashes!!!"
                                 if "pattern-image" in entry["style"]:
                                     there_are_line_patterns = True
                                     if entry["style"]["pattern-image"] == "arrows":
@@ -507,27 +503,27 @@ if options.renderer == "mapnik":
                                             fname = entry["style"]["pattern-image"]
                                             try:
                                                 im = Image.open(icons_path + fname).convert("RGBA")
-                                                fname = "f"+fname
+                                                fname = "f" + fname
                                                 if "pattern-rotate" in entry["style"]:
                                                     im = im.rotate(relaxedFloat(entry["style"]["pattern-rotate"]))
-                                                    fname = "r"+str(relaxedFloat(entry["style"]["pattern-rotate"]))+fname
+                                                    fname = "r" + str(relaxedFloat(entry["style"]["pattern-rotate"])) + fname
                                                 if "pattern-scale" in entry["style"]:
-                                                    sc = relaxedFloat(entry["style"]["pattern-scale"])*1.
-                                                    ns = (max(int(round(im.size[0]*sc)),1), max(int(round(im.size[1]*sc)),1))
+                                                    sc = relaxedFloat(entry["style"]["pattern-scale"]) * 1.
+                                                    ns = (max(int(round(im.size[0] * sc)), 1), max(int(round(im.size[1] * sc)), 1))
                                                     im = im.resize(ns, Image.BILINEAR)
-                                                    fname = "z"+str(sc)+fname
+                                                    fname = "z" + str(sc) + fname
                                                 if "pattern-spacing" in entry["style"]:
-                                                    im2 = Image.new("RGBA", (im.size[0]+int(relaxedFloat(entry["style"]["pattern-spacing"])),im.size[1]))
-                                                    im2.paste(im,(0,0))
+                                                    im2 = Image.new("RGBA", (im.size[0] + int(relaxedFloat(entry["style"]["pattern-spacing"])), im.size[1]))
+                                                    im2.paste(im, (0, 0))
                                                     im = im2
-                                                    fname = "s"+str(int(relaxedFloat(entry["style"]["pattern-spacing"])))+fname
-                                                if not os.path.exists(icons_path+"komap/"):
-                                                    os.makedirs(icons_path+"komap/")
-                                                if not os.path.exists(icons_path+"komap/"+fname):
-                                                    im.save(icons_path+"komap/"+fname, "PNG")
-                                                xml += xml_linepatternsymbolizer("komap/"+fname)
+                                                    fname = "s" + str(int(relaxedFloat(entry["style"]["pattern-spacing"]))) + fname
+                                                if not os.path.exists(icons_path + "komap/"):
+                                                    os.makedirs(icons_path + "komap/")
+                                                if not os.path.exists(icons_path + "komap/" + fname):
+                                                    im.save(icons_path + "komap/" + fname, "PNG")
+                                                xml += xml_linepatternsymbolizer("komap/" + fname)
                                             except:
-                                                print >> sys.stderr, "Error writing to ", icons_path+"komap/"+fname
+                                                print >> sys.stderr, "Error writing to ", icons_path + "komap/" + fname
                                         else:
                                             xml += xml_linepatternsymbolizer(entry["style"]["pattern-image"])
                                 sql.add(entry["sql"])
@@ -546,38 +542,38 @@ if options.renderer == "mapnik":
                     itags = itags_g
                     if sql:
                         mfile.write(xml_g)
-                        sql = "(" + " OR ".join(sql) + ")"# and way &amp;&amp; !bbox!"
+                        sql = "(" + " OR ".join(sql) + ")"  # and way &amp;&amp; !bbox!"
                         if zlayer == 0 and full_layering:
-                            sql = "("+ sql +') and ("layer" not in ('+ ", ".join(['\'%s\''%i for i in range(-5,6) if i != 0])+") or \"layer\" is NULL)"
-                        elif zlayer <=5 and zlayer >= -5 and full_layering:
-                            sql = "("+ sql +') and "layer" = \'%s\''%zlayer
+                            sql = "(" + sql + ') and ("layer" not in (' + ", ".join(['\'%s\'' % i for i in range(-5, 6) if i != 0]) + ") or \"layer\" is NULL)"
+                        elif zlayer <= 5 and zlayer >= -5 and full_layering:
+                            sql = "(" + sql + ') and "layer" = \'%s\'' % zlayer
                         oitags = itags
                         itags = add_numerics_to_itags(itags)
                         if layer_type == "polygon" and there_are_line_patterns:
                             itags = ", ".join(itags)
-                            oitags = '"'+ "\", \"".join(oitags) +'"'
-                            sqlz = """SELECT %s, ST_ForceRHR(way) as way from %spolygon where (%s) and way &amp;&amp; !bbox! and ST_IsValid(way)"""%(itags, libkomapnik.table_prefix ,sql)
+                            oitags = '"' + "\", \"".join(oitags) + '"'
+                            sqlz = """SELECT %s, ST_ForceRHR(way) as way from %spolygon where (%s) and way &amp;&amp; !bbox! and ST_IsValid(way)""" % (itags, libkomapnik.table_prefix , sql)
                             mfile.write(xml_layer("postgis-process", layer_type, itags, sqlz, zoom=zoom))
 
                         #### FIXME: Performance degrades painfully on large lines ST_Union. Gotta find workaround :(
-                        #if layer_type == "polygon" and there_are_dashed_lines:
-                            #itags = ", ".join(itags)
-                            #oitags = '"'+ "\", \"".join(oitags) +'"'
-                            #sqlz = """select %s, ST_LineMerge(ST_Union(way)) as way from
+                        # if layer_type == "polygon" and there_are_dashed_lines:
+                            # itags = ", ".join(itags)
+                            # oitags = '"'+ "\", \"".join(oitags) +'"'
+                            # sqlz = """select %s, ST_LineMerge(ST_Union(way)) as way from
                                             #(SELECT %s, ST_Boundary(way) as way from planet_osm_polygon where (%s) and way &amp;&amp; !bbox! and ST_IsValid(way)  ) tex
-                                #group by %s
+                                # group by %s
                                 #"""%(itags,oitags,sql,oitags)
                         elif layer_type == "line" and there_are_dashed_lines and zoom < 10:
-                            itags = ", ".join(itags) # FIXME: wrong when working with hstore
-                            oitags = '"'+ "\", \"".join(oitags) +'"'
+                            itags = ", ".join(itags)  # FIXME: wrong when working with hstore
+                            oitags = '"' + "\", \"".join(oitags) + '"'
                             sqlz = """select %s, ST_LineMerge(ST_Union(way)) as way from (SELECT %s, ST_SnapToGrid(way, %s) as way from %sline where way &amp;&amp; !bbox! and (%s)) as tex
                             group by %s
-                            """%(oitags, itags,pixel_size_at_zoom(zoom,1.5),libkomapnik.table_prefix,sql,oitags)
-                            mfile.write(xml_layer("postgis-process", layer_type, itags, sqlz, zoom=zoom ))
+                            """ % (oitags, itags, pixel_size_at_zoom(zoom, 1.5), libkomapnik.table_prefix, sql, oitags)
+                            mfile.write(xml_layer("postgis-process", layer_type, itags, sqlz, zoom=zoom))
                         else:
                             if roads:
                                 layer_type = 'roads'
-                            mfile.write(xml_layer("postgis", layer_type, itags, sql, zoom=zoom ))
+                            mfile.write(xml_layer("postgis", layer_type, itags, sql, zoom=zoom))
                     else:
                         xml_nolayer()
 
@@ -588,7 +584,7 @@ if options.renderer == "mapnik":
             xml_g = ""
             prevtype = ""
             for zindex in ta:
-                for layer_type, entry_types in [("point", ("node", "point")),("line",("way", "line")), ("polygon",("way","area"))]:
+                for layer_type, entry_types in [("point", ("node", "point")), ("line", ("way", "line")), ("polygon", ("way", "area"))]:
                     sql = set()
                     itags = set()
                     style_started = False
@@ -600,9 +596,9 @@ if options.renderer == "mapnik":
                                 if prevtype != layer_type:
                                     if sql_g:
                                         mfile.write(xml_g)
-                                        sql_g = "(" + " OR ".join(sql_g) + ")"# and way &amp;&amp; !bbox!"
+                                        sql_g = "(" + " OR ".join(sql_g) + ")"  # and way &amp;&amp; !bbox!"
                                         itags_g = add_numerics_to_itags(itags_g)
-                                        mfile.write(xml_layer("postgis", prevtype, itags_g, sql_g, zoom=zoom ))
+                                        mfile.write(xml_layer("postgis", prevtype, itags_g, sql_g, zoom=zoom))
                                         sql_g = set()
                                         itags_g = set()
                                         xml_g = ""
@@ -618,13 +614,13 @@ if options.renderer == "mapnik":
                                 xml += x_scale
                                 xml += xml_filter(entry["rulestring"])
                                 xml += xml_pointsymbolizer(
-                                  path=entry["style"].get("icon-image", ""),
-                                  width=entry["style"].get("icon-width", ""),
-                                  height=entry["style"].get("icon-height", ""),
-                                  opacity=relaxedFloat(entry["style"].get("opacity", "1")))
-                                if ("text" in entry["style"] and entry["style"].get("text-position","center")=='center'):
+                                    path=entry["style"].get("icon-image", ""),
+                                    width=entry["style"].get("icon-width", ""),
+                                    height=entry["style"].get("icon-height", ""),
+                                    opacity=relaxedFloat(entry["style"].get("opacity", "1")))
+                                if ("text" in entry["style"] and entry["style"].get("text-position", "center") == 'center'):
                                     ttext = entry["style"]["text"].extract_tags().pop()
-                                    sql.add("(("+entry["sql"]+") and "+escape_sql_column(ttext) + " is NULL)")
+                                    sql.add("((" + entry["sql"] + ") and " + escape_sql_column(ttext) + " is NULL)")
                                     itags.add(ttext)
                                     if ttext in columnmap:
                                         itags.update(columnmap[ttext][1])
@@ -645,24 +641,24 @@ if options.renderer == "mapnik":
                             xml_nosubstyle()
             if sql_g:
                 mfile.write(xml_g)
-                sql_g = "(" + " OR ".join(sql_g) + ")"# and way &amp;&amp; !bbox!"
+                sql_g = "(" + " OR ".join(sql_g) + ")"  # and way &amp;&amp; !bbox!"
                 itags_g = add_numerics_to_itags(itags_g)
-                mfile.write(xml_layer("postgis", prevtype, itags_g, sql_g, zoom=zoom ))
+                mfile.write(xml_layer("postgis", prevtype, itags_g, sql_g, zoom=zoom))
             else:
                 xml_nolayer()
 
             ta.reverse()
             for zindex in ta:
-                for layer_type, entry_types in [("point", ("node", "point")), ("polygon",("way","area")), ("line",("way", "line"))]:
-                    for placement in ("center","line"):
+                for layer_type, entry_types in [("point", ("node", "point")), ("polygon", ("way", "area")), ("line", ("way", "line"))]:
+                    for placement in ("center", "line"):
                         ## text pass
                         collhere = set()
                         for entry in zsheet[zindex]:
-                            if entry["type"] in entry_types:#, "node", "line", "point"):
-                                if ("text" in entry["style"] or "shield-text" in entry["style"]) and entry["style"].get("text-position","center")==placement:
-                                    csb = entry["style"].get("collision-sort-by",None)
-                                    cso = entry["style"].get("collision-sort-order","desc")
-                                    collhere.add((csb,cso))
+                            if entry["type"] in entry_types:  # , "node", "line", "point"):
+                                if ("text" in entry["style"] or "shield-text" in entry["style"]) and entry["style"].get("text-position", "center") == placement:
+                                    csb = entry["style"].get("collision-sort-by", None)
+                                    cso = entry["style"].get("collision-sort-order", "desc")
+                                    collhere.add((csb, cso))
                         for snap_to_street in ('true', 'false'):
                             for (csb, cso) in collhere:
                                 sql = set()
@@ -670,68 +666,68 @@ if options.renderer == "mapnik":
                                 texttags = set()
                                 xml = xml_style_start()
                                 for entry in zsheet[zindex]:
-                                    if entry["type"] in entry_types and csb == entry["style"].get("collision-sort-by",None) and cso == entry["style"].get("collision-sort-order","desc") and snap_to_street == entry["style"].get("-x-kot-snap-to-street","false"):
+                                    if entry["type"] in entry_types and csb == entry["style"].get("collision-sort-by", None) and cso == entry["style"].get("collision-sort-order", "desc") and snap_to_street == entry["style"].get("-x-kot-snap-to-street", "false"):
                                         if "shield-text" in entry["style"] and "shield-image" in entry["style"]:
                                             ttext = entry["style"]["shield-text"].extract_tags().pop()
                                             texttags.add(ttext)
-                                            tface = entry["style"].get("shield-font-family","DejaVu Sans Book")
-                                            tsize = entry["style"].get("shield-font-size","10")
-                                            tcolor = entry["style"].get("shield-text-color","#000000")
-                                            toverlap= entry["style"].get("text-allow-overlap",entry["style"].get("allow-overlap","false"))
-                                            tdistance= relaxedFloat(entry["style"].get("-x-kot-min-distance","20"))
-                                            twrap= relaxedFloat(entry["style"].get("shield-max-width",25))
-                                            talign= entry["style"].get("shield-text-align","center")
-                                            topacity= relaxedFloat(entry["style"].get("shield-text-opacity",entry["style"].get("opacity","1")))
-                                            toffset= relaxedFloat(entry["style"].get("shield-text-offset","0"))
-                                            ttransform = entry["style"].get("shield-text-transform","none")
-                                            tspacing = entry["style"].get("shield-spacing","500")
+                                            tface = entry["style"].get("shield-font-family", "DejaVu Sans Book")
+                                            tsize = entry["style"].get("shield-font-size", "10")
+                                            tcolor = entry["style"].get("shield-text-color", "#000000")
+                                            toverlap = entry["style"].get("text-allow-overlap", entry["style"].get("allow-overlap", "false"))
+                                            tdistance = relaxedFloat(entry["style"].get("-x-kot-min-distance", "20"))
+                                            twrap = relaxedFloat(entry["style"].get("shield-max-width", 25))
+                                            talign = entry["style"].get("shield-text-align", "center")
+                                            topacity = relaxedFloat(entry["style"].get("shield-text-opacity", entry["style"].get("opacity", "1")))
+                                            toffset = relaxedFloat(entry["style"].get("shield-text-offset", "0"))
+                                            ttransform = entry["style"].get("shield-text-transform", "none")
+                                            tspacing = entry["style"].get("shield-spacing", "500")
                                             xml += xml_rule_start()
                                             xml += x_scale
 
                                             xml += xml_filter(entry["rulestring"])
 
                                             xml += xml_shieldsymbolizer(
-                                                          entry["style"].get("shield-image", ""),
-                                                          "",
-                                                          "",
-                                                          ttext,tface,tsize,tcolor, "#000000", 0, "center",
-                                                          toffset,toverlap,tdistance,twrap,talign,topacity, ttransform, "false", tspacing)
+                                                entry["style"].get("shield-image", ""),
+                                                "",
+                                                "",
+                                                ttext, tface, tsize, tcolor, "#000000", 0, "center",
+                                                toffset, toverlap, tdistance, twrap, talign, topacity, ttransform, "false", tspacing)
                                             sql.add(entry["sql"])
                                             itags.update(entry["chooser"].get_interesting_tags(entry["type"], zoom))
                                             xml += xml_rule_end()
 
-                                        if "text" in entry["style"] and entry["style"].get("text-position","center")==placement:
+                                        if "text" in entry["style"] and entry["style"].get("text-position", "center") == placement:
                                             ttext = entry["style"]["text"].extract_tags().pop()
                                             texttags.add(ttext)
-                                            tface = entry["style"].get("font-family","DejaVu Sans Book")
-                                            tsize = entry["style"].get("font-size","10")
-                                            tcolor = entry["style"].get("text-color","#000000")
-                                            thcolor= entry["style"].get("text-halo-color","#ffffff")
-                                            thradius= relaxedFloat(entry["style"].get("text-halo-radius","0"))
-                                            tplace= entry["style"].get("text-position","center")
-                                            toffset= relaxedFloat(entry["style"].get("text-offset","0"))
-                                            toverlap= entry["style"].get("text-allow-overlap",entry["style"].get("allow-overlap","false"))
-                                            tdistance= relaxedFloat(entry["style"].get("-x-kot-min-distance","20"))
-                                            twrap= relaxedFloat(entry["style"].get("max-width",256))
-                                            talign= entry["style"].get("text-align","center")
-                                            topacity= relaxedFloat(entry["style"].get("text-opacity",entry["style"].get("opacity","1")))
-                                            tpos = entry["style"].get("text-placement","X")
-                                            ttransform = entry["style"].get("text-transform","none")
-                                            tspacing = entry["style"].get("text-spacing","4096")
+                                            tface = entry["style"].get("font-family", "DejaVu Sans Book")
+                                            tsize = entry["style"].get("font-size", "10")
+                                            tcolor = entry["style"].get("text-color", "#000000")
+                                            thcolor = entry["style"].get("text-halo-color", "#ffffff")
+                                            thradius = relaxedFloat(entry["style"].get("text-halo-radius", "0"))
+                                            tplace = entry["style"].get("text-position", "center")
+                                            toffset = relaxedFloat(entry["style"].get("text-offset", "0"))
+                                            toverlap = entry["style"].get("text-allow-overlap", entry["style"].get("allow-overlap", "false"))
+                                            tdistance = relaxedFloat(entry["style"].get("-x-kot-min-distance", "20"))
+                                            twrap = relaxedFloat(entry["style"].get("max-width", 256))
+                                            talign = entry["style"].get("text-align", "center")
+                                            topacity = relaxedFloat(entry["style"].get("text-opacity", entry["style"].get("opacity", "1")))
+                                            tpos = entry["style"].get("text-placement", "X")
+                                            ttransform = entry["style"].get("text-transform", "none")
+                                            tspacing = entry["style"].get("text-spacing", "4096")
 
                                             xml += xml_rule_start()
                                             xml += x_scale
 
                                             xml += xml_filter(entry["rulestring"])
-                                            if "icon-image" in entry["style"] and entry["style"].get("text-position","center")=='center':
+                                            if "icon-image" in entry["style"] and entry["style"].get("text-position", "center") == 'center':
                                                 xml += xml_shieldsymbolizer(
-                                                            entry["style"].get("icon-image", ""),
-                                                            entry["style"].get("icon-width", ""),
-                                                            entry["style"].get("icon-height", ""),
-                                                            ttext,tface,tsize,tcolor, thcolor, thradius, tplace,
-                                                            toffset,toverlap,tdistance,twrap,talign,topacity, ttransform)
+                                                    entry["style"].get("icon-image", ""),
+                                                    entry["style"].get("icon-width", ""),
+                                                    entry["style"].get("icon-height", ""),
+                                                    ttext, tface, tsize, tcolor, thcolor, thradius, tplace,
+                                                    toffset, toverlap, tdistance, twrap, talign, topacity, ttransform)
                                             else:
-                                                xml += xml_textsymbolizer(ttext,tface,tsize,tcolor, thcolor, thradius, tplace, toffset,toverlap,tdistance,twrap,talign,topacity,tpos,ttransform,tspacing)
+                                                xml += xml_textsymbolizer(ttext, tface, tsize, tcolor, thcolor, thradius, tplace, toffset, toverlap, tdistance, twrap, talign, topacity, tpos, ttransform, tspacing)
                                             sql.add(entry["sql"])
                                             itags.update(entry["chooser"].get_interesting_tags(entry["type"], zoom))
                                             xml += xml_rule_end()
@@ -744,7 +740,7 @@ if options.renderer == "mapnik":
                                         if cso != "desc":
                                             cso = "asc"
                                         itags.add(csb)
-                                        order = """ order by (CASE WHEN "%s" ~ E'^[[:digit:]]+([.][[:digit:]]+)?$' THEN to_char(CAST ("%s" AS FLOAT) ,'000000000000000.99999999999') else "%s" end) %s nulls last """%(csb,csb,csb,cso)
+                                        order = """ order by (CASE WHEN "%s" ~ E'^[[:digit:]]+([.][[:digit:]]+)?$' THEN to_char(CAST ("%s" AS FLOAT) ,'000000000000000.99999999999') else "%s" end) %s nulls last """ % (csb, csb, csb, cso)
 
                                     mfile.write(xml)
 
@@ -754,20 +750,20 @@ if options.renderer == "mapnik":
                                             add_tags.update(columnmap[t][1])
                                             texttags.update(columnmap[t][1])
 
-                                    oitags = itags.union(add_tags) # SELECT: (tags->'mooring') as "mooring"
-                                    oitags = ", ".join([ escape_sql_column(i, asname=True) for i in oitags])
+                                    oitags = itags.union(add_tags)  # SELECT: (tags->'mooring') as "mooring"
+                                    oitags = ", ".join([escape_sql_column(i, asname=True) for i in oitags])
 
-                                    goitags = itags.union(add_tags) # GROUP BY: (tags->'mooring')
-                                    goitags = ", ".join([ escape_sql_column(i) for i in goitags])
+                                    goitags = itags.union(add_tags)  # GROUP BY: (tags->'mooring')
+                                    goitags = ", ".join([escape_sql_column(i) for i in goitags])
 
                                     fitags = [columnmap.get(i, (i,))[0] for i in itags]
 
-                                    #fitags = add_numerics_to_itags(itags)
-                                    itags = add_numerics_to_itags(fitags) # population => {population, population__num}
-                                    neitags = add_numerics_to_itags(fitags, escape = False) # for complex polygons, no escapng needed
+                                    # fitags = add_numerics_to_itags(itags)
+                                    itags = add_numerics_to_itags(fitags)  # population => {population, population__num}
+                                    neitags = add_numerics_to_itags(fitags, escape=False)  # for complex polygons, no escapng needed
                                     del fitags
 
-                                    ttext = " OR ".join([escape_sql_column(i)+ " is not NULL" for i in texttags])
+                                    ttext = " OR ".join([escape_sql_column(i) + " is not NULL" for i in texttags])
 
                                     if placement == "center" and layer_type == "polygon" and snap_to_street == 'false':
                                         sqlz = " OR ".join(sql)
@@ -781,7 +777,7 @@ if options.renderer == "mapnik":
                                             sqlz = """select %s, way
                                                   from %s%s
                                                   where (%s) and (%s) and (way_area > %s) and way &amp;&amp; ST_Expand(!bbox!,3000) %s way_area desc
-                                          """%(itags,libkomapnik.table_prefix,layer_type,ttext,sqlz,pixel_size_at_zoom(zoom,3)**2, order)
+                                          """ % (itags, libkomapnik.table_prefix, layer_type, ttext, sqlz, pixel_size_at_zoom(zoom, 3) ** 2, order)
                                         else:
                                             sqlz = """select %s, way
                                           from (
@@ -791,10 +787,10 @@ if options.renderer == "mapnik":
                                                   from %s%s p
                                                   where (%s) and way_area > %s and p.way &amp;&amp; ST_Expand(!bbox!,%s) and (%s)) p
                                                 group by %s) p %s ST_Area(p.way) desc
-                                          """%(neitags,pixel_size_at_zoom(zoom,9),pixel_size_at_zoom(zoom,10),oitags,
-                                          libkomapnik.table_prefix,layer_type,ttext,pixel_size_at_zoom(zoom,5)**2,max(pixel_size_at_zoom(zoom,20),3000),sqlz,goitags,order)
+                                          """ % (neitags, pixel_size_at_zoom(zoom, 9), pixel_size_at_zoom(zoom, 10), oitags,
+                                                 libkomapnik.table_prefix, layer_type, ttext, pixel_size_at_zoom(zoom, 5) ** 2, max(pixel_size_at_zoom(zoom, 20), 3000), sqlz, goitags, order)
 
-                                        mfile.write(xml_layer("postgis-process", layer_type, itags, sqlz, zoom ))
+                                        mfile.write(xml_layer("postgis-process", layer_type, itags, sqlz, zoom))
                                     elif layer_type == "line" and zoom < 16 and snap_to_street == 'false':
                                         sqlz = " OR ".join(sql)
                                         itags = ", ".join(itags)
@@ -802,14 +798,13 @@ if options.renderer == "mapnik":
                                             order = "order by"
                                         else:
                                             order += ", "
-                                        #itags = "\""+ itags+"\""
+                                        # itags = "\""+ itags+"\""
                                         sqlz = """select * from (select %s, ST_Simplify(ST_LineMerge(ST_Union(way)),%s) as way from (SELECT * from %sline where way &amp;&amp; ST_Expand(!bbox!,%s) and (%s) and (%s)) as tex
                                         group by %s) p
                                         where ST_Length(p.way) > %s
                                         %s ST_Length(p.way) desc
-                                        """%(itags,pixel_size_at_zoom(zoom,3),libkomapnik.table_prefix,max(pixel_size_at_zoom(zoom,20),3000),ttext,sqlz,goitags,pixel_size_at_zoom(zoom,4),order)
-                                        mfile.write(xml_layer("postgis-process", layer_type, itags, sqlz, zoom=zoom ))
-
+                                        """ % (itags, pixel_size_at_zoom(zoom, 3), libkomapnik.table_prefix, max(pixel_size_at_zoom(zoom, 20), 3000), ttext, sqlz, goitags, pixel_size_at_zoom(zoom, 4), order)
+                                        mfile.write(xml_layer("postgis-process", layer_type, itags, sqlz, zoom=zoom))
 
                                     elif snap_to_street == 'true':
                                         sqlz = " OR ".join(sql)
@@ -878,13 +873,12 @@ if options.renderer == "mapnik":
 
                                                 from %s%s h
                                                 where (%s) and (%s) and way &amp;&amp; ST_Expand(!bbox!,3000) %s
-                                        """%(itags, libkomapnik.db_srid,  libkomapnik.table_prefix, libkomapnik.db_srid,  libkomapnik.table_prefix, libkomapnik.table_prefix, layer_type, ttext,sqlz, order)
-                                        mfile.write(xml_layer("postgis-process", layer_type, itags, sqlz, zoom ))
-
+                                        """ % (itags, libkomapnik.db_srid,  libkomapnik.table_prefix, libkomapnik.db_srid,  libkomapnik.table_prefix, libkomapnik.table_prefix, layer_type, ttext, sqlz, order)
+                                        mfile.write(xml_layer("postgis-process", layer_type, itags, sqlz, zoom))
 
                                     else:
-                                        sql = "(" + " OR ".join(sql) + ")  %s"%(order)#and way &amp;&amp; ST_Expand(!bbox!,%s), max(pixel_size_at_zoom(zoom,20),3000),
-                                        mfile.write(xml_layer("postgis", layer_type, itags, sql, zoom=zoom ))
+                                        sql = "(" + " OR ".join(sql) + ")  %s" % (order)  # and way &amp;&amp; ST_Expand(!bbox!,%s), max(pixel_size_at_zoom(zoom,20),3000),
+                                        mfile.write(xml_layer("postgis", layer_type, itags, sql, zoom=zoom))
                                 else:
                                     xml_nolayer()
 

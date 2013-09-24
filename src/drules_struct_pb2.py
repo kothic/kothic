@@ -7,61 +7,60 @@ from google.protobuf import descriptor_pb2
 # @@protoc_insertion_point(imports)
 
 
-
 DESCRIPTOR = descriptor.FileDescriptor(
-  name='drules_struct.proto',
-  package='',
-  serialized_pb='\n\x13\x64rules_struct.proto\"*\n\x0c\x44\x61shDotProto\x12\n\n\x02\x64\x64\x18\x01 \x03(\x01\x12\x0e\n\x06offset\x18\x02 \x01(\x01\":\n\x0cPathSymProto\x12\x0c\n\x04name\x18\x01 \x02(\t\x12\x0c\n\x04step\x18\x02 \x02(\x01\x12\x0e\n\x06offset\x18\x03 \x01(\x01\"\xaf\x01\n\rLineRuleProto\x12\r\n\x05width\x18\x01 \x02(\x01\x12\r\n\x05\x63olor\x18\x02 \x02(\r\x12\x1e\n\x07\x64\x61shdot\x18\x03 \x01(\x0b\x32\r.DashDotProto\x12\x10\n\x08priority\x18\x04 \x02(\x05\x12\x1e\n\x07pathsym\x18\x05 \x01(\x0b\x32\r.PathSymProto\x12\x17\n\x04join\x18\x06 \x01(\x0e\x32\t.LineJoin\x12\x15\n\x03\x63\x61p\x18\x07 \x01(\x0e\x32\x08.LineCap\"\x9c\x01\n\x0cLineDefProto\x12\r\n\x05width\x18\x01 \x02(\x01\x12\r\n\x05\x63olor\x18\x02 \x02(\r\x12\x1e\n\x07\x64\x61shdot\x18\x03 \x01(\x0b\x32\r.DashDotProto\x12\x1e\n\x07pathsym\x18\x04 \x01(\x0b\x32\r.PathSymProto\x12\x17\n\x04join\x18\x06 \x01(\x0e\x32\t.LineJoin\x12\x15\n\x03\x63\x61p\x18\x07 \x01(\x0e\x32\x08.LineCap\"O\n\rAreaRuleProto\x12\r\n\x05\x63olor\x18\x01 \x02(\r\x12\x1d\n\x06\x62order\x18\x02 \x01(\x0b\x32\r.LineDefProto\x12\x10\n\x08priority\x18\x03 \x02(\x05\"I\n\x0fSymbolRuleProto\x12\x0c\n\x04name\x18\x01 \x02(\t\x12\x16\n\x0e\x61pply_for_type\x18\x02 \x01(\x05\x12\x10\n\x08priority\x18\x03 \x02(\x05\"j\n\x0f\x43\x61ptionDefProto\x12\x0e\n\x06height\x18\x01 \x02(\x05\x12\r\n\x05\x63olor\x18\x02 \x02(\r\x12\x14\n\x0cstroke_color\x18\x03 \x01(\r\x12\x10\n\x08offset_x\x18\x04 \x01(\x05\x12\x10\n\x08offset_y\x18\x05 \x01(\x05\"l\n\x10\x43\x61ptionRuleProto\x12!\n\x07primary\x18\x01 \x02(\x0b\x32\x10.CaptionDefProto\x12#\n\tsecondary\x18\x02 \x01(\x0b\x32\x10.CaptionDefProto\x12\x10\n\x08priority\x18\x03 \x02(\x05\"a\n\x0f\x43ircleRuleProto\x12\x0e\n\x06radius\x18\x01 \x02(\x01\x12\r\n\x05\x63olor\x18\x02 \x02(\r\x12\x1d\n\x06\x62order\x18\x03 \x01(\x0b\x32\r.LineDefProto\x12\x10\n\x08priority\x18\x04 \x02(\x05\"m\n\x11PathTextRuleProto\x12!\n\x07primary\x18\x01 \x02(\x0b\x32\x10.CaptionDefProto\x12#\n\tsecondary\x18\x02 \x01(\x0b\x32\x10.CaptionDefProto\x12\x10\n\x08priority\x18\x03 \x02(\x05\"\xed\x01\n\x10\x44rawElementProto\x12\r\n\x05scale\x18\x01 \x02(\x05\x12\x1d\n\x05lines\x18\x02 \x03(\x0b\x32\x0e.LineRuleProto\x12\x1c\n\x04\x61rea\x18\x03 \x01(\x0b\x32\x0e.AreaRuleProto\x12 \n\x06symbol\x18\x04 \x01(\x0b\x32\x10.SymbolRuleProto\x12\"\n\x07\x63\x61ption\x18\x05 \x01(\x0b\x32\x11.CaptionRuleProto\x12 \n\x06\x63ircle\x18\x06 \x01(\x0b\x32\x10.CircleRuleProto\x12%\n\tpath_text\x18\x07 \x01(\x0b\x32\x12.PathTextRuleProto\"G\n\x13\x43lassifElementProto\x12\x0c\n\x04name\x18\x01 \x02(\t\x12\"\n\x07\x65lement\x18\x02 \x03(\x0b\x32\x11.DrawElementProto\"4\n\x0e\x43ontainerProto\x12\"\n\x04\x63ont\x18\x01 \x03(\x0b\x32\x14.ClassifElementProto*4\n\x08LineJoin\x12\r\n\tROUNDJOIN\x10\x00\x12\r\n\tBEVELJOIN\x10\x01\x12\n\n\x06NOJOIN\x10\x02*3\n\x07LineCap\x12\x0c\n\x08ROUNDCAP\x10\x00\x12\x0b\n\x07\x42UTTCAP\x10\x01\x12\r\n\tSQUARECAP\x10\x02\x42\x02H\x03')
+    name='drules_struct.proto',
+    package='',
+    serialized_pb='\n\x13\x64rules_struct.proto\"*\n\x0c\x44\x61shDotProto\x12\n\n\x02\x64\x64\x18\x01 \x03(\x01\x12\x0e\n\x06offset\x18\x02 \x01(\x01\":\n\x0cPathSymProto\x12\x0c\n\x04name\x18\x01 \x02(\t\x12\x0c\n\x04step\x18\x02 \x02(\x01\x12\x0e\n\x06offset\x18\x03 \x01(\x01\"\xaf\x01\n\rLineRuleProto\x12\r\n\x05width\x18\x01 \x02(\x01\x12\r\n\x05\x63olor\x18\x02 \x02(\r\x12\x1e\n\x07\x64\x61shdot\x18\x03 \x01(\x0b\x32\r.DashDotProto\x12\x10\n\x08priority\x18\x04 \x02(\x05\x12\x1e\n\x07pathsym\x18\x05 \x01(\x0b\x32\r.PathSymProto\x12\x17\n\x04join\x18\x06 \x01(\x0e\x32\t.LineJoin\x12\x15\n\x03\x63\x61p\x18\x07 \x01(\x0e\x32\x08.LineCap\"\x9c\x01\n\x0cLineDefProto\x12\r\n\x05width\x18\x01 \x02(\x01\x12\r\n\x05\x63olor\x18\x02 \x02(\r\x12\x1e\n\x07\x64\x61shdot\x18\x03 \x01(\x0b\x32\r.DashDotProto\x12\x1e\n\x07pathsym\x18\x04 \x01(\x0b\x32\r.PathSymProto\x12\x17\n\x04join\x18\x06 \x01(\x0e\x32\t.LineJoin\x12\x15\n\x03\x63\x61p\x18\x07 \x01(\x0e\x32\x08.LineCap\"O\n\rAreaRuleProto\x12\r\n\x05\x63olor\x18\x01 \x02(\r\x12\x1d\n\x06\x62order\x18\x02 \x01(\x0b\x32\r.LineDefProto\x12\x10\n\x08priority\x18\x03 \x02(\x05\"I\n\x0fSymbolRuleProto\x12\x0c\n\x04name\x18\x01 \x02(\t\x12\x16\n\x0e\x61pply_for_type\x18\x02 \x01(\x05\x12\x10\n\x08priority\x18\x03 \x02(\x05\"j\n\x0f\x43\x61ptionDefProto\x12\x0e\n\x06height\x18\x01 \x02(\x05\x12\r\n\x05\x63olor\x18\x02 \x02(\r\x12\x14\n\x0cstroke_color\x18\x03 \x01(\r\x12\x10\n\x08offset_x\x18\x04 \x01(\x05\x12\x10\n\x08offset_y\x18\x05 \x01(\x05\"l\n\x10\x43\x61ptionRuleProto\x12!\n\x07primary\x18\x01 \x02(\x0b\x32\x10.CaptionDefProto\x12#\n\tsecondary\x18\x02 \x01(\x0b\x32\x10.CaptionDefProto\x12\x10\n\x08priority\x18\x03 \x02(\x05\"a\n\x0f\x43ircleRuleProto\x12\x0e\n\x06radius\x18\x01 \x02(\x01\x12\r\n\x05\x63olor\x18\x02 \x02(\r\x12\x1d\n\x06\x62order\x18\x03 \x01(\x0b\x32\r.LineDefProto\x12\x10\n\x08priority\x18\x04 \x02(\x05\"m\n\x11PathTextRuleProto\x12!\n\x07primary\x18\x01 \x02(\x0b\x32\x10.CaptionDefProto\x12#\n\tsecondary\x18\x02 \x01(\x0b\x32\x10.CaptionDefProto\x12\x10\n\x08priority\x18\x03 \x02(\x05\"\xed\x01\n\x10\x44rawElementProto\x12\r\n\x05scale\x18\x01 \x02(\x05\x12\x1d\n\x05lines\x18\x02 \x03(\x0b\x32\x0e.LineRuleProto\x12\x1c\n\x04\x61rea\x18\x03 \x01(\x0b\x32\x0e.AreaRuleProto\x12 \n\x06symbol\x18\x04 \x01(\x0b\x32\x10.SymbolRuleProto\x12\"\n\x07\x63\x61ption\x18\x05 \x01(\x0b\x32\x11.CaptionRuleProto\x12 \n\x06\x63ircle\x18\x06 \x01(\x0b\x32\x10.CircleRuleProto\x12%\n\tpath_text\x18\x07 \x01(\x0b\x32\x12.PathTextRuleProto\"G\n\x13\x43lassifElementProto\x12\x0c\n\x04name\x18\x01 \x02(\t\x12\"\n\x07\x65lement\x18\x02 \x03(\x0b\x32\x11.DrawElementProto\"4\n\x0e\x43ontainerProto\x12\"\n\x04\x63ont\x18\x01 \x03(\x0b\x32\x14.ClassifElementProto*4\n\x08LineJoin\x12\r\n\tROUNDJOIN\x10\x00\x12\r\n\tBEVELJOIN\x10\x01\x12\n\n\x06NOJOIN\x10\x02*3\n\x07LineCap\x12\x0c\n\x08ROUNDCAP\x10\x00\x12\x0b\n\x07\x42UTTCAP\x10\x01\x12\r\n\tSQUARECAP\x10\x02\x42\x02H\x03')
 
 _LINEJOIN = descriptor.EnumDescriptor(
-  name='LineJoin',
-  full_name='LineJoin',
-  filename=None,
-  file=DESCRIPTOR,
-  values=[
-    descriptor.EnumValueDescriptor(
-      name='ROUNDJOIN', index=0, number=0,
-      options=None,
-      type=None),
-    descriptor.EnumValueDescriptor(
-      name='BEVELJOIN', index=1, number=1,
-      options=None,
-      type=None),
-    descriptor.EnumValueDescriptor(
-      name='NOJOIN', index=2, number=2,
-      options=None,
-      type=None),
-  ],
-  containing_type=None,
-  options=None,
-  serialized_start=1415,
-  serialized_end=1467,
+    name='LineJoin',
+    full_name='LineJoin',
+    filename=None,
+    file=DESCRIPTOR,
+    values=[
+        descriptor.EnumValueDescriptor(
+            name='ROUNDJOIN', index=0, number=0,
+            options=None,
+            type=None),
+        descriptor.EnumValueDescriptor(
+            name='BEVELJOIN', index=1, number=1,
+            options=None,
+            type=None),
+        descriptor.EnumValueDescriptor(
+            name='NOJOIN', index=2, number=2,
+            options=None,
+            type=None),
+    ],
+    containing_type=None,
+    options=None,
+    serialized_start=1415,
+    serialized_end=1467,
 )
 
 
 _LINECAP = descriptor.EnumDescriptor(
-  name='LineCap',
-  full_name='LineCap',
-  filename=None,
-  file=DESCRIPTOR,
-  values=[
-    descriptor.EnumValueDescriptor(
-      name='ROUNDCAP', index=0, number=0,
-      options=None,
-      type=None),
-    descriptor.EnumValueDescriptor(
-      name='BUTTCAP', index=1, number=1,
-      options=None,
-      type=None),
-    descriptor.EnumValueDescriptor(
-      name='SQUARECAP', index=2, number=2,
-      options=None,
-      type=None),
-  ],
-  containing_type=None,
-  options=None,
-  serialized_start=1469,
-  serialized_end=1520,
+    name='LineCap',
+    full_name='LineCap',
+    filename=None,
+    file=DESCRIPTOR,
+    values=[
+        descriptor.EnumValueDescriptor(
+            name='ROUNDCAP', index=0, number=0,
+            options=None,
+            type=None),
+        descriptor.EnumValueDescriptor(
+            name='BUTTCAP', index=1, number=1,
+            options=None,
+            type=None),
+        descriptor.EnumValueDescriptor(
+            name='SQUARECAP', index=2, number=2,
+            options=None,
+            type=None),
+    ],
+    containing_type=None,
+    options=None,
+    serialized_start=1469,
+    serialized_end=1520,
 )
 
 
@@ -73,59 +72,58 @@ BUTTCAP = 1
 SQUARECAP = 2
 
 
-
 _DASHDOTPROTO = descriptor.Descriptor(
-  name='DashDotProto',
-  full_name='DashDotProto',
-  filename=None,
-  file=DESCRIPTOR,
-  containing_type=None,
-  fields=[
-    descriptor.FieldDescriptor(
-      name='dd', full_name='DashDotProto.dd', index=0,
-      number=1, type=1, cpp_type=5, label=3,
-      has_default_value=False, default_value=[],
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      options=None),
-    descriptor.FieldDescriptor(
-      name='offset', full_name='DashDotProto.offset', index=1,
-      number=2, type=1, cpp_type=5, label=1,
-      has_default_value=False, default_value=0,
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      options=None),
-  ],
-  extensions=[
-  ],
-  nested_types=[],
-  enum_types=[
-  ],
-  options=None,
-  is_extendable=False,
-  extension_ranges=[],
-  serialized_start=23,
-  serialized_end=65,
+    name='DashDotProto',
+    full_name='DashDotProto',
+    filename=None,
+    file=DESCRIPTOR,
+    containing_type=None,
+    fields=[
+        descriptor.FieldDescriptor(
+            name='dd', full_name='DashDotProto.dd', index=0,
+            number=1, type=1, cpp_type=5, label=3,
+            has_default_value=False, default_value=[],
+            message_type=None, enum_type=None, containing_type=None,
+            is_extension=False, extension_scope=None,
+            options=None),
+        descriptor.FieldDescriptor(
+            name='offset', full_name='DashDotProto.offset', index=1,
+            number=2, type=1, cpp_type=5, label=1,
+            has_default_value=False, default_value=0,
+            message_type=None, enum_type=None, containing_type=None,
+            is_extension=False, extension_scope=None,
+            options=None),
+    ],
+    extensions=[
+    ],
+    nested_types=[],
+    enum_types=[
+    ],
+    options=None,
+    is_extendable=False,
+    extension_ranges=[],
+    serialized_start=23,
+    serialized_end=65,
 )
 
 
 _PATHSYMPROTO = descriptor.Descriptor(
-  name='PathSymProto',
-  full_name='PathSymProto',
-  filename=None,
-  file=DESCRIPTOR,
-  containing_type=None,
-  fields=[
-    descriptor.FieldDescriptor(
-      name='name', full_name='PathSymProto.name', index=0,
-      number=1, type=9, cpp_type=9, label=2,
-      has_default_value=False, default_value=unicode("", "utf-8"),
-      message_type=None, enum_type=None, containing_type=None,
-      is_extension=False, extension_scope=None,
-      options=None),
-    descriptor.FieldDescriptor(
-      name='step', full_name='PathSymProto.step', index=1,
-      number=2, type=1, cpp_type=5, label=2,
+    name='PathSymProto',
+    full_name='PathSymProto',
+    filename=None,
+    file=DESCRIPTOR,
+    containing_type=None,
+    fields=[
+        descriptor.FieldDescriptor(
+            name='name', full_name='PathSymProto.name', index=0,
+            number=1, type=9, cpp_type=9, label=2,
+            has_default_value=False, default_value=unicode("", "utf-8"),
+            message_type=None, enum_type=None, containing_type=None,
+            is_extension=False, extension_scope=None,
+            options=None),
+        descriptor.FieldDescriptor(
+            name='step', full_name='PathSymProto.step', index=1,
+            number=2, type=1, cpp_type=5, label=2,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
@@ -725,82 +723,95 @@ DESCRIPTOR.message_types_by_name['DrawElementProto'] = _DRAWELEMENTPROTO
 DESCRIPTOR.message_types_by_name['ClassifElementProto'] = _CLASSIFELEMENTPROTO
 DESCRIPTOR.message_types_by_name['ContainerProto'] = _CONTAINERPROTO
 
+
 class DashDotProto(message.Message):
-  __metaclass__ = reflection.GeneratedProtocolMessageType
-  DESCRIPTOR = _DASHDOTPROTO
-  
-  # @@protoc_insertion_point(class_scope:DashDotProto)
+    __metaclass__ = reflection.GeneratedProtocolMessageType
+    DESCRIPTOR = _DASHDOTPROTO
+
+    # @@protoc_insertion_point(class_scope:DashDotProto)
+
 
 class PathSymProto(message.Message):
-  __metaclass__ = reflection.GeneratedProtocolMessageType
-  DESCRIPTOR = _PATHSYMPROTO
-  
-  # @@protoc_insertion_point(class_scope:PathSymProto)
+    __metaclass__ = reflection.GeneratedProtocolMessageType
+    DESCRIPTOR = _PATHSYMPROTO
+
+    # @@protoc_insertion_point(class_scope:PathSymProto)
+
 
 class LineRuleProto(message.Message):
-  __metaclass__ = reflection.GeneratedProtocolMessageType
-  DESCRIPTOR = _LINERULEPROTO
-  
-  # @@protoc_insertion_point(class_scope:LineRuleProto)
+    __metaclass__ = reflection.GeneratedProtocolMessageType
+    DESCRIPTOR = _LINERULEPROTO
+
+    # @@protoc_insertion_point(class_scope:LineRuleProto)
+
 
 class LineDefProto(message.Message):
-  __metaclass__ = reflection.GeneratedProtocolMessageType
-  DESCRIPTOR = _LINEDEFPROTO
-  
-  # @@protoc_insertion_point(class_scope:LineDefProto)
+    __metaclass__ = reflection.GeneratedProtocolMessageType
+    DESCRIPTOR = _LINEDEFPROTO
+
+    # @@protoc_insertion_point(class_scope:LineDefProto)
+
 
 class AreaRuleProto(message.Message):
-  __metaclass__ = reflection.GeneratedProtocolMessageType
-  DESCRIPTOR = _AREARULEPROTO
-  
-  # @@protoc_insertion_point(class_scope:AreaRuleProto)
+    __metaclass__ = reflection.GeneratedProtocolMessageType
+    DESCRIPTOR = _AREARULEPROTO
+
+    # @@protoc_insertion_point(class_scope:AreaRuleProto)
+
 
 class SymbolRuleProto(message.Message):
-  __metaclass__ = reflection.GeneratedProtocolMessageType
-  DESCRIPTOR = _SYMBOLRULEPROTO
-  
-  # @@protoc_insertion_point(class_scope:SymbolRuleProto)
+    __metaclass__ = reflection.GeneratedProtocolMessageType
+    DESCRIPTOR = _SYMBOLRULEPROTO
+
+    # @@protoc_insertion_point(class_scope:SymbolRuleProto)
+
 
 class CaptionDefProto(message.Message):
-  __metaclass__ = reflection.GeneratedProtocolMessageType
-  DESCRIPTOR = _CAPTIONDEFPROTO
-  
-  # @@protoc_insertion_point(class_scope:CaptionDefProto)
+    __metaclass__ = reflection.GeneratedProtocolMessageType
+    DESCRIPTOR = _CAPTIONDEFPROTO
+
+    # @@protoc_insertion_point(class_scope:CaptionDefProto)
+
 
 class CaptionRuleProto(message.Message):
-  __metaclass__ = reflection.GeneratedProtocolMessageType
-  DESCRIPTOR = _CAPTIONRULEPROTO
-  
-  # @@protoc_insertion_point(class_scope:CaptionRuleProto)
+    __metaclass__ = reflection.GeneratedProtocolMessageType
+    DESCRIPTOR = _CAPTIONRULEPROTO
+
+    # @@protoc_insertion_point(class_scope:CaptionRuleProto)
+
 
 class CircleRuleProto(message.Message):
-  __metaclass__ = reflection.GeneratedProtocolMessageType
-  DESCRIPTOR = _CIRCLERULEPROTO
-  
-  # @@protoc_insertion_point(class_scope:CircleRuleProto)
+    __metaclass__ = reflection.GeneratedProtocolMessageType
+    DESCRIPTOR = _CIRCLERULEPROTO
+
+    # @@protoc_insertion_point(class_scope:CircleRuleProto)
+
 
 class PathTextRuleProto(message.Message):
-  __metaclass__ = reflection.GeneratedProtocolMessageType
-  DESCRIPTOR = _PATHTEXTRULEPROTO
-  
-  # @@protoc_insertion_point(class_scope:PathTextRuleProto)
+    __metaclass__ = reflection.GeneratedProtocolMessageType
+    DESCRIPTOR = _PATHTEXTRULEPROTO
+
+    # @@protoc_insertion_point(class_scope:PathTextRuleProto)
+
 
 class DrawElementProto(message.Message):
-  __metaclass__ = reflection.GeneratedProtocolMessageType
-  DESCRIPTOR = _DRAWELEMENTPROTO
-  
-  # @@protoc_insertion_point(class_scope:DrawElementProto)
+    __metaclass__ = reflection.GeneratedProtocolMessageType
+    DESCRIPTOR = _DRAWELEMENTPROTO
+
+    # @@protoc_insertion_point(class_scope:DrawElementProto)
+
 
 class ClassifElementProto(message.Message):
-  __metaclass__ = reflection.GeneratedProtocolMessageType
-  DESCRIPTOR = _CLASSIFELEMENTPROTO
-  
-  # @@protoc_insertion_point(class_scope:ClassifElementProto)
+    __metaclass__ = reflection.GeneratedProtocolMessageType
+    DESCRIPTOR = _CLASSIFELEMENTPROTO
+
+    # @@protoc_insertion_point(class_scope:ClassifElementProto)
+
 
 class ContainerProto(message.Message):
-  __metaclass__ = reflection.GeneratedProtocolMessageType
-  DESCRIPTOR = _CONTAINERPROTO
-  
-  # @@protoc_insertion_point(class_scope:ContainerProto)
+    __metaclass__ = reflection.GeneratedProtocolMessageType
+    DESCRIPTOR = _CONTAINERPROTO
+
+    # @@protoc_insertion_point(class_scope:ContainerProto)
 
 # @@protoc_insertion_point(module_scope)

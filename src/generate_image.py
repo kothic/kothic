@@ -18,8 +18,8 @@
 
 from debug import debug, Timer
 from backend.vtile import QuadTileBackend as DataBackend
-#from backend.postgis import PostGisBackend as DataBackend
-#from style import Styling
+# from backend.postgis import PostGisBackend as DataBackend
+# from style import Styling
 from mapcss import MapCSS
 
 from render import RasterTile
@@ -30,22 +30,22 @@ if svg:
     import cairo
 
 
-style = MapCSS(1, 19)     #zoom levels
-style.parse(open("styles/default.mapcss","r").read())
+style = MapCSS(1, 19)  # zoom levels
+style.parse(open("styles/default.mapcss", "r").read())
 
 
-bbox = (27.115768874532,53.740327031764,28.028320754378,54.067187302158)
+bbox = (27.115768874532, 53.740327031764, 28.028320754378, 54.067187302158)
 
-w,h = 630*4,364*4
+w, h = 630 * 4, 364 * 4
 z = 10
 
 db = DataBackend()
-#style = Styling()
+# style = Styling()
 
 res = RasterTile(w, h, z, db)
 if svg:
     file = open("test.svg", "wb")
-    res.surface = cairo.SVGSurface(file.name, w,h)
+    res.surface = cairo.SVGSurface(file.name, w, h)
 res.update_surface(bbox, z, style)
 
 

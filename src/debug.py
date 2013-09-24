@@ -17,14 +17,14 @@
 import datetime
 import sys
 
+
 def debug(st):
     """
     Debug write to stderr
     """
 
-    sys.stderr.write(str(st)+"\n")
+    sys.stderr.write(str(st) + "\n")
     sys.stderr.flush()
-
 
 
 class Timer:
@@ -35,5 +35,6 @@ class Timer:
         self.time = datetime.datetime.now()
         self.comment = comment
         debug("%s started" % comment)
+
     def stop(self):
         debug("%s finished in %s" % (self.comment, str(datetime.datetime.now() - self.time)))

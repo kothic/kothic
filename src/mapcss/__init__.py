@@ -66,12 +66,12 @@ SET_TAG = re.compile(r'^ \s* set \s+(\S+)\s* = \s*          (.+?) \s*           
 SET_TAG_TRUE = re.compile(r'^ \s* set \s+(\S+)\s* $', re.I | re.S | re.X)
 EXIT = re.compile(r'^ \s* exit \s* $', re.I | re.S | re.X)
 
-oZOOM=2
-oGROUP=3
-oCONDITION=4
-oOBJECT=5
-oDECLARATION=6
-oSUBPART=7
+oZOOM = 2
+oGROUP = 3
+oCONDITION = 4
+oOBJECT = 5
+oDECLARATION = 6
+oSUBPART = 7
 
 DASH = re.compile(r'\-/g')
 COLOR = re.compile(r'color$/')
@@ -93,37 +93,36 @@ way {width: 1; casing-width:1; casing-color: white}
   ## ** also needs to support @import rules
 
 class MapCSS():
-    def __init__(self,minscale=0,maxscale=19):
+    def __init__(self, minscale=0, maxscale=19):
         """
         """
         self.cache = {}
         self.cache["style"] = {}
-        self.minscale=minscale
-        self.maxscale=maxscale
+        self.minscale = minscale
+        self.maxscale = maxscale
         self.scalepair = (minscale, maxscale)
         self.choosers = []
         self.style_loaded = False
         self.parse(builtin_style)
-        self.style_loaded = False #override one after loading
+        self.style_loaded = False  # override one after loading
 
     def parseZoom(self, s):
-
         if ZOOM_MINMAX.match(s):
             return tuple([float(i) for i in ZOOM_MINMAX.match(s).groups()])
         elif ZOOM_MIN.match(s):
             return float(ZOOM_MIN.match(s).groups()[0]), self.maxscale
         elif ZOOM_MAX.match(s):
-            return float(self.minscale),float(ZOOM_MAX.match(s).groups()[0])
+            return float(self.minscale), float(ZOOM_MAX.match(s).groups()[0])
         elif ZOOM_SINGLE.match(s):
-            return float(ZOOM_SINGLE.match(s).groups()[0]),float(ZOOM_SINGLE.match(s).groups()[0])
+            return float(ZOOM_SINGLE.match(s).groups()[0]), float(ZOOM_SINGLE.match(s).groups()[0])
         else:
-            logging.error("unparsed zoom: %s" %s)
+            logging.error("unparsed zoom: %s" % s)
 
-    def get_style (self, type, tags={}, zoom=0, scale=1, zscale=.5):
+    def get_style(self, type, tags={}, zoom=0, scale=1, zscale=.5):
         """
         Kothic styling API
         """
-        shash = md5(repr(type)+repr(tags)+repr(zoom)).digest()
+        shash = md5(repr(type) + repr(tags) + repr(zoom)).digest()
         if shash in self.cache["style"]:
             return deepcopy(self.cache["style"][shash])
         style = []
@@ -132,7 +131,7 @@ class MapCSS():
         style = [x for x in style if x["object-id"] != "::*"]
         st = []
         for x in style:
-            for k,v in [('width',0), ('casing-width',0)]:
+            for k, v in [('width', 0), ('casing-width', 0)]:
                 if k in x:
                     if x[k] == v:
                         del x[k]
@@ -141,17 +140,17 @@ class MapCSS():
             if not NEEDED_KEYS.isdisjoint(x):
                 st.append(x)
         style = st
-       
+
         self.cache["style"][shash] = style
         return deepcopy(style)
 
-    def get_style_dict (self, type, tags={}, zoom=0, scale=1, zscale=.5, olddict = {}):
+    def get_style_dict(self, type, tags={}, zoom=0, scale=1, zscale=.5, olddict={}):
         r = self.get_style(type, tags, zoom, scale, zscale)
         d = olddict
         for x in r:
-            if x.get('object-id','') not in d:
-                d[x.get('object-id','')] = {}
-            d[x.get('object-id','')].update(x)
+            if x.get('object-id', '') not in d:
+                d[x.get('object-id', '')] = {}
+            d[x.get('object-id', '')].update(x)
         return d
 
     def get_interesting_tags(self, type=None, zoom=None):
@@ -175,7 +174,6 @@ class MapCSS():
                     hints.append(p)
         return hints
 
-
     def parse(self, css, clamp=True, stretch=1000):
         """
         Parses MapCSS given as string
@@ -184,212 +182,213 @@ class MapCSS():
             self.choosers = []
         log = logging.getLogger('mapcss.parser')
         previous = 0  # what was the previous CSS word?
-        sc=StyleChooser(self.scalepair) #currently being assembled
-        #choosers=[]
-        #o = []
+        sc = StyleChooser(self.scalepair)  # currently being assembled
+        # choosers=[]
+        # o = []
         css_orig = css
         while (css):
 
             # CSS comment
             if COMMENT.match(css):
                 log.debug("comment found")
-                css=COMMENT.sub("", css)
+                css = COMMENT.sub("", css)
 
             #// Whitespace (probably only at beginning of file)
             elif WHITESPACE.match(css):
                 log.debug("whitespace found")
-                css=WHITESPACE.sub("",css)
+                css = WHITESPACE.sub("", css)
 
             #// Class - .motorway, .builtup, :hover
             elif CLASS.match(css):
-                if previous==oDECLARATION:
+                if previous == oDECLARATION:
                     self.choosers.append(sc)
                     sc = StyleChooser(self.scalepair)
 
                 cond = CLASS.match(css).groups()[0]
-                log.debug("class found: %s"% (cond))
+                log.debug("class found: %s" % (cond))
                 css = CLASS.sub("", css)
 
-                sc.addCondition(Condition('eq',("::class",cond)))
-                previous=oCONDITION;
+                sc.addCondition(Condition('eq', ("::class", cond)))
+                previous = oCONDITION
 
             #// Not class - !.motorway, !.builtup, !:hover
             elif NOT_CLASS.match(css):
-                if (previous==oDECLARATION):
+                if (previous == oDECLARATION):
                     self.choosers.append(sc)
                     sc = StyleChooser(self.scalepair)
 
                 cond = NOT_CLASS.match(css).groups()[0]
-                log.debug("not_class found: %s"% (cond))
+                log.debug("not_class found: %s" % (cond))
                 css = NOT_CLASS.sub("", css)
-                sc.addCondition(Condition('ne',("::class",cond)))
-                previous=oCONDITION;
+                sc.addCondition(Condition('ne', ("::class", cond)))
+                previous = oCONDITION
 
             #// Zoom
             elif ZOOM.match(css):
-                if (previous!=oOBJECT & previous!=oCONDITION):
+                if (previous != oOBJECT & previous != oCONDITION):
                     sc.newObject()
 
                 cond = ZOOM.match(css).groups()[0]
-                log.debug("zoom found: %s"% (cond))
-                css=ZOOM.sub("",css)
+                log.debug("zoom found: %s" % (cond))
+                css = ZOOM.sub("", css)
                 sc.addZoom(self.parseZoom(cond))
-                previous=oZOOM;
+                previous = oZOOM
 
             #// Grouping - just a comma
             elif GROUP.match(css):
-                css=GROUP.sub("",css)
+                css = GROUP.sub("", css)
                 sc.newGroup()
-                previous=oGROUP
+                previous = oGROUP
 
             #// Condition - [highway=primary]
             elif CONDITION.match(css):
-                if (previous==oDECLARATION):
+                if (previous == oDECLARATION):
                     self.choosers.append(sc)
                     sc = StyleChooser(self.scalepair)
-                if (previous!=oOBJECT) and (previous!=oZOOM) and (previous!=oCONDITION):
+                if (previous != oOBJECT) and (previous != oZOOM) and (previous != oCONDITION):
                     sc.newObject()
                 cond = CONDITION.match(css).groups()[0]
-                log.debug("condition found: %s"% (cond))
-                css=CONDITION.sub("",css)
+                log.debug("condition found: %s" % (cond))
+                css = CONDITION.sub("", css)
                 sc.addCondition(parseCondition(cond))
-                previous=oCONDITION;
+                previous = oCONDITION
 
             #// Object - way, node, relation
             elif OBJECT.match(css):
-                if (previous==oDECLARATION):
+                if (previous == oDECLARATION):
                     self.choosers.append(sc)
                     sc = StyleChooser(self.scalepair)
                 obj = OBJECT.match(css).groups()[0]
-                log.debug("object found: %s"% (obj))
-                css=OBJECT.sub("",css)
+                log.debug("object found: %s" % (obj))
+                css = OBJECT.sub("", css)
                 sc.newObject(obj)
-                previous=oOBJECT
+                previous = oOBJECT
 
             #// Declaration - {...}
             elif DECLARATION.match(css):
                 decl = DECLARATION.match(css).groups()[0]
-                log.debug("declaration found: %s"% (decl))
+                log.debug("declaration found: %s" % (decl))
                 sc.addStyles(parseDeclaration(decl))
-                css=DECLARATION.sub("",css)
-                previous=oDECLARATION
+                css = DECLARATION.sub("", css)
+                previous = oDECLARATION
 
             #// Unknown pattern
             elif UNKNOWN.match(css):
-                log.warning("unknown thing found on line %s: %s"%(unicode(css_orig[:-len(unicode(css))]).count("\n")+1, UNKNOWN.match(css).group()))
-                css=UNKNOWN.sub("",css)
+                log.warning("unknown thing found on line %s: %s" % (unicode(css_orig[:-len(unicode(css))]).count("\n") + 1, UNKNOWN.match(css).group()))
+                css = UNKNOWN.sub("", css)
 
             else:
-                log.warning("choked on: %s"%(css))
+                log.warning("choked on: %s" % (css))
                 return
 
-        if (previous==oDECLARATION):
+        if (previous == oDECLARATION):
             self.choosers.append(sc)
-            sc= StyleChooser(self.scalepair)
+            sc = StyleChooser(self.scalepair)
         try:
             if clamp:
                 "clamp z-indexes, so they're tightly following integers"
                 zindex = set()
                 for chooser in self.choosers:
                     for stylez in chooser.styles:
-                        zindex.add(float(stylez.get('z-index',0)))
+                        zindex.add(float(stylez.get('z-index', 0)))
                 zindex = list(zindex)
                 zindex.sort()
                 for chooser in self.choosers:
                     for stylez in chooser.styles:
                         if 'z-index' in stylez:
                             if stretch:
-                                stylez['z-index'] = 1.*zindex.index(float(stylez.get('z-index',0)))/len(zindex)*stretch
+                                stylez['z-index'] = 1. * zindex.index(float(stylez.get('z-index', 0))) / len(zindex) * stretch
                             else:
-                                stylez['z-index'] = zindex.index(float(stylez.get('z-index',0)))
+                                stylez['z-index'] = zindex.index(float(stylez.get('z-index', 0)))
 
         except TypeError:
             pass
 
+
 def parseCondition(s):
     log = logging.getLogger('mapcss.parser.condition')
-    if      CONDITION_TRUE.match(s):
+    if CONDITION_TRUE.match(s):
         a = CONDITION_TRUE.match(s).groups()
-        log.debug("condition true: %s"%(a[0]))
-        return  Condition('true'     ,a)
-    if      CONDITION_invTRUE.match(s):
+        log.debug("condition true: %s" % (a[0]))
+        return Condition('true', a)
+    if CONDITION_invTRUE.match(s):
         a = CONDITION_invTRUE.match(s).groups()
-        log.debug("condition invtrue: %s"%(a[0]))
-        return  Condition('ne'     ,(a[0],"yes"))
+        log.debug("condition invtrue: %s" % (a[0]))
+        return Condition('ne', (a[0], "yes"))
 
-    if      CONDITION_FALSE.match(s):
+    if CONDITION_FALSE.match(s):
         a = CONDITION_FALSE.match(s).groups()
-        log.debug("condition false: %s"%(a[0]))
-        return  Condition('false'     ,a)
+        log.debug("condition false: %s" % (a[0]))
+        return Condition('false', a)
 
-    if      CONDITION_SET.match(s):
+    if CONDITION_SET.match(s):
         a = CONDITION_SET.match(s).groups()
-        log.debug("condition set: %s"%(a))
-        return  Condition('set'     ,a)
+        log.debug("condition set: %s" % (a))
+        return Condition('set', a)
 
-    if      CONDITION_UNSET.match(s):
+    if CONDITION_UNSET.match(s):
         a = CONDITION_UNSET.match(s).groups()
-        log.debug("condition unset: %s"%(a))
-        return  Condition('unset'     ,a)
+        log.debug("condition unset: %s" % (a))
+        return Condition('unset', a)
 
-    if      CONDITION_NE.match(s):
+    if CONDITION_NE.match(s):
         a = CONDITION_NE.match(s).groups()
-        log.debug("condition NE: %s = %s"%(a[0], a[1]))
-        return  Condition('ne'     ,a)
+        log.debug("condition NE: %s = %s" % (a[0], a[1]))
+        return Condition('ne', a)
         ## FIXME: convert other conditions to python
 
-    if      CONDITION_LE.match(s):
+    if CONDITION_LE.match(s):
         a = CONDITION_LE.match(s).groups()
-        log.debug("condition LE: %s <= %s"%(a[0], a[1]))
-        return  Condition('<='     ,a)
+        log.debug("condition LE: %s <= %s" % (a[0], a[1]))
+        return Condition('<=', a)
 
-    if      CONDITION_GE.match(s):
+    if CONDITION_GE.match(s):
         a = CONDITION_GE.match(s).groups()
-        log.debug("condition GE: %s >= %s"%(a[0], a[1]))
-        return  Condition('>='     ,a)
+        log.debug("condition GE: %s >= %s" % (a[0], a[1]))
+        return Condition('>=', a)
 
-    if      CONDITION_LT.match(s):
+    if CONDITION_LT.match(s):
         a = CONDITION_LT.match(s).groups()
-        log.debug("condition LT: %s < %s"%(a[0], a[1]))
-        return  Condition('<'     ,a)
+        log.debug("condition LT: %s < %s" % (a[0], a[1]))
+        return Condition('<', a)
 
-    if      CONDITION_GT.match(s):
+    if CONDITION_GT.match(s):
         a = CONDITION_GT.match(s).groups()
-        log.debug("condition GT: %s > %s"%(a[0], a[1]))
-        return  Condition('>'     ,a)
+        log.debug("condition GT: %s > %s" % (a[0], a[1]))
+        return Condition('>', a)
 
-    if      CONDITION_REGEX.match(s):
+    if CONDITION_REGEX.match(s):
         a = CONDITION_REGEX.match(s).groups()
-        log.debug("condition REGEX: %s = %s"%(a[0], a[1]))
-        return  Condition('regex'     ,a)
+        log.debug("condition REGEX: %s = %s" % (a[0], a[1]))
+        return Condition('regex', a)
 
-    if      CONDITION_EQ.match(s):
+    if CONDITION_EQ.match(s):
         a = CONDITION_EQ.match(s).groups()
-        log.debug("condition EQ: %s = %s"%(a[0], a[1]))
-        return  Condition('eq'     ,a)
+        log.debug("condition EQ: %s = %s" % (a[0], a[1]))
+        return Condition('eq', a)
 
     else:
-        log.warning("condition UNKNOWN: %s"%(s))
+        log.warning("condition UNKNOWN: %s" % (s))
 
 
 def parseDeclaration(s):
     """
     Parse declaration string into list of styles
     """
-    styles=[]
+    styles = []
     t = {}
 
     for a in s.split(';'):
-        #if ((o=ASSIGNMENT_EVAL.exec(a)))   { t[o[1].replace(DASH,'_')]=new Eval(o[2]); }
+        # if ((o=ASSIGNMENT_EVAL.exec(a)))   { t[o[1].replace(DASH,'_')]=new Eval(o[2]); }
         if ASSIGNMENT.match(a):
             tzz = ASSIGNMENT.match(a).groups()
-            t[tzz[0]]=tzz[1].strip().strip('"')
-            logging.debug("%s == %s" % (tzz[0],tzz[1]) )
+            t[tzz[0]] = tzz[1].strip().strip('"')
+            logging.debug("%s == %s" % (tzz[0], tzz[1]))
         else:
-            logging.debug("unknown %s" % (a) )
+            logging.debug("unknown %s" % (a))
     return [t]
 
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.WARNING)
-    mc = MapCSS(0,19)
+    mc = MapCSS(0, 19)

@@ -512,6 +512,7 @@ def name_to_hex(name, spec='css3'):
         raise ValueError("'%s' is not defined as a named color in %s." % (name, spec))
     return hex_value
 
+
 def name_to_rgb(name, spec='css3'):
     """
     Convert a color name to a 3-tuple of integers suitable for use in
@@ -539,6 +540,7 @@ def name_to_rgb(name, spec='css3'):
 
     """
     return hex_to_rgb(name_to_hex(name, spec=spec))
+
 
 def name_to_rgb_percent(name, spec='css3'):
     """
@@ -618,6 +620,7 @@ def hex_to_name(hex_value, spec='css3'):
         raise ValueError("'%s' has no defined color name in %s." % (hex_value, spec))
     return name
 
+
 def any_hex_to_name(hex_value):
     try:
         return hex_to_name(hex_value)
@@ -647,6 +650,7 @@ def hex_to_rgb(hex_value):
     hex_digits = normalize_hex(hex_value)
     return tuple(map(lambda s: int(s, 16),
                      (hex_digits[1:3], hex_digits[3:5], hex_digits[5:7])))
+
 
 def hex_to_rgb_percent(hex_value):
     """
@@ -696,6 +700,7 @@ def rgb_to_name(rgb_triplet, spec='css3'):
     """
     return hex_to_name(rgb_to_hex(rgb_triplet), spec=spec)
 
+
 def rgb_to_hex(rgb_triplet):
     """
     Convert a 3-tuple of integers, suitable for use in an ``rgb()``
@@ -712,6 +717,7 @@ def rgb_to_hex(rgb_triplet):
 
     """
     return '#%02x%02x%02x' % rgb_triplet
+
 
 def rgb_to_rgb_percent(rgb_triplet):
     """
@@ -742,8 +748,8 @@ def rgb_to_rgb_percent(rgb_triplet):
     # In order to maintain precision for common values,
     # 256 / 2**n is special-cased for values of n
     # from 0 through 4, as well as 0 itself.
-    specials = { 255: '100%', 128: '50%', 64: '25%',
-                 32: '12.5%', 16: '6.25%', 0: '0%' }
+    specials = {255: '100%', 128: '50%', 64: '25%',
+                32: '12.5%', 16: '6.25%', 0: '0%'}
     return tuple(map(lambda d: specials.get(d, '%.02f%%' % ((d / 255.0) * 100)),
                      rgb_triplet))
 
@@ -778,6 +784,7 @@ def rgb_percent_to_name(rgb_percent_triplet, spec='css3'):
     """
     return rgb_to_name(rgb_percent_to_rgb(rgb_percent_triplet), spec=spec)
 
+
 def rgb_percent_to_hex(rgb_percent_triplet):
     """
     Convert a 3-tuple of percentages, suitable for use in an ``rgb()``
@@ -796,6 +803,7 @@ def rgb_percent_to_hex(rgb_percent_triplet):
     """
     return rgb_to_hex(rgb_percent_to_rgb(rgb_percent_triplet))
 
+
 def _percent_to_integer(percent):
     """
     Internal helper for converting a percentage value to an integer
@@ -805,6 +813,7 @@ def _percent_to_integer(percent):
     num = float(percent.split('%')[0]) / 100.0 * 255
     e = num - math.floor(num)
     return e < 0.5 and int(math.floor(num)) or int(math.ceil(num))
+
 
 def rgb_percent_to_rgb(rgb_percent_triplet):
     """
@@ -833,6 +842,7 @@ def rgb_percent_to_rgb(rgb_percent_triplet):
     """
     return tuple(map(_percent_to_integer, rgb_percent_triplet))
 
+
 def whatever_to_rgb(string):
     """
     Converts CSS3 color or a hex into rgb triplet; hash of string if fails.
@@ -848,19 +858,22 @@ def whatever_to_rgb(string):
                 if string[:3] == "rgb":
                     return tuple([float(i) for i in string[4:-1].split(",")][0:3])
             except:
-                return hex_to_rgb("#"+md5(string).hexdigest()[:6])
+                return hex_to_rgb("#" + md5(string).hexdigest()[:6])
+
 
 def whatever_to_hex(string):
     if type(string) == tuple:
         return cairo_to_hex(string).upper()
     return rgb_to_hex(whatever_to_rgb(string)).upper()
 
+
 def whatever_to_cairo(string):
     a = whatever_to_rgb(string)
-    return a[0]/255.,a[1]/255.,a[2]/255.
+    return a[0] / 255., a[1] / 255., a[2] / 255.
 
-def cairo_to_hex (cairo):
-    return rgb_to_hex((cairo[0]*255.,cairo[1]*255.,cairo[2]*255.))
+
+def cairo_to_hex(cairo):
+    return rgb_to_hex((cairo[0] * 255., cairo[1] * 255., cairo[2] * 255.))
 
 if __name__ == '__main__':
     import doctest

@@ -26,12 +26,10 @@ import Queue
 import os
 
 
-
-#from backend.postgis import PostGisBackend as DataBackend
+# from backend.postgis import PostGisBackend as DataBackend
 from backend.vtile import QuadTileBackend as DataBackend
 from mapcss import MapCSS as Styling
 from gtk_widget import KothicWidget
-
 
 
 try:
@@ -52,11 +50,8 @@ class KothicApp:
         self.data = DataBackend()
         self.load_style()
 
-
-        self.request_d = (0,0)
+        self.request_d = (0, 0)
         self.window = gtk.Window()
-
-
 
         self.window.set_size_request(self.width, self.height)
 
@@ -75,7 +70,7 @@ class KothicApp:
         stylemenu = gtk.Menu()
         stylem = gtk.MenuItem("Style")
         stylem.set_submenu(stylemenu)
-        styles = [name for name in os.listdir("styles")  if ".mapcss" in name]
+        styles = [name for name in os.listdir("styles") if ".mapcss" in name]
         for style in styles:
             i = gtk.MenuItem(style)
             i.StyleName = style
@@ -90,28 +85,25 @@ class KothicApp:
         menu.append(stylem)
 
         vbox = gtk.VBox(False, 2)
-        vbox.pack_start(menu,False,False,0)
+        vbox.pack_start(menu, False, False, 0)
 
         self.KothicWidget = KothicWidget(self.data, self.style)
         self.KothicWidget.set_zoom(self.zoom)
         self.KothicWidget.jump_to(self.center_coord)
 
-
-
         vbox.pack_end(self.KothicWidget)
-
 
         self.window.add(vbox)
 
     def load_style(self):
-        self.style = Styling(0,25)
-        self.style.parse(open("styles/osmosnimki-maps.mapcss","r").read())
-    def reload_style(self,w):
-        self.style = Styling(0,25)
-        self.style.parse(open("styles/%s"%w.StyleName,"r").read())
+        self.style = Styling(0, 25)
+        self.style.parse(open("styles/osmosnimki-maps.mapcss", "r").read())
+
+    def reload_style(self, w):
+        self.style = Styling(0, 25)
+        self.style.parse(open("styles/%s" % w.StyleName, "r").read())
         self.KothicWidget.style_backend = self.style
         self.KothicWidget.redraw()
-
 
     def main(self):
 

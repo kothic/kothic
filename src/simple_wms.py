@@ -24,19 +24,17 @@ from render import RasterTile
 import web
 import StringIO
 
-style = MapCSS(1, 26)     #zoom levels
-style.parse(open("styles/landuses.mapcss","r").read())
+style = MapCSS(1, 26)  # zoom levels
+style.parse(open("styles/landuses.mapcss", "r").read())
 
 
-#bbox = (27.115768874532,53.740327031764,28.028320754378,54.067187302158)
+# bbox = (27.115768874532,53.740327031764,28.028320754378,54.067187302158)
 
-#w,h = 630*4,364*4
-#z = 17
+# w,h = 630*4,364*4
+# z = 17
 
 db = DataBackend()
-#style = Styling()
-
-
+# style = Styling()
 
 
 try:
@@ -48,6 +46,7 @@ except ImportError:
 OK = 200
 ERROR = 500
 
+
 def handler():
     """
     A handler for web.py.
@@ -58,14 +57,14 @@ def handler():
     return content
 
 
-
 urls = (
-      '/(.*)', 'mainhandler'
+    '/(.*)', 'mainhandler'
 )
+
+
 class mainhandler:
     def GET(self, crap):
         return handler()
-
 
 
 if __name__ == "__main__":
@@ -79,33 +78,29 @@ def twms_main(req):
     data = req
     srs = data.get("srs", data.get("SRS", "EPSG:4326"))
     content_type = "image/png"
-    #layer = data.get("layers",data.get("LAYERS", config.default_layers)).split(",")
+    # layer = data.get("layers",data.get("LAYERS", config.default_layers)).split(",")
 
-    width=0
-    height=0
+    width = 0
+    height = 0
     req_bbox = ()
-    if data.get("bbox",data.get("BBOX",None)):
-        req_bbox = tuple(map(float,data.get("bbox",data.get("BBOX",req_bbox)).split(",")))
+    if data.get("bbox", data.get("BBOX", None)):
+        req_bbox = tuple(map(float, data.get("bbox", data.get("BBOX", req_bbox)).split(",")))
 
     req_bbox = projections.to4326(req_bbox, srs)
 
     req_bbox, flip_h = bbox.normalize(req_bbox)
     box = req_bbox
 
-    height = int(data.get("height",data.get("HEIGHT",height)))
-    width = int(data.get("width",data.get("WIDTH",width)))
+    height = int(data.get("height", data.get("HEIGHT", height)))
+    width = int(data.get("width", data.get("WIDTH", width)))
 
-    z = bbox.zoom_for_bbox (box, (height, width), {"proj":"EPSG:3857"}, min_zoom = 1, max_zoom = 25,max_size = (10000,10000))
+    z = bbox.zoom_for_bbox(box, (height, width), {"proj": "EPSG:3857"}, min_zoom=1, max_zoom=25, max_size=(10000, 10000))
 
     res = RasterTile(width, height, z, db)
     res.update_surface(box, z, style)
     image_content = StringIO.StringIO()
 
-
-
     res.surface.write_to_png(image_content)
-
-
 
     resp = image_content.getvalue()
     return (OK, content_type, resp)

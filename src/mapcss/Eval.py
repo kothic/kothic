@@ -17,6 +17,7 @@
 
 NONE = ""
 
+
 class Eval():
     def __init__(self, s='eval()'):
         """
@@ -25,11 +26,10 @@ class Eval():
         s = s.strip()[5:-1].strip()
         self.expr_text = s
         try:
-            self.expr = compile (s, "MapCSS expression", "eval")
+            self.expr = compile(s, "MapCSS expression", "eval")
         except:
-            #print "Can't compile %s" % s
-            self.expr = compile ("0", "MapCSS expression", "eval")
-
+            # print "Can't compile %s" % s
+            self.expr = compile("0", "MapCSS expression", "eval")
 
     def extract_tags(self):
         """
@@ -44,50 +44,50 @@ class Eval():
                 q = x
             return 0
         tags = set([])
-        #print self.expr_text
+        # print self.expr_text
 
-        a = eval(self.expr,{},{
-          "tag":lambda x: max([tags.add(x), " "]),
-          "prop": lambda x: "",
-          "num": lambda x: 0,
-          "metric": fake_compute,
-          "zmetric": fake_compute,
-          "str": lambda x: "",
-          "any": fake_compute,
-          "min": fake_compute,
-          "max": fake_compute,
-        })
+        a = eval(self.expr, {}, {
+                 "tag": lambda x: max([tags.add(x), " "]),
+                 "prop": lambda x: "",
+                 "num": lambda x: 0,
+                 "metric": fake_compute,
+                 "zmetric": fake_compute,
+                 "str": lambda x: "",
+                 "any": fake_compute,
+                 "min": fake_compute,
+                 "max": fake_compute,
+                 })
         return tags
 
-
-    def compute(self, tags={}, props = {}, xscale = 1., zscale = 0.5 ):
+    def compute(self, tags={}, props={}, xscale=1., zscale=0.5):
         """
         Compute this eval()
         """
-        for k,v in tags.iteritems():
+        for k, v in tags.iteritems():
             try:
                 tag[k] = float(v)
             except:
                 pass
         try:
             return str(eval(self.expr, {}, {
-            "tag":lambda x: tags.get(x,""),
-            "prop":lambda x: props.get(x,""),
-            "num": m_num,
-            "metric": lambda x: m_metric(x, xscale),
-            "zmetric": lambda x: m_metric(x, zscale),
-            "str": str,
-            "any": m_any,
-            "min": m_min,
-            "max": m_max,
-            "cond": m_cond,
-            "boolean": m_boolean
-              }))
+                            "tag": lambda x: tags.get(x, ""),
+                            "prop": lambda x: props.get(x, ""),
+                            "num": m_num,
+                            "metric": lambda x: m_metric(x, xscale),
+                            "zmetric": lambda x: m_metric(x, zscale),
+                            "str": str,
+                            "any": m_any,
+                            "min": m_min,
+                            "max": m_max,
+                            "cond": m_cond,
+                            "boolean": m_boolean
+                            }))
         except:
             return ""
 
     def __repr__(self):
-        return "eval(%s)"%self.expr_text
+        return "eval(%s)" % self.expr_text
+
 
 def m_boolean(expr):
     expr = str(expr)
@@ -96,11 +96,13 @@ def m_boolean(expr):
     else:
         return True
 
+
 def m_cond(why, yes, no):
     if m_boolean(why):
         return yes
     else:
         return no
+
 
 def m_min(*x):
     """
@@ -111,6 +113,7 @@ def m_min(*x):
     except:
         return 0
 
+
 def m_max(*x):
     """
     max() MapCSS Feature
@@ -119,6 +122,7 @@ def m_max(*x):
         return max([m_num(t) for t in x])
     except:
         return 0
+
 
 def m_any(*x):
     """
@@ -130,6 +134,7 @@ def m_any(*x):
     else:
         return ""
 
+
 def m_num(x):
     """
     num() MapCSS feature
@@ -138,35 +143,37 @@ def m_num(x):
         return float(str(x))
     except ValueError:
         return 0
+
+
 def m_metric(x, t):
     """
     metric() and zmetric() function.
     """
     x = str(x)
     try:
-        return float(x)*float(t)
+        return float(x) * float(t)
     except:
         "Heuristics."
         # FIXME: add ft, m and friends
         x = x.strip()
         try:
             if x[-2:] in ("cm", "CM", "см"):
-                return float(x[0:-2])*float(t)/100
+                return float(x[0:-2]) * float(t) / 100
             if x[-2:] in ("mm", "MM", "мм"):
-                return float(x[0:-2])*float(t)/1000
+                return float(x[0:-2]) * float(t) / 1000
             if x[-1] in ("m", "M", "м"):
-                return float(x[0:-1])*float(t)
+                return float(x[0:-1]) * float(t)
         except:
             return ""
-#def str(x):
+# def str(x):
     #"""
-    #str() MapCSS feature
+    # str() MapCSS feature
     #"""
-    #return __builtins__.str(x)
+    # return __builtins__.str(x)
 
 
 if __name__ == "__main__":
     a = Eval(""" eval( any( metric(tag("height")), metric ( num(tag("building:levels")) * 3), metric("1m"))) """)
     print repr(a)
-    print a.compute({"building:levels":"3"})
+    print a.compute({"building:levels": "3"})
     print a.extract_tags()
