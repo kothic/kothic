@@ -130,15 +130,26 @@ def komap_mapswithme(options, style):
                         st['z-index'] = float(st.get('z-index', 0)) - 15001.
 
                     if st.get('casing-width') not in (None, 0):  # and (st.get('width') or st.get('fill-color')):
-                        dr_line = LineRuleProto()
-                        dr_line.width = (st.get('width', 0) * WIDTH_SCALE) + (st.get('casing-width') * WIDTH_SCALE * 2)
-                        dr_line.color = mwm_encode_color(st, "casing")
-                        dr_line.priority = min(int(st.get('z-index', 0)), 20000)
-                        dashes = st.get('casing-dashes', st.get('dashes', []))
-                        dr_line.dashdot.dd.extend(dashes)
-                        dr_line.cap = dr_linecaps.get(st.get('casing-linecap', 'butt'), BUTTCAP)
-                        dr_line.join = dr_linejoins.get(st.get('casing-linejoin', 'round'), ROUNDJOIN)
-                        dr_element.lines.extend([dr_line])
+                        if st.get('casing-linecap', 'butt') == 'butt':
+                            dr_line = LineRuleProto()
+                            dr_line.width = (st.get('width', 0) * WIDTH_SCALE) + (st.get('casing-width') * WIDTH_SCALE * 2)
+                            dr_line.color = mwm_encode_color(st, "casing")
+                            dr_line.priority = min(int(st.get('z-index', 0)), 20000)
+                            dashes = st.get('casing-dashes', st.get('dashes', []))
+                            dr_line.dashdot.dd.extend(dashes)
+                            dr_line.cap = dr_linecaps.get(st.get('casing-linecap', 'butt'), BUTTCAP)
+                            dr_line.join = dr_linejoins.get(st.get('casing-linejoin', 'round'), ROUNDJOIN)
+                            dr_element.lines.extend([dr_line])
+                        if st.get('casing-linecap', 'round') != 'butt':
+                            dr_line = LineRuleProto()
+                            dr_line.width = (st.get('width', 0) * WIDTH_SCALE) + (st.get('casing-width') * WIDTH_SCALE * 2)
+                            dr_line.color = mwm_encode_color(st, "casing")
+                            dr_line.priority = -15000
+                            dashes = st.get('casing-dashes', st.get('dashes', []))
+                            dr_line.dashdot.dd.extend(dashes)
+                            dr_line.cap = dr_linecaps.get(st.get('casing-linecap', 'round'), ROUNDCAP)
+                            dr_line.join = dr_linejoins.get(st.get('casing-linejoin', 'round'), ROUNDJOIN)
+                            dr_element.lines.extend([dr_line])
 
                     if st.get('width'):
                         dr_line = LineRuleProto()
