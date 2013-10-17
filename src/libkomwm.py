@@ -1,4 +1,6 @@
 from drules_struct_pb2 import *
+import texture_packer
+
 
 import os
 import csv
@@ -9,12 +11,13 @@ whatever_to_cairo = mapcss.webcolors.webcolors.whatever_to_cairo
 
 WIDTH_SCALE = 1.0
 
-def komap_mapswithme(options, style):
+def komap_mapswithme(options, style, filename):
     if options.outfile == "-":
         print "Please specify base output path."
         exit()
     else:
         ddir = os.path.dirname(options.outfile)
+    basepath = os.path.dirname(filename)
     drules = ContainerProto()
 
     visibility_file = open(os.path.join(ddir, 'visibility.txt'), "w")
@@ -22,6 +25,7 @@ def komap_mapswithme(options, style):
     types_file = open(os.path.join(ddir, 'types.txt'), "w")
     drules_bin = open(os.path.join(options.outfile + '.bin'), "wb")
     drules_txt = open(os.path.join(options.outfile + '.txt'), "wb")
+    textures = {}
 
     classificator = {}
     class_order = []
@@ -60,6 +64,25 @@ def komap_mapswithme(options, style):
         color = whatever_to_hex(st.get(prefix + 'color', default))
         color = color[1] + color[1] + color[3] + color[3] + color[5] + color[5]
         return int(opacity + color, 16)
+    
+    def mwm_encode_image(st, prefix='icon'):
+        if prefix:
+            prefix += "-"
+        if prefix + "image" not in st:
+            return False
+        icon = {
+            "file": os.path.join(basepath,st.get(prefix + "image")),
+            "fill-color": "",
+            "color": "",
+            "width": st.get(prefix + "width", ""),
+            "height": st.get(prefix + "height", ""),
+        }
+        if st.get(prefix + "color"):
+            icon["color"] = whatever_to_hex(st.get(prefix + "color"))
+        if st.get(prefix + "fill-color"):
+            icon["fill-color"] = whatever_to_hex(st.get(prefix + "fill-color"))
+        handle = ":".join([str(i) for i in [st.get(prefix + "image"), icon["fill-color"], icon["color"], icon["width"], icon["height"]]])
+        return handle, icon
 
     bgpos = 0
 
@@ -114,7 +137,7 @@ def komap_mapswithme(options, style):
                     has_fills = True
             txfmt = []
             for st in zstyle:
-                if 'text' in st and not st.get('text') in txfmt:
+                if st.get('text') and not st.get('text') in txfmt:
                     txfmt.append(st.get('text'))
                     has_text.append(st)
 
@@ -166,23 +189,27 @@ def komap_mapswithme(options, style):
                         dr_line = LineRuleProto()
                         dr_line.width = 0
                         dr_line.color = 0
-                        dr_line.pathsym.name = st.get('pattern-image', "").replace(".svg", "")
+                        icon = mwm_encode_image(st, prefix='pattern')
+                        dr_line.pathsym.name = icon[0]
                         dr_line.pathsym.step = float(st.get('pattern-spacing', 0)) - 16
                         dr_line.pathsym.offset = st.get('pattern-offset', 0)
                         dr_line.priority = int(st.get('z-index', 0)) + 1000
                         dr_element.lines.extend([dr_line])
+                        textures[icon[0]] = icon[1]
 
                     if has_icons:
                         if st.get('icon-image'):
                             if not has_icons_for_areas:
                                 dr_element.symbol.apply_for_type = 1
-                            dr_element.symbol.name = st.get('icon-image', "").replace(".svg", "")
+                            icon = mwm_encode_image(st)
+                            dr_element.symbol.name = icon[0]
                             dr_element.symbol.priority = min(19100, (16000 + int(st.get('z-index', 0))))
+                            textures[icon[0]] = icon[1]
                             has_icons = False
                         if st.get('symbol-shape'):
                             dr_element.circle.radius = float(st.get('symbol-size'))
                             dr_element.circle.color = mwm_encode_color(st, 'symbol-fill')
-                            dr_element.circle.priority = min(19000, (15000 + int(st.get('z-index', 0))))
+                            dr_element.circle.priority = min(19000, (14000 + int(st.get('z-index', 0))))
                             has_icons = False
 
                     if has_text and st.get('text'):
@@ -230,6 +257,13 @@ def komap_mapswithme(options, style):
     visnodes = set()
     drules_bin.write(drules.SerializeToString())
     drules_txt.write(unicode(drules))
+
+    gui_symbol_path = os.path.join(ddir, 'symbols')
+    imgpaths = [(".".join(i.split(".")[:-1]), {"file": os.path.join(gui_symbol_path, i)}, 24) for i in os.listdir(gui_symbol_path)]
+    imgpaths.extend([(handle, svg, 18) for handle, svg in textures.iteritems()])
+    dpiset = [('ldpi', 0.75), ('mdpi', 1), ('hdpi', 1.5), ('xhdpi', 2), ('xxhdpi', 3), ('yota', 1)]
+    for (dpiname, multiplier) in dpiset:
+        texture_packer.pack_texture(imgpaths, multiplier, os.path.join(ddir, 'resources-'+dpiname))
 
     for k, v in visibility.iteritems():
         vis = k.split("|")

@@ -28,7 +28,6 @@ import sys
 reload(sys)
 sys.setdefaultencoding("utf-8")
 
-
 import os
 
 try:
@@ -92,11 +91,11 @@ def escape_sql_column(name, type="way", asname=False):
         return "(tags->'" + name + "') as \"" + name + '"'
 
 style = MapCSS(options.minzoom, options.maxzoom + 1)  # zoom levels
-style.parse(filename=options.filename)
+style.parse(filename = options.filename)
 
 if options.renderer == "mapswithme":
     from libkomwm import *
-    komap_mapswithme(options, style)
+    komap_mapswithme(options, style, options.filename)
     exit()
 
 if options.outfile == "-":
