@@ -262,8 +262,10 @@ def komap_mapswithme(options, style, filename):
     imgpaths = [(".".join(i.split(".")[:-1]), {"file": os.path.join(gui_symbol_path, i)}, 24) for i in os.listdir(gui_symbol_path)]
     imgpaths.extend([(handle, svg, 18) for handle, svg in textures.iteritems()])
     dpiset = [('ldpi', 0.75), ('mdpi', 1), ('hdpi', 1.5), ('xhdpi', 2), ('xxhdpi', 3), ('yota', 1)]
+    style_dpi = style.get_style_dict("canvas", {}, 0).values()[0].get("-x-mapsithme-dpi", "ldpi,mdpi,hdpi,xhdpi,xxhdpi").split(",")
     for (dpiname, multiplier) in dpiset:
-        texture_packer.pack_texture(imgpaths, multiplier, os.path.join(ddir, 'resources-'+dpiname))
+        if dpiname in style_dpi:
+            texture_packer.pack_texture(imgpaths, multiplier, os.path.join(ddir, 'resources-'+dpiname))
 
     for k, v in visibility.iteritems():
         vis = k.split("|")
