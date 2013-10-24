@@ -20,8 +20,6 @@ def komap_mapswithme(options, style, filename):
     basepath = os.path.dirname(filename)
     drules = ContainerProto()
 
-    visibility_file = open(os.path.join(ddir, 'visibility.txt'), "w")
-    classificator_file = open(os.path.join(ddir, 'classificator.txt'), "w")
     types_file = open(os.path.join(ddir, 'types.txt'), "w")
     drules_bin = open(os.path.join(options.outfile + '.bin'), "wb")
     drules_txt = open(os.path.join(options.outfile + '.txt'), "wb")
@@ -56,6 +54,7 @@ def komap_mapswithme(options, style, filename):
                 print >> types_file, "mapswithme"
         class_tree[row[0].replace("|", "-")] = row[0]
     class_order.sort()
+    types_file.close()
 
     def mwm_encode_color(st, prefix='', default='black'):
         if prefix:
@@ -64,24 +63,38 @@ def komap_mapswithme(options, style, filename):
         color = whatever_to_hex(st.get(prefix + 'color', default))
         color = color[1] + color[1] + color[3] + color[3] + color[5] + color[5]
         return int(opacity + color, 16)
-    
-    def mwm_encode_image(st, prefix='icon'):
+
+    def mwm_encode_image(st, prefix='icon', bgprefix='symbol'):
         if prefix:
             prefix += "-"
+        if bgprefix:
+            bgprefix += "-"
         if prefix + "image" not in st:
             return False
         icon = {
             "file": os.path.join(basepath,st.get(prefix + "image")),
             "fill-color": "",
             "color": "",
-            "width": st.get(prefix + "width", ""),
-            "height": st.get(prefix + "height", ""),
+            "symbol-image": "",
+            "symbol-file": "",
+            "symbol-fill-color": "",
+            "symbol-color": "",
+            #"width": st.get(prefix + "width", ""),
+            #"height": st.get(prefix + "height", ""),
         }
+
         if st.get(prefix + "color"):
             icon["color"] = whatever_to_hex(st.get(prefix + "color"))
         if st.get(prefix + "fill-color"):
             icon["fill-color"] = whatever_to_hex(st.get(prefix + "fill-color"))
-        handle = ":".join([str(i) for i in [st.get(prefix + "image"), icon["fill-color"], icon["color"], icon["width"], icon["height"]]])
+        if st.get(bgprefix + "image"):
+            icon["symbol-image"] = st.get(bgprefix + "image")
+            icon["symbol-file"] = os.path.join(basepath,st.get(bgprefix + "image"))
+            if st.get(bgprefix + "color"):
+                icon["symbol-color"] = whatever_to_hex(st.get(bgprefix + "color"))
+            if st.get(bgprefix + "fill-color"):
+                icon["symbol-fill-color"] = whatever_to_hex(st.get(bgprefix + "fill-color"))
+        handle = ":".join([str(i) for i in [st.get(prefix + "image"), icon["fill-color"], icon["color"], icon["symbol-image"], icon["symbol-fill-color"], icon["symbol-color"]]])
         return handle, icon
 
     bgpos = 0
@@ -100,6 +113,7 @@ def komap_mapswithme(options, style, filename):
             txclass["addr:housenumber"] = "addr:housenumber"
             txclass["ref"] = "ref"
             txclass["int_name"] = "int_name"
+            txclass["addr:flats"] = "addr:flats"
             has_icons_for_areas = False
             zstyle = {}
 
@@ -112,7 +126,7 @@ def komap_mapswithme(options, style, filename):
             if True:
                 areastyle = style.get_style_dict("area", txclass, zoom, olddict=zstyle, cache=False)
                 for st in areastyle.values():
-                    if "icon-image" in st or 'symbol-shape' in st:
+                    if "icon-image" in st or 'symbol-shape' in st or 'symbol-image' in st:
                         has_icons_for_areas = True
                 zstyle = areastyle
 
@@ -131,7 +145,7 @@ def komap_mapswithme(options, style, filename):
                 st = dict([(k, v) for k, v in st.iteritems() if str(v).strip(" 0.")])
                 if 'width' in st or 'pattern-image' in st:
                     has_lines = True
-                if 'icon-image' in st or 'symbol-shape' in st:
+                if 'icon-image' in st or 'symbol-shape' in st or 'symbol-image' in st:
                     has_icons = True
                 if 'fill-color' in st:
                     has_fills = True
@@ -282,6 +296,9 @@ def komap_mapswithme(options, style, filename):
             return 1
         return -1
     viskeys.sort(cmprepl)
+
+    visibility_file = open(os.path.join(ddir, 'visibility.txt'), "w")
+    classificator_file = open(os.path.join(ddir, 'classificator.txt'), "w")
 
     oldoffset = ""
     for k in viskeys:

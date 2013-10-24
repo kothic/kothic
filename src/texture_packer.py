@@ -11,6 +11,7 @@ from xml.dom import minidom
 
 def open_svg_as_image(icon, multiplier = 1.0, max_height = None):
     fn = icon["file"]
+    original_multiplier = multiplier
     max_height = max_height * multiplier
     maki_resize = [
         (18, 0.75, 12, 1),
@@ -30,30 +31,57 @@ def open_svg_as_image(icon, multiplier = 1.0, max_height = None):
                 multiplier = dstmul
                 break
 
-    dom = minidom.parse(fn)
+    icon_dom = minidom.parse(fn)
     if icon.get("fill-color"):
-        [a.setAttribute("fill", icon["fill-color"]) for a in dom.getElementsByTagName("path") if a.getAttribute("fill")]
-        [a.setAttribute("fill", icon["fill-color"]) for a in dom.getElementsByTagName("g") if a.getAttribute("fill")]
+        [a.setAttribute("fill", icon["fill-color"]) for a in icon_dom.getElementsByTagName("path") if a.getAttribute("fill")]
+        [a.setAttribute("fill", icon["fill-color"]) for a in icon_dom.getElementsByTagName("g") if a.getAttribute("fill")]
+        [a.setAttribute("fill", icon["fill-color"]) for a in icon_dom.getElementsByTagName("rect") if a.getAttribute("fill") not in ("none", "")]
     if icon.get("color"):
-        [a.setAttribute("stroke", icon["color"]) for a in dom.getElementsByTagName("path") if a.getAttribute("stroke")]
-        [a.setAttribute("stroke", icon["color"]) for a in dom.getElementsByTagName("g") if a.getAttribute("stroke")]
+        [a.setAttribute("stroke", icon["color"]) for a in icon_dom.getElementsByTagName("path") if a.getAttribute("stroke")]
+        [a.setAttribute("stroke", icon["color"]) for a in icon_dom.getElementsByTagName("g") if a.getAttribute("stroke")]
+        [a.setAttribute("stroke", icon["color"]) for a in icon_dom.getElementsByTagName("rect") if a.getAttribute("stroke") not in ("none", "")]
 
     tmpfile = StringIO.StringIO()
     outfile = StringIO.StringIO()
-    #svg = rsvg.Handle(file=fn)
-    svg = rsvg.Handle(data=dom.toxml())
+    svg = rsvg.Handle(data=icon_dom.toxml())
     svgwidth = float(svg.get_property('width'))
     svgheight = float(svg.get_property('height'))
-    resheight = svgheight * multiplier
+    iconheight = svgheight * multiplier
     if max_height:
-        resheight = min(resheight, max_height)
-    reswidth = svgwidth * resheight / svgheight
+        iconheight = min(iconheight, max_height)
+    iconwidth = svgwidth * iconheight / svgheight
+
+    reswidth, resheight = iconwidth, iconheight
+
+    if icon.get("symbol-file"):
+        bg_dom = minidom.parse(icon["symbol-file"])
+        if icon.get("symbol-fill-color"):
+            [a.setAttribute("fill", icon["symbol-fill-color"]) for a in bg_dom.getElementsByTagName("path") if a.getAttribute("fill")]
+            [a.setAttribute("fill", icon["symbol-fill-color"]) for a in bg_dom.getElementsByTagName("g") if a.getAttribute("fill")]
+            [a.setAttribute("fill", icon["symbol-fill-color"]) for a in bg_dom.getElementsByTagName("rect") if a.getAttribute("fill") not in ("none", "")]
+        if icon.get("symbol-color"):
+            [a.setAttribute("stroke", icon["symbol-color"]) for a in bg_dom.getElementsByTagName("path") if a.getAttribute("stroke")]
+            [a.setAttribute("stroke", icon["symbol-color"]) for a in bg_dom.getElementsByTagName("g") if a.getAttribute("stroke")]
+            [a.setAttribute("stroke", icon["symbol-color"]) for a in bg_dom.getElementsByTagName("rect") if a.getAttribute("stroke") not in ("none", "")]
+        bg_svg = rsvg.Handle(data=bg_dom.toxml())
+        bg_width = float(bg_svg.get_property('width'))
+        bg_height = float(bg_svg.get_property('height'))
+        reswidth = max(bg_width * original_multiplier, reswidth)
+        resheight = max(bg_height * original_multiplier, resheight)
+
     svgsurface = cairo.SVGSurface(outfile, reswidth, resheight)
     svgctx = cairo.Context(svgsurface)
-    #size = max(24, svgwidth, svgheight)
-    print fn, svgwidth / reswidth, svgheight / resheight
-    svgctx.scale(reswidth / svgwidth, resheight / svgheight)
+
+    if icon.get("symbol-file"):
+        svgctx.save()
+        svgctx.scale(original_multiplier, original_multiplier)
+        bg_svg.render_cairo(svgctx)
+        svgctx.restore()
+        svgctx.translate((reswidth - iconwidth) / 2., (resheight - iconheight) / 2.)
+
+    svgctx.scale(iconwidth / svgwidth, iconheight / svgheight)
     svg.render_cairo(svgctx)
+
     svgsurface.write_to_png(tmpfile)
     svgsurface.finish()
     tmpfile.seek(0)
@@ -64,7 +92,6 @@ def open_svg_as_image(icon, multiplier = 1.0, max_height = None):
         bbox = (dx, dy, im.size[0] - dx, im.size[1] - dy)
         im = im.crop(bbox)
     return im
-
 
 def pack_texture(icons=[], multiplier = 1.0, path = "", rasfilter = []):
     images = {}
@@ -110,7 +137,7 @@ def pack_texture(icons=[], multiplier = 1.0, path = "", rasfilter = []):
             dx += images[img].size[0]
         dy += strip["height"]
         dx = 0
-    pprint.pprint(strips)
+    #pprint.pprint(strips)
 
     print >>skin, """ </page>
     </skin>"""
