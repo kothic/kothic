@@ -177,7 +177,7 @@ def komap_mapswithme(options, style, filename):
                             dr_line.cap = dr_linecaps.get(st.get('casing-linecap', 'butt'), BUTTCAP)
                             dr_line.join = dr_linejoins.get(st.get('casing-linejoin', 'round'), ROUNDJOIN)
                             dr_element.lines.extend([dr_line])
-                        if st.get('casing-linecap', 'round') != 'butt':
+                        if st.get('casing-linecap', st.get('linecap', 'round')) != 'butt':
                             dr_line = LineRuleProto()
                             dr_line.width = (st.get('width', 0) * WIDTH_SCALE) + (st.get('casing-width') * WIDTH_SCALE * 2)
                             dr_line.color = mwm_encode_color(st, "casing")

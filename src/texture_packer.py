@@ -9,7 +9,7 @@ import rsvg
 
 from xml.dom import minidom
 
-def open_svg_as_image(icon, multiplier = 1.0, max_height = None):
+def open_icon_as_image(icon, multiplier = 1.0, max_height = None):
     fn = icon["file"]
     original_multiplier = multiplier
     max_height = max_height * multiplier
@@ -31,61 +31,67 @@ def open_svg_as_image(icon, multiplier = 1.0, max_height = None):
                 multiplier = dstmul
                 break
 
-    icon_dom = minidom.parse(fn)
-    if icon.get("fill-color"):
-        [a.setAttribute("fill", icon["fill-color"]) for a in icon_dom.getElementsByTagName("path") if a.getAttribute("fill")]
-        [a.setAttribute("fill", icon["fill-color"]) for a in icon_dom.getElementsByTagName("g") if a.getAttribute("fill")]
-        [a.setAttribute("fill", icon["fill-color"]) for a in icon_dom.getElementsByTagName("rect") if a.getAttribute("fill") not in ("none", "")]
-    if icon.get("color"):
-        [a.setAttribute("stroke", icon["color"]) for a in icon_dom.getElementsByTagName("path") if a.getAttribute("stroke")]
-        [a.setAttribute("stroke", icon["color"]) for a in icon_dom.getElementsByTagName("g") if a.getAttribute("stroke")]
-        [a.setAttribute("stroke", icon["color"]) for a in icon_dom.getElementsByTagName("rect") if a.getAttribute("stroke") not in ("none", "")]
+    try:
+        im = Image.open(fn)
+        im = im.resize((int(math.ceil(im.size[0] * multiplier)), int(math.ceil(im.size[1] * multiplier))), Image.NEAREST)
 
-    tmpfile = StringIO.StringIO()
-    outfile = StringIO.StringIO()
-    svg = rsvg.Handle(data=icon_dom.toxml())
-    svgwidth = float(svg.get_property('width'))
-    svgheight = float(svg.get_property('height'))
-    iconheight = svgheight * multiplier
-    if max_height:
-        iconheight = min(iconheight, max_height)
-    iconwidth = svgwidth * iconheight / svgheight
+    except IOError:
+        icon_dom = minidom.parse(fn)
 
-    reswidth, resheight = iconwidth, iconheight
+        if icon.get("fill-color"):
+            [a.setAttribute("fill", icon["fill-color"]) for a in icon_dom.getElementsByTagName("path") if a.getAttribute("fill")]
+            [a.setAttribute("fill", icon["fill-color"]) for a in icon_dom.getElementsByTagName("g") if a.getAttribute("fill")]
+            [a.setAttribute("fill", icon["fill-color"]) for a in icon_dom.getElementsByTagName("rect") if a.getAttribute("fill") not in ("none", "")]
+        if icon.get("color"):
+            [a.setAttribute("stroke", icon["color"]) for a in icon_dom.getElementsByTagName("path") if a.getAttribute("stroke")]
+            [a.setAttribute("stroke", icon["color"]) for a in icon_dom.getElementsByTagName("g") if a.getAttribute("stroke")]
+            [a.setAttribute("stroke", icon["color"]) for a in icon_dom.getElementsByTagName("rect") if a.getAttribute("stroke") not in ("none", "")]
 
-    if icon.get("symbol-file"):
-        bg_dom = minidom.parse(icon["symbol-file"])
-        if icon.get("symbol-fill-color"):
-            [a.setAttribute("fill", icon["symbol-fill-color"]) for a in bg_dom.getElementsByTagName("path") if a.getAttribute("fill")]
-            [a.setAttribute("fill", icon["symbol-fill-color"]) for a in bg_dom.getElementsByTagName("g") if a.getAttribute("fill")]
-            [a.setAttribute("fill", icon["symbol-fill-color"]) for a in bg_dom.getElementsByTagName("rect") if a.getAttribute("fill") not in ("none", "")]
-        if icon.get("symbol-color"):
-            [a.setAttribute("stroke", icon["symbol-color"]) for a in bg_dom.getElementsByTagName("path") if a.getAttribute("stroke")]
-            [a.setAttribute("stroke", icon["symbol-color"]) for a in bg_dom.getElementsByTagName("g") if a.getAttribute("stroke")]
-            [a.setAttribute("stroke", icon["symbol-color"]) for a in bg_dom.getElementsByTagName("rect") if a.getAttribute("stroke") not in ("none", "")]
-        bg_svg = rsvg.Handle(data=bg_dom.toxml())
-        bg_width = float(bg_svg.get_property('width'))
-        bg_height = float(bg_svg.get_property('height'))
-        reswidth = max(bg_width * original_multiplier, reswidth)
-        resheight = max(bg_height * original_multiplier, resheight)
+        tmpfile = StringIO.StringIO()
+        outfile = StringIO.StringIO()
+        svg = rsvg.Handle(data=icon_dom.toxml())
+        svgwidth = float(svg.get_property('width'))
+        svgheight = float(svg.get_property('height'))
+        iconheight = svgheight * multiplier
+        if max_height:
+            iconheight = min(iconheight, max_height)
+        iconwidth = svgwidth * iconheight / svgheight
 
-    svgsurface = cairo.SVGSurface(outfile, reswidth, resheight)
-    svgctx = cairo.Context(svgsurface)
+        reswidth, resheight = iconwidth, iconheight
 
-    if icon.get("symbol-file"):
-        svgctx.save()
-        svgctx.scale(original_multiplier, original_multiplier)
-        bg_svg.render_cairo(svgctx)
-        svgctx.restore()
-        svgctx.translate((reswidth - iconwidth) / 2., (resheight - iconheight) / 2.)
+        if icon.get("symbol-file"):
+            bg_dom = minidom.parse(icon["symbol-file"])
+            if icon.get("symbol-fill-color"):
+                [a.setAttribute("fill", icon["symbol-fill-color"]) for a in bg_dom.getElementsByTagName("path") if a.getAttribute("fill")]
+                [a.setAttribute("fill", icon["symbol-fill-color"]) for a in bg_dom.getElementsByTagName("g") if a.getAttribute("fill")]
+                [a.setAttribute("fill", icon["symbol-fill-color"]) for a in bg_dom.getElementsByTagName("rect") if a.getAttribute("fill") not in ("none", "")]
+            if icon.get("symbol-color"):
+                [a.setAttribute("stroke", icon["symbol-color"]) for a in bg_dom.getElementsByTagName("path") if a.getAttribute("stroke")]
+                [a.setAttribute("stroke", icon["symbol-color"]) for a in bg_dom.getElementsByTagName("g") if a.getAttribute("stroke")]
+                [a.setAttribute("stroke", icon["symbol-color"]) for a in bg_dom.getElementsByTagName("rect") if a.getAttribute("stroke") not in ("none", "")]
+            bg_svg = rsvg.Handle(data=bg_dom.toxml())
+            bg_width = float(bg_svg.get_property('width'))
+            bg_height = float(bg_svg.get_property('height'))
+            reswidth = max(bg_width * original_multiplier, reswidth)
+            resheight = max(bg_height * original_multiplier, resheight)
 
-    svgctx.scale(iconwidth / svgwidth, iconheight / svgheight)
-    svg.render_cairo(svgctx)
+        svgsurface = cairo.SVGSurface(outfile, reswidth, resheight)
+        svgctx = cairo.Context(svgsurface)
 
-    svgsurface.write_to_png(tmpfile)
-    svgsurface.finish()
-    tmpfile.seek(0)
-    im = Image.open(tmpfile)
+        if icon.get("symbol-file"):
+            svgctx.save()
+            svgctx.scale(original_multiplier, original_multiplier)
+            bg_svg.render_cairo(svgctx)
+            svgctx.restore()
+            svgctx.translate((reswidth - iconwidth) / 2., (resheight - iconheight) / 2.)
+
+        svgctx.scale(iconwidth / svgwidth, iconheight / svgheight)
+        svg.render_cairo(svgctx)
+
+        svgsurface.write_to_png(tmpfile)
+        svgsurface.finish()
+        tmpfile.seek(0)
+        im = Image.open(tmpfile)
     bbox = im.getbbox()
     if bbox:
         dx, dy = min(bbox[0], im.size[0]-bbox[2]), min(bbox[1], im.size[1]-bbox[3])
@@ -99,7 +105,7 @@ def pack_texture(icons=[], multiplier = 1.0, path = "", rasfilter = []):
     area = 0
     for (svg, icon, max_height) in icons:
         if os.path.exists(icon["file"]):
-            images[svg] = open_svg_as_image(icon, multiplier, max_height)
+            images[svg] = open_icon_as_image(icon, multiplier, max_height)
             area += images[svg].size[0] * images[svg].size[1]
         else:
             print "bad icon!", icon
@@ -112,8 +118,6 @@ def pack_texture(icons=[], multiplier = 1.0, path = "", rasfilter = []):
         for strip in strips:
             if strip["len"] + images[img].size[0] <= width:
                 strip["len"] += images[img].size[0]
-                if images[img].size[1] > 3*18:
-                    print img
                 strip["height"] = max(images[img].size[1], strip["height"])
                 strip["list"].append(img)
                 break
