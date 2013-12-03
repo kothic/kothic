@@ -94,7 +94,7 @@ def xml_linesymbolizer(color="#000000", width="1", opacity="1", linecap="butt", 
     linecap = {"none": "butt", }.get(linecap.lower(), linecap)
 
     if dashes:
-        dashes = 'stroke-dasharray="%s"' % (dashes)
+        dashes = 'stroke-dasharray="' + str(dashes).strip('[]') + '"'
     else:
         dashes = ""
 
