@@ -138,7 +138,7 @@ def xml_textsymbolizer(
     pos = pos.replace("exact", "X").replace("any", "S, E, X, N, W, NE, SE, NW, SW").split(",")
     pos.extend([str(int(float(x) * text_scale)) for x in size.split(",")])
     pos = ",".join(pos)
-    size = str(int(float(size.split(",")[0]) * text_scale))
+    size = str(float(size) * float(text_scale))
 
     placement = {"center": "interior"}.get(placement.lower(), placement)
     align = {"center": "middle"}.get(align.lower(), align)
@@ -150,7 +150,7 @@ def xml_textsymbolizer(
 
     return """
     <TextSymbolizer fontset-name="%s" size="%s" fill="%s" halo-fill= "%s" halo-radius="%s" placement="%s" dx="%s" dy="%s" max-char-angle-delta="17" allow-overlap="%s" wrap-width="%s" minimum-distance="%s" vertical-alignment="middle" horizontal-alignment="%s" opacity="%s" placement-type="simple" placements="%s" text-transform="%s" minimum-path-length="5" spacing="%s">[%s]</TextSymbolizer>
-    """ % (face, int(float(size)), color, halo_color, halo_radius, placement, dx, dy, overlap, wrap_width, distance, align, opacity, pos, transform, spacing, text)
+    """ % (face, size, color, halo_color, halo_radius, placement, dx, dy, overlap, wrap_width, distance, align, opacity, pos, transform, spacing, text)
 
 
 def xml_shieldsymbolizer(path="", width="", height="",
@@ -159,7 +159,7 @@ def xml_shieldsymbolizer(path="", width="", height="",
     halo_color = nicecolor(halo_color)
     placement = {"center": "point"}.get(placement.lower(), placement)
     align = {"center": "middle"}.get(align.lower(), align)
-    size = size.split(",")[0]
+    size = str(float(size) * float(text_scale))
     if width:
         width = ' width="%s" ' % width
     if height:
@@ -167,7 +167,7 @@ def xml_shieldsymbolizer(path="", width="", height="",
     return """
       <ShieldSymbolizer file="%s%s" %s %s fontset-name="%s" size="%s" fill="%s" halo-fill= "%s" halo-radius="%s" placement="%s" dy="%s" allow-overlap="%s" wrap-width="%s" minimum-distance="%s" horizontal-alignment="%s" opacity="%s" text-transform="%s" unlock-image="%s" spacing="%s">[%s]</ShieldSymbolizer>
     """ % (icons_path,
-           path, width, height, face, int(float(size) * text_scale), color, halo_color, halo_radius, placement, offset, overlap, wrap_width, distance, align, opacity, transform, unlock_image, spacing, text)
+           path, width, height, face, size, color, halo_color, halo_radius, placement, offset, overlap, wrap_width, distance, align, opacity, transform, unlock_image, spacing, text)
 
 
 def xml_filter(string):
