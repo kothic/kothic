@@ -124,6 +124,7 @@ if options.renderer == "mapnik":
     libkomapnik.cleantopo_hs_path = config.get("mapnik", "cleantopo_hs_path")
     libkomapnik.srtm_hs_path = config.get("mapnik", "srtm_hs_path")
     libkomapnik.text_scale = options.textscale
+    libkomapnik.default_font_family = config.get("mapnik", "default_font_family")
 
     from libkomapnik import *
 
@@ -204,7 +205,7 @@ if options.renderer == "mapnik":
 
                 chooser_entry["sql"] = sq
                 chooser_entry["style"] = styles
-                fonts.add(styles.get("font-family", "DejaVu Sans Book"))
+                fonts.add(styles.get("font-family", libkomapnik.default_font_family))
 
                 chooser_entry["rule"] = [i.conditions for i in chooser.ruleChains if i.test_zoom(zoom)]
                 numerics.update(chooser.get_numerics())
@@ -672,7 +673,7 @@ if options.renderer == "mapnik":
                                         if "shield-text" in entry["style"] and "shield-image" in entry["style"]:
                                             ttext = entry["style"]["shield-text"].extract_tags().pop()
                                             texttags.add(ttext)
-                                            tface = entry["style"].get("shield-font-family", "DejaVu Sans Book")
+                                            tface = entry["style"].get("shield-font-family", libkomapnik.default_font_family)
                                             tsize = entry["style"].get("shield-font-size", "10")
                                             tcolor = entry["style"].get("shield-text-color", "#000000")
                                             toverlap = entry["style"].get("text-allow-overlap", entry["style"].get("allow-overlap", "false"))
@@ -701,7 +702,7 @@ if options.renderer == "mapnik":
                                         if "text" in entry["style"] and entry["style"].get("text-position", "center") == placement:
                                             ttext = entry["style"]["text"].extract_tags().pop()
                                             texttags.add(ttext)
-                                            tface = entry["style"].get("font-family", "DejaVu Sans Book")
+                                            tface = entry["style"].get("font-family", libkomapnik.default_font_family)
                                             tsize = entry["style"].get("font-size", "10")
                                             tcolor = entry["style"].get("text-color", "#000000")
                                             thcolor = entry["style"].get("text-halo-color", "#ffffff")
