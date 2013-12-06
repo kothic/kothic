@@ -141,7 +141,7 @@ def xml_textsymbolizer(
     pos = pos.replace("exact", "X").replace("any", "S, E, X, N, W, NE, SE, NW, SW").split(",")
     pos.extend([str(int(float(x) * text_scale)) for x in size.split(",")])
     pos = ",".join(pos)
-    size = print str(float(size.split(",")[0]) * text_scale)
+    size = str(float(size.split(",")[0]) * text_scale)
     angle = str(int(angle))
 
     placement = {"center": "interior"}.get(placement.lower(), placement)
@@ -162,7 +162,7 @@ def xml_shieldsymbolizer(path="", width="", height="",
     halo_color = nicecolor(halo_color)
     placement = {"center": "point"}.get(placement.lower(), placement)
     align = {"center": "middle"}.get(align.lower(), align)
-    size = print str(float(size.split(",")[0]) * text_scale)
+    size = str(float(size.split(",")[0]) * text_scale)
     if width:
         width = ' width="%s" ' % width
     if height:
