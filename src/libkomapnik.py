@@ -36,6 +36,8 @@ srtm_dem_path = ""
 cleantopo_hs_path = ""
 srtm_hs_path = ""
 text_scale = 1
+default_font_family = ""
+max_char_angle_delta = ""
 
 substyles = []
 
@@ -132,13 +134,14 @@ def xml_linepatternsymbolizer(file=""):
 
 
 def xml_textsymbolizer(
-        text="name", face="DejaVu Sans Book", size="10", color="#000000", halo_color="#ffffff", halo_radius="0", placement="line", offset="0", overlap="false", distance="26", wrap_width=256, align="center", opacity="1", pos="X", transform="none", spacing="4096"):
+        text="name", face=default_font_family, size="10", color="#000000", halo_color="#ffffff", halo_radius="0", placement="line", offset="0", overlap="false", distance="26", wrap_width=256, align="center", opacity="1", pos="X", transform="none", spacing="4096", angle=max_char_angle_delta):
     color = nicecolor(color)
     halo_color = nicecolor(halo_color)
     pos = pos.replace("exact", "X").replace("any", "S, E, X, N, W, NE, SE, NW, SW").split(",")
     pos.extend([str(int(float(x) * text_scale)) for x in size.split(",")])
     pos = ",".join(pos)
     size = str(int(float(size.split(",")[0]) * text_scale))
+#    angle = str(int(angle))
 
     placement = {"center": "interior"}.get(placement.lower(), placement)
     align = {"center": "middle"}.get(align.lower(), align)
@@ -149,12 +152,12 @@ def xml_textsymbolizer(
         dy = 0
 
     return """
-    <TextSymbolizer fontset-name="%s" size="%s" fill="%s" halo-fill= "%s" halo-radius="%s" placement="%s" dx="%s" dy="%s" max-char-angle-delta="17" allow-overlap="%s" wrap-width="%s" minimum-distance="%s" vertical-alignment="middle" horizontal-alignment="%s" opacity="%s" placement-type="simple" placements="%s" text-transform="%s" minimum-path-length="5" spacing="%s">[%s]</TextSymbolizer>
-    """ % (face, int(float(size)), color, halo_color, halo_radius, placement, dx, dy, overlap, wrap_width, distance, align, opacity, pos, transform, spacing, text)
+    <TextSymbolizer fontset-name="%s" size="%s" fill="%s" halo-fill= "%s" halo-radius="%s" placement="%s" dx="%s" dy="%s" max-char-angle-delta="%s" allow-overlap="%s" wrap-width="%s" minimum-distance="%s" vertical-alignment="middle" horizontal-alignment="%s" opacity="%s" placement-type="simple" placements="%s" text-transform="%s" minimum-path-length="5" spacing="%s">[%s]</TextSymbolizer>
+    """ % (face, int(float(size)), color, halo_color, halo_radius, placement, dx, dy, angle, overlap, wrap_width, distance, align, opacity, pos, transform, spacing, text)
 
 
 def xml_shieldsymbolizer(path="", width="", height="",
-                         text="name", face="DejaVu Sans Book", size="10", color="#000000", halo_color="#ffffff", halo_radius="0", placement="line", offset="0", overlap="false", distance="26", wrap_width=256, align="center", opacity="1", transform="none", unlock_image='true', spacing='500'):
+                         text="name", face=default_font_family, size="10", color="#000000", halo_color="#ffffff", halo_radius="0", placement="line", offset="0", overlap="false", distance="26", wrap_width=256, align="center", opacity="1", transform="none", unlock_image='true', spacing='500'):
     color = nicecolor(color)
     halo_color = nicecolor(halo_color)
     placement = {"center": "point"}.get(placement.lower(), placement)
