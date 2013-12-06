@@ -125,6 +125,7 @@ if options.renderer == "mapnik":
     libkomapnik.srtm_hs_path = config.get("mapnik", "srtm_hs_path")
     libkomapnik.text_scale = options.textscale
     libkomapnik.default_font_family = config.get("mapnik", "default_font_family")
+    libkomapnik.max_char_angle_delta = config.get("mapnik", "max_char_angle_delta")
 
     from libkomapnik import *
 
@@ -717,6 +718,7 @@ if options.renderer == "mapnik":
                                             tpos = entry["style"].get("text-placement", "X")
                                             ttransform = entry["style"].get("text-transform", "none")
                                             tspacing = entry["style"].get("text-spacing", "4096")
+                                            tangle = entry["style"].get("-x-kot-text-angle", libkomapnik.max_char_angle_delta)
 
                                             xml += xml_rule_start()
                                             xml += x_scale
@@ -730,7 +732,7 @@ if options.renderer == "mapnik":
                                                     ttext, tface, tsize, tcolor, thcolor, thradius, tplace,
                                                     toffset, toverlap, tdistance, twrap, talign, topacity, ttransform)
                                             else:
-                                                xml += xml_textsymbolizer(ttext, tface, tsize, tcolor, thcolor, thradius, tplace, toffset, toverlap, tdistance, twrap, talign, topacity, tpos, ttransform, tspacing)
+                                                xml += xml_textsymbolizer(ttext, tface, tsize, tcolor, thcolor, thradius, tplace, toffset, toverlap, tdistance, twrap, talign, topacity, tpos, ttransform, tspacing, tangle)
                                             sql.add(entry["sql"])
                                             itags.update(entry["chooser"].get_interesting_tags(entry["type"], zoom))
                                             xml += xml_rule_end()
