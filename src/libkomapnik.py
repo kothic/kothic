@@ -36,6 +36,9 @@ srtm_dem_path = ""
 cleantopo_hs_path = ""
 srtm_hs_path = ""
 text_scale = 1
+default_font_family = ""
+max_char_angle_delta = ""
+font_tracking = 0
 
 substyles = []
 
@@ -94,7 +97,7 @@ def xml_linesymbolizer(color="#000000", width="1", opacity="1", linecap="butt", 
     linecap = {"none": "butt", }.get(linecap.lower(), linecap)
 
     if dashes:
-        dashes = 'stroke-dasharray="%s"' % (dashes)
+        dashes = 'stroke-dasharray="' + str(dashes).strip('[]') + '"'
     else:
         dashes = ""
 
@@ -132,13 +135,14 @@ def xml_linepatternsymbolizer(file=""):
 
 
 def xml_textsymbolizer(
-        text="name", face="DejaVu Sans Book", size="10", color="#000000", halo_color="#ffffff", halo_radius="0", placement="line", offset="0", overlap="false", distance="26", wrap_width=256, align="center", opacity="1", pos="X", transform="none", spacing="4096"):
+        text="name", face=default_font_family, size="10", color="#000000", halo_color="#ffffff", halo_radius="0", character_spacing=font_tracking, placement="line", offset="0", overlap="false", distance="26", wrap_width=256, align="center", opacity="1", pos="X", transform="none", spacing="4096", angle=max_char_angle_delta):
     color = nicecolor(color)
     halo_color = nicecolor(halo_color)
     pos = pos.replace("exact", "X").replace("any", "S, E, X, N, W, NE, SE, NW, SW").split(",")
     pos.extend([str(int(float(x) * text_scale)) for x in size.split(",")])
     pos = ",".join(pos)
-    size = str(int(float(size.split(",")[0]) * text_scale))
+    size = str(float(size.split(",")[0]) * text_scale)
+    angle = str(int(angle))
 
     placement = {"center": "interior"}.get(placement.lower(), placement)
     align = {"center": "middle"}.get(align.lower(), align)
@@ -149,17 +153,16 @@ def xml_textsymbolizer(
         dy = 0
 
     return """
-    <TextSymbolizer fontset-name="%s" size="%s" fill="%s" halo-fill= "%s" halo-radius="%s" placement="%s" dx="%s" dy="%s" max-char-angle-delta="17" allow-overlap="%s" wrap-width="%s" minimum-distance="%s" vertical-alignment="middle" horizontal-alignment="%s" opacity="%s" placement-type="simple" placements="%s" text-transform="%s" minimum-path-length="5" spacing="%s">[%s]</TextSymbolizer>
-    """ % (face, int(float(size)), color, halo_color, halo_radius, placement, dx, dy, overlap, wrap_width, distance, align, opacity, pos, transform, spacing, text)
-
+    <TextSymbolizer fontset-name="%s" size="%s" fill="%s" halo-fill= "%s" halo-radius="%s" halo-rasterizer="full" character-spacing="%s" placement="%s" dx="%s" dy="%s" max-char-angle-delta="%s" allow-overlap="%s" wrap-width="%s" minimum-distance="%s" vertical-alignment="middle" horizontal-alignment="%s" opacity="%s" placement-type="simple" placements="%s" text-transform="%s" minimum-path-length="5" spacing="%s">[%s]</TextSymbolizer>
+    """ % (face, size, color, halo_color, halo_radius, character_spacing, placement, dx, dy, angle, overlap, wrap_width, distance, align, opacity, pos, transform, spacing, text)
 
 def xml_shieldsymbolizer(path="", width="", height="",
-                         text="name", face="DejaVu Sans Book", size="10", color="#000000", halo_color="#ffffff", halo_radius="0", placement="line", offset="0", overlap="false", distance="26", wrap_width=256, align="center", opacity="1", transform="none", unlock_image='true', spacing='500'):
+                         text="name", face=default_font_family, size="10", color="#000000", halo_color="#ffffff", halo_radius="0", placement="line", offset="0", overlap="false", distance="26", wrap_width=256, align="center", opacity="1", transform="none", unlock_image='true', spacing='500'):
     color = nicecolor(color)
     halo_color = nicecolor(halo_color)
     placement = {"center": "point"}.get(placement.lower(), placement)
     align = {"center": "middle"}.get(align.lower(), align)
-    size = size.split(",")[0]
+    size = str(float(size.split(",")[0]) * text_scale)
     if width:
         width = ' width="%s" ' % width
     if height:
@@ -167,7 +170,7 @@ def xml_shieldsymbolizer(path="", width="", height="",
     return """
       <ShieldSymbolizer file="%s%s" %s %s fontset-name="%s" size="%s" fill="%s" halo-fill= "%s" halo-radius="%s" placement="%s" dy="%s" allow-overlap="%s" wrap-width="%s" minimum-distance="%s" horizontal-alignment="%s" opacity="%s" text-transform="%s" unlock-image="%s" spacing="%s">[%s]</ShieldSymbolizer>
     """ % (icons_path,
-           path, width, height, face, int(float(size) * text_scale), color, halo_color, halo_radius, placement, offset, overlap, wrap_width, distance, align, opacity, transform, unlock_image, spacing, text)
+           path, width, height, face, size, color, halo_color, halo_radius, placement, offset, overlap, wrap_width, distance, align, opacity, transform, unlock_image, spacing, text)
 
 
 def xml_filter(string):
