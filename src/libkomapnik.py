@@ -38,6 +38,7 @@ srtm_hs_path = ""
 text_scale = 1
 default_font_family = ""
 max_char_angle_delta = ""
+font_tracking = 0
 
 substyles = []
 
@@ -134,7 +135,7 @@ def xml_linepatternsymbolizer(file=""):
 
 
 def xml_textsymbolizer(
-        text="name", face=default_font_family, size="10", color="#000000", halo_color="#ffffff", halo_radius="0", placement="line", offset="0", overlap="false", distance="26", wrap_width=256, align="center", opacity="1", pos="X", transform="none", spacing="4096", angle=max_char_angle_delta):
+        text="name", face=default_font_family, size="10", color="#000000", halo_color="#ffffff", halo_radius="0", character_spacing=font_tracking, placement="line", offset="0", overlap="false", distance="26", wrap_width=256, align="center", opacity="1", pos="X", transform="none", spacing="4096", angle=max_char_angle_delta):
     color = nicecolor(color)
     halo_color = nicecolor(halo_color)
     pos = pos.replace("exact", "X").replace("any", "S, E, X, N, W, NE, SE, NW, SW").split(",")
@@ -152,8 +153,8 @@ def xml_textsymbolizer(
         dy = 0
 
     return """
-    <TextSymbolizer fontset-name="%s" size="%s" fill="%s" halo-fill= "%s" halo-radius="%s" placement="%s" dx="%s" dy="%s" max-char-angle-delta="%s" allow-overlap="%s" wrap-width="%s" minimum-distance="%s" vertical-alignment="middle" horizontal-alignment="%s" opacity="%s" placement-type="simple" placements="%s" text-transform="%s" minimum-path-length="5" spacing="%s">[%s]</TextSymbolizer>
-    """ % (face, size, color, halo_color, halo_radius, placement, dx, dy, angle, overlap, wrap_width, distance, align, opacity, pos, transform, spacing, text)
+    <TextSymbolizer fontset-name="%s" size="%s" fill="%s" halo-fill= "%s" halo-radius="%s" halo-rasterizer="full" character_spacing="%s" placement="%s" dx="%s" dy="%s" max-char-angle-delta="%s" allow-overlap="%s" wrap-width="%s" minimum-distance="%s" vertical-alignment="middle" horizontal-alignment="%s" opacity="%s" placement-type="simple" placements="%s" text-transform="%s" minimum-path-length="5" spacing="%s">[%s]</TextSymbolizer>
+    """ % (face, size, color, halo_color, halo_radius, character_spacing, placement, dx, dy, angle, overlap, wrap_width, distance, align, opacity, pos, transform, spacing, text)
 
 def xml_shieldsymbolizer(path="", width="", height="",
                          text="name", face=default_font_family, size="10", color="#000000", halo_color="#ffffff", halo_radius="0", placement="line", offset="0", overlap="false", distance="26", wrap_width=256, align="center", opacity="1", transform="none", unlock_image='true', spacing='500'):
