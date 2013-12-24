@@ -166,7 +166,7 @@ if options.renderer == "mapnik":
           "int_name",
           "name:en",
           "name"
-        ) AS name""" % (table_prefix, table_prefix, table_prefix), ('name:be', "name:ru", "int_name", "name:en"))
+        ) AS name""", ('name:be', "name:ru", "int_name", "name:en"))
     elif options.locale and ("name:" + options.locale in osm2pgsql_avail_keys or not osm2pgsql_avail_keys):
         columnmap["name"] = ('COALESCE("name:' + options.locale + '", "name") AS name', ('name:' + options.locale,))
     elif options.locale:
