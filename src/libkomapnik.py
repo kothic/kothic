@@ -88,7 +88,7 @@ def xml_pointsymbolizer(path="", width="", height="", opacity=1, overlap="false"
     if height:
         height = ' height="%s" ' % height
     return """
-    <PointSymbolizer file="%s" %s %s opacity="%s" allow-overlap="%s" />"""\
+    <MarkersSymbolizer file="%s" %s %s opacity="%s" allow-overlap="%s" />"""\
             % (os.path.join(icons_path, path), width, height, opacity, overlap)
 
 
