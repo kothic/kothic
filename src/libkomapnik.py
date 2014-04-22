@@ -129,10 +129,14 @@ def xml_polygonpatternsymbolizer(file=""):
     <PolygonPatternSymbolizer file="%s"/>""" % (os.path.join(icons_path, file))
 
 
-def xml_linepatternsymbolizer(file="", spacing="0", max_error="0.25", allow_overlap="false"):
-
+def xml_linepatternsymbolizer(file=""):
     return """
-    <MarkersSymbolizer file="%s" spacing="%s" max-error="%s" allow-overlap="%s" placement="line"/>""" % (os.path.join(icons_path, file), spacing, float(max_error), allow_overlap)
+    <LinePatternSymbolizer file="%s" />""" % (os.path.join(icons_path, file))
+
+
+def xml_linemarkerssymbolizer(file="", spacing="100", allow_overlap="false"):
+    return """
+    <MarkersSymbolizer file="%s" spacing="%s" allow-overlap="%s" placement="line"/>""" % (os.path.join(icons_path, file), spacing, allow_overlap)
 
 
 def xml_textsymbolizer(

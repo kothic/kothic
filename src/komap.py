@@ -526,11 +526,14 @@ if options.renderer == "mapnik":
                                                     os.makedirs(icons_path + "komap/")
                                                 if not os.path.exists(icons_path + "komap/" + fname):
                                                     im.save(icons_path + "komap/" + fname, "PNG")
-                                                xml += xml_linepatternsymbolizer("komap/" + fname, entry["style"].get("spacing","0"), entry["style"].get("max-error","0.25"), entry["style"].get("allow-overlap","false"))
+                                                xml += xml_linepatternsymbolizer("komap/" + fname)
                                             except:
                                                 print >> sys.stderr, "Error writing to ", icons_path + "komap/" + fname
                                         else:
-                                            xml += xml_linepatternsymbolizer(entry["style"]["pattern-image"], entry["style"].get("spacing","0"), entry["style"].get("max-error","0.25"), entry["style"].get("allow-overlap","false"))
+                                            if entry["style"].get("-x-kot-render", "none") == "svg":
+                                                xml += xml_linemarkerssymbolizer(entry["style"]["pattern-image"], entry["style"].get("spacing","100"), entry["style"].get("allow-overlap","false"))
+                                            else:
+                                                xml += xml_linepatternsymbolizer(entry["style"]["pattern-image"])
                                 sql.add(entry["sql"])
                                 itags.update(entry["chooser"].get_interesting_tags(entry["type"], zoom))
                                 xml += xml_rule_end()
