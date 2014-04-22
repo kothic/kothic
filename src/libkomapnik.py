@@ -136,7 +136,7 @@ def xml_linepatternsymbolizer(file=""):
 
 def xml_linemarkerssymbolizer(file="", spacing="100", allow_overlap="false"):
     return """
-    <MarkersSymbolizer file="%s" spacing="%s" allow-overlap="%s" placement="line"/>""" % (os.path.join(icons_path, file), spacing, allow_overlap)
+    <MarkersSymbolizer file="%s" spacing="%s" max-error="1" allow-overlap="%s" placement="line"/>""" % (os.path.join(icons_path, file), spacing, allow_overlap)
 
 
 def xml_textsymbolizer(
