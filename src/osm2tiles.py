@@ -80,11 +80,13 @@ print sanitize(" ;=")
 def initDB(filename):
     conn = sqlite3.connect(filename)
     c = conn.cursor()
-    # create table
-    c.execute('''CREATE TABLE nodes (id integer, lat real, lon real)''')
-    # create index in the id column
-    # - this makes node id lookup MUCH faster
-    c.execute('''CREATE INDEX id_idx ON nodes(id)''')
+    # create table with the osm element integer id being the primary index
+    # - according to the sqlite documentation this will equal the index with the
+    #   built in rowid index, providing the same speedup as a separate index while
+    #   saving space - win-win ! :)
+    # - brief testing shows that this makes the osm -> tiles operation about 5% faster
+    #   but more importantly makes the temporary sqlite database 30% smaller! :)
+    c.execute('''CREATE TABLE nodes (id integer, lat real, lon real, PRIMARY KEY (id))''')
     return conn
 
 
