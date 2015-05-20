@@ -41,7 +41,7 @@ CONDITION = re.compile(r'^ \[(.+?)\] \s* ', re.S | re.X)
 OBJECT = re.compile(r'^ (\*|[\w]+) \s* ', re.S | re.X)
 DECLARATION = re.compile(r'^ \{(.+?)\} \s* ', re.S | re.X)
 IMPORT = re.compile(r'^@import\("(.+?)"\); \s* ', re.S | re.X)
-VARIABLE_SET = re.compile(r'^@(\w[\w\d]*) \s* : \s* (.+?) \s* ; \s* ', re.S | re.X)
+VARIABLE_SET = re.compile(r'^@([a-z][\w\d]*) \s* : \s* (.+?) \s* ; \s* ', re.S | re.X | re.I)
 UNKNOWN = re.compile(r'^ (\S+) \s* ', re.S | re.X)
 
 ZOOM_MINMAX = re.compile(r'^ (\d+)\-(\d+) $', re.S | re.X)
@@ -86,7 +86,7 @@ CAPS = re.compile(r'^uppercase$/i')
 CENTER = re.compile(r'^center$/i')
 
 HEX = re.compile(r'^#([0-9a-f]+)$/i')
-VARIABLE = re.compile(r'@(\w[\w\d]*)')
+VARIABLE = re.compile(r'@([a-z][\w\d]*)')
 
 class MapCSS():
     def __init__(self, minscale=0, maxscale=19):
@@ -182,7 +182,7 @@ class MapCSS():
     def get_variable(self, m):
         name = m.group()[1:]
         if not name in self.variables:
-            log.error("Variable not found: {}".format(name))
+            logging.error("Variable not found: {}".format(name))
         return self.variables[name] if name in self.variables else m.group()
 
 
