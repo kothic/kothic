@@ -181,6 +181,8 @@ class MapCSS():
 
     def get_variable(self, m):
         name = m.group()[1:]
+        if not name in self.variables:
+            log.error("Variable not found: {}".format(name))
         return self.variables[name] if name in self.variables else m.group()
 
 
@@ -287,10 +289,10 @@ class MapCSS():
                 filename = os.path.join(basepath, IMPORT.match(css).groups()[0])
                 try:
                     css = IMPORT.sub("", css)
-                    import_text = open(os.path.join(basepath, filename), "r").read().strip()
+                    import_text = open(filename, "r").read().strip()
                     css = import_text + css
-                except IOError:
-                    log.warning("cannot import file %s" % (filename))
+                except IOError as e:
+			log.warning("cannot import file %s: %s" % (filename, e))
 
             elif VARIABLE_SET.match(css):
                 name = VARIABLE_SET.match(css).groups()[0]
