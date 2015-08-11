@@ -88,7 +88,7 @@ def xml_pointsymbolizer(path="", width="", height="", opacity=1, overlap="false"
     if height:
         height = ' height="%s" ' % height
     return """
-    <PointSymbolizer file="%s" %s %s opacity="%s" allow-overlap="%s" />"""\
+    <MarkersSymbolizer file="%s" %s %s opacity="%s" allow-overlap="%s" placement="point" />"""\
             % (os.path.join(icons_path, path), width, height, opacity, overlap)
 
 
@@ -131,7 +131,12 @@ def xml_polygonpatternsymbolizer(file=""):
 
 def xml_linepatternsymbolizer(file=""):
     return """
-    <LinePatternSymbolizer file="%s"/>""" % (os.path.join(icons_path, file))
+    <LinePatternSymbolizer file="%s" />""" % (os.path.join(icons_path, file))
+
+
+def xml_linemarkerssymbolizer(file="", spacing="100", allow_overlap="false"):
+    return """
+    <MarkersSymbolizer file="%s" spacing="%s" allow-overlap="%s" placement="line"/>""" % (os.path.join(icons_path, file), spacing, allow_overlap)
 
 
 def xml_textsymbolizer(
