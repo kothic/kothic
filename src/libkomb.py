@@ -1,12 +1,13 @@
 from mapcss import MapCSS
 import json
 import mapcss.webcolors
+from optparse import OptionParser
 
 whatever_to_hex = mapcss.webcolors.webcolors.whatever_to_hex
 
-style = MapCSS(0, 30)
+# style = MapCSS(0, 30)
 # style.parse(open("styles/osmosnimki-maps.mapcss", "r").read())
-style.parse(filename="styles/clear/style-clear/style.mapcss")
+# style.parse(filename="styles/clear/style-clear/style.mapcss")
 # style.parse(filename="styles/test.mapcss")
 
 
@@ -78,7 +79,8 @@ def komap_mapbox(style):
         "metadata": {},
         "sources": {
             "composite": {
-                "tiles": ["http://localhost:3000/{z}-{x}-{y}.mvt"],
+                # "tiles": ["http://localhost:3000/{z}-{x}-{y}.mvt"],
+                "tiles": ["http://localhost:7800/public.basemap/{z}/{x}/{y}.mvt"],
                 "type": "vector",
             }
         },
@@ -146,6 +148,52 @@ def komap_mapbox(style):
 
         for ss in zs.values():
             for (minzoom, maxzoom, st) in ss:
+                if st.get("casing-width") not in (None, 0) and st.get("casing-color"):
+                    mapbox_style_layer = {
+                        "type": "line",
+                        "minzoom": minzoom,
+                        "maxzoom": maxzoom + 1,
+                        "filter": mapbox_style_layer_filter,
+                        "layout": {},
+                        "paint": {},
+                        "id": str(mapbox_style_layer_id) + "-casing",
+                        "source-layer": subject,
+                        "source": "composite",
+                    }
+
+                    mapbox_style_layer["paint"]["line-width"] = (
+                        st.get("width", 0) + st.get("casing-width") * 2
+                    )
+                    mapbox_style_layer["paint"]["line-color"] = whatever_to_hex(
+                        st.get("casing-color")
+                    )
+
+                    if st.get("casing-opacity"):
+                        mapbox_style_layer["paint"]["line-opacity"] = st.get(
+                            "casing-opacity"
+                        )
+                    if st.get("casing-dashes"):
+                        mapbox_style_layer["paint"]["line-dasharray"] = st.get(
+                            "casing-dashes"
+                        )
+                    if st.get("casing-linecap"):
+                        mapbox_style_layer["layout"]["line-cap"] = mapbox_linecaps[
+                            st.get("casing-linecap")
+                        ]
+                    if st.get("casing-linejoin"):
+                        mapbox_style_layer["layout"]["line-join"] = st.get(
+                            "casing-linejoin"
+                        )
+
+                    if st.get("casing-linecap", "butt") == "butt":
+                        mapbox_style_layer["priority"] = min(
+                            int(st.get("z-index", 0)), 20000
+                        )
+                    if st.get("casing-linecap", "round") != "butt":
+                        mapbox_style_layer["priority"] = -15000
+                    
+                    mapbox_style_layer_id += 1
+                    mapbox_style_layers.append(mapbox_style_layer)
                 if "width" in st and "color" in st:
                     mapbox_style_layer = {
                         "priority": min((int(st.get("z-index", 0)) + 1000), 20000),
@@ -176,7 +224,6 @@ def komap_mapbox(style):
                         mapbox_style_layer["layout"]["line-join"] = st.get("linejoin")
 
                     mapbox_style_layer_id += 1
-
                     mapbox_style_layers.append(mapbox_style_layer)
                 if "fill-color" in st:
                     mapbox_style_layer = {
@@ -211,7 +258,6 @@ def komap_mapbox(style):
                         )
 
                     mapbox_style_layer_id += 1
-
                     mapbox_style_layers.append(mapbox_style_layer)
                 if st.get("text"):
                     mapbox_style_layer = {
@@ -271,12 +317,12 @@ def komap_mapbox(style):
                     )
 
                     mapbox_style_layer_id += 1
-
                     mapbox_style_layers.append(mapbox_style_layer)
-        
+
     mapbox_style["layers"] = sorted(mapbox_style["layers"], key=lambda k: k["priority"])
 
     return mapbox_style
+
 
 # mapbox_style["layers"] = sorted(mapbox_style["layers"], key=lambda k: k["priority"])
 
