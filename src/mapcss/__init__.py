@@ -268,10 +268,10 @@ class MapCSS():
             # @import("filename.css");
             elif IMPORT.match(css):
                 log.debug("import found")
-                filename = os.path.join(basepath, IMPORT.match(css).groups()[0])
+                import_filename = os.path.join(basepath, IMPORT.match(css).groups()[0])
                 try:
                     css = IMPORT.sub("", css)
-                    import_text = open(os.path.join(basepath, filename), "r").read().strip()
+                    import_text = open(import_filename, "r").read().strip()
                     css = import_text + css
                 except IOError:
                     log.warning("cannot import file %s" % (filename))
