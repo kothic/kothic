@@ -15,8 +15,8 @@ def to_mapbox_condition(condition):
     t = condition.type
     params = condition.params
 
-    # TODO:
-    if params[0] == "::class":
+    # if params[0] == "::class":
+    if params[0][:2] == "::":
         return True
 
     if t == "eq":
@@ -34,13 +34,13 @@ def to_mapbox_condition(condition):
     if t == "unset":
         return ["!", ["to-boolean", ["get", params[0]]]]
     if t == "<":
-        return ["<", ["get", params[0]], "yes"]
+        return ["<", ["to-number", ["get", params[0]]], float(params[1])]
     if t == "<=":
-        return ["<=", ["get", params[0]], "yes"]
+        return ["<=", ["to-number", ["get", params[0]]], float(params[1])]
     if t == ">":
-        return [">", ["get", params[0]], "yes"]
+        return [">", ["to-number", ["get", params[0]]], float(params[1])]
     if t == ">=":
-        return [">=", ["get", params[0]], "yes"]
+        return [">=", ["to-number", ["get", params[0]]], float(params[1])]
 
     return True
 
@@ -106,6 +106,7 @@ def komap_mapbox(style):
 
         tags = {}
         for condition in conditions:
+            # < <= > >= require more checks
             if condition.type in ("eq", "ne", "<", "<=", ">", ">="):
                 tags[condition.params[0]] = condition.params[1]
             elif condition.type == "true":
@@ -114,6 +115,7 @@ def komap_mapbox(style):
                 tags[condition.params[0]] = "no"
             elif condition.type == "set":
                 tags[condition.params[0]] = condition.params[0]
+            # elif condition.type == "unset"
 
         tags["name"] = "name"
         tags["addr:housenumber"] = "addr:housenumber"
@@ -191,7 +193,7 @@ def komap_mapbox(style):
                         )
                     if st.get("casing-linecap", "round") != "butt":
                         mapbox_style_layer["priority"] = -15000
-                    
+
                     mapbox_style_layer_id += 1
                     mapbox_style_layers.append(mapbox_style_layer)
                 if "width" in st and "color" in st:
@@ -271,6 +273,11 @@ def komap_mapbox(style):
                         "source-layer": subject,
                         "source": "composite",
                     }
+
+                    if subject == "area":
+                        mapbox_style_layer["filter"] = mapbox_style_layer["filter"] + [
+                            ["==", ["geometry-type"], "Point"]
+                        ]
 
                     mapbox_style_layer["layout"]["text-field"] = ["get", st.get("text")]
                     if st.get("text-position") == "line":
