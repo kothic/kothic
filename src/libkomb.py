@@ -5,11 +5,6 @@ from optparse import OptionParser
 
 whatever_to_hex = mapcss.webcolors.webcolors.whatever_to_hex
 
-# style = MapCSS(0, 30)
-# style.parse(open("styles/osmosnimki-maps.mapcss", "r").read())
-# style.parse(filename="styles/clear/style-clear/style.mapcss")
-# style.parse(filename="styles/test.mapcss")
-
 
 def to_mapbox_condition(condition):
     t = condition.type
@@ -60,8 +55,6 @@ def komap_mapbox(style):
             tuple([subject, tuple(conditions)]) for subject, conditions in l
         )
     ]
-
-    # print('>>>l', l)
 
     mapbox_style_layers = [
         {
@@ -135,6 +128,7 @@ def komap_mapbox(style):
                 else:
                     zs[key].append((zoom, zoom, st))
 
+        # merge adjacent zoom levels with the same style
         for key in zs:
             ss = zs[key]
 
@@ -331,9 +325,8 @@ def komap_mapbox(style):
     return mapbox_style
 
 
-# mapbox_style["layers"] = sorted(mapbox_style["layers"], key=lambda k: k["priority"])
-
-# print(json.dumps(mapbox_style))
+# style.parse(open("styles/osmosnimki-maps.mapcss", "r").read())
+# style.parse(filename="styles/clear/style-clear/style.mapcss")
 
 if __name__ == "__main__":
     parser = OptionParser()
