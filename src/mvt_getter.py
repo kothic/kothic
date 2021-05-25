@@ -80,13 +80,13 @@ def get_vectors(minzoom, maxzoom, x, y, style, vec):
             y,
             geomcolumn,
             groupby,
-            pixel_size_at_zoom(minzoom, pxtolerance),
-            pixel_size_at_zoom(minzoom, pxtolerance),
+            pixel_size_at_zoom(maxzoom, pxtolerance),
+            pixel_size_at_zoom(maxzoom, pxtolerance),
             geomcolumn,
             groupby,
             geomcolumn,
             groupby,
-            pixel_size_at_zoom(minzoom, pxtolerance),
+            pixel_size_at_zoom(maxzoom, pxtolerance),
             geomcolumn,
             select,
             table[vec],
@@ -94,9 +94,9 @@ def get_vectors(minzoom, maxzoom, x, y, style, vec):
             minzoom,
             x,
             y,
-            (pixel_size_at_zoom(minzoom, pxtolerance) ** 2) / pxtolerance,
+            (pixel_size_at_zoom(maxzoom, pxtolerance) ** 2) / pxtolerance,
             groupby,
-            pixel_size_at_zoom(minzoom, pxtolerance) ** 2,
+            pixel_size_at_zoom(maxzoom, pxtolerance) ** 2,
         )
     elif vec == "line":
         query = """select ST_AsMVTGeom(way, ST_TileEnvelope(%s, %s, %s), 4096, 64, true) as %s, %s from
@@ -114,7 +114,7 @@ def get_vectors(minzoom, maxzoom, x, y, style, vec):
             y,
             geomcolumn,
             groupby,
-            pixel_size_at_zoom(minzoom, pxtolerance),
+            pixel_size_at_zoom(maxzoom, pxtolerance),
             geomcolumn,
             groupby,
             geomcolumn,
@@ -169,9 +169,7 @@ if __name__ == "__main__":
         (11, 12),
         (12, 13),
         (13, 14),
-        (14, 15),
-        (15, 16),
-        (16, 30),
+        (14, 30)
     ]
 
     for (minzoom, maxzoom) in zooms:
