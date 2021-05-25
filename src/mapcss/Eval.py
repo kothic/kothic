@@ -48,7 +48,7 @@ class Eval():
 
         a = eval(self.expr, {}, {
                  "tag": lambda x: max([tags.add(x), " "]),
-                 "prop": lambda x: "",
+                 "prop": lambda x: 0,
                  "num": lambda x: 0,
                  "metric": fake_compute,
                  "zmetric": fake_compute,
