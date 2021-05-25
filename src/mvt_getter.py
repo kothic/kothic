@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 import json
-import psycopg2
 from mapcss import MapCSS
 import os
 import sys
@@ -18,35 +17,28 @@ def pixel_size_at_zoom(z, l=1):
     return int(math.ceil(l * 20037508.342789244 / 512 * 2 / (2 ** z)))
 
 
-def get_vectors(zoom, x, y, style, vec="polygon"):
+def get_vectors(minzoom, maxzoom, x, y, style, vec):
     geomcolumn = "way"
 
-    database = "dbname=project user=kalenik"
     pxtolerance = 1.8
-    intscalefactor = 10000
-    ignore_columns = set(["way_area", "osm_id", geomcolumn, "tags", "z_order"])
     table = {
         "polygon": "planet_osm_polygon",
         "line": "planet_osm_line",
         "point": "planet_osm_point",
     }
 
-    a = psycopg2.connect(database)
-    b = a.cursor()
-    if vec != "coastline":
-        b.execute("SELECT * FROM %s LIMIT 1;" % table[vec])
-        names = [q[0] for q in b.description]
-        for i in ignore_columns:
-            if i in names:
-                names.remove(i)
-        names = ",".join(['"' + i + '"' for i in names])
+    types = {"line": "line", "polygon": "area", "point": "node"}
 
-        taghint = "*"
-        types = {"line": "line", "polygon": "area", "point": "node"}
-        adp = ""
-        if "get_sql_hints" in dir(style):
+    names = set()
+    adp = ""
+
+    if "get_sql_hints" in dir(style):
+        adp = []
+
+        for zoom in range(minzoom, maxzoom):
+            names.update(style.get_interesting_tags(types[vec], zoom))
+
             sql_hint = style.get_sql_hints(types[vec], zoom)
-            adp = []
             for tp in sql_hint:
                 add = []
                 for j in tp[0]:
@@ -58,13 +50,17 @@ def get_vectors(zoom, x, y, style, vec="polygon"):
                     add = " OR ".join(add)
                     add = "(" + add + ")"
                     adp.append(add)
-            adp = " OR ".join(adp)
-            if adp:
-                adp = adp.replace("&lt;", "<")
-                adp = adp.replace("&gt;", ">")
+
+    adp = " OR ".join(adp)
+    if adp:
+        adp = adp.replace("&lt;", "<")
+        adp = adp.replace("&gt;", ">")
+
+    select = ",".join(["tags->" + "'" + i + "'" + ' as "' + i + '"' for i in names])
+    groupby = ",".join(['"' + i + '"' for i in names])
 
     if vec == "polygon":
-        query = """select ST_AsMVTGeom(way, ST_TileEnvelope(%s, %s, %s), 4096, 64, true) as %s, %s from
+        query = """select ST_AsMVTGeom(w.way, ST_TileEnvelope(%s, %s, %s), 4096, 64, true) as %s, %s from
                         (select (ST_Dump(ST_Multi(ST_SimplifyPreserveTopology(ST_Buffer(way,-%s),%s)))).geom as %s, %s from
                             (select ST_Union(way) as %s, %s from
                             (select ST_Buffer(way, %s) as %s, %s from
@@ -77,30 +73,30 @@ def get_vectors(zoom, x, y, style, vec="polygon"):
                             ) p
                             where ST_Area(way) > %s
                             order by ST_Area(way)
-                        ) p
+                        ) p, lateral (values (p.way), (ST_PointOnSurface(p.way))) w(way)
           """ % (
-            zoom,
+            minzoom,
             x,
             y,
             geomcolumn,
-            names,
-            pixel_size_at_zoom(z, pxtolerance),
-            pixel_size_at_zoom(z, pxtolerance),
+            groupby,
+            pixel_size_at_zoom(minzoom, pxtolerance),
+            pixel_size_at_zoom(minzoom, pxtolerance),
             geomcolumn,
-            names,
+            groupby,
             geomcolumn,
-            names,
-            pixel_size_at_zoom(z, pxtolerance),
+            groupby,
+            pixel_size_at_zoom(minzoom, pxtolerance),
             geomcolumn,
-            names,
+            select,
             table[vec],
             adp,
-            zoom,
+            minzoom,
             x,
             y,
-            (pixel_size_at_zoom(z, pxtolerance) ** 2) / pxtolerance,
-            names,
-            pixel_size_at_zoom(z, pxtolerance) ** 2,
+            (pixel_size_at_zoom(minzoom, pxtolerance) ** 2) / pxtolerance,
+            groupby,
+            pixel_size_at_zoom(minzoom, pxtolerance) ** 2,
         )
     elif vec == "line":
         query = """select ST_AsMVTGeom(way, ST_TileEnvelope(%s, %s, %s), 4096, 64, true) as %s, %s from
@@ -113,22 +109,22 @@ def get_vectors(zoom, x, y, style, vec="polygon"):
                             ) p
                         ) p
           """ % (
-            zoom,
+            minzoom,
             x,
             y,
             geomcolumn,
-            names,
-            pixel_size_at_zoom(z, pxtolerance),
+            groupby,
+            pixel_size_at_zoom(minzoom, pxtolerance),
             geomcolumn,
-            names,
+            groupby,
             geomcolumn,
-            names,
+            select,
             table[vec],
             adp,
-            zoom,
+            minzoom,
             x,
             y,
-            names,
+            ",".join(["tags->" + "'" + i + "'" for i in names]),
         )
     elif vec == "point":
         query = """select ST_AsMVTGeom(way, ST_TileEnvelope(%s, %s, %s), 4096, 64, true) as %s, %s
@@ -136,14 +132,14 @@ def get_vectors(zoom, x, y, style, vec="polygon"):
                         and way && ST_TileEnvelope(%s, %s, %s)
                         limit 10000
                  """ % (
-            zoom,
+            minzoom,
             x,
             y,
             geomcolumn,
-            names,
+            select,
             table[vec],
             adp,
-            zoom,
+            minzoom,
             x,
             y,
         )
@@ -160,7 +156,25 @@ if __name__ == "__main__":
     style = MapCSS(0, 30)
     style.parse(filename=options.filename)
 
-    for z in range(0, 24):
+    zooms = [
+        (0, 1),
+        (1, 2),
+        (2, 3),
+        (3, 4),
+        (4, 5),
+        (5, 6),
+        (7, 8),
+        (9, 10),
+        (10, 11),
+        (11, 12),
+        (12, 13),
+        (13, 14),
+        (14, 15),
+        (15, 16),
+        (16, 30),
+    ]
+
+    for (minzoom, maxzoom) in zooms:
         print(
             """create or replace function public.basemap_z%s(x integer, y integer)
         returns bytea
@@ -174,11 +188,11 @@ if __name__ == "__main__":
             select into area_mvt
                 ST_AsMVT(tile, 'area', 4096, 'way')
                 from (%s) as tile;
-            
+
             select into line_mvt
                 ST_AsMVT(tile, 'line', 4096, 'way')
                 from (%s) as tile;
-            
+
             select into node_mvt
                 ST_AsMVT(tile, 'node', 4096, 'way')
                 from (%s) as tile;
@@ -189,73 +203,73 @@ if __name__ == "__main__":
         language plpgsql immutable strict parallel safe;
         """
             % (
-                z,
-                get_vectors(z, "x", "y", style, "polygon"),
-                get_vectors(z, "x", "y", style, "line"),
-                get_vectors(z, "x", "y", style, "point"),
+                minzoom,
+                get_vectors(minzoom, maxzoom, "x", "y", style, "polygon"),
+                get_vectors(minzoom, maxzoom, "x", "y", style, "line"),
+                get_vectors(minzoom, maxzoom, "x", "y", style, "point"),
             )
         )
 
-    print(
-        """create or replace function public.basemap(z integer, x integer, y integer)
-        returns bytea
-        as $$
-        begin
-            case
-                when z = 0 then
-                    return public.basemap_z0(x, y);
-                when z = 1 then
-                    return public.basemap_z1(x, y);
-                when z = 2 then
-                    return public.basemap_z2(x, y);
-                when z = 3 then
-                    return public.basemap_z3(x, y);
-                when z = 4 then
-                    return public.basemap_z4(x, y);
-                when z = 5 then
-                    return public.basemap_z5(x, y);
-                when z = 6 then
-                    return public.basemap_z6(x, y);
-                when z = 7 then
-                    return public.basemap_z7(x, y);
-                when z = 8 then
-                    return public.basemap_z8(x, y);
-                when z = 9 then
-                    return public.basemap_z9(x, y);
-                when z = 10 then
-                    return public.basemap_z10(x, y);
-                when z = 11 then
-                    return public.basemap_z11(x, y);
-                when z = 12 then
-                    return public.basemap_z12(x, y);
-                when z = 13 then
-                    return public.basemap_z13(x, y);
-                when z = 14 then
-                    return public.basemap_z14(x, y);
-                when z = 15 then
-                    return public.basemap_z15(x, y);
-                when z = 16 then
-                    return public.basemap_z16(x, y);
-                when z = 17 then
-                    return public.basemap_z17(x, y);
-                when z = 18 then
-                    return public.basemap_z18(x, y);
-                when z = 19 then
-                    return public.basemap_z19(x, y);
-                when z = 20 then
-                    return public.basemap_z20(x, y);
-                when z = 21 then
-                    return public.basemap_z21(x, y);
-                when z = 22 then
-                    return public.basemap_z22(x, y);
-                when z = 23 then
-                    return public.basemap_z23(x, y);
-                when z = 24 then
-                    return public.basemap_z24(x, y);
-                else
-                    raise exception 'invalid tile coordinate (%, %, %)', z, x, y;
-            end case;
-        end
-        $$
-        language plpgsql immutable strict parallel safe;"""
-    )
+    # print(
+    #     """create or replace function public.basemap(z integer, x integer, y integer)
+    #     returns bytea
+    #     as $$
+    #     begin
+    #         case
+    #             when z = 0 then
+    #                 return public.basemap_z0(x, y);
+    #             when z = 1 then
+    #                 return public.basemap_z1(x, y);
+    #             when z = 2 then
+    #                 return public.basemap_z2(x, y);
+    #             when z = 3 then
+    #                 return public.basemap_z3(x, y);
+    #             when z = 4 then
+    #                 return public.basemap_z4(x, y);
+    #             when z = 5 then
+    #                 return public.basemap_z5(x, y);
+    #             when z = 6 then
+    #                 return public.basemap_z6(x, y);
+    #             when z = 7 then
+    #                 return public.basemap_z7(x, y);
+    #             when z = 8 then
+    #                 return public.basemap_z8(x, y);
+    #             when z = 9 then
+    #                 return public.basemap_z9(x, y);
+    #             when z = 10 then
+    #                 return public.basemap_z10(x, y);
+    #             when z = 11 then
+    #                 return public.basemap_z11(x, y);
+    #             when z = 12 then
+    #                 return public.basemap_z12(x, y);
+    #             when z = 13 then
+    #                 return public.basemap_z13(x, y);
+    #             when z = 14 then
+    #                 return public.basemap_z14(x, y);
+    #             when z = 15 then
+    #                 return public.basemap_z15(x, y);
+    #             when z = 16 then
+    #                 return public.basemap_z16(x, y);
+    #             when z = 17 then
+    #                 return public.basemap_z17(x, y);
+    #             when z = 18 then
+    #                 return public.basemap_z18(x, y);
+    #             when z = 19 then
+    #                 return public.basemap_z19(x, y);
+    #             when z = 20 then
+    #                 return public.basemap_z20(x, y);
+    #             when z = 21 then
+    #                 return public.basemap_z21(x, y);
+    #             when z = 22 then
+    #                 return public.basemap_z22(x, y);
+    #             when z = 23 then
+    #                 return public.basemap_z23(x, y);
+    #             when z = 24 then
+    #                 return public.basemap_z24(x, y);
+    #             else
+    #                 raise exception 'invalid tile coordinate (%, %, %)', z, x, y;
+    #         end case;
+    #     end
+    #     $$
+    #     language plpgsql immutable strict parallel safe;"""
+    # )
