@@ -117,7 +117,21 @@ class StyleChooser:
         """
         a = set()
         b = ""
-        needed = set(["width", "casing-width", "fill-color", "fill-image", "icon-image", "text", "extrude", "background-image", "background-color", "pattern-image", "shield-text"])
+        needed = set([
+            "width",
+            # "casing-width",
+            "fill-color",
+            "fill-image",
+            "icon-image",
+            "text",
+            "extrude",
+            "background-image",
+            "background-color",
+            "pattern-image",
+            "shield-text"
+        ])
+
+
 
         if not needed.isdisjoint(set(self.styles[0].keys())):
             for r in self.ruleChains:
