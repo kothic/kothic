@@ -40,6 +40,30 @@ def to_mapbox_condition(condition):
     return True
 
 
+# def to_mapbox_expression(values_by_zoom, default=None):
+#     stops = []
+#     for zoom in range(0, 24):
+#         if zoom in values_by_zoom:
+#             stops.append([zoom, values_by_zoom[zoom]])
+
+#     expression = { "stops": stops }
+#     if default is not None:
+#         expression["default"] = default
+
+#     return expression
+
+
+def to_mapbox_expression(values_by_zoom, default=None):
+    expression = ["step", ["zoom"], values_by_zoom.values().pop()]
+
+    for zoom in range(0, 23):
+        if zoom in values_by_zoom:
+            expression.append(zoom)
+            expression.append(values_by_zoom[zoom])
+
+    return expression
+
+
 mapbox_linecaps = {"none": "butt", "butt": "butt", "round": "round", "square": "square"}
 
 
@@ -73,7 +97,10 @@ def komap_mapbox(style):
         "sources": {
             "composite": {
                 # "tiles": ["http://localhost:3000/{z}-{x}-{y}.mvt"],
-                "tiles": ["http://localhost:7800/public.basemap/{z}/{x}/{y}.mvt"],
+                # "tiles": ["http://localhost:7800/public.basemap/{z}/{x}/{y}.mvt"],
+                "tiles": [
+                    "https://geocint.kontur.io/pgtileserv/public.basemap/{z}/{x}/{y}.mvt"
+                ],
                 "type": "vector",
             }
         },
@@ -124,201 +151,286 @@ def komap_mapbox(style):
             zstyle = style.get_style_dict(subject, tags, zoom, olddict={}, cache=False)
             for key, st in zstyle.items():
                 if key not in zs:
-                    zs[key] = [(zoom, zoom, st)]
-                else:
-                    zs[key].append((zoom, zoom, st))
+                    zs[key] = {}
+                zss = zs[key]
+                for (prop_name, prop_value) in st.items():
+                    if prop_name not in zss:
+                        zss[prop_name] = {}
+                    zss[prop_name][zoom] = prop_value
 
-        # merge adjacent zoom levels with the same style
+        zzs = []
         for key in zs:
-            ss = zs[key]
-
-            j = 0
-            for i in range(1, len(ss)):
-                if ss[i][2] != ss[i - 1][2]:
-                    j += 1
-                    ss[j] = ss[i]
-                else:
-                    ss[j] = (ss[j][0], ss[i][0], ss[i][2])
-
-            zs[key] = ss[0 : j + 1]
-
-        for ss in zs.values():
-            for (minzoom, maxzoom, st) in ss:
-                if st.get("casing-width") not in (None, 0) and st.get("casing-color"):
-                    mapbox_style_layer = {
-                        "type": "line",
-                        "minzoom": minzoom,
-                        "maxzoom": maxzoom + 1,
-                        "filter": mapbox_style_layer_filter,
-                        "layout": {},
-                        "paint": {},
-                        "id": str(mapbox_style_layer_id) + "-casing",
-                        "source-layer": subject,
-                        "source": "composite",
+            break_zs = []
+            prev = (None, None, None)
+            for zoom in range(0, 23):
+                z_indexes = zs[key].get("z-index", {})
+                fill_positions = zs[key].get("fill-position", {})
+                casing_linecaps = zs[key].get("casing-linecap", {})
+                curr = (
+                    z_indexes.get(zoom, 0),
+                    fill_positions.get(zoom, "foreground"),
+                    casing_linecaps.get(zoom, "butt"),
+                )
+                if prev != curr:
+                    break_zs.append(zoom)
+                    prev = curr
+            break_zs.append(24)
+            for (minzoom, maxzoom) in list(zip(break_zs, break_zs[1:])):
+                st = {}
+                for (prop_name, prop_value_by_zoom) in zs[key].items():
+                    t = {
+                        z: v
+                        for z, v in prop_value_by_zoom.items()
+                        if z >= minzoom and z < maxzoom
                     }
+                    if len(t) > 0:
+                        st[prop_name] = t
 
-                    mapbox_style_layer["paint"]["line-width"] = (
-                        st.get("width", 0) + st.get("casing-width") * 2
+                if "z-index" in zs[key]:
+                    st["z-index"] = zs[key]["z-index"].get(minzoom, 0)
+                if "fill-position" in zs[key]:
+                    st["fill-position"] = zs[key]["fill-position"].get(
+                        minzoom, "foreground"
                     )
-                    mapbox_style_layer["paint"]["line-color"] = whatever_to_hex(
-                        st.get("casing-color")
+                if "casing-linecap" in zs[key]:
+                    st["casing-linecap"] = zs[key]["casing-linecap"].get(
+                        minzoom, "butt"
                     )
 
-                    if st.get("casing-opacity"):
-                        mapbox_style_layer["paint"]["line-opacity"] = st.get(
-                            "casing-opacity"
-                        )
-                    if st.get("casing-dashes"):
-                        mapbox_style_layer["paint"]["line-dasharray"] = st.get(
-                            "casing-dashes"
-                        )
-                    if st.get("casing-linecap"):
-                        mapbox_style_layer["layout"]["line-cap"] = mapbox_linecaps[
-                            st.get("casing-linecap")
-                        ]
-                    if st.get("casing-linejoin"):
-                        mapbox_style_layer["layout"]["line-join"] = st.get(
-                            "casing-linejoin"
-                        )
+                zzs.append((minzoom, maxzoom, st))
 
-                    if st.get("casing-linecap", "butt") == "butt":
-                        mapbox_style_layer["priority"] = min(
-                            int(st.get("z-index", 0)), 20000
-                        )
-                    if st.get("casing-linecap", "round") != "butt":
-                        mapbox_style_layer["priority"] = -15000
+        for (minzoom, maxzoom, st) in zzs:
+            if st.get("casing-width") and st.get("casing-color"):
+                mapbox_style_layer = {
+                    "type": "line",
+                    "minzoom": minzoom,
+                    "maxzoom": maxzoom,
+                    "filter": mapbox_style_layer_filter,
+                    "layout": {},
+                    "paint": {},
+                    "id": str(mapbox_style_layer_id) + "-casing",
+                    "source-layer": subject,
+                    "source": "composite",
+                }
 
-                    mapbox_style_layer_id += 1
-                    mapbox_style_layers.append(mapbox_style_layer)
-                if "width" in st and "color" in st:
-                    mapbox_style_layer = {
-                        "priority": min((int(st.get("z-index", 0)) + 1000), 20000),
-                        "type": "line",
-                        "minzoom": minzoom,
-                        "maxzoom": maxzoom + 1,
-                        "filter": mapbox_style_layer_filter,
-                        "layout": {},
-                        "paint": {},
-                        "id": str(mapbox_style_layer_id),
-                        "source-layer": subject,
-                        "source": "composite",
-                    }
+                mapbox_style_layer["minzoom"] = [
+                    z for z, v in st.get("casing-width").items() if v > 0
+                ][0]
+                mapbox_style_layer["paint"]["line-width"] = to_mapbox_expression(
+                    {
+                        z: v * 2 + st.get("width", {}).get(z, 0)
+                        for z, v in st.get("casing-width").items()
+                    },
+                    default=0,
+                )
 
-                    mapbox_style_layer["paint"]["line-width"] = st.get("width", 0)
-                    mapbox_style_layer["paint"]["line-color"] = whatever_to_hex(
-                        st.get("color")
+                mapbox_style_layer["paint"]["line-color"] = to_mapbox_expression(
+                    {z: whatever_to_hex(v) for z, v in st.get("casing-color").items()}
+                )
+
+                if st.get("casing-opacity"):
+                    mapbox_style_layer["paint"]["line-opacity"] = to_mapbox_expression(
+                        st.get("casing-opacity")
                     )
-                    if st.get("opacity"):
-                        mapbox_style_layer["paint"]["line-opacity"] = st.get("opacity")
-                    if st.get("dashes"):
-                        mapbox_style_layer["paint"]["line-dasharray"] = st.get("dashes")
-                    if st.get("linecap"):
-                        mapbox_style_layer["layout"]["line-cap"] = mapbox_linecaps[
-                            st.get("linecap")
-                        ]
-                    if st.get("linejoin"):
-                        mapbox_style_layer["layout"]["line-join"] = st.get("linejoin")
-
-                    mapbox_style_layer_id += 1
-                    mapbox_style_layers.append(mapbox_style_layer)
-                if "fill-color" in st:
-                    mapbox_style_layer = {
-                        "type": "fill",
-                        "minzoom": minzoom,
-                        "maxzoom": maxzoom + 1,
-                        "filter": mapbox_style_layer_filter,
-                        "layout": {},
-                        "paint": {},
-                        "id": str(mapbox_style_layer_id),
-                        "source-layer": subject,
-                        "source": "composite",
-                    }
-
-                    if st.get("fill-position", "foreground") == "background":
-                        if "z-index" not in st:
-                            bgpos -= 1
-                        mapbox_style_layer["priority"] = (
-                            int(st.get("z-index", bgpos)) - 16000
-                        )
-                    else:
-                        mapbox_style_layer["priority"] = (
-                            int(st.get("z-index", 0)) + 1 + 1000
-                        )
-
-                    mapbox_style_layer["paint"]["fill-color"] = whatever_to_hex(
-                        st.get("fill-color")
+                if st.get("casing-dashes"):
+                    mapbox_style_layer["paint"][
+                        "line-dasharray"
+                    ] = to_mapbox_expression(
+                        {z: ["literal", v] for z, v in st.get("casing-dashes").items()}
                     )
-                    if st.get("fill-opacity"):
-                        mapbox_style_layer["paint"]["fill-opacity"] = st.get(
-                            "fill-opacity"
-                        )
-
-                    mapbox_style_layer_id += 1
-                    mapbox_style_layers.append(mapbox_style_layer)
-                if st.get("text"):
-                    mapbox_style_layer = {
-                        "type": "symbol",
-                        "minzoom": minzoom,
-                        "maxzoom": maxzoom + 1,
-                        "filter": mapbox_style_layer_filter,
-                        "layout": {},
-                        "paint": {},
-                        "id": str(mapbox_style_layer_id),
-                        "source-layer": subject,
-                        "source": "composite",
-                    }
-
-                    if subject == "area":
-                        mapbox_style_layer["filter"] = mapbox_style_layer["filter"] + [
-                            ["==", ["geometry-type"], "Point"]
-                        ]
-
-                    mapbox_style_layer["layout"]["text-field"] = ["get", st.get("text")]
-                    if st.get("text-position") == "line":
-                        mapbox_style_layer["layout"]["symbol-placement"] = (
-                            {"line": "line", "center": "line-center"}
-                        )[st.get("text-position")]
-                    if st.get("font-size"):
-                        mapbox_style_layer["layout"]["text-size"] = float(
-                            st.get("font-size").split(",").pop()
-                        )
-                    if st.get("text-transform"):
-                        mapbox_style_layer["layout"]["text-transform"] = st.get(
-                            "text-transform"
-                        )
-                    if st.get("text-allow-overlap"):
-                        mapbox_style_layer["layout"]["text-allow-overlap"] = st.get(
-                            "text-allow-overlap"
-                        )
-                    if st.get("text-offset"):
-                        mapbox_style_layer["layout"]["text-offset"] = [
-                            0,
-                            st.get("text-offset"),
-                        ]
-                    if st.get("text-color"):
-                        mapbox_style_layer["paint"]["text-color"] = whatever_to_hex(
-                            st.get("text-color")
-                        )
-                    if st.get("text-opacity"):
-                        mapbox_style_layer["paint"]["text-opacity"] = st.get(
-                            "text-opacity"
-                        )
-                    if st.get("text-halo-radius"):
-                        mapbox_style_layer["paint"]["text-halo-width"] = float(
-                            st.get("text-halo-radius")
-                        )
-                    if st.get("text-halo-color"):
-                        mapbox_style_layer["paint"][
-                            "text-halo-color"
-                        ] = whatever_to_hex(st.get("text-halo-color"))
-
-                    base_z = 15000
+                if st.get("casing-linecap"):
+                    mapbox_style_layer["layout"]["line-cap"] = mapbox_linecaps[
+                        st.get("casing-linecap")
+                    ]
+                if st.get("casing-linejoin"):
+                    mapbox_style_layer["layout"]["line-join"] = to_mapbox_expression(
+                        st.get("casing-linejoin")
+                    )
+                if st.get("casing-linecap", "butt") == "butt":
                     mapbox_style_layer["priority"] = min(
-                        19000, (base_z + int(st.get("z-index", 0)))
+                        int(st.get("z-index", 0)), 20000
+                    )
+                if st.get("casing-linecap", "round") != "butt":
+                    mapbox_style_layer["priority"] = -15000
+
+                mapbox_style_layer_id += 1
+                mapbox_style_layers.append(mapbox_style_layer)
+            if "width" in st and "color" in st:
+                mapbox_style_layer = {
+                    "priority": min((int(st.get("z-index", 0)) + 1000), 20000),
+                    "type": "line",
+                    "minzoom": minzoom,
+                    "maxzoom": maxzoom,
+                    "filter": mapbox_style_layer_filter,
+                    "layout": {},
+                    "paint": {},
+                    "id": str(mapbox_style_layer_id),
+                    "source-layer": subject,
+                    "source": "composite",
+                }
+
+                mapbox_style_layer["minzoom"] = [
+                    z for z, v in st.get("width").items() if v > 0
+                ][0]
+
+                mapbox_style_layer["paint"]["line-width"] = to_mapbox_expression(
+                    st.get("width"), default=0
+                )
+
+                mapbox_style_layer["paint"]["line-color"] = to_mapbox_expression(
+                    {z: whatever_to_hex(v) for z, v in st.get("color").items()}
+                )
+
+                if st.get("opacity"):
+                    mapbox_style_layer["paint"]["line-opacity"] = to_mapbox_expression(
+                        st.get("opacity")
+                    )
+                if st.get("dashes"):
+                    mapbox_style_layer["paint"][
+                        "line-dasharray"
+                    ] = to_mapbox_expression(
+                        {z: ["literal", v] for z, v in st.get("dashes").items()}
+                    )
+                if st.get("linecap"):
+                    mapbox_style_layer["layout"]["line-cap"] = to_mapbox_expression(
+                        {z: mapbox_linecaps[v] for z, v in st.get("linecap").items()}
+                    )
+                if st.get("linejoin"):
+                    mapbox_style_layer["layout"]["line-join"] = to_mapbox_expression(
+                        st.get("linejoin")
                     )
 
-                    mapbox_style_layer_id += 1
-                    mapbox_style_layers.append(mapbox_style_layer)
+                mapbox_style_layer_id += 1
+                mapbox_style_layers.append(mapbox_style_layer)
+            if "fill-color" in st:
+                # if False:
+                mapbox_style_layer = {
+                    "type": "fill",
+                    "minzoom": minzoom,
+                    "maxzoom": maxzoom,
+                    "filter": mapbox_style_layer_filter,
+                    "layout": {},
+                    "paint": {},
+                    "id": str(mapbox_style_layer_id),
+                    "source-layer": subject,
+                    "source": "composite",
+                }
+
+                if st.get("fill-position", "foreground") == "background":
+                    if "z-index" not in st:
+                        bgpos -= 1
+                    mapbox_style_layer["priority"] = (
+                        int(st.get("z-index", bgpos)) - 16000
+                    )
+                else:
+                    mapbox_style_layer["priority"] = (
+                        int(st.get("z-index", 0)) + 1 + 1000
+                    )
+
+                mapbox_style_layer["paint"]["fill-color"] = to_mapbox_expression(
+                    {z: whatever_to_hex(v) for z, v in st.get("fill-color").items()}
+                )
+
+                if st.get("fill-opacity"):
+                    mapbox_style_layer["paint"]["fill-opacity"] = to_mapbox_expression(
+                        st.get("fill-opacity"), default=0
+                    )
+
+                mapbox_style_layer_id += 1
+                mapbox_style_layers.append(mapbox_style_layer)
+            if st.get("text"):
+                mapbox_style_layer = {
+                    "type": "symbol",
+                    "minzoom": minzoom,
+                    "maxzoom": maxzoom,
+                    "filter": mapbox_style_layer_filter,
+                    "layout": {},
+                    "paint": {},
+                    "id": str(mapbox_style_layer_id),
+                    "source-layer": subject,
+                    "source": "composite",
+                }
+
+                if subject == "area":
+                    mapbox_style_layer["filter"] = mapbox_style_layer["filter"] + [
+                        ["==", ["geometry-type"], "Point"]
+                    ]
+
+                mapbox_style_layer["minzoom"] = [
+                    z for z, v in st.get("text").items() if v > 0
+                ][0]
+
+                mapbox_style_layer["layout"]["text-field"] = to_mapbox_expression(
+                    {z: ["get", v] for z, v in st.get("text").items()}
+                )
+
+                # if st.get("text-position") == "line":
+                # mapbox_style_layer["layout"]["symbol-placement"] = (
+                #     {"line": "line", "center": "line-center"}
+                # )[st.get("text-position")]
+
+                if st.get("text-position"):
+                    symbol_placement = {
+                        z: v for z, v in st.get("text-position").items() if v == "line"
+                    }
+                    if len(symbol_placement) > 0:
+                        mapbox_style_layer["layout"][
+                            "symbol-placement"
+                        ] = to_mapbox_expression(symbol_placement)
+
+                if st.get("font-size"):
+                    mapbox_style_layer["layout"]["text-size"] = to_mapbox_expression(
+                        {
+                            z: float(v.split(",").pop())
+                            for z, v in st.get("font-size").items()
+                        }
+                    )
+                if st.get("text-transform"):
+                    mapbox_style_layer["layout"][
+                        "text-transform"
+                    ] = to_mapbox_expression(st.get("text-transform"))
+                if st.get("text-allow-overlap"):
+                    mapbox_style_layer["layout"][
+                        "text-transform"
+                    ] = to_mapbox_expression(st.get("text-allow-overlap"))
+                if st.get("text-offset"):
+                    mapbox_style_layer["layout"]["text-offset"] = to_mapbox_expression(
+                        {
+                            z: ["literal", [0, float(v)]]
+                            for z, v in st.get("text-offset").items()
+                        }
+                    )
+                if st.get("text-color"):
+                    mapbox_style_layer["paint"]["text-color"] = to_mapbox_expression(
+                        {z: whatever_to_hex(v) for z, v in st.get("text-color").items()}
+                    )
+                if st.get("text-opacity"):
+                    mapbox_style_layer["paint"]["text-opacity"] = to_mapbox_expression(
+                        {z: float(v) for z, v in st.get("text-opacity").items()}
+                    )
+                if st.get("text-halo-radius"):
+                    mapbox_style_layer["paint"][
+                        "text-halo-width"
+                    ] = to_mapbox_expression(
+                        {z: float(v) for z, v in st.get("text-halo-radius").items()}
+                    )
+                if st.get("text-halo-color"):
+                    mapbox_style_layer["paint"][
+                        "text-halo-color"
+                    ] = to_mapbox_expression(
+                        {
+                            z: whatever_to_hex(v)
+                            for z, v in st.get("text-halo-color").items()
+                        }
+                    )
+
+                base_z = 15000
+                mapbox_style_layer["priority"] = min(
+                    19000, (base_z + int(st.get("z-index", 0)))
+                )
+
+                mapbox_style_layer_id += 1
+                mapbox_style_layers.append(mapbox_style_layer)
 
     mapbox_style["layers"] = sorted(mapbox_style["layers"], key=lambda k: k["priority"])
 
