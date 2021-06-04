@@ -54,6 +54,10 @@ def to_mapbox_condition(condition):
 
 
 def to_mapbox_expression(values_by_zoom, default=None):
+    l = values_by_zoom.values()
+    if all(x == l[0] for x in l):
+        return l[0]
+
     expression = ["step", ["zoom"], values_by_zoom.values().pop()]
 
     for zoom in range(0, 23):
@@ -102,6 +106,7 @@ def komap_mapbox(style):
                     "https://geocint.kontur.io/pgtileserv/public.basemap/{z}/{x}/{y}.mvt"
                 ],
                 "type": "vector",
+                "maxzoom": 14
             }
         },
         "glyphs": "mapbox://fonts/mapbox/{fontstack}/{range}.pbf",
@@ -391,8 +396,8 @@ def komap_mapbox(style):
                     ] = to_mapbox_expression(st.get("text-transform"))
                 if st.get("text-allow-overlap"):
                     mapbox_style_layer["layout"][
-                        "text-transform"
-                    ] = to_mapbox_expression(st.get("text-allow-overlap"))
+                        "text-allow-overlap"
+                    ] = to_mapbox_expression({ z: v == "true" for z, v in st.get("text-allow-overlap").items()})
                 if st.get("text-offset"):
                     mapbox_style_layer["layout"]["text-offset"] = to_mapbox_expression(
                         {
