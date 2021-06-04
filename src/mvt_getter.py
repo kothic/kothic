@@ -180,7 +180,6 @@ if __name__ == "__main__":
     style.parse(filename=options.filename)
 
     zooms = [
-        (0, 1),
         (1, 2),
         (2, 3),
         (3, 4),
