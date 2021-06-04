@@ -61,9 +61,9 @@ def get_vectors(minzoom, maxzoom, x, y, style, vec):
 
     if vec == "polygon":
         query = """select ST_AsMVTGeom(w.way, ST_TileEnvelope(%s, %s, %s), 4096, 64, true) as %s, %s from
-                        (select (ST_Dump(ST_Multi(ST_SimplifyPreserveTopology(ST_Buffer(way,-%s),%s)))).geom as %s, %s from
+                        (select (ST_Dump(ST_Multi(ST_Simplify(ST_Buffer(way, -%s, 0),%s)))).geom as %s, %s from
                             (select ST_Union(way) as %s, %s from
-                            (select ST_Buffer(way, %s) as %s, %s from
+                            (select ST_Buffer(way, %s, 0) as %s, %s from
                                 %s
                                 where (%s)
                                 and way && ST_TileEnvelope(%s, %s, %s)
@@ -74,6 +74,18 @@ def get_vectors(minzoom, maxzoom, x, y, style, vec):
                             where ST_Area(way) > %s
                             order by ST_Area(way)
                         ) p, lateral (values (p.way), (ST_PointOnSurface(p.way))) w(way)
+                   union
+                   select ST_AsMVTGeom(geom, ST_TileEnvelope(%s, %s, %s), 4096, 64, true) as way, %s from
+                  (select (ST_Dump(ST_Multi(ST_Simplify(ST_Buffer(geom, -%s, 0),%s)))).geom as geom                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      from
+                    (select ST_Union(geom) as geom from
+                      (select ST_Buffer(geom, %s, 0) geom from
+                         water_polygons_vector
+                         where
+                            geom && ST_TileEnvelope(%s, %s, %s)
+                      ) p
+                    ) p
+                    where ST_Area(geom) > %s
+                  ) p
           """ % (
             minzoom,
             x,
@@ -97,10 +109,21 @@ def get_vectors(minzoom, maxzoom, x, y, style, vec):
             (pixel_size_at_zoom(maxzoom, pxtolerance) ** 2) / pxtolerance,
             groupby,
             pixel_size_at_zoom(maxzoom, pxtolerance) ** 2,
+            minzoom,
+            x,
+            y,
+            ",".join([(("'coastline'" if name == 'natural' else 'null') + ' as "' + name + '"') for name in names]),
+            pixel_size_at_zoom(maxzoom, pxtolerance),
+            pixel_size_at_zoom(maxzoom, pxtolerance),
+            pixel_size_at_zoom(maxzoom, pxtolerance),
+            minzoom,
+            x,
+            y,
+            pixel_size_at_zoom(maxzoom, pxtolerance) ** 2
         )
     elif vec == "line":
         query = """select ST_AsMVTGeom(way, ST_TileEnvelope(%s, %s, %s), 4096, 64, true) as %s, %s from
-                        (select (ST_Dump(ST_Multi(ST_SimplifyPreserveTopology(ST_LineMerge(way),%s)))).geom as %s, %s from
+                        (select (ST_Dump(ST_Multi(ST_Simplify(ST_LineMerge(way),%s)))).geom as %s, %s from
                             (select ST_Union(way) as %s, %s from
                                 %s
                                 where (%s)
@@ -163,7 +186,9 @@ if __name__ == "__main__":
         (3, 4),
         (4, 5),
         (5, 6),
+        (6, 7),
         (7, 8),
+        (8, 9),
         (9, 10),
         (10, 11),
         (11, 12),
