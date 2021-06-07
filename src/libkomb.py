@@ -40,30 +40,23 @@ def to_mapbox_condition(condition):
     return True
 
 
-# def to_mapbox_expression(values_by_zoom, default=None):
-#     stops = []
-#     for zoom in range(0, 24):
-#         if zoom in values_by_zoom:
-#             stops.append([zoom, values_by_zoom[zoom]])
+def to_mapbox_expression(values_by_zoom):
+    values_by_zoom = values_by_zoom.items()
+    values_by_zoom = sorted(values_by_zoom, key=lambda k: k[0])
+    j = 0
+    for i in range(1, len(values_by_zoom)):
+        if values_by_zoom[i][1] != values_by_zoom[i - 1][1]:
+            j += 1
+            values_by_zoom[j] = values_by_zoom[i]
+    values_by_zoom = values_by_zoom[0 : j + 1]
 
-#     expression = { "stops": stops }
-#     if default is not None:
-#         expression["default"] = default
+    if len(values_by_zoom) == 1:
+        return values_by_zoom[0][1]
 
-#     return expression
-
-
-def to_mapbox_expression(values_by_zoom, default=None):
-    l = values_by_zoom.values()
-    if all(x == l[0] for x in l):
-        return l[0]
-
-    expression = ["step", ["zoom"], values_by_zoom.values().pop()]
-
-    for zoom in range(0, 23):
-        if zoom in values_by_zoom:
-            expression.append(zoom)
-            expression.append(values_by_zoom[zoom])
+    expression = ["step", ["zoom"], values_by_zoom[0][1]]
+    for (zoom, value) in values_by_zoom:
+        expression.append(zoom)
+        expression.append(value)
 
     return expression
 
@@ -84,15 +77,24 @@ def komap_mapbox(style):
         )
     ]
 
-    mapbox_style_layers = [
-        {
-            "zindex": -30000,
+    mapbox_style_layers = []
+
+    canvas_style = style.get_style_dict("canvas", {}, 0, olddict={}, cache=False)
+    if canvas_style["::default"] is not None:
+        background_style_layer = {
             "priority": -30000,
             "type": "background",
-            "paint": {"background-color": "#E3E1D2"},
+            "paint": {},
+            "layout": {},
             "id": "bg",
         }
-    ]
+
+        if "background-color" in canvas_style["::default"]:
+            background_style_layer["paint"]["background-color"] = whatever_to_hex(
+                canvas_style["::default"]["background-color"]
+            )
+
+        mapbox_style_layers.append(background_style_layer)
 
     mapbox_style = {
         "version": 8,
@@ -106,7 +108,7 @@ def komap_mapbox(style):
                     "https://geocint.kontur.io/pgtileserv/public.basemap/{z}/{x}/{y}.mvt"
                 ],
                 "type": "vector",
-                "maxzoom": 14
+                "maxzoom": 14,
             }
         },
         "glyphs": "mapbox://fonts/mapbox/{fontstack}/{range}.pbf",
@@ -226,7 +228,6 @@ def komap_mapbox(style):
                         z: v * 2 + st.get("width", {}).get(z, 0)
                         for z, v in st.get("casing-width").items()
                     },
-                    default=0,
                 )
 
                 mapbox_style_layer["paint"]["line-color"] = to_mapbox_expression(
@@ -251,9 +252,10 @@ def komap_mapbox(style):
                     mapbox_style_layer["layout"]["line-join"] = to_mapbox_expression(
                         st.get("casing-linejoin")
                     )
+
                 if st.get("casing-linecap", "butt") == "butt":
                     mapbox_style_layer["priority"] = min(
-                        int(st.get("z-index", 0)), 20000
+                        int(st.get("z-index", 0)) + 999, 20000
                     )
                 if st.get("casing-linecap", "round") != "butt":
                     mapbox_style_layer["priority"] = -15000
@@ -279,7 +281,7 @@ def komap_mapbox(style):
                 ][0]
 
                 mapbox_style_layer["paint"]["line-width"] = to_mapbox_expression(
-                    st.get("width"), default=0
+                    st.get("width")
                 )
 
                 mapbox_style_layer["paint"]["line-color"] = to_mapbox_expression(
@@ -324,9 +326,13 @@ def komap_mapbox(style):
                 if st.get("fill-position", "foreground") == "background":
                     if "z-index" not in st:
                         bgpos -= 1
-                    mapbox_style_layer["priority"] = (
-                        int(st.get("z-index", bgpos)) - 16000
-                    )
+                        mapbox_style_layer["priority"] = bgpos - 16000
+                    else:
+                        zzz = int(st.get("z-index", 0))
+                        if zzz > 0:
+                            mapbox_style_layer["priority"] = zzz - 16000
+                        else:
+                            mapbox_style_layer["priority"] = zzz - 16700
                 else:
                     mapbox_style_layer["priority"] = (
                         int(st.get("z-index", 0)) + 1 + 1000
@@ -338,7 +344,7 @@ def komap_mapbox(style):
 
                 if st.get("fill-opacity"):
                     mapbox_style_layer["paint"]["fill-opacity"] = to_mapbox_expression(
-                        st.get("fill-opacity"), default=0
+                        st.get("fill-opacity")
                     )
 
                 mapbox_style_layer_id += 1
@@ -397,7 +403,12 @@ def komap_mapbox(style):
                 if st.get("text-allow-overlap"):
                     mapbox_style_layer["layout"][
                         "text-allow-overlap"
-                    ] = to_mapbox_expression({ z: v == "true" for z, v in st.get("text-allow-overlap").items()})
+                    ] = to_mapbox_expression(
+                        {
+                            z: v == "true"
+                            for z, v in st.get("text-allow-overlap").items()
+                        }
+                    )
                 if st.get("text-offset"):
                     mapbox_style_layer["layout"]["text-offset"] = to_mapbox_expression(
                         {
@@ -443,7 +454,6 @@ def komap_mapbox(style):
 
 
 # style.parse(open("styles/osmosnimki-maps.mapcss", "r").read())
-# style.parse(filename="styles/clear/style-clear/style.mapcss")
 
 if __name__ == "__main__":
     parser = OptionParser()
