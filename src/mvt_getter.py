@@ -172,12 +172,13 @@ def get_vectors(minzoom, maxzoom, x, y, style, vec):
 
 if __name__ == "__main__":
     parser = OptionParser()
-    parser.add_option("-s", "--stylesheet", dest="filename", metavar="FILE")
+    parser.add_option("-s", "--stylesheet", dest="filename", metavar="FILE", action="append")
 
     (options, args) = parser.parse_args()
 
     style = MapCSS(0, 30)
-    style.parse(filename=options.filename)
+    for style_filename in options.filename:
+        style.parse(filename=style_filename)
 
     zooms = [
         (1, 2),

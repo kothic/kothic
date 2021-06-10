@@ -338,6 +338,8 @@ class MapCSS():
                     self.choosers_by_type[t] = [chooser]
                 else:
                     self.choosers_by_type[t].append(chooser)
+        
+        self.style_loaded = True
 
 
 def parseCondition(s):
