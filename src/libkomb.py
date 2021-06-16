@@ -2,6 +2,7 @@ from mapcss import MapCSS
 import json
 import mapcss.webcolors
 from optparse import OptionParser
+import sys
 
 whatever_to_hex = mapcss.webcolors.webcolors.whatever_to_hex
 
@@ -64,7 +65,7 @@ def to_mapbox_expression(values_by_zoom):
 mapbox_linecaps = {"none": "butt", "butt": "butt", "round": "round", "square": "square"}
 
 
-def komap_mapbox(style):
+def komap_mapbox(style, options):
     l = []
     for chooser in style.choosers:
         for rule in chooser.ruleChains:
@@ -102,13 +103,11 @@ def komap_mapbox(style):
         "metadata": {},
         "sources": {
             "composite": {
-                # "tiles": ["http://localhost:3000/{z}-{x}-{y}.mvt"],
-                # "tiles": ["http://localhost:7800/public.basemap/{z}/{x}/{y}.mvt"],
                 "tiles": [
-                    "https://geocint.kontur.io/pgtileserv/public.basemap/{z}/{x}/{y}.mvt"
+                    options.tiles_url
                 ],
                 "type": "vector",
-                "maxzoom": 14,
+                "maxzoom": int(options.max_zoom),
             }
         },
         "glyphs": "mapbox://fonts/mapbox/{fontstack}/{range}.pbf",
@@ -453,17 +452,21 @@ def komap_mapbox(style):
     return mapbox_style
 
 
-# style.parse(open("styles/osmosnimki-maps.mapcss", "r").read())
-
 if __name__ == "__main__":
     parser = OptionParser()
-    parser.add_option("-s", "--stylesheet", dest="filename", metavar="FILE")
+    parser.add_option("--stylesheet", "--stylesheet", dest="filename")
+    parser.add_option("--tiles-url", "--tiles-url", dest="tiles_url")
+    parser.add_option("--max-zoom", "--max-zoom", dest="max_zoom")
 
     (options, args) = parser.parse_args()
+
+    if options.filename is None or options.tiles_url is None or options.max_zoom is None:
+        sys.stderr.write(">>> required arguments are not passed")
+        exit(1)
 
     style = MapCSS(0, 30)
     style.parse(filename=options.filename)
 
-    mapbox_style = komap_mapbox(style)
+    mapbox_style = komap_mapbox(style, options)
 
     print(json.dumps(mapbox_style))
