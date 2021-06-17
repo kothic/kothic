@@ -110,7 +110,7 @@ def komap_mapbox(style, options):
                 "maxzoom": int(options.max_zoom),
             }
         },
-        "glyphs": "mapbox://fonts/mapbox/{fontstack}/{range}.pbf",
+        "glyphs": options.glyphs_url,
         "center": [27.582705, 53.908227],
         "zoom": 15,
         "layers": mapbox_style_layers,
@@ -354,7 +354,9 @@ def komap_mapbox(style, options):
                     "minzoom": minzoom,
                     "maxzoom": maxzoom,
                     "filter": mapbox_style_layer_filter,
-                    "layout": {},
+                    "layout": {
+                        "text-font": ["Roboto"]
+                    },
                     "paint": {},
                     "id": str(mapbox_style_layer_id),
                     "source-layer": subject,
@@ -456,6 +458,7 @@ if __name__ == "__main__":
     parser = OptionParser()
     parser.add_option("--stylesheet", "--stylesheet", dest="filename")
     parser.add_option("--tiles-url", "--tiles-url", dest="tiles_url")
+    parser.add_option("--glyphs-url", "--glyphs-url", dest="glyphs_url")
     parser.add_option("--max-zoom", "--max-zoom", dest="max_zoom")
 
     (options, args) = parser.parse_args()
