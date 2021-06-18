@@ -15,6 +15,8 @@
 #   You should have received a copy of the GNU General Public License
 #   along with kothic.  If not, see <http://www.gnu.org/licenses/>.
 
+from Condition import Condition
+
 type_matches = {
     "": ('area', 'line', 'way', 'node'),
     "area": ("area", "way"),
@@ -36,11 +38,29 @@ class Rule():
     def __repr__(self):
         return "%s|z%s-%s %s" % (self.subject, self.minZoom, self.maxZoom, self.conditions)
 
+    def test_2(self, obj, conditions, zoom):
+        if (zoom < self.minZoom) or (zoom > self.maxZoom):
+            return False
+
+        if (self.subject != '') and not _test_feature_compatibility(obj, self.subject):
+            return False
+
+        subpart = "::default"
+
+        self_conditions = self.conditions
+        if len([c for c in self_conditions if c.type == 'eq' and c.params[0] == '::class']) == 0:
+            self_conditions.append(Condition('eq', ('::class', '::default')))
+
+        if set(self_conditions).issubset(set(conditions)):
+            return subpart
+        
+        return False
+
     def test(self, obj, tags, zoom):
         if (zoom < self.minZoom) or (zoom > self.maxZoom):
             return False
 
-        if (self.subject != '') and not _test_feature_compatibility(obj, self.subject, tags):
+        if (self.subject != '') and not _test_feature_compatibility(obj, self.subject):
             return False
 
         subpart = "::default"
@@ -97,7 +117,7 @@ class Rule():
         return a, b
 
 
-def _test_feature_compatibility(f1, f2, tags={}):
+def _test_feature_compatibility(f1, f2):
     """
     Checks if feature of type f1 is compatible with f2.
     """

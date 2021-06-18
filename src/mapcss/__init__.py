@@ -143,6 +143,14 @@ class MapCSS():
             self.cache["style"][shash] = deepcopy(style)
         return style
 
+    def get_style_2(self, type, conditions={}, zoom=0):
+        style = {}
+        if type in self.choosers_by_type:
+            for chooser in self.choosers_by_type[type]:
+                style = chooser.updateStyles_2(style, type, conditions, zoom)
+
+        return style
+
     def get_style_dict(self, type, tags={}, zoom=0, scale=1, zscale=.5, olddict={}, cache=True):
         r = self.get_style(type, tags, zoom, scale, zscale, cache)
         d = olddict
@@ -151,6 +159,10 @@ class MapCSS():
                 d[x.get('object-id', '')] = {}
             d[x.get('object-id', '')].update(x)
         return d
+    
+    def get_style_dict_2(self, type, conditions=[], zoom=0):
+        r = self.get_style_2(type, conditions, zoom)
+        return r
 
     def get_interesting_tags(self, type=None, zoom=None):
         """

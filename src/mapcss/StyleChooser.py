@@ -148,6 +148,20 @@ class StyleChooser:
         # no need to check for eval's
         return a, b
 
+    def updateStyles_2(self, sl, ftype, conditions, zoom):
+        # Are any of the ruleChains fulfilled?
+        if self.selzooms:
+            if zoom < self.selzooms[0] or zoom > self.selzooms[1]:
+                return sl
+
+        if not self.testChain_2(self.ruleChains, ftype, conditions, zoom):
+            return sl
+
+        for r in self.styles:
+            sl.update(r)
+
+        return sl
+
     def updateStyles(self, sl, ftype, tags, zoom, scale, zscale):
         # Are any of the ruleChains fulfilled?
         if self.selzooms:
@@ -161,8 +175,6 @@ class StyleChooser:
 
         if not object_id:
             return sl
-
-        w = 0
 
         for r in self.styles:
             if self.has_evals:
@@ -212,6 +224,13 @@ class StyleChooser:
             tt = r.test(obj, tags, zoom)
             if tt:
                 return tt
+        return False
+
+    def testChain_2(self, chain, obj, conditions, zoom):
+        for r in chain:
+            tt = r.test_2(obj, conditions, zoom)
+            if tt:
+                return True
         return False
 
     def newGroup(self):

@@ -1,11 +1,10 @@
-from mapcss import MapCSS
+from mapcss import MapCSS, Condition
 import json
+import sys
 import mapcss.webcolors
 from optparse import OptionParser
-import sys
 
 whatever_to_hex = mapcss.webcolors.webcolors.whatever_to_hex
-
 
 def to_mapbox_condition(condition):
     t = condition.type
@@ -64,7 +63,6 @@ def to_mapbox_expression(values_by_zoom):
 
 mapbox_linecaps = {"none": "butt", "butt": "butt", "round": "round", "square": "square"}
 
-
 def komap_mapbox(style, options):
     l = []
     for chooser in style.choosers:
@@ -112,7 +110,7 @@ def komap_mapbox(style, options):
         },
         "glyphs": options.glyphs_url,
         "center": [27.582705, 53.908227],
-        "zoom": 15,
+        "zoom": 1,
         "layers": mapbox_style_layers,
         "id": "basemap",
     }
@@ -130,83 +128,74 @@ def komap_mapbox(style, options):
         if subject not in ("area", "line", "node"):
             continue
 
-        tags = {}
-        for condition in conditions:
-            # < <= > >= require more checks
-            if condition.type in ("eq", "ne", "<", "<=", ">", ">="):
-                tags[condition.params[0]] = condition.params[1]
-            elif condition.type == "true":
-                tags[condition.params[0]] = "yes"
-            elif condition.type == "untrue":
-                tags[condition.params[0]] = "no"
-            elif condition.type == "set":
-                tags[condition.params[0]] = condition.params[0]
-            # elif condition.type == "unset"
-
-        tags["name"] = "name"
-        tags["addr:housenumber"] = "addr:housenumber"
-        tags["addr:housename"] = "addr:housename"
-        tags["ref"] = "ref"
-        tags["int_name"] = "int_name"
-        tags["addr:flats"] = "addr:flats"
-
         mapbox_style_layer_filter = ["all"] + map(to_mapbox_condition, conditions)
+        conditions += [Condition('set', (c.params[0],)) for c in conditions if c.type in ('eq', 'true' '<', '<=', '>', '>=')]
+
+        if len([c for c in conditions if c.type == 'eq' and c.params[0] == '::class']) == 0:
+            conditions.append(Condition('eq', ('::class', '::default')))
 
         zs = {}
         for zoom in range(0, 24):
-            zstyle = style.get_style_dict(subject, tags, zoom, olddict={}, cache=False)
-            for key, st in zstyle.items():
-                if key not in zs:
-                    zs[key] = {}
-                zss = zs[key]
-                for (prop_name, prop_value) in st.items():
-                    if prop_name not in zss:
-                        zss[prop_name] = {}
-                    zss[prop_name][zoom] = prop_value
+            zstyle = style.get_style_dict_2(subject, conditions, zoom)
 
+            if 'text' in zstyle:
+                tags = {}
+                tags["name"] = "name"
+                tags["addr:housenumber"] = "addr:housenumber"
+                tags["addr:housename"] = "addr:housename"
+                tags["ref"] = "ref"
+                tags["int_name"] = "int_name"
+                tags["addr:flats"] = "addr:flats"
+
+                zstyle["text"] = zstyle["text"].compute(tags, {})
+
+            for (prop_name, prop_value) in zstyle.items():
+                if prop_name not in zs:
+                    zs[prop_name] = {}
+                zs[prop_name][zoom] = prop_value
+        
         zzs = []
-        for key in zs:
-            break_zs = []
-            prev = (None, None, None)
-            for zoom in range(0, 23):
-                z_indexes = zs[key].get("z-index", {})
-                fill_positions = zs[key].get("fill-position", {})
-                casing_linecaps = zs[key].get("casing-linecap", {})
-                curr = (
-                    z_indexes.get(zoom, 0),
-                    fill_positions.get(zoom, "foreground"),
-                    casing_linecaps.get(zoom, "butt"),
+        break_zs = []
+        prev = (None, None, None)
+        for zoom in range(0, 23):
+            z_indexes = zs.get("z-index", {})
+            fill_positions = zs.get("fill-position", {})
+            casing_linecaps = zs.get("casing-linecap", {})
+            curr = (
+                z_indexes.get(zoom, 0),
+                fill_positions.get(zoom, "foreground"),
+                casing_linecaps.get(zoom, "butt"),
+            )
+            if prev != curr:
+                break_zs.append(zoom)
+                prev = curr
+        break_zs.append(24)
+        for (minzoom, maxzoom) in list(zip(break_zs, break_zs[1:])):
+            st = {}
+            for (prop_name, prop_value_by_zoom) in zs.items():
+                t = {
+                    z: v
+                    for z, v in prop_value_by_zoom.items()
+                    if z >= minzoom and z < maxzoom
+                }
+                if len(t) > 0:
+                    st[prop_name] = t
+
+            if "z-index" in zs:
+                st["z-index"] = zs["z-index"].get(minzoom, 0)
+            if "fill-position" in zs:
+                st["fill-position"] = zs["fill-position"].get(
+                    minzoom, "foreground"
                 )
-                if prev != curr:
-                    break_zs.append(zoom)
-                    prev = curr
-            break_zs.append(24)
-            for (minzoom, maxzoom) in list(zip(break_zs, break_zs[1:])):
-                st = {}
-                for (prop_name, prop_value_by_zoom) in zs[key].items():
-                    t = {
-                        z: v
-                        for z, v in prop_value_by_zoom.items()
-                        if z >= minzoom and z < maxzoom
-                    }
-                    if len(t) > 0:
-                        st[prop_name] = t
+            if "casing-linecap" in zs:
+                st["casing-linecap"] = zs["casing-linecap"].get(
+                    minzoom, "butt"
+                )
 
-                if "z-index" in zs[key]:
-                    st["z-index"] = zs[key]["z-index"].get(minzoom, 0)
-                if "fill-position" in zs[key]:
-                    st["fill-position"] = zs[key]["fill-position"].get(
-                        minzoom, "foreground"
-                    )
-                if "casing-linecap" in zs[key]:
-                    st["casing-linecap"] = zs[key]["casing-linecap"].get(
-                        minzoom, "butt"
-                    )
-
-                zzs.append((minzoom, maxzoom, st))
+            zzs.append((minzoom, maxzoom, st))
 
         for (minzoom, maxzoom, st) in zzs:
-            if st.get("casing-width") and st.get("casing-color"):
+            if st.get("casing-width") and any(v > 0 for v in st.get("casing-width").values()):
                 mapbox_style_layer = {
                     "type": "line",
                     "minzoom": minzoom,
@@ -261,7 +250,7 @@ def komap_mapbox(style, options):
 
                 mapbox_style_layer_id += 1
                 mapbox_style_layers.append(mapbox_style_layer)
-            if "width" in st and "color" in st:
+            if st.get("width") and any(v > 0 for v in st.get("width").values()) and st.get("color"):
                 mapbox_style_layer = {
                     "priority": min((int(st.get("z-index", 0)) + 1000), 20000),
                     "type": "line",
@@ -308,7 +297,7 @@ def komap_mapbox(style, options):
 
                 mapbox_style_layer_id += 1
                 mapbox_style_layers.append(mapbox_style_layer)
-            if "fill-color" in st:
+            if "fill-color" in st and any(v is not None for v in st.get("fill-color").values()):
                 # if False:
                 mapbox_style_layer = {
                     "type": "fill",
@@ -349,6 +338,7 @@ def komap_mapbox(style, options):
                 mapbox_style_layer_id += 1
                 mapbox_style_layers.append(mapbox_style_layer)
             if st.get("text"):
+            # if "text" in st and any(len(v) > 0 for v in st.get("text").values()):
                 mapbox_style_layer = {
                     "type": "symbol",
                     "minzoom": minzoom,
@@ -458,8 +448,8 @@ if __name__ == "__main__":
     parser = OptionParser()
     parser.add_option("--stylesheet", "--stylesheet", dest="filename")
     parser.add_option("--tiles-url", "--tiles-url", dest="tiles_url")
-    parser.add_option("--glyphs-url", "--glyphs-url", dest="glyphs_url")
     parser.add_option("--max-zoom", "--max-zoom", dest="max_zoom")
+    parser.add_option("--glyphs-url", "--glyphs-url", dest="glyphs_url")
 
     (options, args) = parser.parse_args()
 
