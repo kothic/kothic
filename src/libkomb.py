@@ -208,9 +208,8 @@ def komap_mapbox(style, options):
                     "source": "composite",
                 }
 
-                mapbox_style_layer["minzoom"] = [
-                    z for z, v in sorted(st.get("casing-width").items(), key=lambda k: k[0]) if v > 0
-                ][0]
+                mapbox_style_layer["minzoom"] = sorted(st.get("casing-width").items(), key=lambda k: k[0])[0][0]
+
                 mapbox_style_layer["paint"]["line-width"] = to_mapbox_expression(
                     {
                         z: v * 2 + st.get("width", {}).get(z, 0)
@@ -264,9 +263,7 @@ def komap_mapbox(style, options):
                     "source": "composite",
                 }
 
-                mapbox_style_layer["minzoom"] = [
-                    z for z, v in sorted(st.get("width").items(), key=lambda k: k[0])if v > 0
-                ][0]
+                mapbox_style_layer["minzoom"] = sorted(st.get("width").items(), key=lambda k: k[0])[0][0]
 
                 mapbox_style_layer["paint"]["line-width"] = to_mapbox_expression(
                     st.get("width")
@@ -310,6 +307,8 @@ def komap_mapbox(style, options):
                     "source-layer": subject,
                     "source": "composite",
                 }
+
+                mapbox_style_layer["minzoom"] = sorted(st.get("fill-color").items(), key=lambda k: k[0])[0][0]
 
                 if st.get("fill-position", "foreground") == "background":
                     if "z-index" not in st:
@@ -358,9 +357,7 @@ def komap_mapbox(style, options):
                         ["==", ["geometry-type"], "Point"]
                     ]
 
-                mapbox_style_layer["minzoom"] = [
-                    z for z, v in sorted(st.get("text").items(), key=lambda k: k[0]) if v > 0
-                ][0]
+                mapbox_style_layer["minzoom"] = sorted(st.get("text").items(), key=lambda k: k[0])[0][0]
 
                 mapbox_style_layer["layout"]["text-field"] = to_mapbox_expression(
                     {z: ["get", v] for z, v in st.get("text").items()}
