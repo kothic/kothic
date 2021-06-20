@@ -209,7 +209,7 @@ def komap_mapbox(style, options):
                 }
 
                 mapbox_style_layer["minzoom"] = [
-                    z for z, v in st.get("casing-width").items() if v > 0
+                    z for z, v in sorted(st.get("casing-width").items(), key=lambda k: k[0]) if v > 0
                 ][0]
                 mapbox_style_layer["paint"]["line-width"] = to_mapbox_expression(
                     {
@@ -265,7 +265,7 @@ def komap_mapbox(style, options):
                 }
 
                 mapbox_style_layer["minzoom"] = [
-                    z for z, v in st.get("width").items() if v > 0
+                    z for z, v in sorted(st.get("width").items(), key=lambda k: k[0])if v > 0
                 ][0]
 
                 mapbox_style_layer["paint"]["line-width"] = to_mapbox_expression(
@@ -359,7 +359,7 @@ def komap_mapbox(style, options):
                     ]
 
                 mapbox_style_layer["minzoom"] = [
-                    z for z, v in st.get("text").items() if v > 0
+                    z for z, v in sorted(st.get("text").items(), key=lambda k: k[0]) if v > 0
                 ][0]
 
                 mapbox_style_layer["layout"]["text-field"] = to_mapbox_expression(
