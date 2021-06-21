@@ -344,7 +344,9 @@ def komap_mapbox(style, options):
                     "maxzoom": maxzoom,
                     "filter": mapbox_style_layer_filter,
                     "layout": {
-                        "text-font": ["Roboto"]
+                        "text-font": ["Roboto"],
+                        # TODO: remove organicmaps specific thing
+                        "symbol-sort-key": ["-", ["to-number", ["get", "population"]]]
                     },
                     "paint": {},
                     "id": str(mapbox_style_layer_id),
