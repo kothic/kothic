@@ -63,6 +63,18 @@ def to_mapbox_expression(values_by_zoom):
 
 mapbox_linecaps = {"none": "butt", "butt": "butt", "round": "round", "square": "square"}
 
+def build_kepler_hints(conditions):
+    hints = []
+    for condition in conditions:
+        if condition.params[0] == "boundary":
+            hints.append("border")
+        if condition.params[0] == "highway":
+            hints.append("road")
+        if condition.params[0] == "place":
+            hints.append("label")
+    
+    return hints
+
 def komap_mapbox(style, options):
     l = []
     for chooser in style.choosers:
