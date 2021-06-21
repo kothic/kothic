@@ -204,7 +204,8 @@ def komap_mapbox(style, options):
                     "layout": {},
                     "paint": {},
                     # "id": str(mapbox_style_layer_id) + "-casing",
-                    "id": "+".join([str(c) for c in conditions]) + "casing" + str(mapbox_style_layer_id),
+                    # "id": "+".join([str(c) for c in conditions]) + "casing" + str(mapbox_style_layer_id),
+                    "id": "+".join(build_kepler_hints(conditions)) + "casing" + str(mapbox_style_layer_id),
                     "source-layer": subject,
                     "source": "composite",
                 }
@@ -260,7 +261,8 @@ def komap_mapbox(style, options):
                     "layout": {},
                     "paint": {},
                     # "id": str(mapbox_style_layer_id),
-                    "id": "+".join([str(c) for c in conditions]) + "line" + str(mapbox_style_layer_id),
+                    # "id": "+".join([str(c) for c in conditions]) + "line" + str(mapbox_style_layer_id),
+                    "id": "+".join(build_kepler_hints(conditions)) + str(mapbox_style_layer_id),
                     "source-layer": subject,
                     "source": "composite",
                 }
@@ -306,7 +308,8 @@ def komap_mapbox(style, options):
                     "layout": {},
                     "paint": {},
                     # "id": str(mapbox_style_layer_id),
-                    "id": "+".join([str(c) for c in conditions]) + "fill" + str(mapbox_style_layer_id),
+                    # "id": "+".join([str(c) for c in conditions]) + "fill" + str(mapbox_style_layer_id),
+                    "id": "+".join(build_kepler_hints(conditions)) + str(mapbox_style_layer_id),
                     "source-layer": subject,
                     "source": "composite",
                 }
@@ -353,7 +356,8 @@ def komap_mapbox(style, options):
                     },
                     "paint": {},
                     # "id": str(mapbox_style_layer_id),
-                    "id": "+".join([str(c) for c in conditions]) + "text" + str(mapbox_style_layer_id),
+                    # "id": "+".join([str(c) for c in conditions]) + "text" + str(mapbox_style_layer_id),
+                    "id": "+".join(build_kepler_hints(conditions)) + str(mapbox_style_layer_id),
                     "source-layer": subject,
                     "source": "composite",
                 }
