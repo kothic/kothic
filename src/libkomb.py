@@ -150,17 +150,6 @@ def komap_mapbox(style, options):
         for zoom in range(0, 24):
             zstyle = style.get_style_dict_2(subject, conditions, zoom)
 
-            if 'text' in zstyle:
-                tags = {}
-                tags["name"] = "name"
-                tags["addr:housenumber"] = "addr:housenumber"
-                tags["addr:housename"] = "addr:housename"
-                tags["ref"] = "ref"
-                tags["int_name"] = "int_name"
-                tags["addr:flats"] = "addr:flats"
-
-                zstyle["text"] = zstyle["text"].compute(tags, {})
-
             for (prop_name, prop_value) in zstyle.items():
                 if prop_name not in zs:
                     zs[prop_name] = {}
@@ -382,7 +371,7 @@ def komap_mapbox(style, options):
                 mapbox_style_layer["minzoom"] = sorted(st.get("text").items(), key=lambda k: k[0])[0][0]
 
                 mapbox_style_layer["layout"]["text-field"] = to_mapbox_expression(
-                    {z: ["get", v] for z, v in st.get("text").items()}
+                    {z: v.to_mapbox_expression() for z, v in st.get("text").items()}
                 )
 
                 # if st.get("text-position") == "line":

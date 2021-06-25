@@ -81,7 +81,7 @@ class Rule():
 
     def get_interesting_tags(self, obj, zoom):
         if obj:
-            if (self.subject != '') and not _test_feature_compatibility(obj, self.subject, {}):
+            if (self.subject != '') and not _test_feature_compatibility(obj, self.subject):
                 return set()
 
         if zoom and not self.test_zoom(zoom):
@@ -101,7 +101,7 @@ class Rule():
 
     def get_sql_hints(self, obj, zoom):
         if obj:
-            if (self.subject != '') and not _test_feature_compatibility(obj, self.subject, {":area": "yes"}):
+            if (self.subject != '') and not _test_feature_compatibility(obj, self.subject):
                 return set()
         if not self.test_zoom(zoom):
             return set()
