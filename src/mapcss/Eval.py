@@ -42,7 +42,7 @@ class Eval():
             return ["get", x]
 
         return eval(self.expr, {}, {
-                "coalesce": to_mapbox_coalesce,
+                "any": to_mapbox_coalesce,
                 "tag": to_mapbox_get
                 })
 
@@ -62,7 +62,6 @@ class Eval():
         # print self.expr_text
 
         a = eval(self.expr, {}, {
-                 "coalesce": fake_compute,
                  "tag": lambda x: max([tags.add(x), " "]),
                  "prop": lambda x: 0,
                  "num": lambda x: 0,
