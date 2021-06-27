@@ -219,15 +219,13 @@ if __name__ == "__main__":
             """create or replace function public.basemap_z%s(x integer, y integer)
         returns bytea
         as $$
-        begin
-            return (
-                (select ST_AsMVT(tile, 'area', 4096, 'way') from (%s) as tile) ||
-                (select ST_AsMVT(tile, 'line', 4096, 'way') from (%s) as tile) ||
-                (select ST_AsMVT(tile, 'node', 4096, 'way') from (%s) as tile)
-            );
-        end
+        select (
+            (select coalesce(ST_AsMVT(tile, 'area', 4096, 'way'), '') from (%s) as tile) ||
+            (select coalesce(ST_AsMVT(tile, 'line', 4096, 'way'), '') from (%s) as tile) ||
+            (select coalesce(ST_AsMVT(tile, 'node', 4096, 'way'), '') from (%s) as tile)
+        )
         $$
-        language plpgsql immutable strict parallel safe;
+        language sql immutable strict parallel safe;
         """
             % (
                 minzoom,
