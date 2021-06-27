@@ -17,7 +17,7 @@ def pixel_size_at_zoom(z, l=1):
     return int(math.ceil(l * 20037508.342789244 / 512 * 2 / (2 ** z)))
 
 
-def get_vectors(minzoom, maxzoom, x, y, style, vec, locale="en"):
+def get_vectors(minzoom, maxzoom, x, y, style, vec):
     geomcolumn = "way"
 
     pxtolerance = 0.5
@@ -51,8 +51,8 @@ def get_vectors(minzoom, maxzoom, x, y, style, vec, locale="en"):
                     add = "(" + add + ")"
                     adp.append(add)
 
-    if "name" in column_map and locale == "en":
-        column_map["name"] = """COALESCE(
+    if "name:en" in column_map:
+        column_map["name:en"] = """coalesce(
         tags->'name:en',
         tags->'int_name',
         replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace
@@ -189,7 +189,6 @@ def get_vectors(minzoom, maxzoom, x, y, style, vec, locale="en"):
 if __name__ == "__main__":
     parser = OptionParser()
     parser.add_option("-s", "--stylesheet", dest="filename", action="append")
-    parser.add_option("-l", "--locale", dest="locale")
 
     (options, args) = parser.parse_args()
 
@@ -229,9 +228,9 @@ if __name__ == "__main__":
         """
             % (
                 minzoom,
-                get_vectors(minzoom, maxzoom, "x", "y", style, "polygon", locale=options.locale),
-                get_vectors(minzoom, maxzoom, "x", "y", style, "line", locale=options.locale),
-                get_vectors(minzoom, maxzoom, "x", "y", style, "point", locale=options.locale),
+                get_vectors(minzoom, maxzoom, "x", "y", style, "polygon"),
+                get_vectors(minzoom, maxzoom, "x", "y", style, "line"),
+                get_vectors(minzoom, maxzoom, "x", "y", style, "point"),
             )
         )
 
