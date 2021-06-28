@@ -1,14 +1,31 @@
 # -*- coding: utf-8 -*-
-import json
 from mapcss import MapCSS
-import os
 import sys
 import math
 from optparse import OptionParser
+from mapcss import _test_feature_compatibility
 
 reload(sys)
 sys.setdefaultencoding("utf-8")  # a hack to support UTF-8
 
+mapped_cols = {}
+osm2pgsql_avail_keys = {}
+
+def escape_sql_column(name, type, asname=False):
+    if name in mapped_cols:
+        if asname:
+            return mapped_cols[name] + ' as "%s"' % name
+        else:
+            return mapped_cols[name]
+
+    name = name.strip().strip('"')
+    type = {'line': 'way', 'area': 'way'}.get(type, type)
+    if type in osm2pgsql_avail_keys.get(name, ()) or not osm2pgsql_avail_keys:
+        return '"' + name + '"'
+    elif not asname:
+        return "(tags->'" + name + "')"
+    else:
+        return "(tags->'" + name + "') as \"" + name + '"'
 
 def pixel_size_at_zoom(z, l=1):
     """
@@ -16,6 +33,82 @@ def pixel_size_at_zoom(z, l=1):
     """
     return int(math.ceil(l * 20037508.342789244 / 512 * 2 / (2 ** z)))
 
+def get_sql(condition, obj):
+    # params = [re.escape(x) for x in self.params]
+    params = condition.params
+    t = condition.type
+    if t == 'eq':   # don't compare tags against sublayers
+        if params[0][:2] == "::":
+            return ("", "")
+    try:
+        column_name = escape_sql_column(params[0], type=obj)
+
+        if t == 'eq':
+            return params[0], '%s = \'%s\'' % (column_name, params[1])
+        if t == 'ne':
+            return params[0], '(%s != \'%s\' or %s IS NULL)' % (column_name, params[1], column_name)
+        if t == 'regex':
+            return params[0], '%s ~ \'%s\'' % (column_name, params[1].replace("'", "\\'"))
+        if t == 'true':
+            return params[0], '%s = \'yes\'' % (column_name)
+        if t == 'untrue':
+            return params[0], '%s = \'no\'' % (column_name)
+        if t == 'set':
+            return params[0], '%s IS NOT NULL' % (column_name)
+        if t == 'unset':
+            return params[0], '%s IS NULL' % (column_name)
+
+        if t == '<':
+            return params[0], """(CASE WHEN %s  ~  E'^[-]?[[:digit:]]+([.][[:digit:]]+)?$' THEN CAST (%s AS FLOAT) &lt; %s ELSE false END) """ % (column_name, column_name, params[1])
+        if t == '<=':
+            return params[0], """(CASE WHEN %s  ~  E'^[-]?[[:digit:]]+([.][[:digit:]]+)?$' THEN CAST (%s AS FLOAT) &lt;= %s ELSE false END)""" % (column_name, column_name, params[1])
+        if t == '>':
+            return params[0], """(CASE WHEN %s  ~  E'^[-]?[[:digit:]]+([.][[:digit:]]+)?$' THEN CAST (%s AS FLOAT) > %s ELSE false END) """ % (column_name, column_name, params[1])
+        if t == '>=':
+            return params[0], """(CASE WHEN %s  ~  E'^[-]?[[:digit:]]+([.][[:digit:]]+)?$' THEN CAST (%s AS FLOAT) >= %s ELSE false END) """ % (column_name, column_name, params[1])
+    except KeyError:
+        pass
+
+def get_sql_hints(choosers, obj, zoom):
+    needed = set([
+        "width",
+        "fill-color",
+        "fill-image",
+        "icon-image",
+        "text",
+        "extrude",
+        "background-image",
+        "background-color",
+        "pattern-image",
+        "shield-text"
+    ])
+
+    hints = []
+    for chooser in choosers:
+        tags = set()
+        qs = []
+        if not needed.isdisjoint(set(chooser.styles[0].keys())):
+            for rule in chooser.ruleChains:
+                if obj:
+                    if (rule.subject != '') and not _test_feature_compatibility(obj, rule.subject):
+                        continue
+                if not rule.test_zoom(zoom):
+                    continue
+                b = set()
+                for condition in rule.conditions:
+                    q = get_sql(condition, obj)
+                    if q:
+                        if q[1]:
+                            tags.add(q[0])
+                            b.add(q[1])
+
+                if b:
+                    qs.append("(" + " AND ".join(b) + ")")
+
+        if qs:
+            hints.append((tags, " OR ".join(qs)))
+    
+    return hints
 
 def get_vectors(minzoom, maxzoom, x, y, style, vec):
     geomcolumn = "way"
@@ -29,30 +122,29 @@ def get_vectors(minzoom, maxzoom, x, y, style, vec):
 
     types = {"line": "line", "polygon": "area", "point": "node"}
 
-    column_map = dict()
+    column_names = set()
     adp = ""
 
-    if "get_sql_hints" in dir(style):
-        adp = []
+    adp = []
 
-        for zoom in range(minzoom, maxzoom):
-            column_map.update({ tag: "tags->'" + tag + "'" for tag in style.get_interesting_tags(types[vec], zoom) })
+    for zoom in range(minzoom, maxzoom):
+        column_names.update(style.get_interesting_tags(types[vec], zoom))
 
-            sql_hint = style.get_sql_hints(types[vec], zoom)
-            for tp in sql_hint:
-                add = []
-                for j in tp[0]:
-                    if j not in column_map:
-                        break
-                else:
-                    add.append(tp[1])
-                if add:
-                    add = " OR ".join(add)
-                    add = "(" + add + ")"
-                    adp.append(add)
+        sql_hint = get_sql_hints(style.choosers, types[vec], zoom)
+        for tp in sql_hint:
+            add = []
+            for j in tp[0]:
+                if j not in column_names:
+                    break
+            else:
+                add.append(tp[1])
+            if add:
+                add = " OR ".join(add)
+                add = "(" + add + ")"
+                adp.append(add)
 
-    if "name:en" in column_map:
-        column_map["name:en"] = """coalesce(
+    if "name:en" in column_names:
+        mapped_cols["name:en"] = """coalesce(
         tags->'name:en',
         tags->'int_name',
         replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace
@@ -75,8 +167,8 @@ def get_vectors(minzoom, maxzoom, x, y, style, vec):
         adp = adp.replace("&lt;", "<")
         adp = adp.replace("&gt;", ">")
 
-    select = ",".join(["%s as \"%s\"" % (value, name) for name, value in column_map.items()])
-    groupby = ",".join(['"%s"' % key for key in column_map.keys()])
+    select = ",".join([escape_sql_column(name, type=types[vec], asname=True) for name in column_names])
+    groupby = ",".join(['"%s"' % name for name in column_names])
 
     if vec == "polygon":
         query = """select ST_AsMVTGeom(w.way, ST_TileEnvelope(%s, %s, %s), 4096, 64, true) as %s, %s from
@@ -130,7 +222,7 @@ def get_vectors(minzoom, maxzoom, x, y, style, vec):
             minzoom,
             x,
             y,
-            ",".join([(("'coastline'" if tag == 'natural' else 'null') + ' as "' + tag + '"') for tag in column_map]),
+            ",".join([(("'coastline'" if name == 'natural' else 'null') + ' as "' + name + '"') for name in column_names]),
             pixel_size_at_zoom(maxzoom, pxtolerance),
             pixel_size_at_zoom(maxzoom, pxtolerance),
             minzoom,
@@ -163,7 +255,7 @@ def get_vectors(minzoom, maxzoom, x, y, style, vec):
             minzoom,
             x,
             y,
-            ",".join([v for v in column_map.values()]),
+            ",".join([escape_sql_column(name, type=types[vec], asname=False) for name in column_names]),
         )
     elif vec == "point":
         query = """select ST_AsMVTGeom(way, ST_TileEnvelope(%s, %s, %s), 4096, 64, true) as %s, %s
@@ -189,12 +281,24 @@ def get_vectors(minzoom, maxzoom, x, y, style, vec):
 if __name__ == "__main__":
     parser = OptionParser()
     parser.add_option("-s", "--stylesheet", dest="filename", action="append")
+    parser.add_option("-p", "--osm2pgsql-style", dest="osm2pgsqlstyle", default="-",
+                  help="osm2pgsql stylesheet filename", metavar="FILE")
 
     (options, args) = parser.parse_args()
 
     style = MapCSS(0, 30)
     for style_filename in options.filename:
         style.parse(filename=style_filename)
+    
+    if options.osm2pgsqlstyle != "-":
+        mf = open(options.osm2pgsqlstyle, "r")
+        for line in mf:
+            line = line.strip()
+            if line and line[0] != "#" and not ("nocolumn" in line):
+                line = line.split()
+                osm2pgsql_avail_keys[line[1]] = tuple(line[0].split(","))
+        osm2pgsql_avail_keys["tags"] = ("node", "way")
+    
 
     zooms = [
         (1, 2),

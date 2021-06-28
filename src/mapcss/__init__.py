@@ -25,6 +25,7 @@ from copy import copy, deepcopy
 
 from StyleChooser import StyleChooser
 from Condition import Condition
+from Rule import _test_feature_compatibility
 
 
 NEEDED_KEYS = set(["width", "casing-width", "fill-color", "fill-image", "icon-image", "text", "extrude", "background-image", "background-color", "pattern-image", "shield-text", "symbol-shape"])
