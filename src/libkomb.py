@@ -145,6 +145,7 @@ def komap_mapbox(style, options):
         "metadata": {},
         "sources": {
             "composite": {
+                "attribution": options.attribution_text,
                 "tiles": [
                     options.tiles_url
                 ],
@@ -490,6 +491,7 @@ if __name__ == "__main__":
     parser.add_option("--tiles-url", "--tiles-url", dest="tiles_url")
     parser.add_option("--max-zoom", "--max-zoom", dest="max_zoom")
     parser.add_option("--glyphs-url", "--glyphs-url", dest="glyphs_url")
+    parser.add_option("--attribution-text", "--attribution-text", dest="attribution_text")
 
     (options, args) = parser.parse_args()
 
