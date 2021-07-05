@@ -1,4 +1,7 @@
-from mapcss import MapCSS, Condition
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+from mapcss import MapCSS, Condition, _test_feature_compatibility
 import json
 import sys
 import mapcss.webcolors
@@ -75,6 +78,35 @@ def build_kepler_hints(conditions):
     
     return hints
 
+def test(rule, obj, conditions, zoom):
+    if (zoom < rule.minZoom) or (zoom > rule.maxZoom):
+        return False
+
+    if (rule.subject != '') and not _test_feature_compatibility(obj, rule.subject):
+        return False
+
+    self_conditions = rule.conditions
+    if len([c for c in self_conditions if c.type == 'eq' and c.params[0] == '::class']) == 0:
+        self_conditions.append(Condition('eq', ('::class', '::default')))
+    
+    return set(self_conditions).issubset(set(conditions))
+
+def get_style(mapcss, ftype, conditions, zoom):
+    style = {}
+    if ftype in mapcss.choosers_by_type:
+        for chooser in mapcss.choosers_by_type[ftype]:
+            if chooser.selzooms:
+                if zoom < chooser.selzooms[0] or zoom > chooser.selzooms[1]:
+                    continue
+
+            if not any(test(r, ftype, conditions, zoom) for r in chooser.ruleChains):
+                continue
+
+            for r in chooser.styles:
+                style.update(r)
+
+    return style
+
 def komap_mapbox(style, options):
     l = []
     for chooser in style.choosers:
@@ -148,7 +180,7 @@ def komap_mapbox(style, options):
 
         zs = {}
         for zoom in range(0, 24):
-            zstyle = style.get_style_dict_2(subject, conditions, zoom)
+            zstyle = get_style(style, subject, conditions, zoom)
 
             for (prop_name, prop_value) in zstyle.items():
                 if prop_name not in zs:
