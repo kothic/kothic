@@ -232,8 +232,6 @@ def komap_mapbox(style, options):
             if st.get("casing-width") and any(v > 0 for v in st.get("casing-width").values()):
                 mapbox_style_layer = {
                     "type": "line",
-                    "minzoom": minzoom,
-                    "maxzoom": maxzoom,
                     "filter": mapbox_style_layer_filter,
                     "layout": {},
                     "paint": {},
@@ -245,6 +243,7 @@ def komap_mapbox(style, options):
                 }
 
                 mapbox_style_layer["minzoom"] = sorted(st.get("casing-width").items(), key=lambda k: k[0])[0][0]
+                mapbox_style_layer["maxzoom"] = sorted(st.get("casing-width").items(), key=lambda k: k[0])[-1][0] + 1
 
                 mapbox_style_layer["paint"]["line-width"] = to_mapbox_expression(
                     {
@@ -289,8 +288,6 @@ def komap_mapbox(style, options):
                 mapbox_style_layer = {
                     "priority": min((int(st.get("z-index", 0)) + 1000), 20000),
                     "type": "line",
-                    "minzoom": minzoom,
-                    "maxzoom": maxzoom,
                     "filter": mapbox_style_layer_filter,
                     "layout": {},
                     "paint": {},
@@ -302,6 +299,7 @@ def komap_mapbox(style, options):
                 }
 
                 mapbox_style_layer["minzoom"] = sorted(st.get("width").items(), key=lambda k: k[0])[0][0]
+                mapbox_style_layer["maxzoom"] = sorted(st.get("width").items(), key=lambda k: k[0])[-1][0] + 1
 
                 mapbox_style_layer["paint"]["line-width"] = to_mapbox_expression(
                     st.get("width")
@@ -336,8 +334,6 @@ def komap_mapbox(style, options):
                 # if False:
                 mapbox_style_layer = {
                     "type": "fill",
-                    "minzoom": minzoom,
-                    "maxzoom": maxzoom,
                     "filter": mapbox_style_layer_filter,
                     "layout": {},
                     "paint": {},
@@ -349,6 +345,7 @@ def komap_mapbox(style, options):
                 }
 
                 mapbox_style_layer["minzoom"] = sorted(st.get("fill-color").items(), key=lambda k: k[0])[0][0]
+                mapbox_style_layer["maxzoom"] = sorted(st.get("fill-color").items(), key=lambda k: k[0])[-1][0] + 1
 
                 if st.get("fill-position", "foreground") == "background":
                     if "z-index" not in st:
@@ -380,8 +377,6 @@ def komap_mapbox(style, options):
             # if "text" in st and any(len(v) > 0 for v in st.get("text").values()):
                 mapbox_style_layer = {
                     "type": "symbol",
-                    "minzoom": minzoom,
-                    "maxzoom": maxzoom,
                     "filter": mapbox_style_layer_filter,
                     "layout": {
                         "text-font": ["Roboto"],
@@ -402,6 +397,7 @@ def komap_mapbox(style, options):
                     ]
 
                 mapbox_style_layer["minzoom"] = sorted(st.get("text").items(), key=lambda k: k[0])[0][0]
+                mapbox_style_layer["maxzoom"] = sorted(st.get("text").items(), key=lambda k: k[0])[-1][0] + 1
 
                 mapbox_style_layer["layout"]["text-field"] = to_mapbox_expression(
                     {z: v.to_mapbox_expression() for z, v in st.get("text").items()}
