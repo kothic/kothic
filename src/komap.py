@@ -54,7 +54,7 @@ parser = OptionParser()
 parser.add_option("-r", "--renderer", dest="renderer", default="mapnik",
                   help="which renderer stylesheet to generate", metavar="ENGINE")
 parser.add_option("-s", "--stylesheet", dest="filename",
-                  help="read MapCSS stylesheet from FILE", metavar="FILE")
+                  help="read MapCSS stylesheet from FILE", metavar="FILE", action="append")
 parser.add_option("-f", "--minzoom", dest="minzoom", default=0, type="int",
                   help="minimal available zoom level", metavar="ZOOM")
 parser.add_option("-t", "--maxzoom", dest="maxzoom", default=19, type="int",
@@ -71,6 +71,10 @@ parser.add_option("-T", "--text-scale", dest="textscale", default=1, type="float
                   help="text size scale", metavar="SCALE")
 parser.add_option("-c", "--config", dest="conffile", default="komap.conf",
                   help="config file name", metavar="FILE")
+parser.add_option("-u", "--tiles-url", dest="tiles_url")
+parser.add_option("-M", "--tiles-max-zoom", dest="tiles_maxzoom", type="int")
+parser.add_option("-g", "--glyphs-url", dest="glyphs_url")
+parser.add_option("-a", "--attribution-text", dest="attribution_text")
 
 (options, args) = parser.parse_args()
 
@@ -91,7 +95,18 @@ def escape_sql_column(name, type="way", asname=False):
         return "(tags->'" + name + "') as \"" + name + '"'
 
 style = MapCSS(options.minzoom, options.maxzoom + 1)  # zoom levels
-style.parse(filename = options.filename)
+for style_filename in options.filename:
+    style.parse(filename=style_filename)
+
+if options.renderer == "mapbox-style-language":
+    from libkomb import *
+    komap_mapbox(options, style)
+    exit()
+
+if options.renderer == "mvt-sql":
+    from mvt_sql import *
+    komap_mvt_sql(options, style)
+    exit()
 
 if options.renderer == "mapswithme":
     from libkomwm import *
