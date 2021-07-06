@@ -64,17 +64,17 @@ def to_mapbox_expression(values_by_zoom):
 
 mapbox_linecaps = {"none": "butt", "butt": "butt", "round": "round", "square": "square"}
 
-def build_kepler_hints(conditions):
-    hints = []
+def build_kepler_hints(conditions, style):
+    hints = set()
     for condition in conditions:
         if condition.params[0] == "boundary":
-            hints.append("border")
+            hints.add("border")
         if condition.params[0] == "highway":
-            hints.append("road")
-        if condition.params[0] == "place":
-            hints.append("label")
+            hints.add("road")
+        if "text" in style:
+            hints.add("label")
     
-    return hints
+    return list(hints)
 
 def test(rule, obj, conditions, zoom):
     if (zoom < rule.minZoom) or (zoom > rule.maxZoom):
@@ -233,7 +233,7 @@ def komap_mapbox(options, style):
                     "filter": mapbox_style_layer_filter,
                     "layout": {},
                     "paint": {},
-                    "id": "+".join(build_kepler_hints(conditions)) + "casing" + str(mapbox_style_layer_id),
+                    "id": "+".join(build_kepler_hints(conditions, st)) + "casing" + str(mapbox_style_layer_id),
                     "source-layer": subject,
                     "source": "composite",
                 }
@@ -287,7 +287,7 @@ def komap_mapbox(options, style):
                     "filter": mapbox_style_layer_filter,
                     "layout": {},
                     "paint": {},
-                    "id": "+".join(build_kepler_hints(conditions)) + str(mapbox_style_layer_id),
+                    "id": "+".join(build_kepler_hints(conditions, st)) + str(mapbox_style_layer_id),
                     "source-layer": subject,
                     "source": "composite",
                 }
@@ -330,7 +330,7 @@ def komap_mapbox(options, style):
                     "filter": mapbox_style_layer_filter,
                     "layout": {},
                     "paint": {},
-                    "id": "+".join(build_kepler_hints(conditions)) + str(mapbox_style_layer_id),
+                    "id": "+".join(build_kepler_hints(conditions, st)) + str(mapbox_style_layer_id),
                     "source-layer": subject,
                     "source": "composite",
                 }
@@ -373,7 +373,7 @@ def komap_mapbox(options, style):
                         "symbol-sort-key": ["-", ["to-number", ["get", "population"]]]
                     },
                     "paint": {},
-                    "id": "+".join(build_kepler_hints(conditions)) + str(mapbox_style_layer_id),
+                    "id": "+".join(build_kepler_hints(conditions, st)) + str(mapbox_style_layer_id),
                     "source-layer": subject,
                     "source": "composite",
                 }
