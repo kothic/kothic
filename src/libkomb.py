@@ -1,11 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from mapcss import MapCSS, Condition, _test_feature_compatibility
+from mapcss import Condition, _test_feature_compatibility
 import json
-import sys
 import mapcss.webcolors
-from optparse import OptionParser
 
 whatever_to_hex = mapcss.webcolors.webcolors.whatever_to_hex
 
@@ -88,7 +86,7 @@ def test(rule, obj, conditions, zoom):
     self_conditions = rule.conditions
     if len([c for c in self_conditions if c.type == 'eq' and c.params[0] == '::class']) == 0:
         self_conditions.append(Condition('eq', ('::class', '::default')))
-    
+
     return set(self_conditions).issubset(set(conditions))
 
 def get_style(mapcss, ftype, conditions, zoom):
@@ -107,7 +105,7 @@ def get_style(mapcss, ftype, conditions, zoom):
 
     return style
 
-def komap_mapbox(style, options):
+def komap_mapbox(options, style):
     l = []
     for chooser in style.choosers:
         for rule in chooser.ruleChains:
@@ -150,7 +148,7 @@ def komap_mapbox(style, options):
                     options.tiles_url
                 ],
                 "type": "vector",
-                "maxzoom": int(options.max_zoom),
+                "maxzoom": options.tiles_maxzoom,
             }
         },
         "glyphs": options.glyphs_url,
@@ -235,8 +233,6 @@ def komap_mapbox(style, options):
                     "filter": mapbox_style_layer_filter,
                     "layout": {},
                     "paint": {},
-                    # "id": str(mapbox_style_layer_id) + "-casing",
-                    # "id": "+".join([str(c) for c in conditions]) + "casing" + str(mapbox_style_layer_id),
                     "id": "+".join(build_kepler_hints(conditions)) + "casing" + str(mapbox_style_layer_id),
                     "source-layer": subject,
                     "source": "composite",
@@ -291,8 +287,6 @@ def komap_mapbox(style, options):
                     "filter": mapbox_style_layer_filter,
                     "layout": {},
                     "paint": {},
-                    # "id": str(mapbox_style_layer_id),
-                    # "id": "+".join([str(c) for c in conditions]) + "line" + str(mapbox_style_layer_id),
                     "id": "+".join(build_kepler_hints(conditions)) + str(mapbox_style_layer_id),
                     "source-layer": subject,
                     "source": "composite",
@@ -331,14 +325,11 @@ def komap_mapbox(style, options):
                 mapbox_style_layer_id += 1
                 mapbox_style_layers.append(mapbox_style_layer)
             if "fill-color" in st and any(v is not None for v in st.get("fill-color").values()):
-                # if False:
                 mapbox_style_layer = {
                     "type": "fill",
                     "filter": mapbox_style_layer_filter,
                     "layout": {},
                     "paint": {},
-                    # "id": str(mapbox_style_layer_id),
-                    # "id": "+".join([str(c) for c in conditions]) + "fill" + str(mapbox_style_layer_id),
                     "id": "+".join(build_kepler_hints(conditions)) + str(mapbox_style_layer_id),
                     "source-layer": subject,
                     "source": "composite",
@@ -374,18 +365,14 @@ def komap_mapbox(style, options):
                 mapbox_style_layer_id += 1
                 mapbox_style_layers.append(mapbox_style_layer)
             if st.get("text"):
-            # if "text" in st and any(len(v) > 0 for v in st.get("text").values()):
                 mapbox_style_layer = {
                     "type": "symbol",
                     "filter": mapbox_style_layer_filter,
                     "layout": {
                         "text-font": ["Roboto"],
-                        # TODO: remove organicmaps specific thing
                         "symbol-sort-key": ["-", ["to-number", ["get", "population"]]]
                     },
                     "paint": {},
-                    # "id": str(mapbox_style_layer_id),
-                    # "id": "+".join([str(c) for c in conditions]) + "text" + str(mapbox_style_layer_id),
                     "id": "+".join(build_kepler_hints(conditions)) + str(mapbox_style_layer_id),
                     "source-layer": subject,
                     "source": "composite",
@@ -402,11 +389,6 @@ def komap_mapbox(style, options):
                 mapbox_style_layer["layout"]["text-field"] = to_mapbox_expression(
                     {z: v.to_mapbox_expression() for z, v in st.get("text").items()}
                 )
-
-                # if st.get("text-position") == "line":
-                # mapbox_style_layer["layout"]["symbol-placement"] = (
-                #     {"line": "line", "center": "line-center"}
-                # )[st.get("text-position")]
 
                 if st.get("text-position"):
                     symbol_placement = {
@@ -477,27 +459,5 @@ def komap_mapbox(style, options):
                 mapbox_style_layers.append(mapbox_style_layer)
 
     mapbox_style["layers"] = sorted(mapbox_style["layers"], key=lambda k: k["priority"])
-
-    return mapbox_style
-
-
-if __name__ == "__main__":
-    parser = OptionParser()
-    parser.add_option("--stylesheet", "--stylesheet", dest="filename")
-    parser.add_option("--tiles-url", "--tiles-url", dest="tiles_url")
-    parser.add_option("--max-zoom", "--max-zoom", dest="max_zoom")
-    parser.add_option("--glyphs-url", "--glyphs-url", dest="glyphs_url")
-    parser.add_option("--attribution-text", "--attribution-text", dest="attribution_text")
-
-    (options, args) = parser.parse_args()
-
-    if options.filename is None or options.tiles_url is None or options.max_zoom is None:
-        sys.stderr.write(">>> required arguments are not passed")
-        exit(1)
-
-    style = MapCSS(0, 30)
-    style.parse(filename=options.filename)
-
-    mapbox_style = komap_mapbox(style, options)
 
     print(json.dumps(mapbox_style))
