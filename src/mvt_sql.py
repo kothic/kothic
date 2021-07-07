@@ -9,6 +9,7 @@ sys.setdefaultencoding("utf-8")  # a hack to support UTF-8
 mapped_cols = {}
 osm2pgsql_avail_keys = {}
 
+
 def escape_sql_column(name, type, asname=False):
     if name in mapped_cols:
         if asname:
@@ -17,7 +18,7 @@ def escape_sql_column(name, type, asname=False):
             return mapped_cols[name]
 
     name = name.strip().strip('"')
-    type = {'line': 'way', 'area': 'way'}.get(type, type)
+    type = {"line": "way", "area": "way"}.get(type, type)
     if type in osm2pgsql_avail_keys.get(name, ()) or not osm2pgsql_avail_keys:
         return '"' + name + '"'
     elif not asname:
@@ -25,61 +26,85 @@ def escape_sql_column(name, type, asname=False):
     else:
         return "(tags->'" + name + "') as \"" + name + '"'
 
+
 def pixel_size_at_zoom(z, l=1):
     """
     Converts l pixels on tiles into length on zoom z
     """
     return int(math.ceil(l * 20037508.342789244 / 512 * 2 / (2 ** z)))
 
+
 def get_sql(condition, obj):
     # params = [re.escape(x) for x in self.params]
     params = condition.params
     t = condition.type
-    if t == 'eq':   # don't compare tags against sublayers
+    if t == "eq":  # don't compare tags against sublayers
         if params[0][:2] == "::":
             return ("", "")
     try:
         column_name = escape_sql_column(params[0], type=obj)
 
-        if t == 'eq':
-            return params[0], '%s = \'%s\'' % (column_name, params[1])
-        if t == 'ne':
-            return params[0], '(%s != \'%s\' or %s IS NULL)' % (column_name, params[1], column_name)
-        if t == 'regex':
-            return params[0], '%s ~ \'%s\'' % (column_name, params[1].replace("'", "\\'"))
-        if t == 'true':
-            return params[0], '%s = \'yes\'' % (column_name)
-        if t == 'untrue':
-            return params[0], '%s = \'no\'' % (column_name)
-        if t == 'set':
-            return params[0], '%s IS NOT NULL' % (column_name)
-        if t == 'unset':
-            return params[0], '%s IS NULL' % (column_name)
+        if t == "eq":
+            return params[0], "%s = '%s'" % (column_name, params[1])
+        if t == "ne":
+            return (
+                params[0],
+                "(%s != '%s' or %s IS NULL)" % (column_name, params[1], column_name),
+            )
+        if t == "regex":
+            return params[0], "%s ~ '%s'" % (column_name, params[1].replace("'", "\\'"))
+        if t == "true":
+            return params[0], "%s = 'yes'" % (column_name)
+        if t == "untrue":
+            return params[0], "%s = 'no'" % (column_name)
+        if t == "set":
+            return params[0], "%s IS NOT NULL" % (column_name)
+        if t == "unset":
+            return params[0], "%s IS NULL" % (column_name)
 
-        if t == '<':
-            return params[0], """(CASE WHEN %s  ~  E'^[-]?[[:digit:]]+([.][[:digit:]]+)?$' THEN CAST (%s AS FLOAT) &lt; %s ELSE false END) """ % (column_name, column_name, params[1])
-        if t == '<=':
-            return params[0], """(CASE WHEN %s  ~  E'^[-]?[[:digit:]]+([.][[:digit:]]+)?$' THEN CAST (%s AS FLOAT) &lt;= %s ELSE false END)""" % (column_name, column_name, params[1])
-        if t == '>':
-            return params[0], """(CASE WHEN %s  ~  E'^[-]?[[:digit:]]+([.][[:digit:]]+)?$' THEN CAST (%s AS FLOAT) > %s ELSE false END) """ % (column_name, column_name, params[1])
-        if t == '>=':
-            return params[0], """(CASE WHEN %s  ~  E'^[-]?[[:digit:]]+([.][[:digit:]]+)?$' THEN CAST (%s AS FLOAT) >= %s ELSE false END) """ % (column_name, column_name, params[1])
+        if t == "<":
+            return (
+                params[0],
+                """(CASE WHEN %s  ~  E'^[-]?[[:digit:]]+([.][[:digit:]]+)?$' THEN CAST (%s AS FLOAT) &lt; %s ELSE false END) """
+                % (column_name, column_name, params[1]),
+            )
+        if t == "<=":
+            return (
+                params[0],
+                """(CASE WHEN %s  ~  E'^[-]?[[:digit:]]+([.][[:digit:]]+)?$' THEN CAST (%s AS FLOAT) &lt;= %s ELSE false END)"""
+                % (column_name, column_name, params[1]),
+            )
+        if t == ">":
+            return (
+                params[0],
+                """(CASE WHEN %s  ~  E'^[-]?[[:digit:]]+([.][[:digit:]]+)?$' THEN CAST (%s AS FLOAT) > %s ELSE false END) """
+                % (column_name, column_name, params[1]),
+            )
+        if t == ">=":
+            return (
+                params[0],
+                """(CASE WHEN %s  ~  E'^[-]?[[:digit:]]+([.][[:digit:]]+)?$' THEN CAST (%s AS FLOAT) >= %s ELSE false END) """
+                % (column_name, column_name, params[1]),
+            )
     except KeyError:
         pass
 
+
 def get_sql_hints(choosers, obj, zoom):
-    needed = set([
-        "width",
-        "fill-color",
-        "fill-image",
-        "icon-image",
-        "text",
-        "extrude",
-        "background-image",
-        "background-color",
-        "pattern-image",
-        "shield-text"
-    ])
+    needed = set(
+        [
+            "width",
+            "fill-color",
+            "fill-image",
+            "icon-image",
+            "text",
+            "extrude",
+            "background-image",
+            "background-color",
+            "pattern-image",
+            "shield-text",
+        ]
+    )
 
     hints = []
     for chooser in choosers:
@@ -88,7 +113,9 @@ def get_sql_hints(choosers, obj, zoom):
         if not needed.isdisjoint(set(chooser.styles[0].keys())):
             for rule in chooser.ruleChains:
                 if obj:
-                    if (rule.subject != '') and not _test_feature_compatibility(obj, rule.subject):
+                    if (rule.subject != "") and not _test_feature_compatibility(
+                        obj, rule.subject
+                    ):
                         continue
                 if not rule.test_zoom(zoom):
                     continue
@@ -105,8 +132,9 @@ def get_sql_hints(choosers, obj, zoom):
 
         if qs:
             hints.append((tags, " OR ".join(qs)))
-    
+
     return hints
+
 
 def get_vectors(minzoom, maxzoom, x, y, style, vec):
     geomcolumn = "way"
@@ -142,7 +170,9 @@ def get_vectors(minzoom, maxzoom, x, y, style, vec):
                 adp.append(add)
 
     if "name:en" in column_names:
-        mapped_cols["name:en"] = """coalesce(
+        mapped_cols[
+            "name:en"
+        ] = """coalesce(
         tags->'name:en',
         tags->'int_name',
         replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace
@@ -165,7 +195,9 @@ def get_vectors(minzoom, maxzoom, x, y, style, vec):
         adp = adp.replace("&lt;", "<")
         adp = adp.replace("&gt;", ">")
 
-    select = ",".join([escape_sql_column(name, type=types[vec], asname=True) for name in column_names])
+    select = ",".join(
+        [escape_sql_column(name, type=types[vec], asname=True) for name in column_names]
+    )
     groupby = ",".join(['"%s"' % name for name in column_names])
 
     if vec == "polygon":
@@ -220,13 +252,23 @@ def get_vectors(minzoom, maxzoom, x, y, style, vec):
             minzoom,
             x,
             y,
-            ",".join([(("'coastline'" if name == 'natural' else 'null') + ' as "' + name + '"') for name in column_names]),
+            ",".join(
+                [
+                    (
+                        ("'coastline'" if name == "natural" else "null")
+                        + ' as "'
+                        + name
+                        + '"'
+                    )
+                    for name in column_names
+                ]
+            ),
             pixel_size_at_zoom(maxzoom, pxtolerance),
             pixel_size_at_zoom(maxzoom, pxtolerance),
             minzoom,
             x,
             y,
-            pixel_size_at_zoom(maxzoom, pxtolerance) ** 2
+            pixel_size_at_zoom(maxzoom, pxtolerance) ** 2,
         )
     elif vec == "line":
         query = """select ST_AsMVTGeom(way, ST_TileEnvelope(%s, %s, %s), 4096, 64, true) as %s, %s from
@@ -253,7 +295,12 @@ def get_vectors(minzoom, maxzoom, x, y, style, vec):
             minzoom,
             x,
             y,
-            ",".join([escape_sql_column(name, type=types[vec], asname=False) for name in column_names]),
+            ",".join(
+                [
+                    escape_sql_column(name, type=types[vec], asname=False)
+                    for name in column_names
+                ]
+            ),
         )
     elif vec == "point":
         query = """select ST_AsMVTGeom(way, ST_TileEnvelope(%s, %s, %s), 4096, 64, true) as %s, %s
@@ -276,10 +323,11 @@ def get_vectors(minzoom, maxzoom, x, y, style, vec):
 
     return query
 
+
 def komap_mvt_sql(options, style):
     for style_filename in options.filename:
         style.parse(filename=style_filename)
-    
+
     if options.osm2pgsqlstyle != "-":
         mf = open(options.osm2pgsqlstyle, "r")
         for line in mf:
@@ -288,7 +336,6 @@ def komap_mvt_sql(options, style):
                 line = line.split()
                 osm2pgsql_avail_keys[line[1]] = tuple(line[0].split(","))
         osm2pgsql_avail_keys["tags"] = ("node", "way")
-    
 
     zooms = [
         (1, 2),
@@ -304,7 +351,7 @@ def komap_mvt_sql(options, style):
         (11, 12),
         (12, 13),
         (13, 14),
-        (14, 30)
+        (14, 30),
     ]
 
     for (minzoom, maxzoom) in zooms:

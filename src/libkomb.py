@@ -7,11 +7,11 @@ import mapcss.webcolors
 
 whatever_to_hex = mapcss.webcolors.webcolors.whatever_to_hex
 
+
 def to_mapbox_condition(condition):
     t = condition.type
     params = condition.params
 
-    # if params[0] == "::class":
     if params[0][:2] == "::":
         return True
 
@@ -64,6 +64,7 @@ def to_mapbox_expression(values_by_zoom):
 
 mapbox_linecaps = {"none": "butt", "butt": "butt", "round": "round", "square": "square"}
 
+
 def build_kepler_hints(conditions, style):
     hints = set()
     for condition in conditions:
@@ -73,21 +74,26 @@ def build_kepler_hints(conditions, style):
             hints.add("road")
         if "text" in style:
             hints.add("label")
-    
+
     return list(hints)
+
 
 def test(rule, obj, conditions, zoom):
     if (zoom < rule.minZoom) or (zoom > rule.maxZoom):
         return False
 
-    if (rule.subject != '') and not _test_feature_compatibility(obj, rule.subject):
+    if (rule.subject != "") and not _test_feature_compatibility(obj, rule.subject):
         return False
 
     self_conditions = rule.conditions
-    if len([c for c in self_conditions if c.type == 'eq' and c.params[0] == '::class']) == 0:
-        self_conditions.append(Condition('eq', ('::class', '::default')))
+    if (
+        len([c for c in self_conditions if c.type == "eq" and c.params[0] == "::class"])
+        == 0
+    ):
+        self_conditions.append(Condition("eq", ("::class", "::default")))
 
     return set(self_conditions).issubset(set(conditions))
+
 
 def get_style(mapcss, ftype, conditions, zoom):
     style = {}
@@ -105,16 +111,18 @@ def get_style(mapcss, ftype, conditions, zoom):
 
     return style
 
+
 def komap_mapbox(options, style):
-    l = []
+    distinct_rules = []
     for chooser in style.choosers:
         for rule in chooser.ruleChains:
-            l.append((rule.subject, rule.conditions))
+            distinct_rules.append((rule.subject, rule.conditions))
 
-    l = [
+    distinct_rules = [
         tuple([subject, list(conditions)])
         for subject, conditions in set(
-            tuple([subject, tuple(conditions)]) for subject, conditions in l
+            tuple([subject, tuple(conditions)])
+            for subject, conditions in distinct_rules
         )
     ]
 
@@ -144,9 +152,7 @@ def komap_mapbox(options, style):
         "sources": {
             "composite": {
                 "attribution": options.attribution_text,
-                "tiles": [
-                    options.tiles_url
-                ],
+                "tiles": [options.tiles_url],
                 "type": "vector",
                 "maxzoom": options.tiles_maxzoom,
             }
@@ -162,7 +168,7 @@ def komap_mapbox(options, style):
 
     bgpos = 0
 
-    for subject, conditions in l:
+    for subject, conditions in distinct_rules:
         """
             TODO:
             if subject == "" then everything
@@ -172,10 +178,17 @@ def komap_mapbox(options, style):
             continue
 
         mapbox_style_layer_filter = ["all"] + map(to_mapbox_condition, conditions)
-        conditions += [Condition('set', (c.params[0],)) for c in conditions if c.type in ('eq', 'true' '<', '<=', '>', '>=')]
+        conditions += [
+            Condition("set", (c.params[0],))
+            for c in conditions
+            if c.type in ("eq", "true" "<", "<=", ">", ">=")
+        ]
 
-        if len([c for c in conditions if c.type == 'eq' and c.params[0] == '::class']) == 0:
-            conditions.append(Condition('eq', ('::class', '::default')))
+        if (
+            len([c for c in conditions if c.type == "eq" and c.params[0] == "::class"])
+            == 0
+        ):
+            conditions.append(Condition("eq", ("::class", "::default")))
 
         zs = {}
         for zoom in range(0, 24):
@@ -185,7 +198,7 @@ def komap_mapbox(options, style):
                 if prop_name not in zs:
                     zs[prop_name] = {}
                 zs[prop_name][zoom] = prop_value
-        
+
         zzs = []
         break_zs = []
         prev = (None, None, None)
@@ -216,30 +229,35 @@ def komap_mapbox(options, style):
             if "z-index" in zs:
                 st["z-index"] = zs["z-index"].get(minzoom, 0)
             if "fill-position" in zs:
-                st["fill-position"] = zs["fill-position"].get(
-                    minzoom, "foreground"
-                )
+                st["fill-position"] = zs["fill-position"].get(minzoom, "foreground")
             if "casing-linecap" in zs:
-                st["casing-linecap"] = zs["casing-linecap"].get(
-                    minzoom, "butt"
-                )
+                st["casing-linecap"] = zs["casing-linecap"].get(minzoom, "butt")
 
             zzs.append((minzoom, maxzoom, st))
 
         for (minzoom, maxzoom, st) in zzs:
-            if st.get("casing-width") and any(v > 0 for v in st.get("casing-width").values()):
+            if st.get("casing-width") and any(
+                v > 0 for v in st.get("casing-width").values()
+            ):
                 mapbox_style_layer = {
                     "type": "line",
                     "filter": mapbox_style_layer_filter,
                     "layout": {},
                     "paint": {},
-                    "id": "+".join(build_kepler_hints(conditions, st)) + "casing" + str(mapbox_style_layer_id),
+                    "id": "+".join(build_kepler_hints(conditions, st))
+                    + "casing"
+                    + str(mapbox_style_layer_id),
                     "source-layer": subject,
                     "source": "composite",
                 }
 
-                mapbox_style_layer["minzoom"] = sorted(st.get("casing-width").items(), key=lambda k: k[0])[0][0]
-                mapbox_style_layer["maxzoom"] = sorted(st.get("casing-width").items(), key=lambda k: k[0])[-1][0] + 1
+                mapbox_style_layer["minzoom"] = sorted(
+                    st.get("casing-width").items(), key=lambda k: k[0]
+                )[0][0]
+                mapbox_style_layer["maxzoom"] = (
+                    sorted(st.get("casing-width").items(), key=lambda k: k[0])[-1][0]
+                    + 1
+                )
 
                 mapbox_style_layer["paint"]["line-width"] = to_mapbox_expression(
                     {
@@ -280,20 +298,29 @@ def komap_mapbox(options, style):
 
                 mapbox_style_layer_id += 1
                 mapbox_style_layers.append(mapbox_style_layer)
-            if st.get("width") and any(v > 0 for v in st.get("width").values()) and st.get("color"):
+            if (
+                st.get("width")
+                and any(v > 0 for v in st.get("width").values())
+                and st.get("color")
+            ):
                 mapbox_style_layer = {
                     "priority": min((int(st.get("z-index", 0)) + 1000), 20000),
                     "type": "line",
                     "filter": mapbox_style_layer_filter,
                     "layout": {},
                     "paint": {},
-                    "id": "+".join(build_kepler_hints(conditions, st)) + str(mapbox_style_layer_id),
+                    "id": "+".join(build_kepler_hints(conditions, st))
+                    + str(mapbox_style_layer_id),
                     "source-layer": subject,
                     "source": "composite",
                 }
 
-                mapbox_style_layer["minzoom"] = sorted(st.get("width").items(), key=lambda k: k[0])[0][0]
-                mapbox_style_layer["maxzoom"] = sorted(st.get("width").items(), key=lambda k: k[0])[-1][0] + 1
+                mapbox_style_layer["minzoom"] = sorted(
+                    st.get("width").items(), key=lambda k: k[0]
+                )[0][0]
+                mapbox_style_layer["maxzoom"] = (
+                    sorted(st.get("width").items(), key=lambda k: k[0])[-1][0] + 1
+                )
 
                 mapbox_style_layer["paint"]["line-width"] = to_mapbox_expression(
                     st.get("width")
@@ -324,19 +351,26 @@ def komap_mapbox(options, style):
 
                 mapbox_style_layer_id += 1
                 mapbox_style_layers.append(mapbox_style_layer)
-            if "fill-color" in st and any(v is not None for v in st.get("fill-color").values()):
+            if "fill-color" in st and any(
+                v is not None for v in st.get("fill-color").values()
+            ):
                 mapbox_style_layer = {
                     "type": "fill",
                     "filter": mapbox_style_layer_filter,
                     "layout": {},
                     "paint": {},
-                    "id": "+".join(build_kepler_hints(conditions, st)) + str(mapbox_style_layer_id),
+                    "id": "+".join(build_kepler_hints(conditions, st))
+                    + str(mapbox_style_layer_id),
                     "source-layer": subject,
                     "source": "composite",
                 }
 
-                mapbox_style_layer["minzoom"] = sorted(st.get("fill-color").items(), key=lambda k: k[0])[0][0]
-                mapbox_style_layer["maxzoom"] = sorted(st.get("fill-color").items(), key=lambda k: k[0])[-1][0] + 1
+                mapbox_style_layer["minzoom"] = sorted(
+                    st.get("fill-color").items(), key=lambda k: k[0]
+                )[0][0]
+                mapbox_style_layer["maxzoom"] = (
+                    sorted(st.get("fill-color").items(), key=lambda k: k[0])[-1][0] + 1
+                )
 
                 if st.get("fill-position", "foreground") == "background":
                     if "z-index" not in st:
@@ -370,10 +404,11 @@ def komap_mapbox(options, style):
                     "filter": mapbox_style_layer_filter,
                     "layout": {
                         "text-font": ["Roboto"],
-                        "symbol-sort-key": ["-", ["to-number", ["get", "population"]]]
+                        "symbol-sort-key": ["-", ["to-number", ["get", "population"]]],
                     },
                     "paint": {},
-                    "id": "+".join(build_kepler_hints(conditions, st)) + str(mapbox_style_layer_id),
+                    "id": "+".join(build_kepler_hints(conditions, st))
+                    + str(mapbox_style_layer_id),
                     "source-layer": subject,
                     "source": "composite",
                 }
@@ -383,8 +418,12 @@ def komap_mapbox(options, style):
                         ["==", ["geometry-type"], "Point"]
                     ]
 
-                mapbox_style_layer["minzoom"] = sorted(st.get("text").items(), key=lambda k: k[0])[0][0]
-                mapbox_style_layer["maxzoom"] = sorted(st.get("text").items(), key=lambda k: k[0])[-1][0] + 1
+                mapbox_style_layer["minzoom"] = sorted(
+                    st.get("text").items(), key=lambda k: k[0]
+                )[0][0]
+                mapbox_style_layer["maxzoom"] = (
+                    sorted(st.get("text").items(), key=lambda k: k[0])[-1][0] + 1
+                )
 
                 mapbox_style_layer["layout"]["text-field"] = to_mapbox_expression(
                     {z: v.to_mapbox_expression() for z, v in st.get("text").items()}
