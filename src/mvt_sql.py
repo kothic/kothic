@@ -259,7 +259,7 @@ def get_vectors(minzoom, maxzoom, x, y, style, vec):
         query = """select ST_AsMVTGeom(way, ST_TileEnvelope(%s, %s, %s), 4096, 64, true) as %s, %s
                         from %s
                         where (%s) and way && ST_TileEnvelope(%s, %s, %s)
-                        order by "admin_level" desc nulls last, "population" desc nulls last
+                        order by "admin_level"::float desc nulls last, "population"::float desc nulls last
                         limit 10000
                  """ % (
             minzoom,
