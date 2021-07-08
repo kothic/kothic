@@ -418,5 +418,6 @@ def komap_mvt_sql(options, style):
         $$
         language plpgsql immutable strict parallel safe;
         
-        alter function basemap set max_parallel_workers_per_gather=0;"""
+        alter function basemap set max_parallel_workers_per_gather=0;
+        alter function basemap set jit=false;"""
     )
