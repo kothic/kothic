@@ -151,7 +151,6 @@ def komap_mapbox(options, style):
         "metadata": {},
         "sources": {
             "composite": {
-                "attribution": options.attribution_text,
                 "tiles": [options.tiles_url],
                 "type": "vector",
                 "maxzoom": options.tiles_maxzoom,
@@ -163,6 +162,9 @@ def komap_mapbox(options, style):
         "layers": mapbox_style_layers,
         "id": "basemap",
     }
+
+    if options.attribution_text:
+        mapbox_style["sources"]["composite"]["attribution"] = options.attribution_text
 
     mapbox_style_layer_id = 0
 

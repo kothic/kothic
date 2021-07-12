@@ -71,10 +71,10 @@ parser.add_option("-T", "--text-scale", dest="textscale", default=1, type="float
                   help="text size scale", metavar="SCALE")
 parser.add_option("-c", "--config", dest="conffile", default="komap.conf",
                   help="config file name", metavar="FILE")
-parser.add_option("-u", "--tiles-url", dest="tiles_url")
-parser.add_option("-M", "--tiles-max-zoom", dest="tiles_maxzoom", type="int")
-parser.add_option("-g", "--glyphs-url", dest="glyphs_url")
-parser.add_option("-a", "--attribution-text", dest="attribution_text")
+parser.add_option("-u", "--tiles-url", dest="tiles_url", help="tiles url")
+parser.add_option("-M", "--tiles-max-zoom", dest="tiles_maxzoom", type="int", help="max available zoom for tiles provided in --tiles-url")
+parser.add_option("-g", "--glyphs-url", dest="glyphs_url", help="glyphs url")
+parser.add_option("-a", "--attribution-text", dest="attribution_text", help="text attribution")
 
 (options, args) = parser.parse_args()
 
@@ -99,6 +99,13 @@ for style_filename in options.filename:
     style.parse(filename=style_filename)
 
 if options.renderer == "mapbox-style-language":
+    if options.tiles_url is None:
+        parser.error("tiles url is required")
+    if options.tiles_maxzoom is None:
+        parser.error("tile maxzoom is required")
+    if options.glyphs_url is None:
+        parser.error("glyphs url is required")
+
     from libkomb import *
     komap_mapbox(options, style)
     exit()
