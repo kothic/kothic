@@ -366,12 +366,17 @@ def komap_mvt_sql(options, style):
         )
         $$
         language sql immutable strict parallel safe;
+
+        alter function basemap_z%s set jit=false;
+        alter function basemap_z%s set max_parallel_workers_per_gather=0;
         """
             % (
                 minzoom,
                 get_vectors(minzoom, maxzoom, "x", "y", style, "polygon"),
                 get_vectors(minzoom, maxzoom, "x", "y", style, "line"),
                 get_vectors(minzoom, maxzoom, "x", "y", style, "point"),
+                minzoom,
+                minzoom
             )
         )
 
@@ -431,36 +436,5 @@ def komap_mvt_sql(options, style):
         language plpgsql volatile strict parallel safe;
 
         alter function basemap set max_parallel_workers_per_gather=0;
-        alter function basemap set jit=false;
-
-        alter function basemap_z0 set jit=false;
-        alter function basemap_z0 set max_parallel_workers_per_gather=0;
-        alter function basemap_z1 set jit=false;
-        alter function basemap_z1 set max_parallel_workers_per_gather=0;
-        alter function basemap_z2 set jit=false;
-        alter function basemap_z2 set max_parallel_workers_per_gather=0;
-        alter function basemap_z3 set jit=false;
-        alter function basemap_z3 set max_parallel_workers_per_gather=0;
-        alter function basemap_z4 set jit=false;
-        alter function basemap_z4 set max_parallel_workers_per_gather=0;
-        alter function basemap_z5 set jit=false;
-        alter function basemap_z5 set max_parallel_workers_per_gather=0;
-        alter function basemap_z6 set jit=false;
-        alter function basemap_z6 set max_parallel_workers_per_gather=0;
-        alter function basemap_z7 set jit=false;
-        alter function basemap_z7 set max_parallel_workers_per_gather=0;
-        alter function basemap_z8 set jit=false;
-        alter function basemap_z8 set max_parallel_workers_per_gather=0;
-        alter function basemap_z9 set jit=false;
-        alter function basemap_z9 set max_parallel_workers_per_gather=0;
-        alter function basemap_z10 set jit=false;
-        alter function basemap_z10 set max_parallel_workers_per_gather=0;
-        alter function basemap_z11 set jit=false;
-        alter function basemap_z11 set max_parallel_workers_per_gather=0;
-        alter function basemap_z12 set jit=false;
-        alter function basemap_z12 set max_parallel_workers_per_gather=0;
-        alter function basemap_z13 set jit=false;
-        alter function basemap_z13 set max_parallel_workers_per_gather=0;
-        alter function basemap_z14 set jit=false;
-        alter function basemap_z14 set max_parallel_workers_per_gather=0;"""
+        alter function basemap set jit=false;"""
     )
