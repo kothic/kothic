@@ -379,45 +379,88 @@ def komap_mvt_sql(options, style):
         """create or replace function public.basemap(z integer, x integer, y integer)
         returns bytea
         as $$
+        declare
+            mvt bytea;
         begin
+            select basemap_mvts.mvt into mvt from basemap_mvts where basemap_mvts.tile_z = z and basemap_mvts.tile_x = x and basemap_mvts.tile_y = y;
+
+            if mvt is not null then
+                return mvt;
+            end if;
+
             case
                 when z = 0 then
-                    return public.basemap_z0(x, y);
+                    select public.basemap_z0(x, y) into mvt;
                 when z = 1 then
-                    return public.basemap_z1(x, y);
+                    select public.basemap_z1(x, y) into mvt;
                 when z = 2 then
-                    return public.basemap_z2(x, y);
+                    select public.basemap_z2(x, y) into mvt;
                 when z = 3 then
-                    return public.basemap_z3(x, y);
+                    select public.basemap_z3(x, y) into mvt;
                 when z = 4 then
-                    return public.basemap_z4(x, y);
+                    select public.basemap_z4(x, y) into mvt;
                 when z = 5 then
-                    return public.basemap_z5(x, y);
+                    select public.basemap_z5(x, y) into mvt;
                 when z = 6 then
-                    return public.basemap_z6(x, y);
+                    select public.basemap_z6(x, y) into mvt;
                 when z = 7 then
-                    return public.basemap_z7(x, y);
+                    select public.basemap_z7(x, y) into mvt;
                 when z = 8 then
-                    return public.basemap_z8(x, y);
+                    select public.basemap_z8(x, y) into mvt;
                 when z = 9 then
-                    return public.basemap_z9(x, y);
+                    select public.basemap_z9(x, y) into mvt;
                 when z = 10 then
-                    return public.basemap_z10(x, y);
+                    select public.basemap_z10(x, y) into mvt;
                 when z = 11 then
-                    return public.basemap_z11(x, y);
+                    select public.basemap_z11(x, y) into mvt;
                 when z = 12 then
-                    return public.basemap_z12(x, y);
+                    select public.basemap_z12(x, y) into mvt;
                 when z = 13 then
-                    return public.basemap_z13(x, y);
+                    select public.basemap_z13(x, y) into mvt;
                 when z = 14 then
-                    return public.basemap_z14(x, y);
+                    select public.basemap_z14(x, y) into mvt;
                 else
                     raise exception 'invalid tile coordinate (%, %, %)', z, x, y;
             end case;
+
+            insert into basemap_mvts(tile_z, tile_x, tile_y, mvt) values (z, x, y, mvt);
+
+            return mvt;
         end
         $$
-        language plpgsql immutable strict parallel safe;
-        
+        language plpgsql volatile strict parallel safe;
+
         alter function basemap set max_parallel_workers_per_gather=0;
-        alter function basemap set jit=false;"""
+        alter function basemap set jit=false;
+
+        alter function basemap_z0 set jit=false;
+        alter function basemap_z0 set max_parallel_workers_per_gather=0;
+        alter function basemap_z1 set jit=false;
+        alter function basemap_z1 set max_parallel_workers_per_gather=0;
+        alter function basemap_z2 set jit=false;
+        alter function basemap_z2 set max_parallel_workers_per_gather=0;
+        alter function basemap_z3 set jit=false;
+        alter function basemap_z3 set max_parallel_workers_per_gather=0;
+        alter function basemap_z4 set jit=false;
+        alter function basemap_z4 set max_parallel_workers_per_gather=0;
+        alter function basemap_z5 set jit=false;
+        alter function basemap_z5 set max_parallel_workers_per_gather=0;
+        alter function basemap_z6 set jit=false;
+        alter function basemap_z6 set max_parallel_workers_per_gather=0;
+        alter function basemap_z7 set jit=false;
+        alter function basemap_z7 set max_parallel_workers_per_gather=0;
+        alter function basemap_z8 set jit=false;
+        alter function basemap_z8 set max_parallel_workers_per_gather=0;
+        alter function basemap_z9 set jit=false;
+        alter function basemap_z9 set max_parallel_workers_per_gather=0;
+        alter function basemap_z10 set jit=false;
+        alter function basemap_z10 set max_parallel_workers_per_gather=0;
+        alter function basemap_z11 set jit=false;
+        alter function basemap_z11 set max_parallel_workers_per_gather=0;
+        alter function basemap_z12 set jit=false;
+        alter function basemap_z12 set max_parallel_workers_per_gather=0;
+        alter function basemap_z13 set jit=false;
+        alter function basemap_z13 set max_parallel_workers_per_gather=0;
+        alter function basemap_z14 set jit=false;
+        alter function basemap_z14 set max_parallel_workers_per_gather=0;"""
     )
