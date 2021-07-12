@@ -201,6 +201,34 @@ def get_vectors(minzoom, maxzoom, x, y, style, vec):
     groupby = ",".join(['"%s"' % name for name in column_names])
 
     if vec == "polygon":
+        coastline_query = """select ST_AsMVTGeom(geom, ST_TileEnvelope(%s, %s, %s), 4096, 64, true) as way, %s from
+            (select ST_Buffer(geom, -%s, 0) as geom                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      from
+                (select ST_Union(geom) as geom from
+                    (select ST_Buffer(geom, %s, 0) geom from
+                        water_polygons_vector
+                        where
+                        geom && ST_TileEnvelope(%s, %s, %s)
+                    ) p
+                ) p
+                where ST_Area(geom) > %s
+            ) p""" % (
+            minzoom,
+            x,
+            y,
+            ",".join(
+                [
+                    '%s as "%s"'
+                    % (("'coastline'" if name == "natural" else "null"), name)
+                    for name in column_names
+                ]
+            ),
+            pixel_size_at_zoom(maxzoom, pxtolerance),
+            pixel_size_at_zoom(maxzoom, pxtolerance),
+            minzoom,
+            x,
+            y,
+            pixel_size_at_zoom(maxzoom, pxtolerance) ** 2,
+        )
         query = """select ST_AsMVTGeom(w.way, ST_TileEnvelope(%s, %s, %s), 4096, 64, true) as %s, %s from
                         (select ST_Buffer(way, -%s, 0) as %s, %s from
                             (select ST_Union(way) as %s, %s from
@@ -216,17 +244,7 @@ def get_vectors(minzoom, maxzoom, x, y, style, vec):
                             order by ST_Area(way) desc
                         ) p, lateral (values (p.way), (ST_PointOnSurface(p.way))) w(way)
                    union
-                   select ST_AsMVTGeom(geom, ST_TileEnvelope(%s, %s, %s), 4096, 64, true) as way, %s from
-                  (select ST_Buffer(geom, -%s, 0) as geom                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      from
-                    (select ST_Union(geom) as geom from
-                      (select ST_Buffer(geom, %s, 0) geom from
-                         water_polygons_vector
-                         where
-                            geom && ST_TileEnvelope(%s, %s, %s)
-                      ) p
-                    ) p
-                    where ST_Area(geom) > %s
-                  ) p
+                   %s
           """ % (
             minzoom,
             x,
@@ -249,26 +267,7 @@ def get_vectors(minzoom, maxzoom, x, y, style, vec):
             (pixel_size_at_zoom(maxzoom, pxtolerance) ** 2) / pxtolerance,
             groupby,
             pixel_size_at_zoom(maxzoom, pxtolerance) ** 2,
-            minzoom,
-            x,
-            y,
-            ",".join(
-                [
-                    (
-                        ("'coastline'" if name == "natural" else "null")
-                        + ' as "'
-                        + name
-                        + '"'
-                    )
-                    for name in column_names
-                ]
-            ),
-            pixel_size_at_zoom(maxzoom, pxtolerance),
-            pixel_size_at_zoom(maxzoom, pxtolerance),
-            minzoom,
-            x,
-            y,
-            pixel_size_at_zoom(maxzoom, pxtolerance) ** 2,
+            coastline_query,
         )
     elif vec == "line":
         query = """select ST_AsMVTGeom(way, ST_TileEnvelope(%s, %s, %s), 4096, 64, true) as %s, %s from
@@ -376,7 +375,7 @@ def komap_mvt_sql(options, style):
                 get_vectors(minzoom, maxzoom, "x", "y", style, "line"),
                 get_vectors(minzoom, maxzoom, "x", "y", style, "point"),
                 minzoom,
-                minzoom
+                minzoom,
             )
         )
 
