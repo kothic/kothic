@@ -229,28 +229,16 @@ def get_vectors(minzoom, maxzoom, x, y, style, vec):
             y,
             pixel_size_at_zoom(maxzoom, pxtolerance) ** 2,
         )
-        query = """select ST_AsMVTGeom(w.way, ST_TileEnvelope(%s, %s, %s), 4096, 64, true) as %s, %s from
-                        (select ST_Buffer(way, -%s, 0) as %s, %s from
-                            (select ST_Union(way) as %s, %s from
-                            (select ST_Buffer(way, %s, 0) as %s, %s from
-                                %s
-                                where (%s)
-                                and way && ST_TileEnvelope(%s, %s, %s)
-                                and way_area > %s
-                            ) p
-                            group by %s
-                            ) p
-                            where ST_Area(way) > %s
-                            order by ST_Area(way) desc
-                        ) p, lateral (values (p.way), (ST_PointOnSurface(p.way))) w(way)
-                   union
-                   %s
-          """ % (
-            minzoom,
-            x,
-            y,
-            geomcolumn,
-            groupby,
+        polygons_query = """select ST_Buffer(way, -%s, 0) as %s, %s from
+                                (select ST_Union(way) as %s, %s from
+                                    (select ST_Buffer(way, %s, 0) as %s, %s from %s
+                                        where (%s)
+                                        and way && ST_TileEnvelope(%s, %s, %s)
+                                        and way_area > %s
+                                    ) p
+                                    group by %s) p
+                                where ST_Area(way) > %s
+                                order by ST_Area(way) desc""" % (
             pixel_size_at_zoom(maxzoom, pxtolerance),
             geomcolumn,
             groupby,
@@ -267,6 +255,18 @@ def get_vectors(minzoom, maxzoom, x, y, style, vec):
             (pixel_size_at_zoom(maxzoom, pxtolerance) ** 2) / pxtolerance,
             groupby,
             pixel_size_at_zoom(maxzoom, pxtolerance) ** 2,
+        )
+
+        query = """select ST_AsMVTGeom(w.way, ST_TileEnvelope(%s, %s, %s), 4096, 64, true) as %s, %s from
+                        (%s) p, lateral (values (p.way), (ST_PointOnSurface(p.way))) w(way)
+                   union
+                   %s""" % (
+            minzoom,
+            x,
+            y,
+            geomcolumn,
+            groupby,
+            polygons_query,
             coastline_query,
         )
     elif vec == "line":
@@ -337,19 +337,19 @@ def komap_mvt_sql(options, style):
         osm2pgsql_avail_keys["tags"] = ("node", "way")
 
     zooms = [
-        (1, 2),
-        (2, 3),
-        (3, 4),
-        (4, 5),
-        (5, 6),
-        (6, 7),
-        (7, 8),
-        (8, 9),
-        (9, 10),
-        (10, 11),
-        (11, 12),
-        (12, 13),
-        (13, 14),
+        (1, 1),
+        (2, 2),
+        (3, 3),
+        (4, 4),
+        (5, 5),
+        (6, 6),
+        (7, 7),
+        (8, 8),
+        (9, 9),
+        (10, 10),
+        (11, 11),
+        (12, 12),
+        (13, 13),
         (14, 30),
     ]
 
