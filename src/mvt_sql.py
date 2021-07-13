@@ -117,7 +117,7 @@ def get_sql_hints(choosers, obj, zoom):
     return hints
 
 
-def get_vectors(minzoom, maxzoom, x, y, style, vec):
+def get_vectors(minzoom, maxzoom, x, y, style, vec, extent):
     geomcolumn = "way"
 
     pxtolerance = 0.5
@@ -182,7 +182,7 @@ def get_vectors(minzoom, maxzoom, x, y, style, vec):
     groupby = ",".join(['"%s"' % name for name in column_names])
 
     if vec == "polygon":
-        coastline_query = """select ST_AsMVTGeom(geom, ST_TileEnvelope(%s, %s, %s), 4096, 64, true) as way, %s from
+        coastline_query = """select ST_AsMVTGeom(geom, ST_TileEnvelope(%s, %s, %s), %s, 64, true) as way, %s from
             (select ST_Buffer(geom, -%s, 0) as geom                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      from
                 (select ST_Union(geom) as geom from
                     (select ST_Buffer(geom, %s, 0) geom from
@@ -196,6 +196,7 @@ def get_vectors(minzoom, maxzoom, x, y, style, vec):
             minzoom,
             x,
             y,
+            extent,
             ",".join(
                 [
                     '%s as "%s"'
@@ -254,20 +255,21 @@ def get_vectors(minzoom, maxzoom, x, y, style, vec):
                 (pixel_size_at_zoom(maxzoom, pxtolerance) ** 2) / pxtolerance,
             )
 
-        query = """select ST_AsMVTGeom(w.way, ST_TileEnvelope(%s, %s, %s), 4096, 64, true) as %s, %s from
+        query = """select ST_AsMVTGeom(w.way, ST_TileEnvelope(%s, %s, %s), %s, 64, true) as %s, %s from
                         (%s) p, lateral (values (p.way), (ST_PointOnSurface(p.way))) w(way)
                    union
                    %s""" % (
             minzoom,
             x,
             y,
+            extent,
             geomcolumn,
             groupby,
             polygons_query,
             coastline_query,
         )
     elif vec == "line":
-        query = """select ST_AsMVTGeom(way, ST_TileEnvelope(%s, %s, %s), 4096, 64, true) as %s, %s from
+        query = """select ST_AsMVTGeom(way, ST_TileEnvelope(%s, %s, %s), %s, 64, true) as %s, %s from
                         (select ST_LineMerge(way) as %s, %s from
                             (select ST_Union(way) as %s, %s from
                                 %s
@@ -280,6 +282,7 @@ def get_vectors(minzoom, maxzoom, x, y, style, vec):
             minzoom,
             x,
             y,
+            extent,
             geomcolumn,
             groupby,
             geomcolumn,
@@ -299,7 +302,7 @@ def get_vectors(minzoom, maxzoom, x, y, style, vec):
             ),
         )
     elif vec == "point":
-        query = """select ST_AsMVTGeom(way, ST_TileEnvelope(%s, %s, %s), 4096, 64, true) as %s, %s
+        query = """select ST_AsMVTGeom(way, ST_TileEnvelope(%s, %s, %s), %s, 64, true) as %s, %s
                         from %s
                         where (%s) and way && ST_TileEnvelope(%s, %s, %s)
                         order by "admin_level"::float desc nulls last, "population"::float desc nulls last
@@ -308,6 +311,7 @@ def get_vectors(minzoom, maxzoom, x, y, style, vec):
             minzoom,
             x,
             y,
+            extent,
             geomcolumn,
             select,
             table[vec],
@@ -334,31 +338,31 @@ def komap_mvt_sql(options, style):
         osm2pgsql_avail_keys["tags"] = ("node", "way")
 
     zooms = [
-        (1, 1),
-        (2, 2),
-        (3, 3),
-        (4, 4),
-        (5, 5),
-        (6, 6),
-        (7, 7),
-        (8, 8),
-        (9, 9),
-        (10, 10),
-        (11, 11),
-        (12, 12),
-        (13, 13),
-        (14, 23),
+        (1, 1, 4096),
+        (2, 2, 4096),
+        (3, 3, 4096),
+        (4, 4, 4096),
+        (5, 5, 4096),
+        (6, 6, 4096),
+        (7, 7, 4096),
+        (8, 8, 4096),
+        (9, 9, 4096),
+        (10, 10, 4096),
+        (11, 11, 4096),
+        (12, 12, 4096),
+        (13, 13, 4096),
+        (14, 23, 8192),
     ]
 
-    for (minzoom, maxzoom) in zooms:
+    for (minzoom, maxzoom, extent) in zooms:
         print(
             """create or replace function public.basemap_z%s(x integer, y integer)
         returns bytea
         as $$
         select (
-            (select coalesce(ST_AsMVT(tile, 'area', 4096, 'way'), '') from (%s) as tile) ||
-            (select coalesce(ST_AsMVT(tile, 'line', 4096, 'way'), '') from (%s) as tile) ||
-            (select coalesce(ST_AsMVT(tile, 'node', 4096, 'way'), '') from (%s) as tile)
+            (select coalesce(ST_AsMVT(tile, 'area', %s, 'way'), '') from (%s) as tile) ||
+            (select coalesce(ST_AsMVT(tile, 'line', %s, 'way'), '') from (%s) as tile) ||
+            (select coalesce(ST_AsMVT(tile, 'node', %s, 'way'), '') from (%s) as tile)
         )
         $$
         language sql immutable strict parallel safe;
@@ -368,9 +372,12 @@ def komap_mvt_sql(options, style):
         """
             % (
                 minzoom,
-                get_vectors(minzoom, maxzoom, "x", "y", style, "polygon"),
-                get_vectors(minzoom, maxzoom, "x", "y", style, "line"),
-                get_vectors(minzoom, maxzoom, "x", "y", style, "point"),
+                extent,
+                get_vectors(minzoom, maxzoom, "x", "y", style, "polygon", extent),
+                extent,
+                get_vectors(minzoom, maxzoom, "x", "y", style, "line", extent),
+                extent,
+                get_vectors(minzoom, maxzoom, "x", "y", style, "point", extent),
                 minzoom,
                 minzoom,
             )
