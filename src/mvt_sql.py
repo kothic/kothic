@@ -153,7 +153,7 @@ def get_vectors(minzoom, maxzoom, x, y, style, vec):
 
     adp = []
 
-    for zoom in range(minzoom, maxzoom):
+    for zoom in range(minzoom, maxzoom + 1):
         column_names.update(style.get_interesting_tags(types[vec], zoom))
 
         sql_hint = get_sql_hints(style.choosers, types[vec], zoom)
@@ -257,6 +257,22 @@ def get_vectors(minzoom, maxzoom, x, y, style, vec):
             pixel_size_at_zoom(maxzoom, pxtolerance) ** 2,
         )
 
+        if maxzoom >= 8:
+            polygons_query = """select way as %s, %s from %s
+                                where (%s)
+                                and way && ST_TileEnvelope(%s, %s, %s)
+                                and way_area > %s
+                                order by way_area desc""" % (
+                geomcolumn,
+                select,
+                table[vec],
+                adp,
+                minzoom,
+                x,
+                y,
+                (pixel_size_at_zoom(maxzoom, pxtolerance) ** 2) / pxtolerance,
+            )
+
         query = """select ST_AsMVTGeom(w.way, ST_TileEnvelope(%s, %s, %s), 4096, 64, true) as %s, %s from
                         (%s) p, lateral (values (p.way), (ST_PointOnSurface(p.way))) w(way)
                    union
@@ -350,7 +366,7 @@ def komap_mvt_sql(options, style):
         (11, 11),
         (12, 12),
         (13, 13),
-        (14, 30),
+        (14, 23),
     ]
 
     for (minzoom, maxzoom) in zooms:
