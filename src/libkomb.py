@@ -405,7 +405,6 @@ def komap_mapbox(options, style):
                     "filter": mapbox_style_layer_filter,
                     "layout": {
                         "text-font": ["Roboto"],
-                        "symbol-sort-key": ["-", ["to-number", ["get", "population"]]],
                     },
                     "paint": {},
                     "id": "+".join(build_kepler_hints(conditions, st))
