@@ -85,10 +85,7 @@ def test(rule, obj, conditions, zoom):
         return False
 
     self_conditions = rule.conditions
-    if (
-        len([c for c in self_conditions if c.type == "eq" and c.params[0] == "::class"])
-        == 0
-    ):
+    if not any(c.type == "eq" and c.params[0] == "::class" for c in self_conditions):
         self_conditions.append(Condition("eq", ("::class", "::default")))
 
     return set(self_conditions).issubset(set(conditions))
@@ -185,10 +182,7 @@ def komap_mapbox(options, style):
             if c.type in ("eq", "true" "<", "<=", ">", ">=")
         ]
 
-        if (
-            len([c for c in conditions if c.type == "eq" and c.params[0] == "::class"])
-            == 0
-        ):
+        if not any(c.type == "eq" and c.params[0] == "::class" for c in conditions):
             conditions.append(Condition("eq", ("::class", "::default")))
 
         zs = {}
@@ -222,7 +216,7 @@ def komap_mapbox(options, style):
                 t = {
                     z: v
                     for z, v in prop_value_by_zoom.items()
-                    if z >= minzoom and z < maxzoom
+                    if minzoom <= z < maxzoom
                 }
                 if len(t) > 0:
                     st[prop_name] = t
@@ -403,9 +397,7 @@ def komap_mapbox(options, style):
                 mapbox_style_layer = {
                     "type": "symbol",
                     "filter": mapbox_style_layer_filter,
-                    "layout": {
-                        "text-font": ["Roboto"],
-                    },
+                    "layout": {"text-font": ["Roboto"],},
                     "paint": {},
                     "id": "+".join(build_kepler_hints(conditions, st))
                     + str(mapbox_style_layer_id),
