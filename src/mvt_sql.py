@@ -49,7 +49,7 @@ def get_sql(condition, obj):
         if t == "ne":
             return (
                 params[0],
-                "(%s != '%s' or %s IS NULL)" % (column_name, params[1], column_name),
+                "(%s is distinct from '%s')" % (column_name, params[1]),
             )
         if t == "regex":
             return params[0], "%s ~ '%s'" % (column_name, params[1].replace("'", "\\'"))
@@ -58,33 +58,14 @@ def get_sql(condition, obj):
         if t == "untrue":
             return params[0], "%s = 'no'" % (column_name)
         if t == "set":
-            return params[0], "%s IS NOT NULL" % (column_name)
+            return params[0], "%s is not null" % (column_name)
         if t == "unset":
-            return params[0], "%s IS NULL" % (column_name)
-
-        if t == "<":
+            return params[0], "%s is null" % (column_name)
+        if t in ("<", "<=", ">", ">="):
             return (
                 params[0],
-                """(CASE WHEN %s  ~  E'^[-]?[[:digit:]]+([.][[:digit:]]+)?$' THEN CAST (%s AS FLOAT) &lt; %s ELSE false END) """
-                % (column_name, column_name, params[1]),
-            )
-        if t == "<=":
-            return (
-                params[0],
-                """(CASE WHEN %s  ~  E'^[-]?[[:digit:]]+([.][[:digit:]]+)?$' THEN CAST (%s AS FLOAT) &lt;= %s ELSE false END)"""
-                % (column_name, column_name, params[1]),
-            )
-        if t == ">":
-            return (
-                params[0],
-                """(CASE WHEN %s  ~  E'^[-]?[[:digit:]]+([.][[:digit:]]+)?$' THEN CAST (%s AS FLOAT) > %s ELSE false END) """
-                % (column_name, column_name, params[1]),
-            )
-        if t == ">=":
-            return (
-                params[0],
-                """(CASE WHEN %s  ~  E'^[-]?[[:digit:]]+([.][[:digit:]]+)?$' THEN CAST (%s AS FLOAT) >= %s ELSE false END) """
-                % (column_name, column_name, params[1]),
+                """(case when %s  ~  E'^[-]?[[:digit:]]+([.][[:digit:]]+)?$' then cast (%s as float) %s %s else false end) """
+                % (column_name, column_name, t, params[1]),
             )
     except KeyError:
         pass

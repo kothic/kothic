@@ -42,8 +42,7 @@ def to_mapbox_condition(condition):
 
 
 def to_mapbox_expression(values_by_zoom):
-    values_by_zoom = values_by_zoom.items()
-    values_by_zoom = sorted(values_by_zoom, key=lambda k: k[0])
+    values_by_zoom = sorted(values_by_zoom.items(), key=lambda k: k[0])
     j = 0
     for i in range(1, len(values_by_zoom)):
         if values_by_zoom[i][1] != values_by_zoom[i - 1][1]:
