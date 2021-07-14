@@ -329,6 +329,10 @@ def komap_mapbox(options, style):
                     mapbox_style_layer["paint"]["line-opacity"] = to_mapbox_expression(
                         st.get("opacity")
                     )
+                if st.get("blur"):
+                    mapbox_style_layer["paint"]["line-blur"] = to_mapbox_expression(
+                        {z: float(v) for z, v in st.get("blur").items()}
+                    )
                 if st.get("dashes"):
                     mapbox_style_layer["paint"][
                         "line-dasharray"
