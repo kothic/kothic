@@ -125,7 +125,7 @@ def komap_mapbox(options, style):
     mapbox_style_layers = []
 
     canvas_style = style.get_style_dict("canvas", {}, 0, olddict={}, cache=False)
-    if canvas_style["::default"] is not None:
+    if "::default" in canvas_style:
         background_style_layer = {
             "priority": -30000,
             "type": "background",
