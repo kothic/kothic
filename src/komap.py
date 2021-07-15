@@ -71,10 +71,10 @@ parser.add_option("-T", "--text-scale", dest="textscale", default=1, type="float
                   help="text size scale", metavar="SCALE")
 parser.add_option("-c", "--config", dest="conffile", default="komap.conf",
                   help="config file name", metavar="FILE")
-parser.add_option("-u", "--tiles-url", dest="tiles_url", help="tiles url")
+parser.add_option("-u", "--tiles-url", dest="tiles_url", help="URL of MVT tiles used to render this map style")
 parser.add_option("-M", "--tiles-max-zoom", dest="tiles_maxzoom", type="int", help="max available zoom for tiles provided in --tiles-url")
-parser.add_option("-g", "--glyphs-url", dest="glyphs_url", help="glyphs url")
-parser.add_option("-a", "--attribution-text", dest="attribution_text", help="text attribution")
+parser.add_option("-g", "--glyphs-url", dest="glyphs_url", help="SDF Font glyphs URL to use in rendering")
+parser.add_option("-a", "--attribution-text", dest="attribution_text", help="Attribution and copyrights text to show on the rendered map")
 
 (options, args) = parser.parse_args()
 

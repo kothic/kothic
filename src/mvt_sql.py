@@ -103,8 +103,7 @@ def get_sql_hints(choosers, obj, zoom):
                 b = set()
                 for condition in rule.conditions:
                     q = get_sql(condition, obj)
-                    if q:
-                        if q[1]:
+                    if q and len(q) > 1:
                             tags.add(q[0])
                             b.add(q[1])
 
@@ -130,7 +129,6 @@ def get_vectors(minzoom, maxzoom, x, y, style, vec, extent):
     types = {"line": "line", "polygon": "area", "point": "node"}
 
     column_names = set()
-    adp = ""
 
     adp = []
 

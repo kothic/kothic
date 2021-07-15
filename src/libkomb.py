@@ -12,6 +12,7 @@ def to_mapbox_condition(condition):
     t = condition.type
     params = condition.params
 
+    # TODO: support subclasses
     if params[0][:2] == "::":
         return True
 
@@ -19,6 +20,7 @@ def to_mapbox_condition(condition):
         return ["==", ["get", params[0]], params[1]]
     if t == "ne":
         return ["!=", ["get", params[0]], params[1]]
+    # TODO: support for regexp in Mapbox GL is not implemented
     if t == "regex":
         return True
     if t == "true":
@@ -42,13 +44,9 @@ def to_mapbox_condition(condition):
 
 
 def to_mapbox_expression(values_by_zoom):
+    """ Convert sequence of zoom-value pairs into condensed mapbox expression """
     values_by_zoom = sorted(values_by_zoom.items(), key=lambda k: k[0])
-    j = 0
-    for i in range(1, len(values_by_zoom)):
-        if values_by_zoom[i][1] != values_by_zoom[i - 1][1]:
-            j += 1
-            values_by_zoom[j] = values_by_zoom[i]
-    values_by_zoom = values_by_zoom[0 : j + 1]
+    values_by_zoom = [val for i, val in enumerate(values_by_zoom) if values_by_zoom[i][1] != values_by_zoom[i - 1][1]]
 
     if len(values_by_zoom) == 1:
         return values_by_zoom[0][1]
@@ -65,6 +63,7 @@ mapbox_linecaps = {"none": "butt", "butt": "butt", "round": "round", "square": "
 
 
 def build_kepler_hints(conditions, style):
+    # https://github.com/keplergl/kepler.gl/blob/master/src/constants/default-settings.js#L191-L227
     hints = set()
     for condition in conditions:
         if condition.params[0] == "boundary":
