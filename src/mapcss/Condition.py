@@ -178,6 +178,9 @@ class Condition:
     def __eq__(self, a):
         return (self.params == a.params) and (self.type == a.type)
 
+    def __hash__(self):
+        return hash(self.type) ^ hash(self.params)
+
     def and_with(self, c2):
         """
         merges two rules with AND.

@@ -30,6 +30,21 @@ class Eval():
         except:
             # print "Can't compile %s" % s
             self.expr = compile("0", "MapCSS expression", "eval")
+    
+    def __eq__(self, a):
+        return self.expr_text == a.expr_text
+    
+    def to_mapbox_expression(self):
+        def to_mapbox_coalesce(*x):
+            return ["coalesce"] + list(x)
+        
+        def to_mapbox_get(x):
+            return ["get", x]
+
+        return eval(self.expr, {}, {
+                "any": to_mapbox_coalesce,
+                "tag": to_mapbox_get
+                })
 
     def extract_tags(self):
         """
@@ -48,7 +63,7 @@ class Eval():
 
         a = eval(self.expr, {}, {
                  "tag": lambda x: max([tags.add(x), " "]),
-                 "prop": lambda x: "",
+                 "prop": lambda x: 0,
                  "num": lambda x: 0,
                  "metric": fake_compute,
                  "zmetric": fake_compute,

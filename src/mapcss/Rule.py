@@ -15,6 +15,8 @@
 #   You should have received a copy of the GNU General Public License
 #   along with kothic.  If not, see <http://www.gnu.org/licenses/>.
 
+from Condition import Condition
+
 type_matches = {
     "": ('area', 'line', 'way', 'node'),
     "area": ("area", "way"),
@@ -40,7 +42,7 @@ class Rule():
         if (zoom < self.minZoom) or (zoom > self.maxZoom):
             return False
 
-        if (self.subject != '') and not _test_feature_compatibility(obj, self.subject, tags):
+        if (self.subject != '') and not _test_feature_compatibility(obj, self.subject):
             return False
 
         subpart = "::default"
@@ -61,7 +63,7 @@ class Rule():
 
     def get_interesting_tags(self, obj, zoom):
         if obj:
-            if (self.subject != '') and not _test_feature_compatibility(obj, self.subject, {}):
+            if (self.subject != '') and not _test_feature_compatibility(obj, self.subject):
                 return set()
 
         if zoom and not self.test_zoom(zoom):
@@ -81,7 +83,7 @@ class Rule():
 
     def get_sql_hints(self, obj, zoom):
         if obj:
-            if (self.subject != '') and not _test_feature_compatibility(obj, self.subject, {":area": "yes"}):
+            if (self.subject != '') and not _test_feature_compatibility(obj, self.subject):
                 return set()
         if not self.test_zoom(zoom):
             return set()
@@ -96,8 +98,7 @@ class Rule():
         b = " AND ".join(b)
         return a, b
 
-
-def _test_feature_compatibility(f1, f2, tags={}):
+def _test_feature_compatibility(f1, f2):
     """
     Checks if feature of type f1 is compatible with f2.
     """

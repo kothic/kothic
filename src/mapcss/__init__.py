@@ -25,6 +25,7 @@ from copy import copy, deepcopy
 
 from StyleChooser import StyleChooser
 from Condition import Condition
+from Rule import _test_feature_compatibility
 
 
 NEEDED_KEYS = set(["width", "casing-width", "fill-color", "fill-image", "icon-image", "text", "extrude", "background-image", "background-color", "pattern-image", "shield-text", "symbol-shape"])
@@ -41,6 +42,7 @@ CONDITION = re.compile(r'^ \[(.+?)\] \s* ', re.S | re.X)
 OBJECT = re.compile(r'^ (\*|[\w]+) \s* ', re.S | re.X)
 DECLARATION = re.compile(r'^ \{(.+?)\} \s* ', re.S | re.X)
 IMPORT = re.compile(r'^@import\("(.+?)"\); \s* ', re.S | re.X)
+VARIABLE_SET = re.compile(r'^@([a-z][\w\d]*) \s* : \s* (.+?) \s* ; \s* ', re.S | re.X | re.I)
 UNKNOWN = re.compile(r'^ (\S+) \s* ', re.S | re.X)
 
 ZOOM_MINMAX = re.compile(r'^ (\d+)\-(\d+) $', re.S | re.X)
@@ -74,6 +76,7 @@ oCONDITION = 4
 oOBJECT = 5
 oDECLARATION = 6
 oSUBPART = 7
+oVARIABLE_SET = 8
 
 DASH = re.compile(r'\-/g')
 COLOR = re.compile(r'color$/')
@@ -84,6 +87,7 @@ CAPS = re.compile(r'^uppercase$/i')
 CENTER = re.compile(r'^center$/i')
 
 HEX = re.compile(r'^#([0-9a-f]+)$/i')
+VARIABLE = re.compile(r'@([a-z][\w\d]*)')
 
 class MapCSS():
     def __init__(self, minscale=0, maxscale=19):
@@ -96,6 +100,7 @@ class MapCSS():
         self.scalepair = (minscale, maxscale)
         self.choosers = []
         self.choosers_by_type = {}
+        self.variables = {}
         self.style_loaded = False
 
     def parseZoom(self, s):
@@ -119,8 +124,9 @@ class MapCSS():
             if shash in self.cache["style"]:
                 return deepcopy(self.cache["style"][shash])
         style = []
-        for chooser in self.choosers_by_type[type]:
-            style = chooser.updateStyles(style, type, tags, zoom, scale, zscale)
+        if type in self.choosers_by_type:
+            for chooser in self.choosers_by_type[type]:
+                style = chooser.updateStyles(style, type, tags, zoom, scale, zscale)
         style = [x for x in style if x["object-id"] != "::*"]
         st = []
         for x in style:
@@ -146,7 +152,7 @@ class MapCSS():
                 d[x.get('object-id', '')] = {}
             d[x.get('object-id', '')].update(x)
         return d
-
+    
     def get_interesting_tags(self, type=None, zoom=None):
         """
         Get set of interesting tags.
@@ -167,6 +173,19 @@ class MapCSS():
                 if p[0] and p[1]:
                     hints.append(p)
         return hints
+
+    def subst_variables(self, t):
+        """Expects an array from parseDeclaration."""
+	for k in t[0]:
+            t[0][k] = VARIABLE.sub(self.get_variable, t[0][k])
+        return t
+
+    def get_variable(self, m):
+        name = m.group()[1:]
+        if not name in self.variables:
+            logging.error("Variable not found: {}".format(name))
+        return self.variables[name] if name in self.variables else m.group()
+
 
     def parse(self, css=None, clamp=True, stretch=1000, filename=None):
         """
@@ -256,7 +275,7 @@ class MapCSS():
             elif DECLARATION.match(css):
                 decl = DECLARATION.match(css).groups()[0]
                 log.debug("declaration found: %s" % (decl))
-                sc.addStyles(parseDeclaration(decl))
+                sc.addStyles(self.subst_variables(parseDeclaration(decl)))
                 css = DECLARATION.sub("", css)
                 previous = oDECLARATION
 
@@ -271,10 +290,17 @@ class MapCSS():
                 filename = os.path.join(basepath, IMPORT.match(css).groups()[0])
                 try:
                     css = IMPORT.sub("", css)
-                    import_text = open(os.path.join(basepath, filename), "r").read().strip()
+                    import_text = open(filename, "r").read().strip()
                     css = import_text + css
-                except IOError:
-                    log.warning("cannot import file %s" % (filename))
+                except IOError as e:
+			log.warning("cannot import file %s: %s" % (filename, e))
+
+            elif VARIABLE_SET.match(css):
+                name = VARIABLE_SET.match(css).groups()[0]
+                log.debug("variable set found: %s" % name)
+                self.variables[name] = VARIABLE_SET.match(css).groups()[1]
+                css = VARIABLE_SET.sub("", css)
+                previous = oVARIABLE_SET
 
             # Unknown pattern
             elif UNKNOWN.match(css):
@@ -313,6 +339,8 @@ class MapCSS():
                     self.choosers_by_type[t] = [chooser]
                 else:
                     self.choosers_by_type[t].append(chooser)
+        
+        self.style_loaded = True
 
 
 def parseCondition(s):
