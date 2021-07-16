@@ -405,7 +405,7 @@ def komap_mapbox(options, style):
                 mapbox_style_layer = {
                     "type": "symbol",
                     "filter": mapbox_style_layer_filter,
-                    "layout": {"text-font": ["Roboto"],},
+                    "layout": {"text-font": ["Roboto"], "text-padding": 10},
                     "paint": {},
                     "id": "+".join(build_kepler_hints(conditions, st))
                     + str(mapbox_style_layer_id),
