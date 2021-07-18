@@ -119,7 +119,7 @@ def get_sql_hints(choosers, obj, zoom):
 def get_vectors(minzoom, maxzoom, x, y, style, vec, extent):
     geomcolumn = "way"
 
-    pxtolerance = 0.5
+    pxtolerance = 0.1
     table = {
         "polygon": "planet_osm_polygon",
         "line": "planet_osm_line",
@@ -231,7 +231,7 @@ def get_vectors(minzoom, maxzoom, x, y, style, vec, extent):
             minzoom,
             x,
             y,
-            (pixel_size_at_zoom(maxzoom, pxtolerance) ** 2) / pxtolerance,
+            pixel_size_at_zoom(maxzoom, pxtolerance) ** 2,
             groupby,
             pixel_size_at_zoom(maxzoom, pxtolerance) ** 2,
         )
@@ -249,7 +249,7 @@ def get_vectors(minzoom, maxzoom, x, y, style, vec, extent):
                 minzoom,
                 x,
                 y,
-                (pixel_size_at_zoom(maxzoom, pxtolerance) ** 2) / pxtolerance,
+                pixel_size_at_zoom(maxzoom, pxtolerance) ** 2,
             )
 
         query = """select ST_AsMVTGeom(w.way, ST_TileEnvelope(%s, %s, %s), %s, 64, true) as %s, %s from
