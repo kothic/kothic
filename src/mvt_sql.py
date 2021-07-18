@@ -234,8 +234,8 @@ def get_vectors(minzoom, maxzoom, x, y, style, vec, extent):
             pixel_size_at_zoom(maxzoom, pxtolerance) ** 2,
         )
 
-        if maxzoom >= 8:
-            polygons_query = """select way as %s, %s from %s
+        #if maxzoom >= 8:
+        polygons_query = """select way as %s, %s from %s
                                 where (%s)
                                 and way && ST_TileEnvelope(%s, %s, %s)
                                 and way_area > %s
@@ -333,6 +333,7 @@ def komap_mvt_sql(options, style):
         osm2pgsql_avail_keys["tags"] = ("node", "way")
 
     zooms = [
+        (0, 0, 4096),
         (1, 1, 4096),
         (2, 2, 4096),
         (3, 3, 4096),
