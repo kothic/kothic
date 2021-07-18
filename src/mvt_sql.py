@@ -181,16 +181,13 @@ def get_vectors(minzoom, maxzoom, x, y, style, vec, extent):
 
     if vec == "polygon":
         coastline_query = """select ST_AsMVTGeom(geom, ST_TileEnvelope(%s, %s, %s), %s, 64, true) as way, %s from
-            (select ST_Buffer(geom, -%s, 0) as geom                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      from
-                (select ST_Union(geom) as geom from
-                    (select ST_Buffer(geom, %s, 0) geom from
+                (select ST_Union(geom, %s) as geom from
+                    (select ST_ReducePrecision(geom, %s) geom from
                         water_polygons_vector
-                        where
-                        geom && ST_TileEnvelope(%s, %s, %s)
+                        where geom && ST_TileEnvelope(%s, %s, %s)
+                        and ST_Area(geom) > %s
                     ) p
-                ) p
-                where ST_Area(geom) > %s
-            ) p""" % (
+                ) p""" % (
             minzoom,
             x,
             y,
@@ -255,7 +252,7 @@ def get_vectors(minzoom, maxzoom, x, y, style, vec, extent):
 
         query = """select ST_AsMVTGeom(w.way, ST_TileEnvelope(%s, %s, %s), %s, 64, true) as %s, %s from
                         (%s) p, lateral (values (p.way), (ST_PointOnSurface(p.way))) w(way)
-                   union
+                   union all
                    %s""" % (
             minzoom,
             x,
