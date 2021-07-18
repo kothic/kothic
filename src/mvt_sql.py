@@ -173,6 +173,8 @@ def get_vectors(minzoom, maxzoom, x, y, style, vec, extent):
     if adp:
         adp = adp.replace("&lt;", "<")
         adp = adp.replace("&gt;", ">")
+    if not adp:
+        adp = 'false'
 
     select = ",".join(
         [escape_sql_column(name, type=types[vec], asname=True) for name in column_names]
