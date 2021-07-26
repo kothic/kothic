@@ -405,7 +405,7 @@ def komap_mapbox(options, style):
                 mapbox_style_layer = {
                     "type": "symbol",
                     "filter": mapbox_style_layer_filter,
-                    "layout": {"text-font": ["Roboto"], "text-padding": 10},
+                    "layout": {},
                     "paint": {},
                     "id": "+".join(build_kepler_hints(conditions, st))
                     + str(mapbox_style_layer_id),
@@ -445,6 +445,10 @@ def komap_mapbox(options, style):
                             for z, v in st.get("font-size").items()
                         }
                     )
+                if st.get("font-family"):
+                    mapbox_style_layer["layout"]["text-font"] = to_mapbox_expression(
+                        {z: [v] for z, v in st.get("font-family").items()}
+                    )
                 if st.get("text-transform"):
                     mapbox_style_layer["layout"][
                         "text-transform"
@@ -464,6 +468,10 @@ def komap_mapbox(options, style):
                             z: ["literal", [0, float(v)]]
                             for z, v in st.get("text-offset").items()
                         }
+                    )
+                if st.get("text-padding"):
+                    mapbox_style_layer["layout"]["text-padding"] = to_mapbox_expression(
+                        {z: float(v) for z, v in st.get("text-padding").items()}
                     )
                 if st.get("text-color"):
                     mapbox_style_layer["paint"]["text-color"] = to_mapbox_expression(
