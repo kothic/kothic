@@ -182,6 +182,32 @@ def get_vectors(minzoom, maxzoom, x, y, style, vec, extent):
     groupby = ",".join(['"%s"' % name for name in column_names])
 
     if vec == "polygon":
+        coastline_query = """select ST_AsMVTGeom(geom, ST_TileEnvelope(%s, %s, %s), %s, 64, true) as way, %s from
+                (select ST_Union(geom, %s) as geom from
+                    (select ST_ReducePrecision(geom, %s) geom from
+                        water_polygons_vector
+                        where geom && ST_TileEnvelope(%s, %s, %s)
+                        and ST_Area(geom) > %s
+                    ) p
+                ) p""" % (
+            minzoom,
+            x,
+            y,
+            extent,
+            ",".join(
+                [
+                    '%s as "%s"'
+                    % (("'coastline'" if name == "natural" else "null"), name)
+                    for name in column_names
+                ]
+            ),
+            pixel_size_at_zoom(maxzoom, pxtolerance),
+            pixel_size_at_zoom(maxzoom, pxtolerance),
+            minzoom,
+            x,
+            y,
+            pixel_size_at_zoom(maxzoom, pxtolerance) ** 2,
+        )
         polygons_query = """select ST_Buffer(way, -%s, 0) as %s, %s from
                                 (select ST_Union(way) as %s, %s from
                                     (select ST_Buffer(way, %s, 0) as %s, %s from %s
@@ -227,7 +253,9 @@ def get_vectors(minzoom, maxzoom, x, y, style, vec, extent):
             )
 
         query = """select ST_AsMVTGeom(w.way, ST_TileEnvelope(%s, %s, %s), %s, 64, true) as %s, %s from
-                        (%s) p, lateral (values (p.way), (ST_PointOnSurface(p.way))) w(way)""" % (
+                        (%s) p, lateral (values (p.way), (ST_PointOnSurface(p.way))) w(way)
+                   union all
+                   %s""" % (
             minzoom,
             x,
             y,
@@ -235,6 +263,7 @@ def get_vectors(minzoom, maxzoom, x, y, style, vec, extent):
             geomcolumn,
             groupby,
             polygons_query,
+            coastline_query,
         )
     elif vec == "line":
         query = """select ST_AsMVTGeom(way, ST_TileEnvelope(%s, %s, %s), %s, 64, true) as %s, %s from
