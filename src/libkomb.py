@@ -447,7 +447,7 @@ def komap_mapbox(options, style):
                     )
                 if st.get("font-family"):
                     mapbox_style_layer["layout"]["text-font"] = to_mapbox_expression(
-                        {z: [v] for z, v in st.get("font-family").items()}
+                        {z: ["literal", [v]] for z, v in st.get("font-family").items()}
                     )
                 if st.get("text-transform"):
                     mapbox_style_layer["layout"][
