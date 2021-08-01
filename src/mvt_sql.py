@@ -231,9 +231,9 @@ def get_vectors(minzoom, maxzoom, x, y, style, vec, extent):
             minzoom,
             x,
             y,
-            pixel_size_at_zoom(maxzoom, pxtolerance) ** 2,
+            pixel_size_at_zoom(maxzoom, 1) ** 2,
             groupby,
-            pixel_size_at_zoom(maxzoom, pxtolerance) ** 2,
+            pixel_size_at_zoom(maxzoom, 1) ** 2,
         )
 
         #if maxzoom >= 8:
@@ -249,7 +249,7 @@ def get_vectors(minzoom, maxzoom, x, y, style, vec, extent):
                 minzoom,
                 x,
                 y,
-                pixel_size_at_zoom(maxzoom, pxtolerance) ** 2,
+                pixel_size_at_zoom(maxzoom, 1) ** 2,
             )
 
         query = """select ST_AsMVTGeom(w.way, ST_TileEnvelope(%s, %s, %s), %s, 64, true) as %s, %s from
