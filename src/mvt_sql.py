@@ -389,10 +389,14 @@ def komap_mvt_sql(options, style):
         as $$
         declare
             mvt bytea;
+            dirty boolean;
+            t timestamp with time zone := clock_timestamp();
         begin
-            select basemap_mvts.mvt into mvt from basemap_mvts where basemap_mvts.tile_z = z and basemap_mvts.tile_x = x and basemap_mvts.tile_y = y;
+            select basemap_mvts.mvt, basemap_mvts.dirty into mvt, dirty from basemap_mvts
+                where basemap_mvts.tile_z = z and basemap_mvts.tile_x = x and basemap_mvts.tile_y = y
+                for update;
 
-            if mvt is not null then
+            if (mvt is not null) and (not dirty) then
                 return mvt;
             end if;
 
@@ -431,7 +435,10 @@ def komap_mvt_sql(options, style):
                     raise exception 'invalid tile coordinate (%, %, %)', z, x, y;
             end case;
 
-            insert into basemap_mvts(tile_z, tile_x, tile_y, mvt) values (z, x, y, mvt);
+            insert into basemap_mvts(tile_z, tile_x, tile_y, mvt, render_time, updated_at, dirty)
+                values (z, x, y, mvt, age(clock_timestamp(), t), now(), false)
+                on conflict (tile_z, tile_x, tile_y)
+                do update set mvt = excluded.mvt, render_time = excluded.render_time, updated_at = excluded.updated_at, dirty = excluded.dirty;
 
             return mvt;
         end
