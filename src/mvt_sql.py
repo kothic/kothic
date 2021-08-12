@@ -119,7 +119,7 @@ def get_sql_hints(choosers, obj, zoom):
 def get_vectors(minzoom, maxzoom, x, y, style, vec, extent):
     geomcolumn = "way"
 
-    pxtolerance = 0.1
+    pxtolerance = 0.5
     table = {
         "polygon": "planet_osm_polygon",
         "line": "planet_osm_line",
@@ -183,7 +183,7 @@ def get_vectors(minzoom, maxzoom, x, y, style, vec, extent):
 
     if vec == "polygon":
         coastline_query = """select ST_AsMVTGeom(geom, ST_TileEnvelope(%s, %s, %s), %s, 64, true) as way, %s from
-                (select ST_Union(geom, %s) as geom from
+                (select ST_Simplify(ST_Union(geom, %s), %s) as geom from
                     (select ST_ReducePrecision(geom, %s) geom from
                         water_polygons_vector
                         where geom && ST_TileEnvelope(%s, %s, %s)
@@ -203,14 +203,15 @@ def get_vectors(minzoom, maxzoom, x, y, style, vec, extent):
             ),
             pixel_size_at_zoom(maxzoom, pxtolerance),
             pixel_size_at_zoom(maxzoom, pxtolerance),
+            pixel_size_at_zoom(maxzoom, pxtolerance),
             minzoom,
             x,
             y,
             pixel_size_at_zoom(maxzoom, pxtolerance) ** 2,
         )
         polygons_query = """select ST_Buffer(way, -%s, 0) as %s, %s from
-                                (select ST_Union(way) as %s, %s from
-                                    (select ST_Buffer(way, %s, 0) as %s, %s from %s
+                                (select ST_Union(way, %s) as %s, %s from
+                                    (select ST_Buffer(st_ReducePrecision(way, %s), %s, 0) as %s, %s from %s
                                         where (%s)
                                         and way && ST_TileEnvelope(%s, %s, %s)
                                         and way_area > %s
@@ -221,8 +222,10 @@ def get_vectors(minzoom, maxzoom, x, y, style, vec, extent):
             pixel_size_at_zoom(maxzoom, pxtolerance),
             geomcolumn,
             groupby,
+            pixel_size_at_zoom(maxzoom, pxtolerance),
             geomcolumn,
             groupby,
+            pixel_size_at_zoom(maxzoom, pxtolerance),
             pixel_size_at_zoom(maxzoom, pxtolerance),
             geomcolumn,
             select,
@@ -267,8 +270,8 @@ def get_vectors(minzoom, maxzoom, x, y, style, vec, extent):
         )
     elif vec == "line":
         query = """select ST_AsMVTGeom(way, ST_TileEnvelope(%s, %s, %s), %s, 64, true) as %s, %s from
-                        (select ST_LineMerge(way) as %s, %s from
-                            (select ST_Union(way) as %s, %s from
+                        (select ST_Simplify(ST_LineMerge(way), %s) as %s, %s from
+                            (select ST_Union(way, %s) as %s, %s from
                                 %s
                                 where (%s)
                                 and way && ST_TileEnvelope(%s, %s, %s)
@@ -282,8 +285,10 @@ def get_vectors(minzoom, maxzoom, x, y, style, vec, extent):
             extent,
             geomcolumn,
             groupby,
+            pixel_size_at_zoom(maxzoom, pxtolerance),
             geomcolumn,
             groupby,
+            pixel_size_at_zoom(maxzoom, pxtolerance),
             geomcolumn,
             select,
             table[vec],
