@@ -308,7 +308,7 @@ def get_vectors(minzoom, maxzoom, x, y, style, vec, extent):
                         from %s
                         where (%s) and way && ST_TileEnvelope(%s, %s, %s)
                         order by
-                        (case when "admin_level"  ~  E'^[-]?[[:digit:]]+([.][[:digit:]]+)?$' then cast ("admin_level" as float) else null end) desc nulls last,
+                        (case when "admin_level"  ~  E'^[-]?[[:digit:]]+([.][[:digit:]]+)?$' then cast ("admin_level" as float) else null end) asc nulls last,
                         (case when "population"  ~  E'^[-]?[[:digit:]]+([.][[:digit:]]+)?$' then cast ("population" as float) else null end) desc nulls last
                         limit 10000
                  """ % (
