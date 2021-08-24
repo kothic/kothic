@@ -74,6 +74,7 @@ parser.add_option("-c", "--config", dest="conffile", default="komap.conf",
 parser.add_option("-u", "--tiles-url", dest="tiles_url", help="URL of MVT tiles used to render this map style")
 parser.add_option("-M", "--tiles-max-zoom", dest="tiles_maxzoom", type="int", help="max available zoom for tiles provided in --tiles-url")
 parser.add_option("-g", "--glyphs-url", dest="glyphs_url", help="SDF Font glyphs URL to use in rendering")
+parser.add_option("-e", "--sprite-url", dest="sprite_url", help="URL of sprite to use in rendering")
 parser.add_option("-a", "--attribution-text", dest="attribution_text", help="Attribution and copyrights text to show on the rendered map")
 
 (options, args) = parser.parse_args()

@@ -157,6 +157,7 @@ def komap_mapbox(options, style):
             }
         },
         "glyphs": options.glyphs_url,
+        "sprite": options.sprite_url,
         "center": [27.582705, 53.908227],
         "zoom": 1,
         "layers": mapbox_style_layers,
