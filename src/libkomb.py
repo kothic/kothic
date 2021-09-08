@@ -426,9 +426,22 @@ def komap_mapbox(options, style):
                     sorted(st.get("text").items(), key=lambda k: k[0])[-1][0] + 1
                 )
 
-                mapbox_style_layer["layout"]["text-field"] = to_mapbox_expression(
-                    {z: v.to_mapbox_expression(lambda tag: tag if tag != "name" else "name:%s" % (options.locale)) for z, v in st.get("text").items()}
-                )
+                locales = options.locale.split(",")
+                zoom_text = {}
+                for z, v in st.get("text").items():
+                    if v.expr_text == "tag(\"name\")":
+                        coalesce = ["coalesce"]
+                        for l in locales:
+                            coalesce.append(["get", "name:%s" % (l)])
+                        if "en" in locales:
+                            coalesce += [["get", "int_name"]]
+                        coalesce += [["get", "name"]]
+
+                        zoom_text[z] = coalesce
+                    else:
+                        zoom_text[z] = v.to_mapbox_expression()
+
+                mapbox_style_layer["layout"]["text-field"] = to_mapbox_expression(zoom_text)
 
                 if st.get("text-position"):
                     symbol_placement = {

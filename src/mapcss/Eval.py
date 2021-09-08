@@ -34,12 +34,12 @@ class Eval():
     def __eq__(self, a):
         return self.expr_text == a.expr_text
     
-    def to_mapbox_expression(self, tag_mapper):
+    def to_mapbox_expression(self):
         def to_mapbox_coalesce(*x):
             return ["coalesce"] + list(x)
         
         def to_mapbox_get(x):
-            return ["get", tag_mapper(x)]
+            return ["get", x]
 
         return eval(self.expr, {}, {
                 "any": to_mapbox_coalesce,
