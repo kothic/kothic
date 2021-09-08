@@ -427,7 +427,7 @@ def komap_mapbox(options, style):
                 )
 
                 mapbox_style_layer["layout"]["text-field"] = to_mapbox_expression(
-                    {z: v.to_mapbox_expression() for z, v in st.get("text").items()}
+                    {z: v.to_mapbox_expression(lambda tag: tag if tag != "name" else "name:%s" % (options.locale)) for z, v in st.get("text").items()}
                 )
 
                 if st.get("text-position"):
