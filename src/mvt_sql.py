@@ -31,7 +31,7 @@ def pixel_size_at_zoom(z, l=1):
     """
     Converts l pixels on tiles into length on zoom z
     """
-    return int(math.ceil(l * 20037508.342789244 / 512 * 2 / (2 ** z)))
+    return l * 20037508.342789244 / 512 * 2 / (2 ** z)
 
 
 def get_sql(condition, obj):
