@@ -275,7 +275,7 @@ def get_vectors(minzoom, maxzoom, x, y, style, vec, extent, locales):
     elif vec == "line":
         query = """select ST_AsMVTGeom(way, ST_TileEnvelope(%s, %s, %s), %s, 64, true) as %s, %s from
                         (select ST_Simplify(ST_LineMerge(way), %s) as %s, %s from
-                            (select ST_Union(way, %s) as %s, %s from
+                            (select ST_Union(way) as %s, %s from
                                 %s
                                 where (%s)
                                 and way && ST_TileEnvelope(%s, %s, %s)
@@ -292,7 +292,6 @@ def get_vectors(minzoom, maxzoom, x, y, style, vec, extent, locales):
             pixel_size_at_zoom(maxzoom, pxtolerance),
             geomcolumn,
             groupby,
-            pixel_size_at_zoom(maxzoom, pxtolerance),
             geomcolumn,
             select,
             table[vec],
