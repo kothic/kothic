@@ -157,12 +157,14 @@ def komap_mapbox(options, style):
             }
         },
         "glyphs": options.glyphs_url,
-        "sprite": options.sprite_url,
         "center": [27.582705, 53.908227],
         "zoom": 1,
         "layers": mapbox_style_layers,
         "id": "basemap",
     }
+
+    if options.sprite_url:
+        mapbox_style["sprite"] = options.sprite_url
 
     if options.attribution_text:
         mapbox_style["sources"]["composite"]["attribution"] = options.attribution_text
