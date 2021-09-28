@@ -115,7 +115,7 @@ def _test_feature_compatibility(f1, f2):
         return True
 #      else:
 #        return False
-    elif f2 == "line" and f1 in ("way", "line", "area"):
+    elif f2 == "line" and f1 in ("way", "line"):
         return True
     else:
         return False
