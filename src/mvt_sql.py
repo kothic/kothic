@@ -115,7 +115,6 @@ def get_sql_hints(choosers, obj, zoom):
 
     return hints
 
-
 def get_vectors(minzoom, maxzoom, x, y, style, vec, extent, locales):
     geomcolumn = "way"
 
@@ -126,7 +125,12 @@ def get_vectors(minzoom, maxzoom, x, y, style, vec, extent, locales):
         "point": "planet_osm_point",
     }
 
-    types = {"line": "line", "polygon": "area", "point": "node"}
+    types = {
+        "line": "line",
+        "polygon": "area",
+        "coastline": "area",
+        "point": "node"
+    }
 
     column_names = set()
 
@@ -188,8 +192,8 @@ def get_vectors(minzoom, maxzoom, x, y, style, vec, extent, locales):
     )
     groupby = ",".join(['"%s"' % name for name in column_names])
 
-    if vec == "polygon":
-        coastline_query = """select ST_AsMVTGeom(geom, ST_TileEnvelope(%s, %s, %s), %s, 64, true) as way, %s from
+    if vec == "coastline":
+        query = """select ST_AsMVTGeom(geom, ST_TileEnvelope(%s, %s, %s), %s, 64, true) as way, %s from
                 (select ST_Simplify(ST_Union(geom), %s) as geom from
                     (select geom from
                         water_polygons_vector
@@ -214,6 +218,7 @@ def get_vectors(minzoom, maxzoom, x, y, style, vec, extent, locales):
             y,
             pixel_size_at_zoom(maxzoom, pxtolerance) ** 2,
         )
+    if vec == "polygon":
         polygons_query = """select ST_Buffer(way, -%s, 0) as %s, %s from
                                 (select ST_Union(way) as %s, %s from
                                     (select ST_Buffer(way, %s) as %s, %s from %s
@@ -259,9 +264,7 @@ def get_vectors(minzoom, maxzoom, x, y, style, vec, extent, locales):
                 )
 
         query = """select ST_AsMVTGeom(w.way, ST_TileEnvelope(%s, %s, %s), %s, 64, true) as %s, %s from
-                        (%s) p, lateral (values (p.way), (ST_PointOnSurface(p.way))) w(way)
-                   union all
-                   %s""" % (
+                        (%s) p, lateral (values (p.way), (ST_PointOnSurface(p.way))) w(way)""" % (
             minzoom,
             x,
             y,
@@ -269,7 +272,6 @@ def get_vectors(minzoom, maxzoom, x, y, style, vec, extent, locales):
             geomcolumn,
             groupby,
             polygons_query,
-            coastline_query,
         )
     elif vec == "line":
         query = """select ST_AsMVTGeom(way, ST_TileEnvelope(%s, %s, %s), %s, 64, true) as %s, %s from
@@ -368,6 +370,7 @@ def komap_mvt_sql(options, style):
         as $$
         select (
             (select coalesce(ST_AsMVT(tile, 'area', %s, 'way'), '') from (%s) as tile) ||
+            (select coalesce(ST_AsMVT(tile, 'area', %s, 'way'), '') from (%s) as tile) ||
             (select coalesce(ST_AsMVT(tile, 'line', %s, 'way'), '') from (%s) as tile) ||
             (select coalesce(ST_AsMVT(tile, 'node', %s, 'way'), '') from (%s) as tile)
         )
@@ -381,6 +384,8 @@ def komap_mvt_sql(options, style):
                 minzoom,
                 extent,
                 get_vectors(minzoom, maxzoom, "x", "y", style, "polygon", extent, options.locale.split(',')),
+                extent,
+                get_vectors(minzoom, maxzoom, "x", "y", style, "coastline", extent, options.locale.split(',')),
                 extent,
                 get_vectors(minzoom, maxzoom, "x", "y", style, "line", extent, options.locale.split(',')),
                 extent,
