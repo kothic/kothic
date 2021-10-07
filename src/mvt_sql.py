@@ -217,9 +217,8 @@ def get_vectors(minzoom, maxzoom, x, y, style, vec, extent, locales):
         polygons_query = """select ST_Buffer(way, -%s, 0) as %s, %s from
                                 (select ST_Union(way) as %s, %s from
                                     (select ST_Buffer(way, %s) as %s, %s from %s
-                                        where (%s)
+                                        where (min_zoom <= %s)
                                         and way && ST_TileEnvelope(%s, %s, %s)
-                                        and way_area > %s
                                     ) p
                                     group by %s) p
                                 where ST_Area(way) > %s
@@ -233,29 +232,30 @@ def get_vectors(minzoom, maxzoom, x, y, style, vec, extent, locales):
             geomcolumn,
             select,
             table[vec],
-            adp,
+            # adp,
+            minzoom,
             minzoom,
             x,
             y,
-            pixel_size_at_zoom(maxzoom, 1) ** 2,
+            # pixel_size_at_zoom(maxzoom, 1) ** 2,
             groupby,
             pixel_size_at_zoom(maxzoom, 1) ** 2,
         )
 
         if maxzoom >= 8:
             polygons_query = """select way as %s, %s from %s
-                                    where (%s)
+                                    where (min_zoom <= %s)
                                     and way && ST_TileEnvelope(%s, %s, %s)
-                                    and way_area > %s
                                     order by way_area desc""" % (
                     geomcolumn,
                     select,
                     table[vec],
-                    adp,
+                    # adp,
+                    minzoom,
                     minzoom,
                     x,
                     y,
-                    pixel_size_at_zoom(maxzoom, 1) ** 2,
+                    # pixel_size_at_zoom(maxzoom, 1) ** 2,
                 )
 
         query = """select ST_AsMVTGeom(w.way, ST_TileEnvelope(%s, %s, %s), %s, 64, true) as %s, %s from
@@ -276,7 +276,7 @@ def get_vectors(minzoom, maxzoom, x, y, style, vec, extent, locales):
                         (select ST_Simplify(ST_LineMerge(way), %s) as %s, %s from
                             (select ST_Union(way) as %s, %s from
                                 %s
-                                where (%s)
+                                where (min_zoom <= %s)
                                 and way && ST_TileEnvelope(%s, %s, %s)
                             group by %s
                             ) p
@@ -294,7 +294,8 @@ def get_vectors(minzoom, maxzoom, x, y, style, vec, extent, locales):
             geomcolumn,
             select,
             table[vec],
-            adp,
+            # adp,
+            minzoom,
             minzoom,
             x,
             y,
@@ -308,7 +309,7 @@ def get_vectors(minzoom, maxzoom, x, y, style, vec, extent, locales):
     elif vec == "point":
         query = """select ST_AsMVTGeom(way, ST_TileEnvelope(%s, %s, %s), %s, 64, true) as %s, %s
                         from %s
-                        where (%s) and way && ST_TileEnvelope(%s, %s, %s)
+                        where (min_zoom <= %s) and way && ST_TileEnvelope(%s, %s, %s)
                         order by
                         (case when "admin_level"  ~  E'^[-]?[[:digit:]]+([.][[:digit:]]+)?$' then cast ("admin_level" as float) else null end) asc nulls last,
                         (case when "population"  ~  E'^[-]?[[:digit:]]+([.][[:digit:]]+)?$' then cast ("population" as float) else null end) desc nulls last
@@ -321,7 +322,8 @@ def get_vectors(minzoom, maxzoom, x, y, style, vec, extent, locales):
             geomcolumn,
             select,
             table[vec],
-            adp,
+            # adp,
+            minzoom,
             minzoom,
             x,
             y,
@@ -390,6 +392,212 @@ def komap_mvt_sql(options, style):
             )
         )
 
+    area_sql_hints = [
+        get_sql_hints(style.choosers, "area", zoom) for zoom in range(0, 15)
+    ]
+    distinct_tags = set(
+        [
+            tag
+            for hints in area_sql_hints
+            for tags in map(lambda t: t[0], hints)
+            for tag in tags
+        ]
+    )
+    add_hstore = any([tag not in osm2pgsql_avail_keys for tag in distinct_tags])
+    area_args = [[tag, "text"] for tag in distinct_tags if tag in osm2pgsql_avail_keys]
+    if add_hstore:
+        area_args.append(["tags", "hstore"])
+    area_args.append(["way_area", "real"])
+    area_sql = map(
+        lambda hints: " or ".join(set(map(lambda t: t[1], hints))), area_sql_hints
+    )
+    for zoom, sql in enumerate(area_sql):
+        area_sql[zoom] = """(%s) and way_area > %s""" % (
+            sql,
+            pixel_size_at_zoom(zoom, 0.5) ** 2,
+        )
+    print(
+        """create or replace function public.polygon_min_zoom(%s)
+        returns integer
+        as $$
+        select (
+            case when %s then 0
+                 when %s then 1
+                 when %s then 2
+                 when %s then 3
+                 when %s then 4
+                 when %s then 5
+                 when %s then 6
+                 when %s then 7
+                 when %s then 8
+                 when %s then 9
+                 when %s then 10
+                 when %s then 11
+                 when %s then 12
+                 when %s then 13
+                 when %s then 14
+                 else 999
+            end
+        )
+        $$
+        language sql immutable parallel safe;"""
+        % (
+            ",".join(map(lambda t: "%s %s" % (t[0], t[1]), area_args)),
+            area_sql[0] if area_sql[0] else "false",
+            area_sql[1] if area_sql[1] else "false",
+            area_sql[2] if area_sql[2] else "false",
+            area_sql[3] if area_sql[3] else "false",
+            area_sql[4] if area_sql[4] else "false",
+            area_sql[5] if area_sql[5] else "false",
+            area_sql[6] if area_sql[6] else "false",
+            area_sql[7] if area_sql[7] else "false",
+            area_sql[8] if area_sql[8] else "false",
+            area_sql[9] if area_sql[9] else "false",
+            area_sql[10] if area_sql[10] else "false",
+            area_sql[11] if area_sql[11] else "false",
+            area_sql[12] if area_sql[12] else "false",
+            area_sql[13] if area_sql[13] else "false",
+            area_sql[14] if area_sql[14] else "false",
+        )
+    )
+
+    # print(
+    #     """alter table planet_osm_polygon add column min_zoom integer generated always as (public.polygon_min_zoom("place", "natural", way_area)) stored;"""
+    # )
+
+    line_sql_hints = [
+        get_sql_hints(style.choosers, "line", zoom) for zoom in range(0, 15)
+    ]
+    distinct_tags = set(
+        [
+            tag
+            for hints in line_sql_hints
+            for tags in map(lambda t: t[0], hints)
+            for tag in tags
+        ]
+    )
+    add_hstore = any([tag not in osm2pgsql_avail_keys for tag in distinct_tags])
+    line_args = [[tag, "text"] for tag in distinct_tags if tag in osm2pgsql_avail_keys]
+    if add_hstore:
+        line_args.append(["tags", "hstore"])
+    line_sql = map(
+        lambda hints: " or ".join(set(map(lambda t: t[1], hints))), line_sql_hints
+    )
+    print(
+        """create or replace function public.line_min_zoom(%s)
+        returns integer
+        as $$
+        select (
+            case when %s then 0
+                 when %s then 1
+                 when %s then 2
+                 when %s then 3
+                 when %s then 4
+                 when %s then 5
+                 when %s then 6
+                 when %s then 7
+                 when %s then 8
+                 when %s then 9
+                 when %s then 10
+                 when %s then 11
+                 when %s then 12
+                 when %s then 13
+                 when %s then 14
+                 else 999
+            end
+        )
+        $$
+        language sql immutable parallel safe;"""
+        % (
+            ",".join(map(lambda t: "%s %s" % (t[0], t[1]), line_args)),
+            line_sql[0] if line_sql[0] else "false",
+            line_sql[1] if line_sql[1] else "false",
+            line_sql[2] if line_sql[2] else "false",
+            line_sql[3] if line_sql[3] else "false",
+            line_sql[4] if line_sql[4] else "false",
+            line_sql[5] if line_sql[5] else "false",
+            line_sql[6] if line_sql[6] else "false",
+            line_sql[7] if line_sql[7] else "false",
+            line_sql[8] if line_sql[8] else "false",
+            line_sql[9] if line_sql[9] else "false",
+            line_sql[10] if line_sql[10] else "false",
+            line_sql[11] if line_sql[11] else "false",
+            line_sql[12] if line_sql[12] else "false",
+            line_sql[13] if line_sql[13] else "false",
+            line_sql[14] if line_sql[14] else "false",
+        )
+    )
+
+    # print(
+    #     """alter table planet_osm_line add column min_zoom integer generated always as (public.line_min_zoom("admin_level","boundary","waterway","highway")) stored;"""
+    # )
+
+    point_sql_hints = [
+        get_sql_hints(style.choosers, "node", zoom) for zoom in range(0, 15)
+    ]
+    distinct_tags = set(
+        [
+            tag
+            for hints in point_sql_hints
+            for tags in map(lambda t: t[0], hints)
+            for tag in tags
+        ]
+    )
+    add_hstore = any([tag not in osm2pgsql_avail_keys for tag in distinct_tags])
+    point_args = [[tag, "text"] for tag in distinct_tags if tag in osm2pgsql_avail_keys]
+    if add_hstore:
+        point_args.append(["tags", "hstore"])
+    point_sql = map(
+        lambda hints: " or ".join(set(map(lambda t: t[1], hints))), point_sql_hints
+    )
+    print(
+        """create or replace function public.point_min_zoom(%s)
+        returns integer
+        as $$
+        select (
+            case when %s then 0
+                 when %s then 1
+                 when %s then 2
+                 when %s then 3
+                 when %s then 4
+                 when %s then 5
+                 when %s then 6
+                 when %s then 7
+                 when %s then 8
+                 when %s then 9
+                 when %s then 10
+                 when %s then 11
+                 when %s then 12
+                 when %s then 13
+                 when %s then 14
+                 else 999
+            end
+        )
+        $$
+        language sql immutable parallel safe;"""
+        % (
+            ",".join(map(lambda t: "%s %s" % (t[0], t[1]), point_args)),
+            point_sql[0] if point_sql[0] else "false",
+            point_sql[1] if point_sql[1] else "false",
+            point_sql[2] if point_sql[2] else "false",
+            point_sql[3] if point_sql[3] else "false",
+            point_sql[4] if point_sql[4] else "false",
+            point_sql[5] if point_sql[5] else "false",
+            point_sql[6] if point_sql[6] else "false",
+            point_sql[7] if point_sql[7] else "false",
+            point_sql[8] if point_sql[8] else "false",
+            point_sql[9] if point_sql[9] else "false",
+            point_sql[10] if point_sql[10] else "false",
+            point_sql[11] if point_sql[11] else "false",
+            point_sql[12] if point_sql[12] else "false",
+            point_sql[14] if point_sql[14] else "false",
+            point_sql[13] if point_sql[13] else "false",
+        )
+    )
+
+    # print(
+    #     """alter table planet_osm_line add column min_zoom integer generated always as (public.line_min_zoom("admin_level","boundary","waterway","highway")) stored;"""
+    # )
     print(
         """create or replace function public.basemap(z integer, x integer, y integer)
         returns bytea
