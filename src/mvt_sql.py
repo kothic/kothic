@@ -394,63 +394,27 @@ def komap_mvt_sql(options, style):
         """create or replace function public.basemap(z integer, x integer, y integer)
         returns bytea
         as $$
-        declare
-            mvt bytea;
-            dirty boolean;
-            t timestamp with time zone := clock_timestamp();
-        begin
-            select basemap_mvts.mvt, basemap_mvts.dirty into mvt, dirty from basemap_mvts
-                where basemap_mvts.tile_z = z and basemap_mvts.tile_x = x and basemap_mvts.tile_y = y
-                for update;
-
-            if (mvt is not null) and (not dirty) then
-                return mvt;
-            end if;
-
+        select
             case
-                when z = 0 then
-                    select public.basemap_z0(x, y) into mvt;
-                when z = 1 then
-                    select public.basemap_z1(x, y) into mvt;
-                when z = 2 then
-                    select public.basemap_z2(x, y) into mvt;
-                when z = 3 then
-                    select public.basemap_z3(x, y) into mvt;
-                when z = 4 then
-                    select public.basemap_z4(x, y) into mvt;
-                when z = 5 then
-                    select public.basemap_z5(x, y) into mvt;
-                when z = 6 then
-                    select public.basemap_z6(x, y) into mvt;
-                when z = 7 then
-                    select public.basemap_z7(x, y) into mvt;
-                when z = 8 then
-                    select public.basemap_z8(x, y) into mvt;
-                when z = 9 then
-                    select public.basemap_z9(x, y) into mvt;
-                when z = 10 then
-                    select public.basemap_z10(x, y) into mvt;
-                when z = 11 then
-                    select public.basemap_z11(x, y) into mvt;
-                when z = 12 then
-                    select public.basemap_z12(x, y) into mvt;
-                when z = 13 then
-                    select public.basemap_z13(x, y) into mvt;
-                when z = 14 then
-                    select public.basemap_z14(x, y) into mvt;
-                else
-                    raise exception 'invalid tile coordinate (%, %, %)', z, x, y;
-            end case;
-
-            insert into basemap_mvts(tile_z, tile_x, tile_y, mvt, render_time, updated_at, dirty)
-                values (z, x, y, mvt, age(clock_timestamp(), t), now(), false)
-                on conflict (tile_z, tile_x, tile_y)
-                do update set mvt = excluded.mvt, render_time = excluded.render_time, updated_at = excluded.updated_at, dirty = excluded.dirty;
-
-            return mvt;
-        end
+                when z = 0 then public.basemap_z0(x, y)
+                when z = 1 then public.basemap_z1(x, y)
+                when z = 2 then public.basemap_z2(x, y)
+                when z = 3 then public.basemap_z3(x, y)
+                when z = 4 then public.basemap_z4(x, y)
+                when z = 5 then public.basemap_z5(x, y)
+                when z = 6 then public.basemap_z6(x, y)
+                when z = 7 then public.basemap_z7(x, y)
+                when z = 8 then public.basemap_z8(x, y)
+                when z = 9 then public.basemap_z9(x, y)
+                when z = 10 then public.basemap_z10(x, y)
+                when z = 11 then public.basemap_z11(x, y)
+                when z = 12 then public.basemap_z12(x, y)
+                when z = 13 then public.basemap_z13(x, y)
+                when z = 14 then public.basemap_z14(x, y)
+                else null
+            end
         $$
-        language plpgsql volatile strict parallel safe;
+        language sql immutable strict parallel safe;
 
         alter function basemap set max_parallel_workers_per_gather=0;
         alter function basemap set jit=false;"""
