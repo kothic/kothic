@@ -242,12 +242,13 @@ def get_vectors(minzoom, maxzoom, x, y, style, vec, extent, locales):
             pixel_size_at_zoom(maxzoom, 1) ** 2,
         )
 
-        if maxzoom >= 8:
-            polygons_query = """select way as %s, %s from %s
+        if maxzoom >= 7:
+            polygons_query = """select ST_Simplify(way, %s) as %s, %s from %s
                                     where (%s)
                                     and way && ST_TileEnvelope(%s, %s, %s)
                                     and way_area > %s
                                     order by way_area desc""" % (
+                    pixel_size_at_zoom(maxzoom, pxtolerance),
                     geomcolumn,
                     select,
                     table[vec],
