@@ -364,7 +364,7 @@ def komap_mvt_sql(options, style):
 
     for (minzoom, maxzoom, extent) in zooms:
         print(
-            """create or replace function public.basemap_%s(x integer, y integer)
+            """prepare basemap_%s(x integer, y integer)
         returns bytea
         as $$
         select (
@@ -373,10 +373,6 @@ def komap_mvt_sql(options, style):
             (select coalesce(ST_AsMVT(tile, 'node', %s, 'way'), '') from (%s) as tile)
         )
         $$
-        language sql immutable strict parallel safe;
-
-        alter function basemap_z%s set jit=false;
-        alter function basemap_z%s set max_parallel_workers_per_gather=0;
         """
             % (
                 minzoom,
