@@ -331,6 +331,48 @@ def get_vectors(minzoom, maxzoom, x, y, style, vec, extent, locales):
     return query
 
 
+def basemap_sql(minzoom, maxzoom, extent, style, options):
+    return """(
+            (select coalesce(ST_AsMVT(tile, 'area', %s, 'way'), '') from (%s) as tile) ||
+            (select coalesce(ST_AsMVT(tile, 'line', %s, 'way'), '') from (%s) as tile) ||
+            (select coalesce(ST_AsMVT(tile, 'node', %s, 'way'), '') from (%s) as tile)
+        )""" % (
+        extent,
+        get_vectors(
+            minzoom,
+            maxzoom,
+            "$2",
+            "$3",
+            style,
+            "polygon",
+            extent,
+            options.locale.split(","),
+        ),
+        extent,
+        get_vectors(
+            minzoom,
+            maxzoom,
+            "$2",
+            "$3",
+            style,
+            "line",
+            extent,
+            options.locale.split(","),
+        ),
+        extent,
+        get_vectors(
+            minzoom,
+            maxzoom,
+            "$2",
+            "$3",
+            style,
+            "point",
+            extent,
+            options.locale.split(","),
+        ),
+    )
+
+
 def komap_mvt_sql(options, style):
     for style_filename in options.filename:
         style.parse(filename=style_filename)
@@ -344,46 +386,40 @@ def komap_mvt_sql(options, style):
                 osm2pgsql_avail_keys[line[1]] = tuple(line[0].split(","))
         osm2pgsql_avail_keys["tags"] = ("node", "way")
 
-    zooms = [
-        (0, 0, 4096),
-        (1, 1, 4096),
-        (2, 2, 4096),
-        (3, 3, 4096),
-        (4, 4, 4096),
-        (5, 5, 4096),
-        (6, 6, 4096),
-        (7, 7, 4096),
-        (8, 8, 4096),
-        (9, 9, 4096),
-        (10, 10, 4096),
-        (11, 11, 4096),
-        (12, 12, 4096),
-        (13, 13, 4096),
-        (14, 23, 8192),
-    ]
-
-    print("""create or replace procedure public.generate_basemap_prepared_statements()
-    language sql
-    as $$""")
-
-    for (minzoom, maxzoom, extent) in zooms:
-        print(
-            """prepare basemap_%s(integer, integer) as
-        select (
-            (select coalesce(ST_AsMVT(tile, 'area', %s, 'way'), '') from (%s) as tile) ||
-            (select coalesce(ST_AsMVT(tile, 'line', %s, 'way'), '') from (%s) as tile) ||
-            (select coalesce(ST_AsMVT(tile, 'node', %s, 'way'), '') from (%s) as tile)
-        );
-        """
-            % (
-                minzoom,
-                extent,
-                get_vectors(minzoom, maxzoom, "$1", "$2", style, "polygon", extent, options.locale.split(',')),
-                extent,
-                get_vectors(minzoom, maxzoom, "$1", "$2", style, "line", extent, options.locale.split(',')),
-                extent,
-                get_vectors(minzoom, maxzoom, "$1", "$2", style, "point", extent, options.locale.split(',')),
-            )
+    print(
+        """select
+        case when $1 = 0 then %s
+             when $1 = 1 then %s
+             when $1 = 2 then %s
+             when $1 = 3 then %s
+             when $1 = 4 then %s
+             when $1 = 5 then %s
+             when $1 = 6 then %s
+             when $1 = 7 then %s
+             when $1 = 8 then %s
+             when $1 = 9 then %s
+             when $1 = 10 then %s
+             when $1 = 11 then %s
+             when $1 = 12 then %s
+             when $1 = 13 then %s
+             when $1 = 14 then %s
+             else null
+        end"""
+        % (
+            basemap_sql(0, 0, 4096, style, options),
+            basemap_sql(1, 1, 4096, style, options),
+            basemap_sql(2, 2, 4096, style, options),
+            basemap_sql(3, 3, 4096, style, options),
+            basemap_sql(4, 4, 4096, style, options),
+            basemap_sql(5, 5, 4096, style, options),
+            basemap_sql(6, 6, 4096, style, options),
+            basemap_sql(7, 7, 4096, style, options),
+            basemap_sql(8, 8, 4096, style, options),
+            basemap_sql(9, 9, 4096, style, options),
+            basemap_sql(10, 10, 4096, style, options),
+            basemap_sql(11, 11, 4096, style, options),
+            basemap_sql(12, 12, 4096, style, options),
+            basemap_sql(13, 13, 4096, style, options),
+            basemap_sql(14, 23, 8192, style, options),
         )
-    
-    print("$$;")
+    )
