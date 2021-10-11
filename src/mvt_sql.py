@@ -364,7 +364,7 @@ def komap_mvt_sql(options, style):
 
     for (minzoom, maxzoom, extent) in zooms:
         print(
-            """create or replace function public.basemap_z%s(x integer, y integer)
+            """create or replace function public.basemap_%s(x integer, y integer)
         returns bytea
         as $$
         select (
@@ -390,33 +390,3 @@ def komap_mvt_sql(options, style):
                 minzoom,
             )
         )
-
-    print(
-        """create or replace function public.basemap(z integer, x integer, y integer)
-        returns bytea
-        as $$
-        select
-            case
-                when z = 0 then public.basemap_z0(x, y)
-                when z = 1 then public.basemap_z1(x, y)
-                when z = 2 then public.basemap_z2(x, y)
-                when z = 3 then public.basemap_z3(x, y)
-                when z = 4 then public.basemap_z4(x, y)
-                when z = 5 then public.basemap_z5(x, y)
-                when z = 6 then public.basemap_z6(x, y)
-                when z = 7 then public.basemap_z7(x, y)
-                when z = 8 then public.basemap_z8(x, y)
-                when z = 9 then public.basemap_z9(x, y)
-                when z = 10 then public.basemap_z10(x, y)
-                when z = 11 then public.basemap_z11(x, y)
-                when z = 12 then public.basemap_z12(x, y)
-                when z = 13 then public.basemap_z13(x, y)
-                when z = 14 then public.basemap_z14(x, y)
-                else null
-            end
-        $$
-        language sql immutable strict parallel safe;
-
-        alter function basemap set max_parallel_workers_per_gather=0;
-        alter function basemap set jit=false;"""
-    )
