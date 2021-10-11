@@ -190,7 +190,7 @@ def get_vectors(minzoom, maxzoom, x, y, style, vec, extent, locales):
 
     if vec == "polygon":
         coastline_query = """select ST_AsMVTGeom(geom, ST_TileEnvelope(%s, %s, %s), %s, 64, true) as way, %s from
-                (select ST_Simplify(ST_Union(geom), %s) as geom from
+                (select ST_SimplifyVW(ST_Union(geom), %s) as geom from
                     (select geom from
                         land_polygons_vector
                         where geom && ST_TileEnvelope(%s, %s, %s)
@@ -208,7 +208,7 @@ def get_vectors(minzoom, maxzoom, x, y, style, vec, extent, locales):
                     for name in column_names
                 ]
             ),
-            pixel_size_at_zoom(maxzoom, pxtolerance),
+            pixel_size_at_zoom(maxzoom, pxtolerance) ** 2,
             minzoom,
             x,
             y,
