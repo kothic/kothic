@@ -190,7 +190,7 @@ def get_vectors(minzoom, maxzoom, x, y, style, vec, extent, locales):
 
     if vec == "polygon":
         coastline_query = """select ST_AsMVTGeom(geom, ST_TileEnvelope(%s, %s, %s), %s, 64, true) as way, %s from
-                (select ST_Simplify(ST_Union(geom), %s) as geom from
+                (select ST_SimplifyVW(ST_Union(geom), %s) as geom from
                     (select geom from
                         land_polygons_vector
                         where geom && ST_TileEnvelope(%s, %s, %s)
@@ -208,7 +208,7 @@ def get_vectors(minzoom, maxzoom, x, y, style, vec, extent, locales):
                     for name in column_names
                 ]
             ),
-            pixel_size_at_zoom(maxzoom, pxtolerance),
+            pixel_size_at_zoom(maxzoom, pxtolerance) ** 2,
             minzoom,
             x,
             y,
@@ -242,12 +242,13 @@ def get_vectors(minzoom, maxzoom, x, y, style, vec, extent, locales):
             pixel_size_at_zoom(maxzoom, 1) ** 2,
         )
 
-        if maxzoom >= 8:
-            polygons_query = """select way as %s, %s from %s
+        if maxzoom >= 7:
+            polygons_query = """select ST_Simplify(way, %s) as %s, %s from %s
                                     where (%s)
                                     and way && ST_TileEnvelope(%s, %s, %s)
                                     and way_area > %s
                                     order by way_area desc""" % (
+                    pixel_size_at_zoom(maxzoom, pxtolerance),
                     geomcolumn,
                     select,
                     table[vec],
@@ -330,6 +331,48 @@ def get_vectors(minzoom, maxzoom, x, y, style, vec, extent, locales):
     return query
 
 
+def basemap_sql(minzoom, maxzoom, extent, style, options):
+    return """(
+            (select coalesce(ST_AsMVT(tile, 'area', %s, 'way'), '') from (%s) as tile) ||
+            (select coalesce(ST_AsMVT(tile, 'line', %s, 'way'), '') from (%s) as tile) ||
+            (select coalesce(ST_AsMVT(tile, 'node', %s, 'way'), '') from (%s) as tile)
+        )""" % (
+        extent,
+        get_vectors(
+            minzoom,
+            maxzoom,
+            "$2",
+            "$3",
+            style,
+            "polygon",
+            extent,
+            options.locale.split(","),
+        ),
+        extent,
+        get_vectors(
+            minzoom,
+            maxzoom,
+            "$2",
+            "$3",
+            style,
+            "line",
+            extent,
+            options.locale.split(","),
+        ),
+        extent,
+        get_vectors(
+            minzoom,
+            maxzoom,
+            "$2",
+            "$3",
+            style,
+            "point",
+            extent,
+            options.locale.split(","),
+        ),
+    )
+
+
 def komap_mvt_sql(options, style):
     for style_filename in options.filename:
         style.parse(filename=style_filename)
@@ -343,115 +386,40 @@ def komap_mvt_sql(options, style):
                 osm2pgsql_avail_keys[line[1]] = tuple(line[0].split(","))
         osm2pgsql_avail_keys["tags"] = ("node", "way")
 
-    zooms = [
-        (0, 0, 4096),
-        (1, 1, 4096),
-        (2, 2, 4096),
-        (3, 3, 4096),
-        (4, 4, 4096),
-        (5, 5, 4096),
-        (6, 6, 4096),
-        (7, 7, 4096),
-        (8, 8, 4096),
-        (9, 9, 4096),
-        (10, 10, 4096),
-        (11, 11, 4096),
-        (12, 12, 4096),
-        (13, 13, 4096),
-        (14, 23, 8192),
-    ]
-
-    for (minzoom, maxzoom, extent) in zooms:
-        print(
-            """create or replace function public.basemap_z%s(x integer, y integer)
-        returns bytea
-        as $$
-        select (
-            (select coalesce(ST_AsMVT(tile, 'area', %s, 'way'), '') from (%s) as tile) ||
-            (select coalesce(ST_AsMVT(tile, 'line', %s, 'way'), '') from (%s) as tile) ||
-            (select coalesce(ST_AsMVT(tile, 'node', %s, 'way'), '') from (%s) as tile)
-        )
-        $$
-        language sql immutable strict parallel safe;
-
-        alter function basemap_z%s set jit=false;
-        alter function basemap_z%s set max_parallel_workers_per_gather=0;
-        """
-            % (
-                minzoom,
-                extent,
-                get_vectors(minzoom, maxzoom, "x", "y", style, "polygon", extent, options.locale.split(',')),
-                extent,
-                get_vectors(minzoom, maxzoom, "x", "y", style, "line", extent, options.locale.split(',')),
-                extent,
-                get_vectors(minzoom, maxzoom, "x", "y", style, "point", extent, options.locale.split(',')),
-                minzoom,
-                minzoom,
-            )
-        )
-
     print(
-        """create or replace function public.basemap(z integer, x integer, y integer)
-        returns bytea
-        as $$
-        declare
-            mvt bytea;
-            dirty boolean;
-            t timestamp with time zone := clock_timestamp();
-        begin
-            select basemap_mvts.mvt, basemap_mvts.dirty into mvt, dirty from basemap_mvts
-                where basemap_mvts.tile_z = z and basemap_mvts.tile_x = x and basemap_mvts.tile_y = y
-                for update;
-
-            if (mvt is not null) and (not dirty) then
-                return mvt;
-            end if;
-
-            case
-                when z = 0 then
-                    select public.basemap_z0(x, y) into mvt;
-                when z = 1 then
-                    select public.basemap_z1(x, y) into mvt;
-                when z = 2 then
-                    select public.basemap_z2(x, y) into mvt;
-                when z = 3 then
-                    select public.basemap_z3(x, y) into mvt;
-                when z = 4 then
-                    select public.basemap_z4(x, y) into mvt;
-                when z = 5 then
-                    select public.basemap_z5(x, y) into mvt;
-                when z = 6 then
-                    select public.basemap_z6(x, y) into mvt;
-                when z = 7 then
-                    select public.basemap_z7(x, y) into mvt;
-                when z = 8 then
-                    select public.basemap_z8(x, y) into mvt;
-                when z = 9 then
-                    select public.basemap_z9(x, y) into mvt;
-                when z = 10 then
-                    select public.basemap_z10(x, y) into mvt;
-                when z = 11 then
-                    select public.basemap_z11(x, y) into mvt;
-                when z = 12 then
-                    select public.basemap_z12(x, y) into mvt;
-                when z = 13 then
-                    select public.basemap_z13(x, y) into mvt;
-                when z = 14 then
-                    select public.basemap_z14(x, y) into mvt;
-                else
-                    raise exception 'invalid tile coordinate (%, %, %)', z, x, y;
-            end case;
-
-            insert into basemap_mvts(tile_z, tile_x, tile_y, mvt, render_time, updated_at, dirty)
-                values (z, x, y, mvt, age(clock_timestamp(), t), now(), false)
-                on conflict (tile_z, tile_x, tile_y)
-                do update set mvt = excluded.mvt, render_time = excluded.render_time, updated_at = excluded.updated_at, dirty = excluded.dirty;
-
-            return mvt;
-        end
-        $$
-        language plpgsql volatile strict parallel safe;
-
-        alter function basemap set max_parallel_workers_per_gather=0;
-        alter function basemap set jit=false;"""
+        """select
+        case when $1 = 0 then %s
+             when $1 = 1 then %s
+             when $1 = 2 then %s
+             when $1 = 3 then %s
+             when $1 = 4 then %s
+             when $1 = 5 then %s
+             when $1 = 6 then %s
+             when $1 = 7 then %s
+             when $1 = 8 then %s
+             when $1 = 9 then %s
+             when $1 = 10 then %s
+             when $1 = 11 then %s
+             when $1 = 12 then %s
+             when $1 = 13 then %s
+             when $1 = 14 then %s
+             else null
+        end"""
+        % (
+            basemap_sql(0, 0, 4096, style, options),
+            basemap_sql(1, 1, 4096, style, options),
+            basemap_sql(2, 2, 4096, style, options),
+            basemap_sql(3, 3, 4096, style, options),
+            basemap_sql(4, 4, 4096, style, options),
+            basemap_sql(5, 5, 4096, style, options),
+            basemap_sql(6, 6, 4096, style, options),
+            basemap_sql(7, 7, 4096, style, options),
+            basemap_sql(8, 8, 4096, style, options),
+            basemap_sql(9, 9, 4096, style, options),
+            basemap_sql(10, 10, 4096, style, options),
+            basemap_sql(11, 11, 4096, style, options),
+            basemap_sql(12, 12, 4096, style, options),
+            basemap_sql(13, 13, 4096, style, options),
+            basemap_sql(14, 23, 8192, style, options),
+        )
     )
