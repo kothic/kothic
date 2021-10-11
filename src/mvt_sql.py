@@ -362,27 +362,28 @@ def komap_mvt_sql(options, style):
         (14, 23, 8192),
     ]
 
+    print("""create or replace procedure public.generate_basemap_prepared_statements()
+    language sql
+    as $$""")
+
     for (minzoom, maxzoom, extent) in zooms:
         print(
-            """prepare basemap_%s(x integer, y integer)
-        returns bytea
-        as $$
+            """prepare basemap_%s(integer, integer) as
         select (
             (select coalesce(ST_AsMVT(tile, 'area', %s, 'way'), '') from (%s) as tile) ||
             (select coalesce(ST_AsMVT(tile, 'line', %s, 'way'), '') from (%s) as tile) ||
             (select coalesce(ST_AsMVT(tile, 'node', %s, 'way'), '') from (%s) as tile)
-        )
-        $$
+        );
         """
             % (
                 minzoom,
                 extent,
-                get_vectors(minzoom, maxzoom, "x", "y", style, "polygon", extent, options.locale.split(',')),
+                get_vectors(minzoom, maxzoom, "$1", "$2", style, "polygon", extent, options.locale.split(',')),
                 extent,
-                get_vectors(minzoom, maxzoom, "x", "y", style, "line", extent, options.locale.split(',')),
+                get_vectors(minzoom, maxzoom, "$1", "$2", style, "line", extent, options.locale.split(',')),
                 extent,
-                get_vectors(minzoom, maxzoom, "x", "y", style, "point", extent, options.locale.split(',')),
-                minzoom,
-                minzoom,
+                get_vectors(minzoom, maxzoom, "$1", "$2", style, "point", extent, options.locale.split(',')),
             )
         )
+    
+    print("$$;")
