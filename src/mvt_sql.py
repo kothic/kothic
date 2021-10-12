@@ -87,10 +87,9 @@ def get_sql_hints(choosers, obj, zoom):
         ]
     )
 
-    hints = []
+    hints = set()
     for chooser in choosers:
         tags = set()
-        qs = []
         if not needed.isdisjoint(set(chooser.styles[0].keys())):
             for rule in chooser.ruleChains:
                 if obj:
@@ -108,12 +107,9 @@ def get_sql_hints(choosers, obj, zoom):
                             b.add(q[1])
 
                 if b:
-                    qs.append("(" + " AND ".join(b) + ")")
+                    hints.add("(" + " AND ".join(b) + ")")
 
-        if qs:
-            hints.append((tags, " OR ".join(qs)))
-
-    return hints
+    return (tags, hints)
 
 
 def get_vectors(minzoom, maxzoom, x, y, style, vec, extent, locales):
@@ -130,23 +126,16 @@ def get_vectors(minzoom, maxzoom, x, y, style, vec, extent, locales):
 
     column_names = set()
 
-    adp = []
-
+    adp = set()
     for zoom in range(minzoom, maxzoom + 1):
         column_names.update(style.get_interesting_tags(types[vec], zoom))
 
-        sql_hint = get_sql_hints(style.choosers, types[vec], zoom)
-        for tp in sql_hint:
-            add = []
-            for j in tp[0]:
-                if j not in column_names:
-                    break
-            else:
-                add.append(tp[1])
-            if add:
-                add = " OR ".join(add)
-                add = "(" + add + ")"
-                adp.append(add)
+        tp = get_sql_hints(style.choosers, types[vec], zoom)
+        for j in tp[0]:
+            if j not in column_names:
+                break
+        else:
+            adp = adp.union(tp[1])
 
     if "name" in column_names:
         for locale in locales:
