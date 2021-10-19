@@ -56,6 +56,19 @@ def make_nice_style(r):
             ra[a] = b
     return ra
 
+needed = set([
+    "width",
+    # "casing-width",
+    "fill-color",
+    "fill-image",
+    "icon-image",
+    "text",
+    "extrude",
+    "background-image",
+    "background-color",
+    "pattern-image",
+    "shield-text"
+])
 
 class StyleChooser:
     """
@@ -102,8 +115,9 @@ class StyleChooser:
         """
         ### FIXME
         a = set()
-        for r in self.ruleChains:
-            a.update(r.get_interesting_tags(ztype, zoom))
+        if not needed.isdisjoint(set(self.styles[0].keys())):
+            for r in self.ruleChains:
+                a.update(r.get_interesting_tags(ztype, zoom))
         if a:  # FIXME: semi-illegal optimization, may wreck in future on tagless matches
             for r in self.styles:
                 for c, b in r.iteritems():
@@ -117,21 +131,6 @@ class StyleChooser:
         """
         a = set()
         b = ""
-        needed = set([
-            "width",
-            # "casing-width",
-            "fill-color",
-            "fill-image",
-            "icon-image",
-            "text",
-            "extrude",
-            "background-image",
-            "background-color",
-            "pattern-image",
-            "shield-text"
-        ])
-
-
 
         if not needed.isdisjoint(set(self.styles[0].keys())):
             for r in self.ruleChains:
