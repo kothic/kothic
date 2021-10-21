@@ -208,7 +208,7 @@ def get_vectors(minzoom, maxzoom, x, y, style, vec, extent, locales):
         )
         polygons_query = """select ST_Buffer(way, -%s, 0) as %s, %s from
                                 (select ST_Union(way) as %s, %s from
-                                    (select ST_Buffer(way, %s) as %s, %s from %s
+                                    (select ST_Buffer(ST_SnapToGrid(way, %s / 10), %s) as %s, %s from %s
                                         where (%s)
                                         and way && ST_TileEnvelope(%s, %s, %s)
                                         and way_area > %s
@@ -221,6 +221,7 @@ def get_vectors(minzoom, maxzoom, x, y, style, vec, extent, locales):
             groupby,
             geomcolumn,
             groupby,
+            pixel_size_at_zoom(maxzoom, pxtolerance),
             pixel_size_at_zoom(maxzoom, pxtolerance),
             geomcolumn,
             select,
