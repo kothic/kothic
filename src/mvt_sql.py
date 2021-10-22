@@ -102,7 +102,7 @@ def get_sql_hints(choosers, obj, zoom):
                 b = set()
                 for condition in rule.conditions:
                     q = get_sql(condition, obj)
-                    if q and len(q) > 1:
+                    if q and len(q) > 1 and len(q[1]) > 0:
                             tags.add(q[0])
                             b.add(q[1])
 
@@ -176,6 +176,9 @@ def get_vectors(minzoom, maxzoom, x, y, style, vec, extent, locales):
         [escape_sql_column(name, type=types[vec], asname=True) for name in column_names]
     )
     groupby = ",".join(['"%s"' % name for name in column_names])
+
+    if not select:
+        return "select "
 
     if vec == "polygon":
         coastline_query = """select ST_AsMVTGeom(geom, ST_TileEnvelope(%s, %s, %s), %s, 64, true) as way, %s from

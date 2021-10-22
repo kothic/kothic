@@ -66,7 +66,7 @@ class Rule():
             if (self.subject != '') and not _test_feature_compatibility(obj, self.subject):
                 return set()
 
-        if zoom and not self.test_zoom(zoom):
+        if not self.test_zoom(zoom):
             return set()
 
         a = set()
