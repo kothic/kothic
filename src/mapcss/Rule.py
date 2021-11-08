@@ -61,6 +61,16 @@ class Rule():
     def get_compatible_types(self):
         return type_matches.get(self.subject, (self.subject,))
 
+    def get_all_tags(self, obj):
+        if obj:
+            if (self.subject != '') and not _test_feature_compatibility(obj, self.subject):
+                return set()
+
+        tags = set()
+        for condition in self.conditions:
+            tags.update(condition.get_interesting_tags())
+        return tags
+
     def get_interesting_tags(self, obj, zoom):
         if obj:
             if (self.subject != '') and not _test_feature_compatibility(obj, self.subject):
