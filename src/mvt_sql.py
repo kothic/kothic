@@ -177,6 +177,12 @@ def get_vectors(minzoom, maxzoom, x, y, style, vec, extent, locales):
         [escape_sql_column(name, type=types[vec], asname=True) for name in column_names_needed]
     )
     groupby = ",".join(['"%s"' % name for name in column_names_needed])
+    """
+    complete list of tags used in a style is preserved across all zoom levels.
+    it is required to make tiles containing the same feature on different zoom levels be the same.
+    this property allows to skip rendering of tile subtree if parent and child tiles are equal.
+    to avoid tile bloating unneeded tags are always filled with NULLs.
+    """
     groupby_all = ",".join([('"%s"' % name if name in column_names_needed else 'null as "%s"' % name) for name in column_names_all])
 
     if not select:

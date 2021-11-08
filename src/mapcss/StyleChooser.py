@@ -110,6 +110,9 @@ class StyleChooser:
         return a
 
     def get_all_tags(self, ztype):
+        """
+        get all tags collected from every rule and eval() in a chooser
+        """
         tags = set()
         for rule in self.ruleChains:
             tags.update(rule.get_all_tags(ztype))
@@ -124,7 +127,7 @@ class StyleChooser:
 
     def get_interesting_tags(self, ztype, zoom):
         """
-        Returns a set of tags that were used in here.
+        get tags required to be included for specific zoom level
         """
         ### FIXME
         a = set()
