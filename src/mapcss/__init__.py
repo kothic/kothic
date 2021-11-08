@@ -153,6 +153,16 @@ class MapCSS():
             d[x.get('object-id', '')].update(x)
         return d
     
+    def get_all_tags(self, ztype):
+        """
+        get all tags collected from every rule and eval() in a style
+        """
+        tags = set()
+        for chooser in self.choosers:
+            tags.update(chooser.get_all_tags(ztype))
+        
+        return tags
+
     def get_interesting_tags(self, type=None, zoom=None):
         """
         Get set of interesting tags.

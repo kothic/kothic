@@ -124,27 +124,28 @@ def get_vectors(minzoom, maxzoom, x, y, style, vec, extent, locales):
 
     types = {"line": "line", "polygon": "area", "point": "node"}
 
-    column_names = set()
+    column_names_needed = set()
+    column_names_all = style.get_all_tags(types[vec])
 
     adp = set()
     for zoom in range(minzoom, maxzoom + 1):
-        column_names.update(style.get_interesting_tags(types[vec], zoom))
+        column_names_needed.update(style.get_interesting_tags(types[vec], zoom))
 
         tp = get_sql_hints(style.choosers, types[vec], zoom)
         for j in tp[0]:
-            if j not in column_names:
+            if j not in column_names_needed:
                 break
         else:
             adp = adp.union(tp[1])
 
-    if "name" in column_names:
+    if "name" in column_names_needed:
         for locale in locales:
-            column_names.add("name:%s" % (locale))
+            column_names_needed.add("name:%s" % (locale))
         
         if "en" in locales:
-            column_names.add("int_name")
+            column_names_needed.add("int_name")
     
-    if "name:en" in column_names:
+    if "name:en" in column_names_needed:
         mapped_cols[
             "name:en"
         ] = """coalesce(
@@ -173,9 +174,16 @@ def get_vectors(minzoom, maxzoom, x, y, style, vec, extent, locales):
         adp = 'false'
 
     select = ",".join(
-        [escape_sql_column(name, type=types[vec], asname=True) for name in column_names]
+        [escape_sql_column(name, type=types[vec], asname=True) for name in column_names_needed]
     )
-    groupby = ",".join(['"%s"' % name for name in column_names])
+    groupby = ",".join(['"%s"' % name for name in column_names_needed])
+    """
+    complete list of tags used in a style is preserved across all zoom levels.
+    it is required to make tiles containing the same feature on different zoom levels be the same.
+    this property allows to skip rendering of tile subtree if parent and child tiles are equal.
+    to avoid tile bloating unneeded tags are always filled with NULLs.
+    """
+    groupby_all = ",".join([('"%s"' % name if name in column_names_needed else 'null as "%s"' % name) for name in column_names_all])
 
     if not select:
         return "select "
@@ -197,7 +205,7 @@ def get_vectors(minzoom, maxzoom, x, y, style, vec, extent, locales):
                 [
                     '%s as "%s"'
                     % (("'coastline'" if name == "natural" else "null"), name)
-                    for name in column_names
+                    for name in column_names_all
                 ]
             ),
             pixel_size_at_zoom(maxzoom, pxtolerance) ** 2,
@@ -260,7 +268,7 @@ def get_vectors(minzoom, maxzoom, x, y, style, vec, extent, locales):
             y,
             extent,
             geomcolumn,
-            groupby,
+            groupby_all,
             polygons_query,
             coastline_query,
         )
@@ -280,7 +288,7 @@ def get_vectors(minzoom, maxzoom, x, y, style, vec, extent, locales):
             y,
             extent,
             geomcolumn,
-            groupby,
+            groupby_all,
             pixel_size_at_zoom(maxzoom, pxtolerance),
             geomcolumn,
             groupby,
@@ -294,7 +302,7 @@ def get_vectors(minzoom, maxzoom, x, y, style, vec, extent, locales):
             ",".join(
                 [
                     escape_sql_column(name, type=types[vec], asname=False)
-                    for name in column_names
+                    for name in column_names_needed
                 ]
             ),
         )
