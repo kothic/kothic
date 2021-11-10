@@ -58,7 +58,7 @@ def make_nice_style(r):
 
 needed = set([
     "width",
-    # "casing-width",
+    "casing-width",
     "fill-color",
     "fill-image",
     "icon-image",
