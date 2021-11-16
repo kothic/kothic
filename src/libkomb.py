@@ -428,7 +428,9 @@ def komap_mapbox(options, style):
                     sorted(st.get("text").items(), key=lambda k: k[0])[-1][0] + 1
                 )
 
-                locales = options.locale.split(",")
+                locales = []
+                if options.locale is not None:
+                    locales = options.locale.split(",")
                 zoom_text = {}
                 for z, v in st.get("text").items():
                     if v.expr_text == "tag(\"name\")":
