@@ -135,7 +135,7 @@ def komap_mapbox(options, style):
             "type": "background",
             "paint": {},
             "layout": {},
-            "id": "bg",
+            "id": "land",
         }
 
         if "background-color" in canvas_style["::default"]:
@@ -522,6 +522,8 @@ def komap_mapbox(options, style):
 
                 mapbox_style_layer_id += 1
                 mapbox_style_layers.append(mapbox_style_layer)
+            if st.get("-x-mapbox-layer-id") and st.get("-x-mapbox-layer-id")[mapbox_style_layer["minzoom"]] is not None:
+                mapbox_style_layer["id"] = st.get("-x-mapbox-layer-id")[mapbox_style_layer["minzoom"]]
 
     mapbox_style["layers"] = sorted(mapbox_style["layers"], key=lambda k: k["priority"])
 
