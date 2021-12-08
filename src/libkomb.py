@@ -73,10 +73,19 @@ def build_kepler_hints(conditions, style):
     for condition in conditions:
         if condition.params[0] == "boundary":
             hints.add("border")
-        if condition.params[0] == "highway":
+        if condition.params[0] in ("highway", "railway"):
             hints.add("road")
-        if "text" in style:
-            hints.add("label")
+        if condition.params[0] in ("building", "building:part"):
+            hints.add("building")
+        if condition in (
+            Condition("eq", ("natural", "water")),
+            Condition("eq", ("natural", "strait")),
+            Condition("eq", ("place", "ocean")),
+            Condition("eq", ("place", "sea")),
+        ) or condition.params[0] in ("water", "waterway"):
+            hints.add("water")
+        if condition == Condition("eq", ("natural", "coastline")):
+            hints.add("landcover")
 
     return list(hints)
 
@@ -410,8 +419,7 @@ def komap_mapbox(options, style):
                     "filter": mapbox_style_layer_filter,
                     "layout": {},
                     "paint": {},
-                    "id": "+".join(build_kepler_hints(conditions, st))
-                    + str(mapbox_style_layer_id),
+                    "id": "label" + str(mapbox_style_layer_id),
                     "source-layer": subject,
                     "source": "composite",
                 }
