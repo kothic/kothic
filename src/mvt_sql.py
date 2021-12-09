@@ -189,11 +189,15 @@ def get_vectors(minzoom, maxzoom, x, y, style, vec, extent, locales):
         return "select "
 
     if vec == "polygon":
+        """
+        margin > 0 for ST_TileEnvelope is required to merge pieces of subdivided land_polygons_vector lying outside of tile box.
+        required to handle edge case when subdivision grid matches tile grid.
+        """
         coastline_query = """select ST_AsMVTGeom(geom, ST_TileEnvelope(%s, %s, %s), %s, 64, true) as way, %s from
                 (select ST_SimplifyVW(ST_Union(geom), %s) as geom from
                     (select geom from
                         land_polygons_vector
-                        where geom && ST_TileEnvelope(%s, %s, %s)
+                        where geom && ST_TileEnvelope(%s, %s, %s, margin => (256.0 / %s))
                         and ST_Area(geom) > %s
                     ) p
                 ) p""" % (
@@ -212,6 +216,7 @@ def get_vectors(minzoom, maxzoom, x, y, style, vec, extent, locales):
             minzoom,
             x,
             y,
+            extent,
             pixel_size_at_zoom(maxzoom, pxtolerance) ** 2,
         )
         polygons_query = """select ST_Buffer(way, -%s, 0) as %s, %s from
