@@ -186,7 +186,7 @@ def get_vectors(minzoom, maxzoom, x, y, style, vec, extent, locales):
     groupby_all = ",".join([('"%s"' % name if name in column_names_needed else 'null as "%s"' % name) for name in column_names_all])
 
     if not select:
-        return "select "
+        return "select null as way"
 
     if vec == "polygon":
         """
