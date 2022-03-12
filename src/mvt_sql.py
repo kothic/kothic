@@ -149,6 +149,7 @@ def get_vectors(minzoom, maxzoom, x, y, style, vec, extent, locales):
         mapped_cols[
             "name:en"
         ] = """coalesce(
+        tags->(boundaries_lang_override.lang),
         tags->'name:en',
         tags->'int_name',
         replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace
@@ -221,7 +222,8 @@ def get_vectors(minzoom, maxzoom, x, y, style, vec, extent, locales):
         )
         polygons_query = """select ST_Buffer(way, -%s, 0) as %s, %s from
                                 (select ST_Union(way) as %s, %s from
-                                    (select ST_Buffer(ST_Subdivide(way, 100), %s) as %s, %s from %s
+                                    (select ST_Buffer(ST_Subdivide(way, 100), %s) as %s, %s
+                                        from %s left join boundaries_lang_override on ST_Intersects(way, boundaries_lang_override.geom)
                                         where (%s)
                                         and way && ST_TileEnvelope(%s, %s, %s)
                                         and way_area > %s
@@ -248,7 +250,8 @@ def get_vectors(minzoom, maxzoom, x, y, style, vec, extent, locales):
         )
 
         if maxzoom >= 7:
-            polygons_query = """select ST_Simplify(way, %s) as %s, %s from %s
+            polygons_query = """select ST_Simplify(way, %s) as %s, %s
+                                    from %s left join boundaries_lang_override on ST_Intersects(way, boundaries_lang_override.geom)
                                     where (%s)
                                     and way && ST_TileEnvelope(%s, %s, %s)
                                     and way_area > %s
@@ -281,7 +284,7 @@ def get_vectors(minzoom, maxzoom, x, y, style, vec, extent, locales):
         query = """select ST_AsMVTGeom(way, ST_TileEnvelope(%s, %s, %s), %s, 64, true) as %s, %s from
                         (select ST_Simplify(ST_LineMerge(way), %s) as %s, %s from
                             (select ST_Union(way) as %s, %s from
-                                %s
+                                %s left join boundaries_lang_override on ST_Intersects(way, boundaries_lang_override.geom)
                                 where (%s)
                                 and way && ST_TileEnvelope(%s, %s, %s)
                             group by %s
@@ -313,7 +316,7 @@ def get_vectors(minzoom, maxzoom, x, y, style, vec, extent, locales):
         )
     elif vec == "point":
         query = """select ST_AsMVTGeom(way, ST_TileEnvelope(%s, %s, %s), %s, 64, true) as %s, %s
-                        from %s
+                        from %s left join boundaries_lang_override on ST_Intersects(way, boundaries_lang_override.geom)
                         where (%s) and way && ST_TileEnvelope(%s, %s, %s)
                         order by
                         (case when "admin_level"  ~  E'^[-]?[[:digit:]]+([.][[:digit:]]+)?$' then cast ("admin_level" as float) else null end) asc nulls last,
