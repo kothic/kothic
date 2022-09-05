@@ -144,7 +144,7 @@ def komap_mapbox(options, style):
             "type": "background",
             "paint": {},
             "layout": {},
-            "id": "background",
+            "id": "bg",
         }
 
         if "background-color" in canvas_style["::default"]:
