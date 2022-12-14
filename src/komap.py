@@ -60,7 +60,9 @@ parser.add_option("-f", "--minzoom", dest="minzoom", default=0, type="int",
 parser.add_option("-t", "--maxzoom", dest="maxzoom", default=19, type="int",
                   help="maximal available zoom level", metavar="ZOOM")
 parser.add_option("-l", "--locale", dest="locale",
-                  help="language that should be used for labels (ru, en, be, uk..)", metavar="LANG")
+                  help="language that should be used for labels (ru,en,be,uk,..)", metavar="LANG")
+parser.add_option("-F", "--label-fallback", dest="label_fallback",
+                  help="tags to use as additional fallback for labels (int_name,name,..)", default="name")
 parser.add_option("-o", "--output-file", dest="outfile", default="-",
                   help="output filename (defaults to stdout)", metavar="FILE")
 parser.add_option("-p", "--osm2pgsql-style", dest="osm2pgsqlstyle", default="-",
