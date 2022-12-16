@@ -437,17 +437,19 @@ def komap_mapbox(options, style):
                 )
 
                 locales = []
+                fallback = []
                 if options.locale is not None:
                     locales = options.locale.split(",")
+                if options.label_fallback is not None:
+                    fallback = options.label_fallback.split(",")
                 zoom_text = {}
                 for z, v in st.get("text").items():
                     if v.expr_text == "tag(\"name\")":
                         coalesce = ["coalesce"]
                         for l in locales:
                             coalesce.append(["get", "name:%s" % (l)])
-                        if "en" in locales:
-                            coalesce += [["get", "int_name"]]
-                        coalesce += [["get", "name"]]
+                        for f in fallback:
+                            coalesce.append(["get", f])
 
                         zoom_text[z] = coalesce
                     else:
