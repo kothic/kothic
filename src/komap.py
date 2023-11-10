@@ -93,9 +93,9 @@ def escape_sql_column(name, type="way", asname=False):
     if type in osm2pgsql_avail_keys.get(name, ()) or not osm2pgsql_avail_keys:
         return '"' + name + '"'
     elif not asname:
-        return "(tags->'" + name + "')"
+        return "(tags->>'" + name + "')"
     else:
-        return "(tags->'" + name + "') as \"" + name + '"'
+        return "(tags->>'" + name + "') as \"" + name + '"'
 
 style = MapCSS(options.minzoom, options.maxzoom + 1)  # zoom levels
 for style_filename in options.filename:
@@ -195,7 +195,7 @@ if options.renderer == "mapnik":
     elif options.locale and ("name:" + options.locale in osm2pgsql_avail_keys or not osm2pgsql_avail_keys):
         columnmap["name"] = ('COALESCE("name:' + options.locale + '", "name") AS name', ('name:' + options.locale,))
     elif options.locale:
-        columnmap["name"] = ("COALESCE(tags->'name:" + options.locale + '\', "name") AS name', ('tags',))
+        columnmap["name"] = ("COALESCE(tags->>'name:" + options.locale + '\', "name") AS name', ('tags',))
 
     mapped_cols = [i[0] for i in columnmap.values()]
     numerics = set()  # set of number-compared things, like "population<10000" needs population as number, not text
@@ -785,10 +785,10 @@ if options.renderer == "mapnik":
                                             add_tags.update(columnmap[t][1])
                                             texttags.update(columnmap[t][1])
 
-                                    oitags = itags.union(add_tags)  # SELECT: (tags->'mooring') as "mooring"
+                                    oitags = itags.union(add_tags)  # SELECT: (tags->>'mooring') as "mooring"
                                     oitags = ", ".join([escape_sql_column(i, asname=True) for i in oitags])
 
-                                    goitags = itags.union(add_tags)  # GROUP BY: (tags->'mooring')
+                                    goitags = itags.union(add_tags)  # GROUP BY: (tags->>'mooring')
                                     goitags = ", ".join([escape_sql_column(i) for i in goitags])
 
                                     fitags = [columnmap.get(i, (i,))[0] for i in itags]
