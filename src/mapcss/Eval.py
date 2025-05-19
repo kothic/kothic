@@ -78,7 +78,7 @@ class Eval():
         """
         Compute this eval()
         """
-        for k, v in tags.iteritems():
+        for k, v in tags.items():
             try:
                 tag[k] = float(v)
             except:
@@ -189,6 +189,6 @@ def m_metric(x, t):
 
 if __name__ == "__main__":
     a = Eval(""" eval( any( metric(tag("height")), metric ( num(tag("building:levels")) * 3), metric("1m"))) """)
-    print repr(a)
-    print a.compute({"building:levels": "3"})
-    print a.extract_tags()
+    print(repr(a))
+    print(a.compute({"building:levels": "3"}))
+    print(a.extract_tags())

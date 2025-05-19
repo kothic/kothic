@@ -117,7 +117,7 @@ _PATHSYMPROTO = descriptor.Descriptor(
         descriptor.FieldDescriptor(
             name='name', full_name='PathSymProto.name', index=0,
             number=1, type=9, cpp_type=9, label=2,
-            has_default_value=False, default_value=unicode("", "utf-8"),
+            has_default_value=False, default_value=str("", "utf-8"),
             message_type=None, enum_type=None, containing_type=None,
             is_extension=False, extension_scope=None,
             options=None),
@@ -334,7 +334,7 @@ _SYMBOLRULEPROTO = descriptor.Descriptor(
     descriptor.FieldDescriptor(
       name='name', full_name='SymbolRuleProto.name', index=0,
       number=1, type=9, cpp_type=9, label=2,
-      has_default_value=False, default_value=unicode("", "utf-8"),
+      has_default_value=False, default_value=str("", "utf-8"),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
@@ -635,7 +635,7 @@ _CLASSIFELEMENTPROTO = descriptor.Descriptor(
     descriptor.FieldDescriptor(
       name='name', full_name='ClassifElementProto.name', index=0,
       number=1, type=9, cpp_type=9, label=2,
-      has_default_value=False, default_value=unicode("", "utf-8"),
+      has_default_value=False, default_value=str("", "utf-8"),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
@@ -724,92 +724,79 @@ DESCRIPTOR.message_types_by_name['ClassifElementProto'] = _CLASSIFELEMENTPROTO
 DESCRIPTOR.message_types_by_name['ContainerProto'] = _CONTAINERPROTO
 
 
-class DashDotProto(message.Message):
-    __metaclass__ = reflection.GeneratedProtocolMessageType
+class DashDotProto(message.Message, metaclass=reflection.GeneratedProtocolMessageType):
     DESCRIPTOR = _DASHDOTPROTO
 
     # @@protoc_insertion_point(class_scope:DashDotProto)
 
 
-class PathSymProto(message.Message):
-    __metaclass__ = reflection.GeneratedProtocolMessageType
+class PathSymProto(message.Message, metaclass=reflection.GeneratedProtocolMessageType):
     DESCRIPTOR = _PATHSYMPROTO
 
     # @@protoc_insertion_point(class_scope:PathSymProto)
 
 
-class LineRuleProto(message.Message):
-    __metaclass__ = reflection.GeneratedProtocolMessageType
+class LineRuleProto(message.Message, metaclass=reflection.GeneratedProtocolMessageType):
     DESCRIPTOR = _LINERULEPROTO
 
     # @@protoc_insertion_point(class_scope:LineRuleProto)
 
 
-class LineDefProto(message.Message):
-    __metaclass__ = reflection.GeneratedProtocolMessageType
+class LineDefProto(message.Message, metaclass=reflection.GeneratedProtocolMessageType):
     DESCRIPTOR = _LINEDEFPROTO
 
     # @@protoc_insertion_point(class_scope:LineDefProto)
 
 
-class AreaRuleProto(message.Message):
-    __metaclass__ = reflection.GeneratedProtocolMessageType
+class AreaRuleProto(message.Message, metaclass=reflection.GeneratedProtocolMessageType):
     DESCRIPTOR = _AREARULEPROTO
 
     # @@protoc_insertion_point(class_scope:AreaRuleProto)
 
 
-class SymbolRuleProto(message.Message):
-    __metaclass__ = reflection.GeneratedProtocolMessageType
+class SymbolRuleProto(message.Message, metaclass=reflection.GeneratedProtocolMessageType):
     DESCRIPTOR = _SYMBOLRULEPROTO
 
     # @@protoc_insertion_point(class_scope:SymbolRuleProto)
 
 
-class CaptionDefProto(message.Message):
-    __metaclass__ = reflection.GeneratedProtocolMessageType
+class CaptionDefProto(message.Message, metaclass=reflection.GeneratedProtocolMessageType):
     DESCRIPTOR = _CAPTIONDEFPROTO
 
     # @@protoc_insertion_point(class_scope:CaptionDefProto)
 
 
-class CaptionRuleProto(message.Message):
-    __metaclass__ = reflection.GeneratedProtocolMessageType
+class CaptionRuleProto(message.Message, metaclass=reflection.GeneratedProtocolMessageType):
     DESCRIPTOR = _CAPTIONRULEPROTO
 
     # @@protoc_insertion_point(class_scope:CaptionRuleProto)
 
 
-class CircleRuleProto(message.Message):
-    __metaclass__ = reflection.GeneratedProtocolMessageType
+class CircleRuleProto(message.Message, metaclass=reflection.GeneratedProtocolMessageType):
     DESCRIPTOR = _CIRCLERULEPROTO
 
     # @@protoc_insertion_point(class_scope:CircleRuleProto)
 
 
-class PathTextRuleProto(message.Message):
-    __metaclass__ = reflection.GeneratedProtocolMessageType
+class PathTextRuleProto(message.Message, metaclass=reflection.GeneratedProtocolMessageType):
     DESCRIPTOR = _PATHTEXTRULEPROTO
 
     # @@protoc_insertion_point(class_scope:PathTextRuleProto)
 
 
-class DrawElementProto(message.Message):
-    __metaclass__ = reflection.GeneratedProtocolMessageType
+class DrawElementProto(message.Message, metaclass=reflection.GeneratedProtocolMessageType):
     DESCRIPTOR = _DRAWELEMENTPROTO
 
     # @@protoc_insertion_point(class_scope:DrawElementProto)
 
 
-class ClassifElementProto(message.Message):
-    __metaclass__ = reflection.GeneratedProtocolMessageType
+class ClassifElementProto(message.Message, metaclass=reflection.GeneratedProtocolMessageType):
     DESCRIPTOR = _CLASSIFELEMENTPROTO
 
     # @@protoc_insertion_point(class_scope:ClassifElementProto)
 
 
-class ContainerProto(message.Message):
-    __metaclass__ = reflection.GeneratedProtocolMessageType
+class ContainerProto(message.Message, metaclass=reflection.GeneratedProtocolMessageType):
     DESCRIPTOR = _CONTAINERPROTO
 
     # @@protoc_insertion_point(class_scope:ContainerProto)

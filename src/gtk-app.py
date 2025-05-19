@@ -22,14 +22,14 @@ import math
 import string
 import threading
 import time
-import Queue
+import queue
 import os
 
 
 # from backend.postgis import PostGisBackend as DataBackend
-from backend.vtile import QuadTileBackend as DataBackend
-from mapcss import MapCSS as Styling
-from gtk_widget import KothicWidget
+from .backend.vtile import QuadTileBackend as DataBackend
+from .mapcss import MapCSS as Styling
+from .gtk_widget import KothicWidget
 
 
 try:

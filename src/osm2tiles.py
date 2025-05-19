@@ -20,10 +20,12 @@ import sqlite3
 import sys
 from lxml import etree
 from twms import projections
-from style import Styling
+from .style import Styling
+import importlib
 
-reload(sys)
-sys.setdefaultencoding("utf-8")          # a hack to support UTF-8
+importlib.reload(sys)
+if hasattr(sys, "setdefaultencoding"):
+    sys.setdefaultencoding("utf-8")  # a hack to support UTF-8
 
 try:
     import psyco
@@ -47,16 +49,16 @@ def tilelist_by_geometry(way, start_zoom=0, ispoly=False):
     """
     ret = set([])
     tiles_by_zooms = {}  # zoom: set(tile,tile,tile...)
-    for t in xrange(0, MAXZOOM + 1):
+    for t in range(0, MAXZOOM + 1):
         tiles_by_zooms[t] = set([])
     for point in way:
         tile = projections.tile_by_coords(point, MAXZOOM, proj)
         tile = (MAXZOOM, int(tile[0]), int(tile[1]))
         tiles_by_zooms[MAXZOOM].add(tile)
-    for t in xrange(MAXZOOM - 1, start_zoom - 1, -1):
+    for t in range(MAXZOOM - 1, start_zoom - 1, -1):
         for tt in tiles_by_zooms[t + 1]:
             tiles_by_zooms[t].add((t, int(tt[1] / 2), int(tt[2] / 2)))
-    for z in tiles_by_zooms.values():
+    for z in list(tiles_by_zooms.values()):
         ret.update(z)
     return ret
 
@@ -74,7 +76,7 @@ def sanitize(string):
     string = string.replace("=", "###")
     return string
 
-print sanitize(" ;=")
+print(sanitize(" ;="))
 
 
 def initDB(filename):
@@ -120,15 +122,15 @@ def main():
     tags = {}
     context = etree.iterparse(osm_infile)
     for action, elem in context:
-        items = dict(elem.items())
+        items = dict(list(elem.items()))
         if elem.tag == "node":
             NODES_READ += 1
             if NODES_READ % 10000 == 0:
-                print "Nodes read:", NODES_READ
-                print len(curway), len(tags), len(tilefiles), len(tilefiles_hist)
+                print("Nodes read:", NODES_READ)
+                print(len(curway), len(tags), len(tilefiles), len(tilefiles_hist))
             if NODES_READ % 100000 == 0:
                 conn.commit()
-                print "flushing to temporary storage"
+                print("flushing to temporary storage")
 
 #      nodes[str(items["id"])] = (float(items["lon"]), float(items["lat"]))
             storeNode(conn, int(items["id"]), float(items["lon"]), float(items["lat"]))
@@ -146,17 +148,17 @@ def main():
         elif elem.tag == "way":
             WAYS_READ += 1
             if WAYS_READ % 1000 == 0:
-                print "Ways read:", WAYS_READ
+                print("Ways read:", WAYS_READ)
 
             mzoom = 1
             # tags = style.filter_tags(tags)
             if tags:
                 if True:  # style.get_style("way", tags, True):            # if way is stylized
-                    towrite = ";".join(["%s=%s" % x for x in tags.iteritems()])  # TODO: sanitize keys and values
+                    towrite = ";".join(["%s=%s" % x for x in tags.items()])  # TODO: sanitize keys and values
                     # print towrite
                     way_simplified = {MAXZOOM: curway}
 
-                    for zoom in xrange(MAXZOOM - 1, -1, -1):  # generalize a bit
+                    for zoom in range(MAXZOOM - 1, -1, -1):  # generalize a bit
                                           # TODO: Douglas-Peucker
                         prev_point = curway[0]
                         way = [prev_point]
@@ -189,9 +191,9 @@ def main():
                                 tilefiles_hist.append(tile)
                         tilefiles_hist.remove(tile)
                         tilefiles_hist.append(tile)
-                        print >>tilefiles[tile], "%s %s" % (towrite, items["id"]), " ".join([str(x[0]) + " " + str(x[1]) for x in way_simplified[tile[0]]])
+                        print("%s %s" % (towrite, items["id"]), " ".join([str(x[0]) + " " + str(x[1]) for x in way_simplified[tile[0]]]), file=tilefiles[tile])
                         if len(tilefiles_hist) > 400:
-                            print "Cleaned up tiles. Wrote by now:", len(tilefiles), "active:", len(tilefiles_hist)
+                            print("Cleaned up tiles. Wrote by now:", len(tilefiles), "active:", len(tilefiles_hist))
                             for tile in tilefiles_hist[0:len(tilefiles_hist) - 100]:
 
                                 tilefiles_hist.remove(tile)
@@ -202,7 +204,7 @@ def main():
                 # print >>corr, "%s %s %s %s %s %s"% (curway[0][0],curway[0][1],curway[1][0],curway[1][1], user, ts )
                 WAYS_WRITTEN += 1
                 if WAYS_WRITTEN % 10000 == 0:
-                    print WAYS_WRITTEN
+                    print(WAYS_WRITTEN)
             curway = []
             tags = {}
         elem.clear()
@@ -210,15 +212,15 @@ def main():
         del elem
                 # user = default_user
                 # ts = ""
-    print "Tiles generated:", len(tilefiles)
-    print "Nodes dropped when generalizing:", DROPPED_POINTS
+    print("Tiles generated:", len(tilefiles))
+    print("Nodes dropped when generalizing:", DROPPED_POINTS)
 #  print "Nodes in memory:", len(nodes)
     c = conn.cursor()
     c.execute('SELECT * from nodes')
-    print "Nodes in memory:", len(c.fetchall())
+    print("Nodes in memory:", len(c.fetchall()))
 
     # report temporary file size
-    print "Temporary file size:", os.path.getsize(TEMPORARY_FILE_PATH)
+    print("Temporary file size:", os.path.getsize(TEMPORARY_FILE_PATH))
 
     # remove temporary files
     os.remove(TEMPORARY_FILE_PATH)

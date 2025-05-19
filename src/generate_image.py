@@ -16,13 +16,13 @@
 #   along with kothic.  If not, see <http://www.gnu.org/licenses/>.
 
 
-from debug import debug, Timer
-from backend.vtile import QuadTileBackend as DataBackend
+from .debug import debug, Timer
+from .backend.vtile import QuadTileBackend as DataBackend
 # from backend.postgis import PostGisBackend as DataBackend
 # from style import Styling
-from mapcss import MapCSS
+from .mapcss import MapCSS
 
-from render import RasterTile
+from .render import RasterTile
 
 svg = False
 

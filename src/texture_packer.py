@@ -4,7 +4,7 @@ import pprint
 
 import Image
 import cairo
-import StringIO
+import io
 import rsvg
 
 from xml.dom import minidom
@@ -47,8 +47,8 @@ def open_icon_as_image(icon, multiplier = 1.0, max_height = None):
             [a.setAttribute("stroke", icon["color"]) for a in icon_dom.getElementsByTagName("g") if a.getAttribute("stroke")]
             [a.setAttribute("stroke", icon["color"]) for a in icon_dom.getElementsByTagName("rect") if a.getAttribute("stroke") not in ("none", "")]
 
-        tmpfile = StringIO.StringIO()
-        outfile = StringIO.StringIO()
+        tmpfile = io.BytesIO()
+        outfile = io.BytesIO()
         svg = rsvg.Handle(data=icon_dom.toxml())
         svgwidth = float(svg.get_property('width'))
         svgheight = float(svg.get_property('height'))
@@ -108,10 +108,10 @@ def pack_texture(icons=[], multiplier = 1.0, path = "", rasfilter = []):
             images[svg] = open_icon_as_image(icon, multiplier, max_height)
             area += images[svg].size[0] * images[svg].size[1]
         else:
-            print "bad icon!", icon
+            print("bad icon!", icon)
     width = 2 ** math.ceil(math.log(area ** 0.5, 2))
 
-    queue = images.keys()
+    queue = list(images.keys())
     queue.sort(key = lambda x: -images[x].size[1] * 10000 - images[x].size[0])
 
     for img in queue:
@@ -128,21 +128,21 @@ def pack_texture(icons=[], multiplier = 1.0, path = "", rasfilter = []):
     dx, dy = 0, 0
     icon_id = 0
     skin = open(os.path.join(path, 'basic.skn'), "w")
-    print >> skin, """<!DOCTYPE skin>
+    print("""<!DOCTYPE skin>
     <skin>
-    <page width="%s" height="%s" file="symbols.png">"""%(int(width), int(height))
+    <page width="%s" height="%s" file="symbols.png">"""%(int(width), int(height)), file=skin)
     for strip in strips:
         for img in strip["list"]:
             page.paste(images[img], (dx, dy))
             icon_id += 1
-            print >> skin,"""  <symbolStyle id="%s" name="%s">
+            print("""  <symbolStyle id="%s" name="%s">
     <resourceStyle x="%s" y="%s" width="%s" height="%s"/>
-    </symbolStyle>""" % (icon_id, img, dx, dy, images[img].size[0], images[img].size[1])
+    </symbolStyle>""" % (icon_id, img, dx, dy, images[img].size[0], images[img].size[1]), file=skin)
             dx += images[img].size[0]
         dy += strip["height"]
         dx = 0
     #pprint.pprint(strips)
 
-    print >>skin, """ </page>
-    </skin>"""
+    print(""" </page>
+    </skin>""", file=skin)
     page.save(os.path.join(path,"symbols.png"))
