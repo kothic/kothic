@@ -49,6 +49,26 @@ class FullDrulesGenTest(unittest.TestCase):
                     full_drules_gen.compare_with_baseline(generated_dir, baseline_dir, options)
                 )
 
+    def test_full_styles_regenerate_creates_output_dir(self):
+        options = Options()
+        options.outdir = ""
+
+        with tempfile.TemporaryDirectory() as out_parent:
+            options.outdir = str(Path(out_parent, "nested", "drules"))
+
+            original_styles = full_drules_gen.styles
+            original_libkomwm = full_drules_gen.libkomwm
+            try:
+                full_drules_gen.styles = {}
+                full_drules_gen.libkomwm = type("LibkomwmStub", (), {"MULTIPROCESSING": True, "prio_ranges": {}})()
+
+                full_drules_gen.full_styles_regenerate(options)
+            finally:
+                full_drules_gen.styles = original_styles
+                full_drules_gen.libkomwm = original_libkomwm
+
+            self.assertTrue(Path(options.outdir).is_dir())
+
 
 if __name__ == '__main__':
     unittest.main()

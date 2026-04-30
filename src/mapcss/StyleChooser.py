@@ -29,7 +29,7 @@ def make_nice_style(r):
         "checking and nicifying style table"
         if isinstance(b, TYPE_EVAL):
             ra[a] = b
-        elif "color" in a and b.strip() != 'none':
+        elif "color" in a and (isinstance(b, tuple) or b.strip() != 'none'):
             "parsing color value to 3-tuple"
             # print "res:", b
             if b and not isinstance(b, tuple):
@@ -39,7 +39,7 @@ def make_nice_style(r):
                 ra[a] = colorparser(b)
             elif b:
                 ra[a] = b
-        elif any(x in a for x in ("width", "opacity", "offset", "radius", "extrude")):
+        elif any(x in a for x in ("width", "z-index", "opacity", "offset", "radius", "extrude")):
             "these things are float's or not in table at all"
             try:
                 ra[a] = float(b)
@@ -124,7 +124,7 @@ class StyleChooser:
         return rule.runtime_conditions
 
     # TODO: Rename to "applyStyles"
-    def updateStyles(self, sl, tags, xscale, zscale, filter_by_runtime_conditions):
+    def updateStyles(self, sl, tags, xscale, zscale, filter_by_runtime_conditions, strict_runtime_filtering=False):
         # Are any of the ruleChains fulfilled?
         rule_and_object_id = self.testChains(tags)
 
@@ -134,7 +134,7 @@ class StyleChooser:
         rule = rule_and_object_id[0]
         object_id = rule_and_object_id[1]
 
-        if (filter_by_runtime_conditions is not None
+        if ((filter_by_runtime_conditions is not None or strict_runtime_filtering)
             and rule.runtime_conditions is not None
             and filter_by_runtime_conditions != rule.runtime_conditions):
             return sl

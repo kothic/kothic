@@ -304,6 +304,9 @@ class StyleChooserTest(unittest.TestCase):
         self.assertEqual(len(unfiltered_styles), 1)
         self.assertEqual(unfiltered_styles[0]["width"], 4.0)
 
+        strict_unfiltered_styles = sc.updateStyles([], object_tags, 1.0, 1.0, None, strict_runtime_filtering=True)
+        self.assertEqual(strict_unfiltered_styles, [])
+
         matching_styles = sc.updateStyles([], object_tags, 1.0, 1.0, [runtime_condition])
         self.assertEqual(len(matching_styles), 1)
         self.assertEqual(matching_styles[0]["width"], 4.0)

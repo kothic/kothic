@@ -15,6 +15,8 @@ whatever_to_cairo = mapcss.webcolors.webcolors.whatever_to_cairo
 
 PROFILE = False
 MULTIPROCESSING = True
+RUNTIME_CONDITION_MODE = 'organicmaps'
+PRIORITY_MODE = 'priority_files'
 
 # Priority values defined in *.prio.txt files are adjusted
 # to fit into the following "priorities ranges":
@@ -148,39 +150,55 @@ def query_style(args):
         if "area" not in cltags:
             all_runtime_conditions_arr.extend(style.get_runtime_rules(clname, "node", cltags, zoom))
 
-        runtime_conditions_arr = []
-        if len(all_runtime_conditions_arr) == 0:
-            # If there is no runtime conditions, do not filter style by runtime conditions
-            runtime_conditions_arr.append(None)
-        elif len(all_runtime_conditions_arr) == 1:
-            runtime_conditions_arr = all_runtime_conditions_arr
-        else:
-            # Keep unique conditions only
-            runtime_conditions_arr.append(all_runtime_conditions_arr.pop(0))
-            for new_rt_conditions in all_runtime_conditions_arr:
-                conditions_unique = True
-                for rt_conditions in runtime_conditions_arr:
-                    if new_rt_conditions == rt_conditions:
-                        conditions_unique = False
-                        break
-                if conditions_unique:
-                    runtime_conditions_arr.append(new_rt_conditions)
+        runtime_conditions_arr = runtime_condition_variants(all_runtime_conditions_arr)
 
         for runtime_conditions in runtime_conditions_arr:
             zstyle = {}
+            strict_runtime_filtering = RUNTIME_CONDITION_MODE != 'mapsme'
 
             # Get style for class 'cl' on zoom 'zoom' with corresponding runtime conditions
             if "area" not in cltags:
-                linestyle = style.get_style_dict(clname, "line", cltags, zoom, olddict=zstyle, filter_by_runtime_conditions=runtime_conditions)
+                linestyle = style.get_style_dict(clname, "line", cltags, zoom, olddict=zstyle, filter_by_runtime_conditions=runtime_conditions, strict_runtime_filtering=strict_runtime_filtering)
                 zstyle = linestyle
-            areastyle = style.get_style_dict(clname, "area", cltags, zoom, olddict=zstyle, filter_by_runtime_conditions=runtime_conditions)
+            areastyle = style.get_style_dict(clname, "area", cltags, zoom, olddict=zstyle, filter_by_runtime_conditions=runtime_conditions, strict_runtime_filtering=strict_runtime_filtering)
+            has_icons_for_areas = False
+            for st in areastyle.values():
+                if "icon-image" in st or 'symbol-shape' in st or 'symbol-image' in st:
+                    has_icons_for_areas = True
+                    break
             zstyle = areastyle
             if "area" not in cltags:
-                nodestyle = style.get_style_dict(clname, "node", cltags, zoom, olddict=zstyle, filter_by_runtime_conditions=runtime_conditions)
+                nodestyle = style.get_style_dict(clname, "node", cltags, zoom, olddict=zstyle, filter_by_runtime_conditions=runtime_conditions, strict_runtime_filtering=strict_runtime_filtering)
                 zstyle = nodestyle
 
-            results.append((cl, zoom, runtime_conditions, list(zstyle.values())))
+            results.append((cl, zoom, runtime_conditions, list(zstyle.values()), has_icons_for_areas))
     return results
+
+
+def runtime_condition_variants(runtime_conditions):
+    if not runtime_conditions:
+        # If there is no runtime conditions, do not filter style by runtime conditions.
+        return [None]
+
+    if RUNTIME_CONDITION_MODE == 'mapsme':
+        return runtime_conditions
+
+    unique_conditions = []
+    for new_rt_conditions in runtime_conditions:
+        conditions_unique = True
+        for rt_conditions in unique_conditions:
+            if new_rt_conditions == rt_conditions:
+                conditions_unique = False
+                break
+        if conditions_unique:
+            unique_conditions.append(new_rt_conditions)
+
+    if RUNTIME_CONDITION_MODE == 'comaps':
+        # CoMaps emits a base rule as a fallback in addition to runtime variants.
+        unique_conditions.append(None)
+
+    return unique_conditions
+
 
 def get_priorities_filename(prio_range, path):
     return os.path.join(path, f'priorities_{prio_ranges[prio_range]["pos"]}_{prio_range}.prio.txt')
@@ -541,6 +559,55 @@ def get_drape_priority(cl, dr_type, object_id, auto_dr_type = None, auto_comment
     return 0
 
 
+def legacy_z_index_priority(st, explicit_key, base, max_priority):
+    if explicit_key in st:
+        return int(st.get(explicit_key))
+    return min(max_priority, base + int(st.get('z-index', 0)))
+
+
+def legacy_casing_line_priority(st):
+    if '-x-me-casing-line-priority' in st:
+        return int(st.get('-x-me-casing-line-priority'))
+    return min(int(st.get('z-index', 0) + 999), 20000)
+
+
+def legacy_line_priority(st):
+    return legacy_z_index_priority(st, '-x-me-line-priority', 1000, 20000)
+
+
+def legacy_shield_priority(st):
+    return legacy_z_index_priority(st, '-x-me-shield-priority', 16000, 19100)
+
+
+def legacy_icon_priority(st):
+    return legacy_z_index_priority(st, '-x-me-icon-priority', 16000, 19100)
+
+
+def legacy_circle_priority(st):
+    return legacy_z_index_priority(st, '-x-me-symbol-priority', 14000, 19000)
+
+
+def legacy_text_priority(st, base_z):
+    return legacy_z_index_priority(st, '-x-me-text-priority', base_z, 19000)
+
+
+def legacy_area_priority(st, bgpos):
+    if '-x-me-area-priority' in st:
+        return int(st.get('-x-me-area-priority')), bgpos
+
+    if st.get('fill-position', 'foreground') == 'background':
+        if 'z-index' not in st:
+            bgpos -= 1
+            return bgpos - 16000, bgpos
+
+        zzz = int(st.get('z-index', 0))
+        if zzz > 0:
+            return zzz - 16000, bgpos
+        return zzz - 16700, bgpos
+
+    return int(st.get('z-index', 0)) + 1 + 1000, bgpos
+
+
 def format_priorities(options):
     output = ''
     for prio_range in prio_ranges.keys():
@@ -551,6 +618,11 @@ def format_priorities(options):
 
 # TODO: Split large function to smaller ones
 def komap_mapswithme(options):
+    global PRIORITY_MODE
+    global RUNTIME_CONDITION_MODE
+    PRIORITY_MODE = getattr(options, 'priority_mode', PRIORITY_MODE)
+    RUNTIME_CONDITION_MODE = getattr(options, 'runtime_condition_mode', RUNTIME_CONDITION_MODE)
+
     if options.data and os.path.isdir(options.data):
         ddir = options.data
     else:
@@ -610,7 +682,7 @@ def komap_mapswithme(options):
         cnt += 1
 
         cl = row[0].replace("|", "-")
-        if cl in unique_types_check and row[2] != 'x':
+        if PRIORITY_MODE != 'mapsme' and cl in unique_types_check and row[2] != 'x':
             raise Exception('Duplicate type: {0}'.format(row[0]))
         pairs = [i.strip(']').split("=") for i in row[1].split(',')[0].split('[')]
         kv = OrderedDict()
@@ -640,11 +712,12 @@ def komap_mapswithme(options):
     mapping_file.close()
     types_file.close()
 
-    output = ''
-    for prio_range in prio_ranges.keys():
-        load_priorities(prio_range, options.priorities_path, unique_types_check, compress = False)
-        output += f'{"" if not output else ", "}{len(prio_ranges[prio_range]["priorities"])} {prio_range}'
-    print(f'Loaded priorities: {output}.')
+    if PRIORITY_MODE == 'priority_files':
+        output = ''
+        for prio_range in prio_ranges.keys():
+            load_priorities(prio_range, options.priorities_path, unique_types_check, compress = False)
+            output += f'{"" if not output else ", "}{len(prio_ranges[prio_range]["priorities"])} {prio_range}'
+        print(f'Loaded priorities: {output}.')
 
     del unique_types_check
 
@@ -663,9 +736,13 @@ def komap_mapswithme(options):
     # Parse style mapcss
     global style
     style = MapCSS(options.minzoom, options.maxzoom)
-    style.parse(clamp=False, stretch=LAYER_PRIORITY_RANGE,
-                filename=options.filename, static_tags=mapcss_static_tags,
-                dynamic_tags=mapcss_dynamic_tags)
+    if PRIORITY_MODE == 'mapsme':
+        style.parse(filename=options.filename, static_tags=mapcss_static_tags,
+                    dynamic_tags=mapcss_dynamic_tags)
+    else:
+        style.parse(clamp=False, stretch=LAYER_PRIORITY_RANGE,
+                    filename=options.filename, static_tags=mapcss_static_tags,
+                    dynamic_tags=mapcss_dynamic_tags)
 
     # Build optimization tree - class/zoom/type -> StyleChoosers
     clname_cltag_unique = set()
@@ -694,6 +771,7 @@ def komap_mapswithme(options):
             style_colors[k] = mwm_encode_color(colors, raw_style_colors, k)
 
     visibility = {}
+    bgpos = 0
 
     dr_linecaps = {'none': BUTTCAP, 'butt': BUTTCAP, 'round': ROUNDCAP}
     dr_linejoins = {'none': NOJOIN, 'bevel': BEVELJOIN, 'round': ROUNDJOIN}
@@ -724,20 +802,21 @@ def komap_mapswithme(options):
     global validation_errors_count
     for results in imapfunc(query_style, ((cl, classificator[cl], options.minzoom, options.maxzoom) for cl in class_order)):
         for result in results:
-                cl, zoom, runtime_conditions, zstyle = result
+                cl, zoom, runtime_conditions, zstyle, has_icons_for_areas = result
 
-                # First, sort rules by ::object-id in captions (primary, secondary, none ..)
-                # then by other ::object-id in ascending order.
-                def rule_sort_key(dict_):
-                    first = 0
-                    if dict_.get('text'):
-                        if str(dict_.get('object-id')) != '::default':
-                            first = 1
-                        if str(dict_.get('text')) == 'none':
-                            first = 2
-                    return (first, dict_.get('object-id'))
+                if PRIORITY_MODE == 'priority_files':
+                    # First, sort rules by ::object-id in captions (primary, secondary, none ..)
+                    # then by other ::object-id in ascending order.
+                    def rule_sort_key(dict_):
+                        first = 0
+                        if dict_.get('text'):
+                            if str(dict_.get('object-id')) != '::default':
+                                first = 1
+                            if str(dict_.get('text')) == 'none':
+                                first = 2
+                        return (first, dict_.get('object-id'))
 
-                zstyle.sort(key = rule_sort_key)
+                    zstyle.sort(key = rule_sort_key)
 
                 # For debug purpose.
                 # if str(cl) == 'highway-path' and int(zoom) == 19:
@@ -785,7 +864,7 @@ def komap_mapswithme(options):
 
                 visstring[zoom] = "1"
 
-                if zoom == 0:
+                if zoom == 0 and PRIORITY_MODE != 'mapsme':
                     continue
 
                 dr_element = DrawElementProto()
@@ -796,6 +875,12 @@ def komap_mapswithme(options):
                         dr_element.apply_if.append(str(rc))
 
                 for st in zstyle:
+                    if PRIORITY_MODE == 'mapsme':
+                        if st.get('-x-kot-layer') == 'top':
+                            st['z-index'] = float(st.get('z-index', 0)) + 15001.
+                        elif st.get('-x-kot-layer') == 'bottom':
+                            st['z-index'] = float(st.get('z-index', 0)) - 15001.
+
                     if st.get('casing-width') not in (None, 0) or st.get('casing-width-add') is not None:  # and (st.get('width') or st.get('fill-color')):
                         is_area_st = 'fill-color' in st
                         if has_lines and not is_area_st and st.get('casing-linecap', 'butt') == 'butt':
@@ -815,7 +900,9 @@ def komap_mapswithme(options):
 
                             dr_line.width = round(base_width + st.get('casing-width') * 2, 2)
                             dr_line.color = mwm_encode_color(colors, st, "casing")
-                            if st.get('object-id') == '::default':
+                            if PRIORITY_MODE == 'mapsme':
+                                dr_line.priority = legacy_casing_line_priority(st)
+                            elif st.get('object-id') == '::default':
                                 # An automatic casing line should be rendered below the "main" line, hence auto priority -1.
                                 auto_comment = 'casing'
                                 dr_line.priority = get_drape_priority(cl, 'line', st.get('object-id'), 'line', auto_comment, -1)
@@ -857,8 +944,11 @@ def komap_mapswithme(options):
                             addPattern(dr_line.dashdot.dd)
                             dr_line.cap = dr_linecaps.get(st.get('linecap', 'butt'), BUTTCAP)
                             dr_line.join = dr_linejoins.get(st.get('linejoin', 'round'), ROUNDJOIN)
-                            dr_line.priority = get_drape_priority(cl, 'line', st.get('object-id'))
-                            store_visibility(cl, 'line', st.get('object-id'), zoom)
+                            if PRIORITY_MODE == 'mapsme':
+                                dr_line.priority = legacy_line_priority(st)
+                            else:
+                                dr_line.priority = get_drape_priority(cl, 'line', st.get('object-id'))
+                                store_visibility(cl, 'line', st.get('object-id'), zoom)
                             dr_element.lines.extend([dr_line])
                         if st.get('pattern-image'):
                             dr_line = LineRuleProto()
@@ -868,8 +958,11 @@ def komap_mapswithme(options):
                             dr_line.pathsym.name = icon[0]
                             dr_line.pathsym.step = float(st.get('pattern-spacing', 0)) - 16
                             dr_line.pathsym.offset = st.get('pattern-offset', 0)
-                            dr_line.priority = get_drape_priority(cl, 'line', st.get('object-id'))
-                            store_visibility(cl, 'line', st.get('object-id'), zoom)
+                            if PRIORITY_MODE == 'mapsme':
+                                dr_line.priority = legacy_line_priority(st)
+                            else:
+                                dr_line.priority = get_drape_priority(cl, 'line', st.get('object-id'))
+                                store_visibility(cl, 'line', st.get('object-id'), zoom)
                             dr_element.lines.extend([dr_line])
 
                     if st.get('shield-font-size'):
@@ -880,17 +973,25 @@ def komap_mapswithme(options):
                         dr_element.shield.color = mwm_encode_color(colors, st, "shield")
                         if st.get('shield-outline-radius', 0) != 0:
                             dr_element.shield.stroke_color = mwm_encode_color(colors, st, "shield-outline", "white")
-                        dr_element.shield.priority = get_drape_priority(cl, 'shield', st.get('object-id'))
-                        store_visibility(cl, 'shield', st.get('object-id'), zoom)
+                        if PRIORITY_MODE == 'mapsme':
+                            dr_element.shield.priority = legacy_shield_priority(st)
+                        else:
+                            dr_element.shield.priority = get_drape_priority(cl, 'shield', st.get('object-id'))
+                            store_visibility(cl, 'shield', st.get('object-id'), zoom)
                         if st.get('shield-min-distance', 0) != 0:
                             dr_element.shield.min_distance = int(st.get('shield-min-distance', 0))
 
                     if has_icons:
                         if st.get('icon-image') and st.get('icon-image') != 'none':
+                            if PRIORITY_MODE == 'mapsme' and not has_icons_for_areas:
+                                dr_element.symbol.apply_for_type = 1
                             icon = mwm_encode_image(st)
                             dr_element.symbol.name = icon[0]
-                            dr_element.symbol.priority = get_drape_priority(cl, 'icon', st.get('object-id'))
-                            store_visibility(cl, 'icon', st.get('object-id'), zoom)
+                            if PRIORITY_MODE == 'mapsme':
+                                dr_element.symbol.priority = legacy_icon_priority(st)
+                            else:
+                                dr_element.symbol.priority = get_drape_priority(cl, 'icon', st.get('object-id'))
+                                store_visibility(cl, 'icon', st.get('object-id'), zoom)
                             if 'icon-min-distance' in st:
                                 dr_element.symbol.min_distance = int(st.get('icon-min-distance', 0))
                             has_icons = False
@@ -898,13 +999,18 @@ def komap_mapswithme(options):
                             # TODO: not used in current styles; do "circles" work in drape at all?
                             dr_element.circle.radius = float(st.get('symbol-size'))
                             dr_element.circle.color = mwm_encode_color(colors, st, 'symbol-fill')
-                            dr_element.circle.priority = get_drape_priority(cl, 'circle', st.get('object-id'))
-                            store_visibility(cl, 'circle', st.get('object-id'), zoom)
+                            if PRIORITY_MODE == 'mapsme':
+                                dr_element.circle.priority = legacy_circle_priority(st)
+                            else:
+                                dr_element.circle.priority = get_drape_priority(cl, 'circle', st.get('object-id'))
+                                store_visibility(cl, 'circle', st.get('object-id'), zoom)
                             has_icons = False
 
                     if has_text and st.get('text') and st.get('text') != 'none':
                         # Take only first 2 captions: primary, secondary.
                         has_text = has_text[:2]
+                        if PRIORITY_MODE == 'mapsme':
+                            has_text.reverse()
 
                         dr_text = dr_element.caption
                         text_priority_key = 'caption'
@@ -913,9 +1019,11 @@ def komap_mapswithme(options):
                             text_priority_key = 'pathtext'
 
                         dr_cur_subtext = dr_text.primary
-                        for sp in has_text:
+                        for sp in has_text[:]:
+                            if PRIORITY_MODE == 'mapsme' and len(has_text) == 2:
+                                dr_cur_subtext = dr_text.secondary
                             dr_cur_subtext.height = int(float(sp.get('font-size', "10").split(",")[0]))
-                            if 'text-color' not in st:
+                            if PRIORITY_MODE != 'mapsme' and 'text-color' not in st:
                                 print(f'ERROR: text-color not set for z{zoom} {cl}')
                                 validation_errors_count += 1
                             dr_cur_subtext.color = mwm_encode_color(colors, sp, "text")
@@ -925,10 +1033,10 @@ def komap_mapswithme(options):
                                 dr_cur_subtext.offset_y = int(sp.get('text-offset-y', sp.get('text-offset', 0)))
                             elif 'text-offset-x' in sp:
                                 dr_cur_subtext.offset_x = int(sp.get('text-offset-x', 0))
-                            elif st.get('text-position', 'center') == 'center' and dr_element.symbol.priority:
+                            elif PRIORITY_MODE != 'mapsme' and st.get('text-position', 'center') == 'center' and dr_element.symbol.priority:
                                 print(f'ERROR: an icon is present, but caption\'s text-offset is not set for z{zoom} {cl}')
                                 validation_errors_count += 1
-                            if 'text' in sp and sp.get('text') not in ('name', 'int_name'):
+                            if 'text' in sp and (PRIORITY_MODE == 'mapsme' and sp.get('text') != 'name' or PRIORITY_MODE != 'mapsme' and sp.get('text') not in ('name', 'int_name')):
                                 dr_cur_subtext.text = sp.get('text')
                             if 'text-optional' in sp:
                                 is_valid, value = to_boolean(sp.get('text-optional', ''))
@@ -936,13 +1044,18 @@ def komap_mapswithme(options):
                                     dr_cur_subtext.is_optional = value
                                 else:
                                     dr_cur_subtext.is_optional = True
-                            elif text_priority_key == 'caption' and dr_element.symbol.priority:
+                            elif PRIORITY_MODE != 'mapsme' and text_priority_key == 'caption' and dr_element.symbol.priority:
                                 # On by default for all captions (not path texts) with icons.
                                 dr_cur_subtext.is_optional = True
                             dr_cur_subtext = dr_text.secondary
+                            if PRIORITY_MODE == 'mapsme':
+                                has_text.pop()
 
                         auto_comment = None
-                        if text_priority_key == 'caption' and dr_element.symbol.priority:
+                        if PRIORITY_MODE == 'mapsme':
+                            base_z = 16000 if text_priority_key == 'pathtext' else 15000
+                            dr_text.priority = legacy_text_priority(st, base_z)
+                        elif text_priority_key == 'caption' and dr_element.symbol.priority:
                             # A caption with an icon.
                             # Mandatory captions use icon's priority.
                             auto_prio_mod = 0
@@ -957,7 +1070,8 @@ def komap_mapswithme(options):
                             # A pathtext or a standalone caption.
                             dr_text.priority = get_drape_priority(cl, text_priority_key, st.get('object-id'))
 
-                        store_visibility(cl, text_priority_key, st.get('object-id'), zoom, auto_comment)
+                        if PRIORITY_MODE != 'mapsme':
+                            store_visibility(cl, text_priority_key, st.get('object-id'), zoom, auto_comment)
 
                         # Process captions block once.
                         has_text = None
@@ -965,8 +1079,11 @@ def komap_mapswithme(options):
                     if has_fills:
                         if 'fill-color' in st and st.get('fill-color') != 'none' and float(st.get('fill-opacity', 1)) > 0:
                             dr_element.area.color = mwm_encode_color(colors, st, "fill")
-                            dr_element.area.priority = get_drape_priority(cl, 'area', st.get('object-id'))
-                            store_visibility(cl, 'area', st.get('object-id'), zoom)
+                            if PRIORITY_MODE == 'mapsme':
+                                dr_element.area.priority, bgpos = legacy_area_priority(st, bgpos)
+                            else:
+                                dr_element.area.priority = get_drape_priority(cl, 'area', st.get('object-id'))
+                                store_visibility(cl, 'area', st.get('object-id'), zoom)
                             has_fills = False
 
                 str_dr_element = dr_cont.name + "/" + str(dr_element)
@@ -980,19 +1097,21 @@ def komap_mapswithme(options):
 
         visibility["world|" + class_tree[cl] + "|"] = "".join(visstring)
 
-    validate_visibilities(options.maxzoom)
+    if PRIORITY_MODE != 'mapsme':
+        validate_visibilities(options.maxzoom)
 
-    if validation_errors_count:
+    if PRIORITY_MODE != 'mapsme' and validation_errors_count:
         print()
         exit('FAILED to write regenerated drules files!\n'
              f'There are {validation_errors_count} validation errors (see in the log above).\n'
              'Fix all errors first and re-run.')
 
-    output = ''
-    for prio_range in prio_ranges.keys():
-        dump_priorities(prio_range, options.priorities_path, options.maxzoom)
-        output += f'{"" if not output else ", "}{len(prio_ranges[prio_range]["priorities"])} {prio_range}'
-    print(f'Re-formated priorities files: {output}.')
+    if PRIORITY_MODE == 'priority_files':
+        output = ''
+        for prio_range in prio_ranges.keys():
+            dump_priorities(prio_range, options.priorities_path, options.maxzoom)
+            output += f'{"" if not output else ", "}{len(prio_ranges[prio_range]["priorities"])} {prio_range}'
+        print(f'Re-formated priorities files: {output}.')
 
     # Write drules_proto.bin and drules_proto.txt files
 
@@ -1078,12 +1197,25 @@ def main():
                       help="path to priorities *.prio.txt files", metavar="PATH")
     parser.add_option("-d", "--data-path", dest="data",
                       help="path to mapcss-mapping.csv and other files", metavar="PATH")
+    parser.add_option("", "--runtime-condition-mode", dest="runtime_condition_mode",
+                      help="runtime condition compatibility mode: organicmaps, comaps, or mapsme",
+                      default=RUNTIME_CONDITION_MODE, metavar="MODE")
+    parser.add_option("", "--priority-mode", dest="priority_mode",
+                      help="priority compatibility mode: priority_files or mapsme",
+                      default=PRIORITY_MODE, metavar="MODE")
 
     (options, args) = parser.parse_args()
 
-    if (options.priorities_path is None or not os.path.isdir(options.priorities_path)):
+    if options.priority_mode not in ('priority_files', 'mapsme'):
+        parser.error("Unknown priority mode.")
+
+    if options.priority_mode == 'priority_files' and (options.priorities_path is None or not os.path.isdir(options.priorities_path)):
         parser.error("A path to priorities *.prio.txt files is required.")
-    options.priorities_path = os.path.normpath(options.priorities_path)
+    if options.priorities_path is not None:
+        options.priorities_path = os.path.normpath(options.priorities_path)
+
+    if options.runtime_condition_mode not in ('organicmaps', 'comaps', 'mapsme'):
+        parser.error("Unknown runtime condition mode.")
 
     if options.format_priorities_only:
         format_priorities(options)

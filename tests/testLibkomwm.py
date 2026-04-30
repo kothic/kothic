@@ -74,6 +74,51 @@ class LibKomwmTest(unittest.TestCase):
         #       of validation errors.
         self.assertTrue(True)
 
+    def test_runtime_condition_variants_support_fork_modes(self):
+        original_mode = libkomwm.RUNTIME_CONDITION_MODE
+        runtime_conditions = ["night", "night", "wifi"]
+        try:
+            libkomwm.RUNTIME_CONDITION_MODE = "organicmaps"
+            self.assertEqual(
+                libkomwm.runtime_condition_variants(runtime_conditions),
+                ["night", "wifi"]
+            )
+
+            libkomwm.RUNTIME_CONDITION_MODE = "comaps"
+            self.assertEqual(
+                libkomwm.runtime_condition_variants(runtime_conditions),
+                ["night", "wifi", None]
+            )
+
+            libkomwm.RUNTIME_CONDITION_MODE = "mapsme"
+            self.assertEqual(
+                libkomwm.runtime_condition_variants(runtime_conditions),
+                ["night", "night", "wifi"]
+            )
+
+            self.assertEqual(libkomwm.runtime_condition_variants([]), [None])
+        finally:
+            libkomwm.RUNTIME_CONDITION_MODE = original_mode
+
+    def test_legacy_mapsme_priority_helpers(self):
+        base_style = {"z-index": 3}
+        explicit_style = {
+            "z-index": 3,
+            "-x-me-line-priority": 42,
+            "-x-me-icon-priority": 43,
+            "-x-me-area-priority": -44,
+        }
+
+        self.assertEqual(libkomwm.legacy_line_priority(base_style), 1003)
+        self.assertEqual(libkomwm.legacy_icon_priority(base_style), 16003)
+        self.assertEqual(libkomwm.legacy_line_priority(explicit_style), 42)
+        self.assertEqual(libkomwm.legacy_icon_priority(explicit_style), 43)
+        self.assertEqual(libkomwm.legacy_area_priority(explicit_style, 0), (-44, 0))
+        self.assertEqual(
+            libkomwm.legacy_area_priority({"fill-position": "background"}, 0),
+            (-16001, -1)
+        )
+
     def test_line_casing_width_add_uses_base_width(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             data_dir = Path(tmpdir)

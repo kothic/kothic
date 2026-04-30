@@ -32,6 +32,7 @@ def output_name(options, style_name):
 
 def full_styles_regenerate(options):
     log.info("Start generating styles")
+    Path(options.outdir).mkdir(parents=True, exist_ok=True)
     libkomwm.MULTIPROCESSING = False
     prio_ranges_orig = deepcopy(libkomwm.prio_ranges)
 
@@ -97,6 +98,9 @@ def main():
     parser.add_option("", "--compare-baseline", dest="baseline_dir",
                       help="compare generated .bin/.txt files with baseline files from DIR",
                       metavar="DIR")
+    parser.add_option("", "--runtime-condition-mode", dest="runtime_condition_mode",
+                      help="runtime condition compatibility mode: organicmaps, comaps, or mapsme",
+                      default=libkomwm.RUNTIME_CONDITION_MODE, metavar="MODE")
 
     (options, args) = parser.parse_args()
 
@@ -105,6 +109,9 @@ def main():
 
     if options.outdir is None:
         parser.error("Please specify base output path.")
+
+    if options.runtime_condition_mode not in ('organicmaps', 'comaps', 'mapsme'):
+        parser.error("Unknown runtime condition mode.")
 
     full_styles_regenerate(options)
     if options.baseline_dir:

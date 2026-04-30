@@ -177,11 +177,11 @@ class MapCSS():
 
     # TODO: Renamed to `get_styles` because it returns a list of styles for each class `::XXX`
     # Refactoring idea: Maybe return dict with `object-id` as a key
-    def get_style(self, clname, type, tags, zoom, xscale, zscale, filter_by_runtime_conditions):
+    def get_style(self, clname, type, tags, zoom, xscale, zscale, filter_by_runtime_conditions, strict_runtime_filtering=False):
         style = []
         if type in self.choosers_by_type_zoom_tag:
             for chooser in self.choosers_by_type_zoom_tag[type][zoom][clname]:
-                style = chooser.updateStyles(style, tags, xscale, zscale, filter_by_runtime_conditions)
+                style = chooser.updateStyles(style, tags, xscale, zscale, filter_by_runtime_conditions, strict_runtime_filtering)
         style = [x for x in style if x["object-id"] != "::*"]
         for x in style:
             for k, v in [('width', 0), ('casing-width', 0)]:
@@ -201,11 +201,11 @@ class MapCSS():
             return colors[0].styles[0]
         return None
 
-    def get_style_dict(self, clname, type, tags={}, zoom=0, xscale=1, zscale=.5, olddict={}, filter_by_runtime_conditions=None):
+    def get_style_dict(self, clname, type, tags={}, zoom=0, xscale=1, zscale=.5, olddict={}, filter_by_runtime_conditions=None, strict_runtime_filtering=False):
         """
         Kothic styling API
         """
-        r = self.get_style(clname, type, tags, zoom, xscale, zscale, filter_by_runtime_conditions)
+        r = self.get_style(clname, type, tags, zoom, xscale, zscale, filter_by_runtime_conditions, strict_runtime_filtering)
         d = olddict
         for x in r:
             if x.get('object-id', '') not in d:
