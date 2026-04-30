@@ -1,11 +1,11 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from mapcss import Condition, _test_feature_compatibility
+from .mapcss import Condition, _test_feature_compatibility
 import json
-import mapcss.webcolors
+from .mapcss import webcolors
 
-whatever_to_hex = mapcss.webcolors.webcolors.whatever_to_hex
+whatever_to_hex = webcolors.webcolors.whatever_to_hex
 
 
 def to_mapbox_condition(condition):
@@ -45,7 +45,7 @@ def to_mapbox_condition(condition):
 
 def to_mapbox_expression(values_by_zoom):
     """ Convert sequence of zoom-value pairs into condensed mapbox expression """
-    values_by_zoom = sorted(values_by_zoom.items(), key=lambda k: k[0])
+    values_by_zoom = sorted(list(values_by_zoom.items()), key=lambda k: k[0])
     j = 0
     for i in range(1, len(values_by_zoom)):
         if values_by_zoom[i][1] != values_by_zoom[i - 1][1]:
@@ -191,7 +191,7 @@ def komap_mapbox(options, style):
         if subject not in ("area", "line", "node"):
             continue
 
-        mapbox_style_layer_filter = ["all"] + map(to_mapbox_condition, conditions)
+        mapbox_style_layer_filter = ["all"] + list(map(to_mapbox_condition, conditions))
         conditions += [
             Condition("set", (c.params[0],))
             for c in conditions
@@ -205,7 +205,7 @@ def komap_mapbox(options, style):
         for zoom in range(0, 24):
             zstyle = get_style(style, subject, conditions, zoom)
 
-            for (prop_name, prop_value) in zstyle.items():
+            for (prop_name, prop_value) in list(zstyle.items()):
                 if prop_name not in zs:
                     zs[prop_name] = {}
                 zs[prop_name][zoom] = prop_value
@@ -228,10 +228,10 @@ def komap_mapbox(options, style):
         break_zs.append(24)
         for (minzoom, maxzoom) in list(zip(break_zs, break_zs[1:])):
             st = {}
-            for (prop_name, prop_value_by_zoom) in zs.items():
+            for (prop_name, prop_value_by_zoom) in list(zs.items()):
                 t = {
                     z: v
-                    for z, v in prop_value_by_zoom.items()
+                    for z, v in list(prop_value_by_zoom.items())
                     if minzoom <= z < maxzoom
                 }
                 if len(t) > 0:
@@ -248,7 +248,7 @@ def komap_mapbox(options, style):
 
         for (minzoom, maxzoom, st) in zzs:
             if st.get("casing-width") and any(
-                v > 0 for v in st.get("casing-width").values()
+                v > 0 for v in list(st.get("casing-width").values())
             ):
                 mapbox_style_layer = {
                     "type": "line",
@@ -263,22 +263,22 @@ def komap_mapbox(options, style):
                 }
 
                 mapbox_style_layer["minzoom"] = sorted(
-                    st.get("casing-width").items(), key=lambda k: k[0]
+                    list(st.get("casing-width").items()), key=lambda k: k[0]
                 )[0][0]
                 mapbox_style_layer["maxzoom"] = (
-                    sorted(st.get("casing-width").items(), key=lambda k: k[0])[-1][0]
+                    sorted(list(st.get("casing-width").items()), key=lambda k: k[0])[-1][0]
                     + 1
                 )
 
                 mapbox_style_layer["paint"]["line-width"] = to_mapbox_expression(
                     {
                         z: v * 2 + st.get("width", {}).get(z, 0)
-                        for z, v in st.get("casing-width").items()
+                        for z, v in list(st.get("casing-width").items())
                     },
                 )
 
                 mapbox_style_layer["paint"]["line-color"] = to_mapbox_expression(
-                    {z: whatever_to_hex(v) for z, v in st.get("casing-color").items()}
+                    {z: whatever_to_hex(v) for z, v in list(st.get("casing-color").items())}
                 )
 
                 if st.get("casing-opacity"):
@@ -289,7 +289,7 @@ def komap_mapbox(options, style):
                     mapbox_style_layer["paint"][
                         "line-dasharray"
                     ] = to_mapbox_expression(
-                        {z: ["literal", v] for z, v in st.get("casing-dashes").items()}
+                        {z: ["literal", v] for z, v in list(st.get("casing-dashes").items())}
                     )
                 if st.get("casing-linecap"):
                     mapbox_style_layer["layout"]["line-cap"] = mapbox_linecaps[
@@ -311,7 +311,7 @@ def komap_mapbox(options, style):
                 mapbox_style_layers.append(mapbox_style_layer)
             if (
                 st.get("width")
-                and any(v > 0 for v in st.get("width").values())
+                and any(v > 0 for v in list(st.get("width").values()))
                 and st.get("color")
             ):
                 mapbox_style_layer = {
@@ -327,10 +327,10 @@ def komap_mapbox(options, style):
                 }
 
                 mapbox_style_layer["minzoom"] = sorted(
-                    st.get("width").items(), key=lambda k: k[0]
+                    list(st.get("width").items()), key=lambda k: k[0]
                 )[0][0]
                 mapbox_style_layer["maxzoom"] = (
-                    sorted(st.get("width").items(), key=lambda k: k[0])[-1][0] + 1
+                    sorted(list(st.get("width").items()), key=lambda k: k[0])[-1][0] + 1
                 )
 
                 mapbox_style_layer["paint"]["line-width"] = to_mapbox_expression(
@@ -338,7 +338,7 @@ def komap_mapbox(options, style):
                 )
 
                 mapbox_style_layer["paint"]["line-color"] = to_mapbox_expression(
-                    {z: whatever_to_hex(v) for z, v in st.get("color").items()}
+                    {z: whatever_to_hex(v) for z, v in list(st.get("color").items())}
                 )
 
                 if st.get("opacity"):
@@ -347,17 +347,17 @@ def komap_mapbox(options, style):
                     )
                 if st.get("blur"):
                     mapbox_style_layer["paint"]["line-blur"] = to_mapbox_expression(
-                        {z: float(v) for z, v in st.get("blur").items()}
+                        {z: float(v) for z, v in list(st.get("blur").items())}
                     )
                 if st.get("dashes"):
                     mapbox_style_layer["paint"][
                         "line-dasharray"
                     ] = to_mapbox_expression(
-                        {z: ["literal", v] for z, v in st.get("dashes").items()}
+                        {z: ["literal", v] for z, v in list(st.get("dashes").items())}
                     )
                 if st.get("linecap"):
                     mapbox_style_layer["layout"]["line-cap"] = to_mapbox_expression(
-                        {z: mapbox_linecaps[v] for z, v in st.get("linecap").items()}
+                        {z: mapbox_linecaps[v] for z, v in list(st.get("linecap").items())}
                     )
                 if st.get("linejoin"):
                     mapbox_style_layer["layout"]["line-join"] = to_mapbox_expression(
@@ -367,7 +367,7 @@ def komap_mapbox(options, style):
                 mapbox_style_layer_id += 1
                 mapbox_style_layers.append(mapbox_style_layer)
             if "fill-color" in st and any(
-                v is not None for v in st.get("fill-color").values()
+                v is not None for v in list(st.get("fill-color").values())
             ):
                 mapbox_style_layer = {
                     "type": "fill",
@@ -381,10 +381,10 @@ def komap_mapbox(options, style):
                 }
 
                 mapbox_style_layer["minzoom"] = sorted(
-                    st.get("fill-color").items(), key=lambda k: k[0]
+                    list(st.get("fill-color").items()), key=lambda k: k[0]
                 )[0][0]
                 mapbox_style_layer["maxzoom"] = (
-                    sorted(st.get("fill-color").items(), key=lambda k: k[0])[-1][0] + 1
+                    sorted(list(st.get("fill-color").items()), key=lambda k: k[0])[-1][0] + 1
                 )
 
                 if st.get("fill-position", "foreground") == "background":
@@ -403,7 +403,7 @@ def komap_mapbox(options, style):
                     )
 
                 mapbox_style_layer["paint"]["fill-color"] = to_mapbox_expression(
-                    {z: whatever_to_hex(v) for z, v in st.get("fill-color").items()}
+                    {z: whatever_to_hex(v) for z, v in list(st.get("fill-color").items())}
                 )
 
                 if st.get("fill-opacity"):
@@ -430,10 +430,10 @@ def komap_mapbox(options, style):
                     ]
 
                 mapbox_style_layer["minzoom"] = sorted(
-                    st.get("text").items(), key=lambda k: k[0]
+                    list(st.get("text").items()), key=lambda k: k[0]
                 )[0][0]
                 mapbox_style_layer["maxzoom"] = (
-                    sorted(st.get("text").items(), key=lambda k: k[0])[-1][0] + 1
+                    sorted(list(st.get("text").items()), key=lambda k: k[0])[-1][0] + 1
                 )
 
                 locales = []
@@ -443,7 +443,7 @@ def komap_mapbox(options, style):
                 if options.label_fallback is not None:
                     fallback = options.label_fallback.split(",")
                 zoom_text = {}
-                for z, v in st.get("text").items():
+                for z, v in list(st.get("text").items()):
                     if v.expr_text == "tag(\"name\")":
                         coalesce = ["coalesce"]
                         for l in locales:
@@ -459,7 +459,7 @@ def komap_mapbox(options, style):
 
                 if st.get("text-position"):
                     symbol_placement = {
-                        z: v for z, v in st.get("text-position").items() if v == "line"
+                        z: v for z, v in list(st.get("text-position").items()) if v == "line"
                     }
                     if len(symbol_placement) > 0:
                         mapbox_style_layer["layout"][
@@ -470,12 +470,12 @@ def komap_mapbox(options, style):
                     mapbox_style_layer["layout"]["text-size"] = to_mapbox_expression(
                         {
                             z: float(v.split(",").pop())
-                            for z, v in st.get("font-size").items()
+                            for z, v in list(st.get("font-size").items())
                         }
                     )
                 if st.get("font-family"):
                     mapbox_style_layer["layout"]["text-font"] = to_mapbox_expression(
-                        {z: ["literal", [v]] for z, v in st.get("font-family").items()}
+                        {z: ["literal", [v]] for z, v in list(st.get("font-family").items())}
                     )
                 if st.get("text-transform"):
                     mapbox_style_layer["layout"][
@@ -487,33 +487,33 @@ def komap_mapbox(options, style):
                     ] = to_mapbox_expression(
                         {
                             z: v == "true"
-                            for z, v in st.get("text-allow-overlap").items()
+                            for z, v in list(st.get("text-allow-overlap").items())
                         }
                     )
                 if st.get("text-offset"):
                     mapbox_style_layer["layout"]["text-offset"] = to_mapbox_expression(
                         {
                             z: ["literal", [0, float(v)]]
-                            for z, v in st.get("text-offset").items()
+                            for z, v in list(st.get("text-offset").items())
                         }
                     )
                 if st.get("text-padding"):
                     mapbox_style_layer["layout"]["text-padding"] = to_mapbox_expression(
-                        {z: float(v) for z, v in st.get("text-padding").items()}
+                        {z: float(v) for z, v in list(st.get("text-padding").items())}
                     )
                 if st.get("text-color"):
                     mapbox_style_layer["paint"]["text-color"] = to_mapbox_expression(
-                        {z: whatever_to_hex(v) for z, v in st.get("text-color").items()}
+                        {z: whatever_to_hex(v) for z, v in list(st.get("text-color").items())}
                     )
                 if st.get("text-opacity"):
                     mapbox_style_layer["paint"]["text-opacity"] = to_mapbox_expression(
-                        {z: float(v) for z, v in st.get("text-opacity").items()}
+                        {z: float(v) for z, v in list(st.get("text-opacity").items())}
                     )
                 if st.get("text-halo-radius"):
                     mapbox_style_layer["paint"][
                         "text-halo-width"
                     ] = to_mapbox_expression(
-                        {z: float(v) for z, v in st.get("text-halo-radius").items()}
+                        {z: float(v) for z, v in list(st.get("text-halo-radius").items())}
                     )
                 if st.get("text-halo-color"):
                     mapbox_style_layer["paint"][
@@ -521,7 +521,7 @@ def komap_mapbox(options, style):
                     ] = to_mapbox_expression(
                         {
                             z: whatever_to_hex(v)
-                            for z, v in st.get("text-halo-color").items()
+                            for z, v in list(st.get("text-halo-color").items())
                         }
                     )
 
@@ -535,4 +535,4 @@ def komap_mapbox(options, style):
 
     mapbox_style["layers"] = sorted(mapbox_style["layers"], key=lambda k: k["priority"])
 
-    print(json.dumps(mapbox_style))
+    print((json.dumps(mapbox_style)))

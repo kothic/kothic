@@ -15,18 +15,20 @@
 #   You should have received a copy of the GNU General Public License
 #   along with kothic.  If not, see <http://www.gnu.org/licenses/>.
 
-from debug import debug, Timer
-from mapcss import MapCSS
+from .debug import debug, Timer
+from .mapcss import MapCSS
 
 import gc
+import importlib
 gc.disable()
 
-import mapcss.webcolors
-whatever_to_hex = mapcss.webcolors.webcolors.whatever_to_hex
+from .mapcss import webcolors
+whatever_to_hex = webcolors.webcolors.whatever_to_hex
 
 import sys
-reload(sys)
-sys.setdefaultencoding("utf-8")
+importlib.reload(sys)
+if hasattr(sys, "setdefaultencoding"):
+    sys.setdefaultencoding("utf-8")
 
 import os
 
@@ -36,11 +38,11 @@ except ImportError:
     pass
 
 from optparse import OptionParser
-import ConfigParser
+import configparser
 import csv
 import math
 
-config = ConfigParser.ConfigParser()
+config = configparser.ConfigParser()
 
 
 def relaxedFloat(x):
@@ -109,17 +111,17 @@ if options.renderer == "mapbox-style-language":
     if options.glyphs_url is None:
         parser.error("glyphs url is required")
 
-    from libkomb import *
+    from .libkomb import *
     komap_mapbox(options, style)
     exit()
 
 if options.renderer == "mvt-sql":
-    from mvt_sql import *
+    from .mvt_sql import *
     komap_mvt_sql(options, style)
     exit()
 
 if options.renderer == "mapswithme":
-    from libkomwm import *
+    from .libkomwm import *
     komap_mapswithme(options, style, options.filename)
     exit()
 
@@ -129,11 +131,11 @@ else:
     mfile = open(options.outfile, "w")
 
 if options.renderer == "js":
-    from libkojs import *
+    from .libkojs import *
     komap_js(mfile, style)
 
 if options.renderer == "mapnik":
-    import libkomapnik
+    from . import libkomapnik
 
     config.read(['komap.conf', os.path.expanduser('~/.komap/komap.conf'), options.conffile])
     libkomapnik.map_proj = config.get("mapnik", "map_proj")
@@ -153,7 +155,7 @@ if options.renderer == "mapnik":
     libkomapnik.max_char_angle_delta = config.get("mapnik", "max_char_angle_delta")
     libkomapnik.font_tracking = config.get("mapnik", "font_tracking")
 
-    from libkomapnik import *
+    from .libkomapnik import *
 
     osm2pgsql_avail_keys = {}  # "column" : ["node", "way"]
     if options.osm2pgsqlstyle != "-":
@@ -167,7 +169,7 @@ if options.renderer == "mapnik":
     columnmap = {}
 
     if options.locale == "en":
-        columnmap["name"] = (u"""COALESCE(
+        columnmap["name"] = ("""COALESCE(
         "name:en",
         "int_name",
         replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace(replace
@@ -197,7 +199,7 @@ if options.renderer == "mapnik":
     elif options.locale:
         columnmap["name"] = ("COALESCE(tags->'name:" + options.locale + '\', "name") AS name', ('tags',))
 
-    mapped_cols = [i[0] for i in columnmap.values()]
+    mapped_cols = [i[0] for i in list(columnmap.values())]
     numerics = set()  # set of number-compared things, like "population<10000" needs population as number, not text
     mapniksheet = {}
 
@@ -205,7 +207,7 @@ if options.renderer == "mapnik":
     coast = {}
     fonts = set()
     demhack = False
-    for zoom in xrange(options.minzoom, options.maxzoom + 1):
+    for zoom in range(options.minzoom, options.maxzoom + 1):
         mapniksheet[zoom] = {}
         zsheet = mapniksheet[zoom]
         for chooser in style.choosers:
@@ -284,9 +286,9 @@ if options.renderer == "mapnik":
     for font in fonts:
         mfile.write(xml_fontset(font, True))
 
-    for zoom, zsheet in mapniksheet.iteritems():
+    for zoom, zsheet in mapniksheet.items():
         x_scale = xml_scaledenominator(zoom)
-        ta = zsheet.keys()
+        ta = list(zsheet.keys())
         ta.sort(key=float)
         demcolors = {}
         demramp = {"ground": "", "ocean": ""}
@@ -297,7 +299,7 @@ if options.renderer == "mapnik":
                     if entry["type"] in ("ele",):
                         ele = int(entry["rule"][0][0].params[0])
                         demcolors[ele] = (whatever_to_hex(entry["style"].get('fill-color', '#ffffff')), entry["style"].get('fill-opacity', '1'))
-            dk = demcolors.keys()
+            dk = list(demcolors.keys())
             dk.sort()
             for ele in dk:
                 (color, opacity) = demcolors[ele]
@@ -372,7 +374,7 @@ if options.renderer == "mapnik":
             xml = xml_hillshade(zoom, x_scale)
             mfile.write(xml)
 
-        index_range = range(-6, 7)
+        index_range = list(range(-6, 7))
         full_layering = conf_full_layering
         if (zoom < 9) or not conf_full_layering:
             index_range = (-6, 0, 6)
@@ -415,7 +417,7 @@ if options.renderer == "mapnik":
                                     continue
                                 if zlayer != 6 and entry["style"]["-x-kot-layer"] == "top":
                                     continue
-                            elif zlayer not in range(-5, 6):
+                            elif zlayer not in list(range(-5, 6)):
                                 continue
                             if "casing-width" in entry["style"]:
                                 xml += xml_rule_start()
@@ -485,7 +487,7 @@ if options.renderer == "mapnik":
                                     continue
                                 if zlayer != 6 and entry["style"]["-x-kot-layer"] == "top":
                                     continue
-                            elif zlayer not in range(-5, 6):
+                            elif zlayer not in list(range(-5, 6)):
                                 continue
                             if "width" in entry["style"] or "pattern-image" in entry["style"] or (("fill-color" in entry["style"] or "fill-image" in entry["style"]) and (layer_type == "polygon") and (entry["style"].get("fill-position", "foreground") == "foreground")):
                                 xml += xml_rule_start()
@@ -553,7 +555,7 @@ if options.renderer == "mapnik":
                                                     im.save(icons_path + "komap/" + fname, "PNG")
                                                 xml += xml_linepatternsymbolizer("komap/" + fname)
                                             except:
-                                                print >> sys.stderr, "Error writing to ", icons_path + "komap/" + fname
+                                                print("Error writing to ", icons_path + "komap/" + fname, file=sys.stderr)
                                         else:
                                             if entry["style"].get("-x-kot-render", "none") == "svg":
                                                 xml += xml_linemarkerssymbolizer(entry["style"]["pattern-image"], entry["style"].get("spacing","100"), entry["style"].get("allow-overlap","false"))

@@ -1,8 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-from mapcss import MapCSS
-import mapcss.webcolors
-whatever_to_hex = mapcss.webcolors.webcolors.whatever_to_hex
+from .mapcss import MapCSS
+from .mapcss import webcolors
+import importlib
+whatever_to_hex = webcolors.webcolors.whatever_to_hex
 
 import json
 
@@ -10,8 +11,9 @@ import cairo
 
 import sys
 
-reload(sys)
-sys.setdefaultencoding("utf-8")
+importlib.reload(sys)
+if hasattr(sys, "setdefaultencoding"):
+    sys.setdefaultencoding("utf-8")
 
 minzoom = 0
 maxzoom = 18
@@ -23,7 +25,7 @@ style.parse(open(sys.argv[1], "r").read(), clamp=False)
 
 
 tags = [json.loads(x) for x in open("data/tags.list", "r")]
-print len(tags)
+print(len(tags))
 # a = cairo.PDFSurface("legend.pdf",100,100*len(tags))
 
 maxzoom += 1
@@ -42,7 +44,7 @@ for tag in tags:
         styles = style.get_style_dict("area", tag, zoom, olddict=styles.copy())
         styles = style.get_style_dict("line", tag, zoom, olddict=styles.copy())
 
-        styles = styles.values()
+        styles = list(styles.values())
         styles.sort(key=lambda x: x.get('z-index', 0))
         if len(styles) > 0:
             for st in styles:
@@ -77,7 +79,7 @@ for tag in tags:
                     cr.stroke()
                 if "icon-image" in st:
                     icons[st["icon-image"]] = icons.get(st["icon-image"], set())
-                    icons[st["icon-image"]].add('[' + ']['.join([k + "=" + v for k, v in tag.iteritems()]) + ']')
+                    icons[st["icon-image"]].add('[' + ']['.join([k + "=" + v for k, v in tag.items()]) + ']')
 
             if had_lines:
                 cr.move_to(0 + sample_width * zoom, 25 + 50 * i)
@@ -85,7 +87,7 @@ for tag in tags:
                 cr.show_text('z' + str(zoom))
 
     if had_lines:
-        text = '[' + ']['.join([k + "=" + v for k, v in tag.iteritems()]) + ']'
+        text = '[' + ']['.join([k + "=" + v for k, v in tag.items()]) + ']'
         cr.move_to(10, 20 + 50 * i)
         cr.set_source_rgb(0, 0, 0)
         cr.show_text(text)
@@ -98,8 +100,8 @@ for tag in tags:
         i += 1
 # a.finish()\
 ss = open("icons.html", "w")
-print >> ss, "<html><body><table border=1>"
-for k, v in icons.iteritems():
-    print >> ss, "<tr><td><img src='%s' width='24' height='24'></td><td>%s</td><td>%s</td></tr>\n" % (k.lower(), k.lower(), "<br>".join(list(v)))
-print >> ss, "</table></body></html>"
+print("<html><body><table border=1>", file=ss)
+for k, v in icons.items():
+    print("<tr><td><img src='%s' width='24' height='24'></td><td>%s</td><td>%s</td></tr>\n" % (k.lower(), k.lower(), "<br>".join(list(v))), file=ss)
+print("</table></body></html>", file=ss)
 a.write_to_png("legend.png")

@@ -17,14 +17,14 @@
 
 import sys
 
-from debug import debug, Timer
-from mapcss import MapCSS
+from .debug import debug, Timer
+from .mapcss import MapCSS
 
 
 langs = ['int_name', 'name:af', 'name:am', 'name:ar', 'name:be', 'name:bg', 'name:br', 'name:ca', 'name:cs', 'name:cy', 'name:de', 'name:el', 'name:en', 'name:eo', 'name:es', 'name:et', 'name:eu', 'name:fa', 'name:fi', 'name:fr', 'name:fur', 'name:fy', 'name:ga', 'name:gd', 'name:gsw', 'name:he', 'name:hi', 'name:hr', 'name:hsb', 'name:hu', 'name:hy', 'name:it', 'name:ja', 'name:ja_kana', 'name:ja_rm', 'name:ka', 'name:kk', 'name:kn', 'name:ko', 'name:ko_rm', 'name:ku', 'name:la', 'name:lb', 'name:lt', 'name:lv', 'name:mk', 'name:mn', 'name:nl', 'name:pl', 'name:pt', 'name:ro', 'name:ru', 'name:sk', 'name:sl', 'name:sq', 'name:sr', 'name:sv', 'name:th', 'name:tr', 'name:uk', 'name:vi', 'name:zh', 'name:zh_pinyin']
 
 if len(sys.argv) < 2:
-    print "Usage: make_postgis_style.py [stylesheet] [additional_tag,tag2,tag3]"
+    print("Usage: make_postgis_style.py [stylesheet] [additional_tag,tag2,tag3]")
     exit()
 
 style = MapCSS(1, 19)  # zoom levels
@@ -44,13 +44,13 @@ for a in t:
             dct[tag] = set()
         dct[tag].add(t[a])
 
-print """
-# OsmType  Tag                DataType      Flags"""
+print("""
+# OsmType  Tag                DataType      Flags""")
 for t in ("z_order", "way_area", ":area"):
     if t in dct:
         del dct[t]
 
-keys = dct.keys()
+keys = list(dct.keys())
 keys.sort()
 
 for k in keys:
@@ -59,7 +59,7 @@ for k in keys:
     pol = "linear"
     if "polygon" in set([i[1] for i in v]):
         pol = "polygon"
-    print "%-10s %-20s %-13s %s" % (s, k, "text", pol)
-print """
+    print("%-10s %-20s %-13s %s" % (s, k, "text", pol))
+print("""
 node,way   z_order              int4          linear # This is calculated during import
-way        way_area             real                 # This is calculated during import"""
+way        way_area             real                 # This is calculated during import""")

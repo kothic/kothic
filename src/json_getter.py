@@ -1,14 +1,16 @@
 # -*- coding: utf-8 -*-
 from twms import projections
-from libkomapnik import pixel_size_at_zoom
+from .libkomapnik import pixel_size_at_zoom
 import json
 import psycopg2
-from mapcss import MapCSS
+from .mapcss import MapCSS
 import cgi
 import os
 import sys
-reload(sys)
-sys.setdefaultencoding("utf-8")          # a hack to support UTF-8
+import importlib
+importlib.reload(sys)
+if hasattr(sys, "setdefaultencoding"):
+    sys.setdefaultencoding("utf-8")  # a hack to support UTF-8
 
 try:
     import psyco
@@ -167,8 +169,8 @@ def get_vectors(bbox, zoom, style, vec="polygon"):
 
     for row in b.fetchall():
         ROWS_FETCHED += 1
-        geom = dict(map(None, names, row))
-        for t in geom.keys():
+        geom = dict(zip(names, row))
+        for t in list(geom.keys()):
             if not geom[t]:
                 del geom[t]
         geojson = json.loads(geom[geomcolumn])
@@ -179,7 +181,7 @@ def get_vectors(bbox, zoom, style, vec="polygon"):
             geojson["reprpoint"] = json.loads(geom["reprpoint"])["coordinates"]
             del geom["reprpoint"]
         prop = {}
-        for k, v in geom.iteritems():
+        for k, v in geom.items():
             prop[k] = v
             try:
                 if int(v) == float(v):
@@ -195,18 +197,18 @@ def get_vectors(bbox, zoom, style, vec="polygon"):
     return {"bbox": bbox, "granularity": intscalefactor, "features": polygons}
 
 
-print "Content-Type: text/html"
-print
+print("Content-Type: text/html")
+print()
 
 form = cgi.FieldStorage()
 if "z" not in form:
-    print "need z"
+    print("need z")
     exit()
 if "x" not in form:
-    print "need x"
+    print("need x")
     exit()
 if "y" not in form:
-    print "need y"
+    print("need y")
     exit()
 z = int(form["z"].value)
 x = int(form["x"].value)
@@ -226,7 +228,7 @@ aaaa["features"].extend(get_vectors(bbox, zoom, style, "line")["features"])
 aaaa["features"].extend(get_vectors(bbox, zoom, style, "point")["features"])
 
 aaaa = callback + "(" + json.dumps(aaaa, True, False, separators=(',', ':')) + ",%s,%s,%s);" % (z, x, y)
-print aaaa
+print(aaaa)
 
 dir = "/var/www/vtile/%s/%s/" % (z, x)
 file = "%s.js" % y

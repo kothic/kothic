@@ -16,13 +16,13 @@
 #   along with kothic.  If not, see <http://www.gnu.org/licenses/>.
 
 
-from debug import debug, Timer
-from backend.postgis import PostGisBackend as DataBackend
-from mapcss import MapCSS
+from .debug import debug, Timer
+from .backend.postgis import PostGisBackend as DataBackend
+from .mapcss import MapCSS
 from twms import bbox, projections
-from render import RasterTile
+from .render import RasterTile
 import web
-import StringIO
+import io
 
 style = MapCSS(1, 26)  # zoom levels
 style.parse(open("styles/landuses.mapcss", "r").read())
@@ -98,7 +98,7 @@ def twms_main(req):
 
     res = RasterTile(width, height, z, db)
     res.update_surface(box, z, style)
-    image_content = StringIO.StringIO()
+    image_content = io.BytesIO()
 
     res.surface.write_to_png(image_content)
 

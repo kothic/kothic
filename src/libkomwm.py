@@ -1,19 +1,19 @@
-from drules_struct_pb2 import *
-import texture_packer
+from .drules_struct_pb2 import *
+from . import texture_packer
 
 
 import os
 import csv
 import json
-import mapcss.webcolors
-whatever_to_hex = mapcss.webcolors.webcolors.whatever_to_hex
-whatever_to_cairo = mapcss.webcolors.webcolors.whatever_to_cairo
+from .mapcss import webcolors
+whatever_to_hex = webcolors.webcolors.whatever_to_hex
+whatever_to_cairo = webcolors.webcolors.whatever_to_cairo
 
 WIDTH_SCALE = 1.0
 
 def komap_mapswithme(options, style, filename):
     if options.outfile == "-":
-        print "Please specify base output path."
+        print("Please specify base output path.")
         exit()
     else:
         ddir = os.path.dirname(options.outfile)
@@ -45,13 +45,13 @@ def komap_mapswithme(options, style, filename):
         classificator[row[0].replace("|", "-")] = kv
         if row[2] != "x":
             class_order.append(row[0].replace("|", "-"))
-            print >> types_file, row[0]
+            print(row[0], file=types_file)
         else:
             # compatibility mode
             if row[6]:
-                print >> types_file, row[6]
+                print(row[6], file=types_file)
             else:
-                print >> types_file, "mapswithme"
+                print("mapswithme", file=types_file)
         class_tree[row[0].replace("|", "-")] = row[0]
     class_order.sort()
     types_file.close()
@@ -107,7 +107,7 @@ def komap_mapswithme(options, style, filename):
         dr_cont = ClassifElementProto()
         dr_cont.name = cl
 
-        for zoom in xrange(options.minzoom, options.maxzoom + 1):
+        for zoom in range(options.minzoom, options.maxzoom + 1):
             txclass = classificator[cl]
             txclass["name"] = "name"
             txclass["addr:housenumber"] = "addr:housenumber"
@@ -125,7 +125,7 @@ def komap_mapswithme(options, style, filename):
 
             if True:
                 areastyle = style.get_style_dict("area", txclass, zoom, olddict=zstyle, cache=False)
-                for st in areastyle.values():
+                for st in list(areastyle.values()):
                     if "icon-image" in st or 'symbol-shape' in st or 'symbol-image' in st:
                         has_icons_for_areas = True
                 zstyle = areastyle
@@ -136,13 +136,13 @@ def komap_mapswithme(options, style, filename):
                 #    if "fill-color" in st:
                 #        del st["fill-color"]
                 zstyle = nodestyle
-            zstyle = zstyle.values()
+            zstyle = list(zstyle.values())
             has_lines = False
             has_text = []
             has_icons = False
             has_fills = False
             for st in zstyle:
-                st = dict([(k, v) for k, v in st.iteritems() if str(v).strip(" 0.")])
+                st = dict([(k, v) for k, v in st.items() if str(v).strip(" 0.")])
                 if 'width' in st or 'pattern-image' in st:
                     has_lines = True
                 if 'icon-image' in st or 'symbol-shape' in st or 'symbol-image' in st:
@@ -270,22 +270,22 @@ def komap_mapswithme(options, style, filename):
     prevvis = []
     visnodes = set()
     drules_bin.write(drules.SerializeToString())
-    drules_txt.write(unicode(drules))
+    drules_txt.write(str(drules))
 
     gui_symbol_path = os.path.join(ddir, 'symbols')
     imgpaths = [(".".join(i.split(".")[:-1]), {"file": os.path.join(gui_symbol_path, i)}, 24) for i in os.listdir(gui_symbol_path)]
-    imgpaths.extend([(handle, svg, 18) for handle, svg in textures.iteritems()])
+    imgpaths.extend([(handle, svg, 18) for handle, svg in textures.items()])
     dpiset = [('ldpi', 0.75), ('mdpi', 1), ('hdpi', 1.5), ('xhdpi', 2), ('xxhdpi', 3), ('yota', 1)]
-    style_dpi = style.get_style_dict("canvas", {}, 0).values()[0].get("-x-mapsithme-dpi", "ldpi,mdpi,hdpi,xhdpi,xxhdpi").split(",")
+    style_dpi = list(style.get_style_dict("canvas", {}, 0).values())[0].get("-x-mapsithme-dpi", "ldpi,mdpi,hdpi,xhdpi,xxhdpi").split(",")
     for (dpiname, multiplier) in dpiset:
         if dpiname in style_dpi:
             texture_packer.pack_texture(imgpaths, multiplier, os.path.join(ddir, 'resources-'+dpiname))
 
-    for k, v in visibility.iteritems():
+    for k, v in visibility.items():
         vis = k.split("|")
         for i in range(1, len(vis) - 1):
             visnodes.add("|".join(vis[0:i]) + "|")
-    viskeys = list(set(visibility.keys() + list(visnodes)))
+    viskeys = list(set(list(visibility.keys()) + list(visnodes)))
 
     def cmprepl(a, b):
         if a == b:
@@ -304,15 +304,15 @@ def komap_mapswithme(options, style, filename):
     for k in viskeys:
         offset = "    " * (k.count("|") - 1)
         for i in range(len(oldoffset) / 4, len(offset) / 4, -1):
-            print >>visibility_file, "    " * i + "{}"
-            print >>classificator_file, "    " * i + "{}"
+            print("    " * i + "{}", file=visibility_file)
+            print("    " * i + "{}", file=classificator_file)
 
         oldoffset = offset
         end = "-"
         if k in visnodes:
             end = "+"
-        print >>visibility_file, offset + k.split("|")[-2] + "  " + visibility.get(k, "0" * (options.maxzoom + 1)) + "  " + end
-        print >>classificator_file, offset + k.split("|")[-2] + "  " + end
+        print(offset + k.split("|")[-2] + "  " + visibility.get(k, "0" * (options.maxzoom + 1)) + "  " + end, file=visibility_file)
+        print(offset + k.split("|")[-2] + "  " + end, file=classificator_file)
     for i in range(len(offset) / 4, 0, -1):
-        print >>visibility_file, "    " * i + "{}"
-        print >>classificator_file, "    " * i + "{}"
+        print("    " * i + "{}", file=visibility_file)
+        print("    " * i + "{}", file=classificator_file)

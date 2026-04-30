@@ -46,7 +46,7 @@ def komap_js(mfile, style):
         styles = ""
         if subclass != "default":
             styles = 'if(!("%s" in style)){style["%s"] = new Object;}' % (subclass, subclass)
-        for k, v in chooser.styles[0].iteritems():
+        for k, v in chooser.styles[0].items():
             if type(v) == str:
                 try:
                     v = str(float(v))

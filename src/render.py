@@ -15,7 +15,7 @@
 #   You should have received a copy of the GNU General Public License
 #   along with kothic.  If not, see <http://www.gnu.org/licenses/>.
 
-from debug import debug, Timer
+from .debug import debug, Timer
 from twms import projections
 import cairo
 import math
@@ -77,7 +77,8 @@ class RasterTile:
         return projections.to4326((1. * x / self.w * (lo2 - lo1) + lo1, la2 + (1. * y / (self.h) * (la1 - la2))), self.proj)
     #  return (x - self.w/2)/(math.cos(self.center_coord[1]*math.pi/180)*self.zoom) + self.center_coord[0], -(y - self.h/2)/self.zoom + self.center_coord[1]
 
-    def lonlat2screen(self, (lon, lat), epsg4326=False):
+    def lonlat2screen(self, lonlat, epsg4326=False):
+        (lon, lat) = lonlat
         if epsg4326:
             lon, lat = projections.from4326((lon, lat), self.proj)
         lo1, la1, lo2, la2 = self.bbox_p
@@ -103,7 +104,7 @@ class RasterTile:
         self.bbox = bbox
         self.bbox_p = projections.from4326(bbox, self.proj)
 
-        print self.bbox_p
+        print(self.bbox_p)
         scale = abs(self.w / (self.bbox_p[0] - self.bbox_p[2]) / math.cos(math.pi * (self.bbox[1] + self.bbox[3]) / 2 / 180))
         zscale = 0.5 * scale
         cr = cairo.Context(self.surface)
@@ -147,7 +148,7 @@ class RasterTile:
         # enlarge bbox by 20% to each side. results in more vectors, but makes less artifaces.
         span_x, span_y = bbox[2] - bbox[0], bbox[3] - bbox[1]
         bbox_expand = [bbox[0] - 0.2 * span_x, bbox[1] - 0.2 * span_y, bbox[2] + 0.2 * span_x, bbox[3] + 0.2 * span_y]
-        vectors = self.data.get_vectors(bbox_expand, self.zoom, hints, itags).values()
+        vectors = list(self.data.get_vectors(bbox_expand, self.zoom, hints, itags).values())
         datatimer.stop()
         datatimer = Timer("Applying styles")
         ww = []
@@ -319,8 +320,8 @@ class RasterTile:
                     return -1
 
                 return cmp(math.sin(math.atan2(a[0][0][0] - a[0][1][0], a[0][0][0] - a[0][1][0])), math.sin(math.atan2(b[0][0][0] - b[0][1][0], b[0][0][0] - b[0][1][0])))
-                print t1
-                print t2
+                print(t1)
+                print(t2)
 
             extlist.sort(compare_things)
 
@@ -434,7 +435,7 @@ class RasterTile:
                             cr.fill()
                     else:  # render text along line
                         c = obj[0].cs
-                        text = unicode(text, "utf-8")
+                        text = str(text, "utf-8")
                         # - calculate line length
                         length = reduce(lambda x, y: (x[0] + ((y[0] - x[1]) ** 2 + (y[1] - x[2]) ** 2) ** 0.5, y[0], y[1]), c, (0, c[0][0], c[0][1]))[0]
                         # print length, text, cr.text_extents(text)
@@ -536,7 +537,7 @@ class ImageLoader:
         if url in self.cache:
             return self.cache[url]
         else:
-            print url, os_module.path.exists(url)
+            print(url, os_module.path.exists(url))
             if os_module.path.exists(url):
                 self.cache[url] = cairo.ImageSurface.create_from_png(url)
                 return self.cache[url]

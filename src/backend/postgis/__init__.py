@@ -19,6 +19,7 @@
 from twms import projections
 import psycopg2
 import shapely.wkb
+from functools import reduce
 
 
 class Empty:
@@ -112,14 +113,14 @@ class PostGisBackend:
                 adp = " OR ".join(adp)
 
             req = "SELECT %s FROM %s WHERE (%s) and way && SetSRID('BOX3D(%s %s,%s %s)'::box3d,900913);" % (taghint, table, adp, bbox[0], bbox[1], bbox[2], bbox[3])
-            print req
+            print(req)
             b.execute(req)
             names = [q[0] for q in b.description]
 
             for row in b.fetchall():
 
-                row_dict = dict(map(None, names, row))
-                for k, v in row_dict.items():
+                row_dict = dict(zip(names, row))
+                for k, v in list(row_dict.items()):
                     if not v:
                         del row_dict[k]
                 geom = shapely.wkb.loads(row_dict["way"].decode('hex'))

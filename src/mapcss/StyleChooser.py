@@ -16,15 +16,15 @@
 #   along with kothic.  If not, see <http://www.gnu.org/licenses/>.
 
 
-from Rule import Rule
-from webcolors.webcolors import whatever_to_cairo as colorparser
-from webcolors.webcolors import cairo_to_hex
-from Eval import Eval
+from .Rule import Rule
+from .webcolors.webcolors import whatever_to_cairo as colorparser
+from .webcolors.webcolors import cairo_to_hex
+from .Eval import Eval
 
 
 def make_nice_style(r):
     ra = {}
-    for a, b in r.iteritems():
+    for a, b in r.items():
         "checking and nicifying style table"
         if type(b) == type(Eval()):
             ra[a] = b
@@ -119,7 +119,7 @@ class StyleChooser:
         
         if tags:  # FIXME: semi-illegal optimization, may wreck in future on tagless matches
             for r in self.styles:
-                for c, b in r.iteritems():
+                for c, b in r.items():
                     if type(b) == self.eval_type:
                         tags.update(b.extract_tags())
         
@@ -136,7 +136,7 @@ class StyleChooser:
                 a.update(r.get_interesting_tags(ztype, zoom))
         if a:  # FIXME: semi-illegal optimization, may wreck in future on tagless matches
             for r in self.styles:
-                for c, b in r.iteritems():
+                for c, b in r.items():
                     if type(b) == self.eval_type:
                         a.update(b.extract_tags())
         return a
@@ -180,13 +180,13 @@ class StyleChooser:
         for r in self.styles:
             if self.has_evals:
                 ra = {}
-                for a, b in r.iteritems():
+                for a, b in r.items():
                     "calculating eval()'s"
                     if type(b) == self.eval_type:
                         combined_style = {}
                         for t in sl:
                             combined_style.update(t)
-                        for p, q in combined_style.iteritems():
+                        for p, q in combined_style.items():
                             if "color" in p:
                                 combined_style[p] = cairo_to_hex(q)
                         b = b.compute(tags, combined_style, scale, zscale)
@@ -269,7 +269,7 @@ class StyleChooser:
         rb = []
         for r in a:
             ra = {}
-            for a, b in r.iteritems():
+            for a, b in r.items():
                 a = a.strip()
                 b = b.strip()
                 if a == "casing-width":

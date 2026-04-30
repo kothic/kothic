@@ -1,12 +1,14 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-from mapcss import MapCSS
-import mapcss.webcolors
-whatever_to_hex = mapcss.webcolors.webcolors.whatever_to_hex
+from .mapcss import MapCSS
+from .mapcss import webcolors
+import importlib
+whatever_to_hex = webcolors.webcolors.whatever_to_hex
 import sys
 
-reload(sys)
-sys.setdefaultencoding("utf-8")
+importlib.reload(sys)
+if hasattr(sys, "setdefaultencoding"):
+    sys.setdefaultencoding("utf-8")
 
 minzoom = 0
 maxzoom = 19
@@ -45,9 +47,9 @@ def compare_order(a, function, b):
                     mab = max(sb)
                     TOTAL_TESTS += 1
                     if (function == "over") and (mia <= mab):
-                        print "ORDER: z%s\t[%s %s %s %s %s]\t[%s, %s], " % (zoom, typ1, mia, function, typ2, mab, repr(a), repr(b))
-                        print style.get_style(typ1, a, zoom)
-                        print style.get_style(typ2, b, zoom)
+                        print("ORDER: z%s\t[%s %s %s %s %s]\t[%s, %s], " % (zoom, typ1, mia, function, typ2, mab, repr(a), repr(b)))
+                        print(style.get_style(typ1, a, zoom))
+                        print(style.get_style(typ2, b, zoom))
                         FAILED_TESTS += 1
 
 
@@ -64,7 +66,7 @@ def compare_line_lightness(a, function, b):
                     mab = max(sb)
                     TOTAL_TESTS += 1
                     if (function == "darker") and (mia >= mab):
-                        print "LIGHT: z%s\t[%s %s %s %s %s]\t[%s, %s], " % (zoom, typ1, mia, function, typ2, mab, repr(a), repr(b))
+                        print("LIGHT: z%s\t[%s %s %s %s %s]\t[%s, %s], " % (zoom, typ1, mia, function, typ2, mab, repr(a), repr(b)))
                         FAILED_TESTS += 1
 
 
@@ -78,7 +80,7 @@ def compare_visibility(a, function, b):
             if sa or sb:
                 TOTAL_TESTS += 1
                 if (function == "both") and not ((sa) and (sb)):
-                    print "VISIBILITY: z%s\t[%s %s %s %s %s]\t[%s, %s], " % (zoom, typ, bool(sa), function, typ, bool(sb), repr(a), repr(b))
+                    print("VISIBILITY: z%s\t[%s %s %s %s %s]\t[%s, %s], " % (zoom, typ, bool(sa), function, typ, bool(sb), repr(a), repr(b)))
                     FAILED_TESTS += 1
 
 
@@ -93,7 +95,7 @@ def has_stable_labels(a):
             if sa or sb:
                 TOTAL_TESTS += 1
                 if sb and not sa:
-                    print "LABELS: %s|z%s\t[%s]" % (typ, zoom, repr(a))
+                    print("LABELS: %s|z%s\t[%s]" % (typ, zoom, repr(a)))
                     FAILED_TESTS += 1
                 else:
                     prev[typ] = sa
@@ -112,7 +114,7 @@ def has_darker_casings(a):
                     light_color = get_color_lightness(x.get('color', 0.))
                     light_casing = get_color_lightness(x.get('casing-color', 0.))
                     if light_color != (light_casing + 2):
-                        print "CASINGS: %s|z%s\t[%s], base: %x (%s)  casing: %x (%s)" % (typ, zoom, repr(a), light_color, x.get('width'), light_casing, x.get('casing-width'))
+                        print("CASINGS: %s|z%s\t[%s], base: %x (%s)  casing: %x (%s)" % (typ, zoom, repr(a), light_color, x.get('width'), light_casing, x.get('casing-width')))
                         FAILED_TESTS += 1
 
 compare_order({'area:highway': 'primary'}, "over", {'highway': 'primary'})
@@ -199,6 +201,6 @@ has_darker_casings({'highway': 'unclassified'})
 
 
 if TOTAL_TESTS > 0:
-    print "Failed tests: %s (%s%%)" % (FAILED_TESTS, 100 * FAILED_TESTS / TOTAL_TESTS)
-print "Passed tests:", TOTAL_TESTS - FAILED_TESTS
-print "Total tests:", TOTAL_TESTS
+    print("Failed tests: %s (%s%%)" % (FAILED_TESTS, 100 * FAILED_TESTS / TOTAL_TESTS))
+print("Passed tests:", TOTAL_TESTS - FAILED_TESTS)
+print("Total tests:", TOTAL_TESTS)

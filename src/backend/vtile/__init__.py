@@ -18,6 +18,7 @@
 
 from twms import projections
 import twms.bbox
+from functools import reduce
 
 
 class Empty:
@@ -74,8 +75,9 @@ class QuadTileBackend:
         self.keep_tiles = 15                # a number of tiles to cache in memory
         self.tile_load_log = []             # used when selecting which tile to unload
 
-    def filename(self, (z, x, y)):
+    def filename(self, tile):
 
+        (z, x, y) = tile
         return "%s/z%s/%s/x%s/%s/y%s.vtile" % (self.path, z, x / 1024, x, y / 1024, y)
 
     def load_tile(self, k):
@@ -83,7 +85,7 @@ class QuadTileBackend:
         try:
             f = open(self.filename(k))
         except IOError:
-            print ("Failed open: '%s'" % self.filename(k))
+            print(("Failed open: '%s'" % self.filename(k)))
             return {}
         t = {}
         for line in f:
@@ -105,7 +107,7 @@ class QuadTileBackend:
                     del self.tiles[tile]
                     self.tile_load_log.remove(tile)
                     # debug ("killed tile: %s" % (tile,))
-                except KeyError, ValueError:
+                except (KeyError, ValueError):
                     pass
                     # debug ("tile killed not by us: %s" % (tile,))
 

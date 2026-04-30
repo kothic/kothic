@@ -14,19 +14,19 @@
 #   You should have received a copy of the GNU General Public License
 #   along with tWMS.  If not, see <http://www.gnu.org/licenses/>.
 
-import StringIO
+import io
 import Image
 import os
 import threading
-import thread
+import _thread
 
 from twms import projections
 import config
 
 # from vtiles_backend import QuadTileBackend as DataBackend
-from backend.postgis import PostGisBackend as DataBackend
-from mapcss import MapCSS
-from render import RasterTile
+from .backend.postgis import PostGisBackend as DataBackend
+from .mapcss import MapCSS
+from .render import RasterTile
 from tempfile import NamedTemporaryFile
 
 style = MapCSS(1, 19)
@@ -60,7 +60,7 @@ def kothic_fetcher(z, x, y, this_layer):
 
 def kothic_metatile(z, x, y, this_layer):
 
-    print z, x, y
+    print(z, x, y)
     global metatiles_in_progress
     if "max_zoom" in this_layer:
         if z >= this_layer["max_zoom"]:

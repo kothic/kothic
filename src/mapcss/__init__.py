@@ -23,9 +23,9 @@ from hashlib import md5
 from copy import copy, deepcopy
 
 
-from StyleChooser import StyleChooser
-from Condition import Condition
-from Rule import _test_feature_compatibility
+from .StyleChooser import StyleChooser
+from .Condition import Condition
+from .Rule import _test_feature_compatibility
 
 
 NEEDED_KEYS = set(["width", "casing-width", "fill-color", "fill-image", "icon-image", "text", "extrude", "background-image", "background-color", "pattern-image", "shield-text", "symbol-shape"])
@@ -120,7 +120,7 @@ class MapCSS():
         Kothic styling API
         """
         if cache:
-            shash = md5(repr(type) + repr(tags) + repr(zoom)).digest()
+            shash = md5((repr(type) + repr(tags) + repr(zoom)).encode("utf-8")).digest()
             if shash in self.cache["style"]:
                 return deepcopy(self.cache["style"][shash])
         style = []
@@ -186,7 +186,7 @@ class MapCSS():
 
     def subst_variables(self, t):
         """Expects an array from parseDeclaration."""
-	for k in t[0]:
+        for k in t[0]:
             t[0][k] = VARIABLE.sub(self.get_variable, t[0][k])
         return t
 
@@ -303,7 +303,7 @@ class MapCSS():
                     import_text = open(filename, "r").read().strip()
                     css = import_text + css
                 except IOError as e:
-			log.warning("cannot import file %s: %s" % (filename, e))
+                    log.warning("cannot import file %s: %s" % (filename, e))
 
             elif VARIABLE_SET.match(css):
                 name = VARIABLE_SET.match(css).groups()[0]
@@ -314,7 +314,7 @@ class MapCSS():
 
             # Unknown pattern
             elif UNKNOWN.match(css):
-                log.warning("unknown thing found on line %s: %s" % (unicode(css_orig[:-len(unicode(css))]).count("\n") + 1, UNKNOWN.match(css).group()))
+                log.warning("unknown thing found on line %s: %s" % (str(css_orig[:-len(str(css))]).count("\n") + 1, UNKNOWN.match(css).group()))
                 css = UNKNOWN.sub("", css)
 
             else:

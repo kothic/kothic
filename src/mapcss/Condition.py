@@ -19,7 +19,7 @@ import re
 
 INVERSIONS = {"eq": "ne", "true": "false", "set": "unset", "<": ">=", ">": "<="}
 in2 = {}
-for a, b in INVERSIONS.iteritems():
+for a, b in INVERSIONS.items():
     in2[b] = a
 INVERSIONS.update(in2)
 del in2

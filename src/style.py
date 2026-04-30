@@ -18,9 +18,9 @@
 ### TODO: MapCSS loading and parsing
 
 
-from debug import debug
+from .debug import debug
 
-from mapcss.webcolors.webcolors import whatever_to_cairo as colorparser
+from .mapcss.webcolors.webcolors import whatever_to_cairo as colorparser
 
 
 class Styling():
@@ -61,7 +61,7 @@ class Styling():
 
         self.stylefile = stylefile
         self.useful_keys = set(["layer"])
-        for objtype in self.Selectors.values():  # getting useful keys
+        for objtype in list(self.Selectors.values()):  # getting useful keys
             for selector in objtype:
                 # debug(selector)
                 for tag in selector.tags:
@@ -147,11 +147,11 @@ class StyleSelector():
 
 if __name__ == "__main__":
     c = Styling()
-    print c.get_style("way", {"building": "yes"})
-    print c.get_style("way", {"highway": "residential"})
-    print c.get_style("way", {"highway": "road"})
-    print c.get_style("way", {"highway": "residential", "building": "yes"})
-    print c.get_style("way", {"highwadfgaay": "resifdgsdential", "builafgding": "yedfgs"})
-    print c.get_style("way", {"highwadfgaay": "resifdgsdential", "builafgding": "yedfgs"}, True)
-    print c.get_style("way", {"highway": "residential", "building": "yes"}, True)
-    print c.filter_tags({"highwadfgaay": "resifdgsdential", "builafgding": "yedfgs", "building": "residential"})
+    print(c.get_style("way", {"building": "yes"}))
+    print(c.get_style("way", {"highway": "residential"}))
+    print(c.get_style("way", {"highway": "road"}))
+    print(c.get_style("way", {"highway": "residential", "building": "yes"}))
+    print(c.get_style("way", {"highwadfgaay": "resifdgsdential", "builafgding": "yedfgs"}))
+    print(c.get_style("way", {"highwadfgaay": "resifdgsdential", "builafgding": "yedfgs"}, True))
+    print(c.get_style("way", {"highway": "residential", "building": "yes"}, True))
+    print(c.filter_tags({"highwadfgaay": "resifdgsdential", "builafgding": "yedfgs", "building": "residential"}))

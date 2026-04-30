@@ -18,9 +18,9 @@
 
 import os
 import math
-from debug import debug, Timer
+from .debug import debug, Timer
 
-from mapcss.webcolors.webcolors import whatever_to_hex as nicecolor
+from .mapcss.webcolors.webcolors import whatever_to_hex as nicecolor
 
 
 map_proj = ""
@@ -72,14 +72,14 @@ def pixel_size_at_zoom(z, l=1):
     return int(math.ceil(l * 20037508.342789244 / 256 * 2 / (2 ** z)))
 
 
-def xml_fontset(name, unicode=True):
-    if unicode:
-        unicode = '<Font face-name="unifont Medium" />'
+def xml_fontset(name, str=True):
+    if str:
+        str = '<Font face-name="unifont Medium" />'
     return """
     <FontSet name="%s">
           <Font face-name="%s" />
           %s
-    </FontSet>""" % (name, name, unicode)
+    </FontSet>""" % (name, name, str)
 
 
 def xml_pointsymbolizer(path="", width="", height="", opacity=1, overlap="false"):

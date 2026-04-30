@@ -24,10 +24,10 @@ import string
 import threading
 import datetime
 import time
-import Queue
+import queue
 import os
-from render import RasterTile
-from debug import debug, Timer
+from .render import RasterTile
+from .debug import debug, Timer
 import twms.bbox
 from twms import projections
 
@@ -81,9 +81,9 @@ class KothicWidget(gtk.DrawingArea):
 
     def zoom_to(self, bbox):
         self.zoom = twms.bbox.zoom_for_bbox(bbox, (self.width, self.height), {"proj": "EPSG:3857", "max_zoom": self.max_zoom}) - 1
-        print "Zoom:", self.zoom
+        print("Zoom:", self.zoom)
         self.center_coord = ((bbox[0] + bbox[2]) / 2, (bbox[1] + bbox[3]) / 2)
-        print self.center_coord
+        print(self.center_coord)
         self.redraw()
 
     def motion_ev(self, widget, event):
@@ -120,7 +120,7 @@ class KothicWidget(gtk.DrawingArea):
             x = event.x
             y = event.y
             lo1, la1, lo2, la2 = projections.from4326(self.bbox, "EPSG:3857")
-            print lo1, la1, lo2, la2
+            print(lo1, la1, lo2, la2)
             # self.center_coord = projections.to4326((0.5*(self.width+self.dx)/self.width*(lo1-lo2)+lo2, la1+(0.5*(self.height+self.dy)/self.height*(la2-la1))),"EPSG:3857")
 
             self.center_coord = projections.to4326((0.5 * (self.width + 2 * self.dx) / self.width * (lo1 - lo2) + lo2, la1 + (0.5 * (self.height + 2 * self.dy) / self.height * (la2 - la1))), "EPSG:3857")
@@ -170,7 +170,7 @@ class KothicWidget(gtk.DrawingArea):
         from_tile_x, from_tile_y, to_tile_x, to_tile_y = self.tilebox
         dx = 1. * (from_tile_x - int(from_tile_x)) * self.tiles.tilewidth
         dy = 1. * (from_tile_y - int(from_tile_y)) * self.tiles.tileheight
-        print dx, dy
+        print(dx, dy)
         # print self.dx, self.dy
         onscreen_tiles = set()
         for x in range(int(from_tile_x), int(to_tile_x) + 1):
@@ -202,12 +202,13 @@ class TileSource:
         self._singlethread = False
         self._prerender = True
 
-    def __getitem__(self, (z, x, y), wait=False):
+    def __getitem__(self, tile, wait=False):
 
+        (z, x, y) = tile
         try:
             # if "surface" in self.tiles[(z,x,y)] and not wait:
             #  self._callback((z,x,y), True)
-            print "Tiles count:", len(self.tiles)
+            print("Tiles count:", len(self.tiles))
             return self.tiles[(z, x, y)]["surface"]
         except:
             self.tiles[(z, x, y)] = {"tile": RasterTile(self.tilewidth, self.tileheight, z, self.data_backend)}
@@ -226,9 +227,10 @@ class TileSource:
                     self.tiles[(z, x, y)]["thread"].join()
             return self.tiles[(z, x, y)]["surface"]
 
-    def _callback(self, (z, x, y), last):
+    def _callback(self, tile, last):
         # if last:
         #  print last, "dddddddddddddddddd"
+        (z, x, y) = tile
         if not self._singlethread:
             if ((z, x, y) in self.onscreen or last) and "tile" in self.tiles[(z, x, y)]:
                 cr = cairo.Context(self.tiles[(z, x, y)]["surface"])
@@ -276,7 +278,7 @@ class TileSource:
                 if (len(self.tiles) > self.max_tiles):
                     c = cand.pop()
                     try:
-                        print "Killed tile ", c, " - finished in ", str(self.tiles[c]["finish_time"]), ", ago:", str(datetime.datetime.now() - self.tiles[c]["start_time"])
+                        print("Killed tile ", c, " - finished in ", str(self.tiles[c]["finish_time"]), ", ago:", str(datetime.datetime.now() - self.tiles[c]["start_time"]))
                         del self.tiles[c]
                     except KeyError:
                         pass
