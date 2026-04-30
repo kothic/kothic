@@ -205,13 +205,16 @@ Cheap checks:
 
 ```sh
 python3 -m unittest discover -s tests
-ruff check src tests integration-tests/full_drules_gen.py --exclude=src/drules_struct_pb2.py --target-version=py39
+ruff check src tests integration-tests/*.py --exclude=src/drules_struct_pb2.py --target-version=py39
 python3 -m compileall -q src tests integration-tests
 git diff --check
 ```
 
 Fork output checks:
 
+- CI runs `integration-tests/check_fork_drules.py`. It sparse-checks out pinned
+  Organic Maps and CoMaps data, regenerates drules, and compares generated
+  output against checked-in/fork-generated baselines.
 - Organic Maps: run `integration-tests/full_drules_gen.py` with
   `--compatibility-profile organicmaps` and compare all six `.bin/.txt` files.
 - CoMaps: run the same script with `--compatibility-profile comaps`.
