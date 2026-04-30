@@ -1,14 +1,14 @@
+# ruff: noqa: F405
 from mapcss import MapCSS
 from optparse import OptionParser
 import os
 import csv
 import functools
 from sys import exit
-from itertools import chain
 from multiprocessing import Pool, set_start_method
 from collections import OrderedDict
 import mapcss.webcolors
-from drules_struct_pb2 import *
+from drules_struct_pb2 import *  # noqa: F403
 
 whatever_to_hex = mapcss.webcolors.webcolors.whatever_to_hex
 whatever_to_cairo = mapcss.webcolors.webcolors.whatever_to_cairo
@@ -273,7 +273,7 @@ def load_priorities(prio_range, path, classif, compress = False, level = 0, has_
 
         if len(group):
             line = group
-            print_warning(f'skipping last types groups with no priority set')
+            print_warning('skipping last types groups with no priority set')
 
     if prio_range == PRIO_OVERLAYS:
         for key in prio_ranges[PRIO_OVERLAYS][collection_name].keys():
@@ -413,9 +413,9 @@ def dump_priorities(prio_range, path, maxzoom, include_comments = True, format_o
             outfile.write('\n')
 
         if include_comments:
-            collection_name = 'priorities';
+            collection_name = 'priorities'
         else:
-            collection_name = 'originalPriorities';
+            collection_name = 'originalPriorities'
         if len(prio_ranges[prio_range][collection_name]):
             dr_types_order = (('icon', 'caption', 'pathtext', 'shield', 'line', 'area') if prio_range == PRIO_OVERLAYS
                               else ('line', 'area', 'icon', 'caption', 'pathtext', 'shield'))
@@ -542,11 +542,6 @@ def get_drape_priority(cl, dr_type, object_id, auto_dr_type = None, auto_comment
 
 
 def format_priorities(options):
-    if options.data and os.path.isdir(options.data):
-        ddir = options.data
-    else:
-        ddir = os.path.abspath(os.path.join(os.path.dirname(options.priorities_path), "..", ".."))
-
     output = ''
     for prio_range in prio_ranges.keys():
         load_priorities(prio_range, options.priorities_path, set(), compress = False, level = 0, has_imports = False, skip_imports = False, format_only = True)
@@ -758,7 +753,6 @@ def komap_mapswithme(options):
                 if dr_cont is None:
                     dr_cont = ClassifElementProto()
                     dr_cont.name = cl
-                    dr_lines_objects = {}
 
                     visstring = ["0"] * (options.maxzoom - options.minzoom + 1)
 
@@ -780,7 +774,7 @@ def komap_mapswithme(options):
                 has_text = None
                 txfmt = []
                 for st in zstyle:
-                    if st.get('text') and st.get('text') != 'none' and not st.get('text') in txfmt:
+                    if st.get('text') and st.get('text') != 'none' and st.get('text') not in txfmt:
                         txfmt.append(st.get('text'))
                         if has_text is None:
                             has_text = []

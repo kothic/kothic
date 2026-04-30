@@ -47,9 +47,9 @@ class LibKomwmTest(unittest.TestCase):
 
             # Check that types.txt contains 1173 lines
             with open(assets_dir / "types.txt", "rt") as typesFile:
-                lines = [l.strip() for l in typesFile]
+                lines = [line.strip() for line in typesFile]
                 self.assertEqual(len(lines), 1173, "Generated types.txt file should contain 1173 lines")
-                self.assertEqual(len([l for l in lines if l!="mapswithme"]), 148, "Actual types count should be 148 as in mapcss-mapping.csv")
+                self.assertEqual(len([line for line in lines if line != "mapswithme"]), 148, "Actual types count should be 148 as in mapcss-mapping.csv")
 
             # Check that style_output.bin has 20 styles
             with open(assets_dir / "style_output.bin", "rb") as protobuf_file:
@@ -69,7 +69,6 @@ class LibKomwmTest(unittest.TestCase):
                 priority_file.write_bytes(content)
 
     def test_generate_drules_validation_errors(self):
-        assets_dir = Path(__file__).parent / 'assets' / 'case-3-styles-validation'
         # TODO: needs refactoring of libkomwm.validation_errors_count to have a list
         #       of validation errors.
         self.assertTrue(True)
