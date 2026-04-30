@@ -20,7 +20,6 @@ from twms import projections
 import cairo
 import math
 import os as os_module
-from copy import deepcopy
 from functools import cmp_to_key, reduce
 import pangocairo
 import pango
@@ -179,7 +178,7 @@ class RasterTile:
                 offset = float(w[1]["offset"])
                 w[0] = w[0].copy()
                 w[0].cs = offset_line(w[0].cs, offset)
-            if "raise" in w[1] and not "extrude" in w[1]:
+            if "raise" in w[1] and "extrude" not in w[1]:
                 w[0] = w[0].copy()
                 offset = float(w[1]["raise"])
                 w[0].cs_real = w[0].cs
@@ -223,7 +222,7 @@ class RasterTile:
 
             # - fill polygons
             for obj in data:
-                if ("fill-color" in obj[1] or "fill-image" in obj[1]) and not "extrude" in obj[1]:  # TODO: fill-image
+                if ("fill-color" in obj[1] or "fill-image" in obj[1]) and "extrude" not in obj[1]:  # TODO: fill-image
                     color = obj[1].get("fill-color", (0, 0, 0))
                     cr.set_source_rgba(color[0], color[1], color[2], obj[1].get("fill-opacity", 1))
 
@@ -287,7 +286,6 @@ class RasterTile:
                     raised = float(obj[1].get("raise", 0))
                     excoords = [(a[0], a[1] - hgt - raised) for a in obj[0].cs]
 
-                    faces = []
                     coord = obj[0].cs[-1]
                     # p_coord = (coord[0],coord[1]-raised)
                     p_coord = False
@@ -457,16 +455,13 @@ class RasterTile:
                                 else:
                                     return None
                             da = 0
-                            os = 1
                             z = length / 2 - cr.text_extents(text)[2] / 2
                          #  print get_xy_from_len(c,z)
                             if c[0][0] < c[1][0] and get_xy_from_len(c, z)[2] < math.pi / 2 and get_xy_from_len(c, z)[2] > -math.pi / 2:
                                 da = 0
-                                os = 1
                                 z = length / 2 - cr.text_extents(text)[2] / 2
                             else:
                                 da = math.pi
-                                os = -1
                                 z = length / 2 + cr.text_extents(text)[2] / 2
                             z1 = z
                             if "text-halo-color" in obj[1] or "text-halo-radius" in obj[1]:

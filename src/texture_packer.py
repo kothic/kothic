@@ -1,6 +1,5 @@
 import os
 import math
-import pprint
 
 import Image
 import cairo

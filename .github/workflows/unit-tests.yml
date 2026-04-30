@@ -20,7 +20,7 @@ jobs:
       - name: Check Python 3 runtime blockers
         run: ruff check --select=E9,F63,F7,F82 --exclude=src/drules_struct_pb2.py --output-format=github --target-version=py39
       - name: Lint maintained Python surfaces
-        run: ruff check tests integration-tests/full_drules_gen.py src/libkomwm.py src/mapcss src/libkomb.py src/mvt_sql.py src/komap.py --output-format=github --target-version=py39
+        run: ruff check src tests integration-tests/full_drules_gen.py --exclude=src/drules_struct_pb2.py --output-format=github --target-version=py39
       - name: Compile Python sources
         run: python -m compileall -q src tests integration-tests
       - name: Run unit-tests

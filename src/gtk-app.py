@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+# ruff: noqa: E402
 #    This file is part of kothic, the realtime map renderer.
 
 #   kothic is free software: you can redistribute it and/or modify
@@ -17,12 +18,6 @@
 import pygtk
 pygtk.require('2.0')
 import gtk
-import cairo
-import math
-import string
-import threading
-import time
-import queue
 import os
 
 

@@ -17,7 +17,6 @@
 
 import sys
 
-from .debug import debug, Timer
 from .mapcss import MapCSS
 
 

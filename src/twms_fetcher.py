@@ -14,11 +14,9 @@
 #   You should have received a copy of the GNU General Public License
 #   along with tWMS.  If not, see <http://www.gnu.org/licenses/>.
 
-import io
 import Image
 import os
 import threading
-import _thread
 
 from twms import projections
 import config

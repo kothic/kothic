@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+# ruff: noqa: E402
 #    This file is part of kothic, the realtime map renderer.
 
 #   kothic is free software: you can redistribute it and/or modify
@@ -19,13 +20,8 @@ pygtk.require('2.0')
 import gtk
 import gobject
 import cairo
-import math
-import string
 import threading
 import datetime
-import time
-import queue
-import os
 from .render import RasterTile
 from .debug import debug, Timer
 import twms.bbox
@@ -117,8 +113,6 @@ class KothicWidget(gtk.DrawingArea):
             self.drag = False
             self.timer.stop()
             # debug("dd: %s,%s "%(self.dx, self.dy))
-            x = event.x
-            y = event.y
             lo1, la1, lo2, la2 = projections.from4326(self.bbox, "EPSG:3857")
             print(lo1, la1, lo2, la2)
             # self.center_coord = projections.to4326((0.5*(self.width+self.dx)/self.width*(lo1-lo2)+lo2, la1+(0.5*(self.height+self.dy)/self.height*(la2-la1))),"EPSG:3857")
@@ -210,7 +204,7 @@ class TileSource:
             #  self._callback((z,x,y), True)
             print("Tiles count:", len(self.tiles))
             return self.tiles[(z, x, y)]["surface"]
-        except:
+        except KeyError:
             self.tiles[(z, x, y)] = {"tile": RasterTile(self.tilewidth, self.tileheight, z, self.data_backend)}
             self.tiles[(z, x, y)]["start_time"] = datetime.datetime.now()
             if self._singlethread:
@@ -248,23 +242,23 @@ class TileSource:
         self.collect_grabage()
         if last and self._prerender:
             if (z, x, y) in self.onscreen:
-                a = self.__getitem__((z - 1, x / 2, y / 2), True)
+                self.__getitem__((z - 1, x / 2, y / 2), True)
             if (z, x, y) in self.onscreen:
-                a = self.__getitem__((z + 1, x * 2, y * 2), True)
+                self.__getitem__((z + 1, x * 2, y * 2), True)
             if (z, x, y) in self.onscreen:
-                a = self.__getitem__((z + 1, x * 2 + 1, y * 2), True)
+                self.__getitem__((z + 1, x * 2 + 1, y * 2), True)
             if (z, x, y) in self.onscreen:
-                a = self.__getitem__((z + 1, x * 2, y * 2 + 1), True)
+                self.__getitem__((z + 1, x * 2, y * 2 + 1), True)
             if (z, x, y) in self.onscreen:
-                a = self.__getitem__((z + 1, x * 2 + 1, y * 2 + 1), True)
+                self.__getitem__((z + 1, x * 2 + 1, y * 2 + 1), True)
             if (z, x, y) in self.onscreen:
-                a = self.__getitem__((z, x + 1, y), True)
+                self.__getitem__((z, x + 1, y), True)
             if (z, x, y) in self.onscreen:
-                a = self.__getitem__((z, x, y + 1), True)
+                self.__getitem__((z, x, y + 1), True)
             if (z, x, y) in self.onscreen:
-                a = self.__getitem__((z, x - 1, y), True)
+                self.__getitem__((z, x - 1, y), True)
             if (z, x, y) in self.onscreen:
-                a = self.__getitem__((z, x, y - 1), True)
+                self.__getitem__((z, x, y - 1), True)
 
     def collect_grabage(self):
         if len(self.tiles) > self.max_tiles:
