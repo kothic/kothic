@@ -1,5 +1,6 @@
 import unittest
 import sys
+import tempfile
 from pathlib import Path
 from copy import deepcopy
 
@@ -72,3 +73,63 @@ class LibKomwmTest(unittest.TestCase):
         # TODO: needs refactoring of libkomwm.validation_errors_count to have a list
         #       of validation errors.
         self.assertTrue(True)
+
+    def test_line_casing_width_add_uses_base_width(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            data_dir = Path(tmpdir)
+            include_dir = data_dir / "include"
+            include_dir.mkdir()
+
+            (data_dir / "mapcss-mapping.csv").write_text("highway|primary;1;\n")
+            (data_dir / "mapcss-dynamic.txt").write_text("")
+            (include_dir / "priorities_1_BG-by-size.prio.txt").write_text("")
+            (include_dir / "priorities_2_BG-top.prio.txt").write_text("")
+            (include_dir / "priorities_3_FG.prio.txt").write_text(
+                "highway-primary\n"
+                "highway-primary::casing\n"
+                "=== 10\n"
+            )
+            (include_dir / "priorities_4_overlays.prio.txt").write_text("")
+            (data_dir / "style.mapcss").write_text(
+                "line|z10[highway=primary] { width: 2; color: #101010; }\n"
+                "line|z10[highway=primary]::casing { casing-width-add: 1; casing-color: #000000; }\n"
+            )
+
+            class Options(object):
+                pass
+
+            options = Options()
+            options.data = str(data_dir)
+            options.minzoom = 0
+            options.maxzoom = 10
+            options.txt = True
+            options.filename = str(data_dir / "style.mapcss")
+            options.outfile = str(data_dir / "style_output")
+            options.priorities_path = str(include_dir)
+
+            try:
+                libkomwm.MULTIPROCESSING = False
+                prio_ranges_orig = deepcopy(libkomwm.prio_ranges)
+                validation_errors_count_orig = libkomwm.validation_errors_count
+                libkomwm.visibilities = {}
+                libkomwm.validation_errors_count = 0
+
+                komap_mapswithme(options)
+
+                with open(data_dir / "style_output.bin", "rb") as protobuf_file:
+                    protobuf_data = protobuf_file.read()
+                drules = libkomwm.ContainerProto()
+                drules.ParseFromString(protobuf_data)
+
+                generated_lines = [
+                    line.width
+                    for element in drules.cont[0].element
+                    for line in element.lines
+                ]
+                self.assertIn(2.0, generated_lines)
+                self.assertIn(6.0, generated_lines)
+            finally:
+                libkomwm.prio_ranges = prio_ranges_orig
+                libkomwm.MULTIPROCESSING = True
+                libkomwm.visibilities = {}
+                libkomwm.validation_errors_count = validation_errors_count_orig
