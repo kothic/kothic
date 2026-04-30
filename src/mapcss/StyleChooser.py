@@ -20,7 +20,6 @@ from .Rule import Rule
 from .webcolors.webcolors import whatever_to_cairo as colorparser
 from .webcolors.webcolors import cairo_to_hex
 from .Eval import Eval
-from .Condition import  *
 
 TYPE_EVAL = type(Eval())
 
@@ -28,12 +27,12 @@ def make_nice_style(r):
     ra = {}
     for a, b in r.items():
         "checking and nicifying style table"
-        if type(b) == TYPE_EVAL:
+        if isinstance(b, TYPE_EVAL):
             ra[a] = b
         elif "color" in a and b.strip() != 'none':
             "parsing color value to 3-tuple"
             # print "res:", b
-            if b and (type(b) != tuple):
+            if b and not isinstance(b, tuple):
             # if not b:
             #    print sl, ftype, tags, zoom, scale, zscale
             # else:
@@ -46,7 +45,7 @@ def make_nice_style(r):
                 ra[a] = float(b)
             except ValueError:
                 pass
-        elif "dashes" in a and type(b) != list:
+        elif "dashes" in a and not isinstance(b, list):
             "these things are arrays of float's or not in table at all"
             try:
                 b = b.split(",")
@@ -104,7 +103,7 @@ class StyleChooser:
         if self.has_evals and "*" not in a:
             for s in self.styles:
                 for v in list(s.values()):
-                    if type(v) == self.eval_type:
+                    if isinstance(v, self.eval_type):
                         a.update(v.extract_tags())
         if len(a) == 0:
             a = set('*')
@@ -145,7 +144,7 @@ class StyleChooser:
                 ra = {}
                 for a, b in r.items():
                     "calculating eval()'s"
-                    if type(b) == self.eval_type:
+                    if isinstance(b, self.eval_type):
                         # TODO: Move next block to a separate function
                         combined_style = {}
                         for t in sl:
@@ -258,7 +257,7 @@ class StyleChooser:
                     if b[0] == "+":
                         try:
                             b = str(float(b) / 2)
-                        except:
+                        except ValueError:
                             pass
                 if b[:5] == "eval(":
                     b = Eval(b)

@@ -44,7 +44,7 @@ class Rule():
             res = condition.test(tags)
             if not res:
                 return False
-            if type(res) != bool:
+            if not isinstance(res, bool):
                 subpart = res
         return subpart
 

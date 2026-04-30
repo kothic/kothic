@@ -223,7 +223,7 @@ class MapCSS():
         name = m.group()[1:]
         if name in self.unused_variables:
             self.unused_variables.remove(name)
-        if not name in self.variables:
+        if name not in self.variables:
             raise Exception("Variable not found: " + str(format(name)))
         return self.variables[name] if name in self.variables else m.group()
 

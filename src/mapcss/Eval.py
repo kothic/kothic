@@ -29,7 +29,7 @@ class Eval():
         self.expr_text = s
         try:
             self.expr = compile(s, "MapCSS expression", "eval")
-        except:
+        except SyntaxError:
             # print "Can't compile %s" % s
             self.expr = compile("0", "MapCSS expression", "eval")
 
@@ -42,16 +42,16 @@ class Eval():
             Perform a fake computation. Always computes all the parameters, always returns 0.
             WARNING: Might not cope with complex statements.
             """
-            for t in x:
-                q = x
             return 0
 
         # print self.expr_text
         tags = set([])
+
         def tags_add(x):
             tags.add(x)
             return 0
-        a = eval(self.expr, {}, {
+
+        eval(self.expr, {}, {
                  "tag": lambda x: tags_add(x),
                  "prop": lambda x: 0,
                  "num": lambda x: 0,
@@ -92,7 +92,7 @@ class Eval():
                             "boolean": m_boolean
                             })
 
-            if type(result) == float:
+            if isinstance(result, float):
                 # In Python2 and Python3 float to string behaves differently
                 # Python 2:
                 #   >>> str(2.8 + 0.4)
@@ -113,7 +113,7 @@ class Eval():
         return "eval(%s)" % self.expr_text
 
     def __eq__(self, other):
-        return type(self) == type(other) and self.expr_text == other.expr_text
+        return isinstance(other, Eval) and self.expr_text == other.expr_text
 
 def m_boolean(expr):
     expr = str(expr)
@@ -136,7 +136,7 @@ def m_min(*x):
     """
     try:
         return min([m_num(t) for t in x])
-    except:
+    except (TypeError, ValueError):
         return 0
 
 
@@ -146,7 +146,7 @@ def m_max(*x):
     """
     try:
         return max([m_num(t) for t in x])
-    except:
+    except (TypeError, ValueError):
         return 0
 
 
@@ -178,7 +178,7 @@ def m_metric(x, t):
     x = str(x)
     try:
         return float(x) * float(t)
-    except:
+    except ValueError:
         "Heuristics."
         # FIXME: add ft, m and friends
         x = x.strip()
@@ -189,7 +189,7 @@ def m_metric(x, t):
                 return float(x[0:-2]) * float(t) / 1000
             if x[-1] in ("m", "M", "м"):
                 return float(x[0:-1]) * float(t)
-        except:
+        except (IndexError, ValueError):
             return ""
 
 

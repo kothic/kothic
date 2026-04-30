@@ -20,7 +20,7 @@ import re
 class Condition:
     def __init__(self, typez, params):
         self.type = typez         # eq, regex, lt, gt etc.
-        if type(params) == type(str()):
+        if isinstance(params, str):
             params = (params,)
         self.params = params      # e.g. ('highway','primary')
         if typez == "regex":
