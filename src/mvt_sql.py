@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 import sys
-import math
 from .mapcss import _test_feature_compatibility
 import importlib
 
@@ -29,11 +28,11 @@ def escape_sql_column(name, type, asname=False):
         return "(tags->'" + name + "') as \"" + name + '"'
 
 
-def pixel_size_at_zoom(z, l=1):
+def pixel_size_at_zoom(z, pixel_count=1):
     """
-    Converts l pixels on tiles into length on zoom z
+    Converts pixels on tiles into length on zoom z.
     """
-    return l * 20037508.342789244 / 512 * 2 / (2 ** z)
+    return pixel_count * 20037508.342789244 / 512 * 2 / (2 ** z)
 
 
 def get_sql(condition, obj):
@@ -388,7 +387,7 @@ def komap_mvt_sql(options, style):
         mf = open(options.osm2pgsqlstyle, "r")
         for line in mf:
             line = line.strip()
-            if line and line[0] != "#" and not ("nocolumn" in line):
+            if line and line[0] != "#" and "nocolumn" not in line:
                 line = line.split()
                 osm2pgsql_avail_keys[line[1]] = tuple(line[0].split(","))
         osm2pgsql_avail_keys["tags"] = ("node", "way")

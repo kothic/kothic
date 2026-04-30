@@ -446,8 +446,8 @@ def komap_mapbox(options, style):
                 for z, v in list(st.get("text").items()):
                     if v.expr_text == "tag(\"name\")":
                         coalesce = ["coalesce"]
-                        for l in locales:
-                            coalesce.append(["get", "name:%s" % (l)])
+                        for locale in locales:
+                            coalesce.append(["get", "name:%s" % (locale)])
                         for f in fallback:
                             coalesce.append(["get", f])
 
