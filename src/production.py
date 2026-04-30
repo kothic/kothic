@@ -17,10 +17,12 @@
 
 
 """
-This is a module to substitute debug.py in porduction mode.
+This is a module to substitute debug.py in production mode.
 """
 
-debug = lambda st: None
+
+def debug(st):
+    pass
 
 
 class Timer:

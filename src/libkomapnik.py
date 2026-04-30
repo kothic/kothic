@@ -18,7 +18,6 @@
 
 import os
 import math
-from .debug import debug, Timer
 
 from .mapcss.webcolors.webcolors import whatever_to_hex as nicecolor
 
@@ -65,9 +64,9 @@ def zoom_to_scaledenom(z1, z2=False):
     return z1, z2
 
 
-def pixel_size_at_zoom(z, l=1):
+def pixel_size_at_zoom(z, l=1):  # noqa: E741
     """
-    Converts l pixels on tiles into length on zoom z
+    Converts pixel length on tiles into projected length on zoom z.
     """
     return int(math.ceil(l * 20037508.342789244 / 256 * 2 / (2 ** z)))
 

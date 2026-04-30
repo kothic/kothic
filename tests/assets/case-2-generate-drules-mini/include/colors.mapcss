@@ -1,0 +1,16 @@
+/* 5.1 All roads */
+@trunk0: #FF7326;
+@trunk1: #FF7A26;
+@primary0:  #FF8726;
+@secondary0: #FFB226;
+
+/* 6.1 Main labels */
+@label_medium: #333333;
+@label_light: #444444;
+@label_halo_medium: #EDEBDB;
+
+/* 6.4 Road labels */
+@shield_text: #000000;
+@shield_text_halo: #000000;
+@shield: #FFFFFF;
+@shield_outline: #000000;

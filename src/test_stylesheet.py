@@ -1,10 +1,12 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+import importlib
+import sys
+
 from .mapcss import MapCSS
 from .mapcss import webcolors
-import importlib
+
 whatever_to_hex = webcolors.webcolors.whatever_to_hex
-import sys
 
 importlib.reload(sys)
 if hasattr(sys, "setdefaultencoding"):

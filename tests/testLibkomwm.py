@@ -1,0 +1,254 @@
+import unittest
+import sys
+import tempfile
+from pathlib import Path
+from copy import deepcopy
+
+# Add `src` directory to the import paths
+sys.path.insert(0, str(Path(__file__).parent.parent / 'src'))
+
+import libkomwm
+from libkomwm import komap_mapswithme
+
+
+class LibKomwmTest(unittest.TestCase):
+    def test_generate_drules_mini(self):
+        assets_dir = Path(__file__).parent / 'assets' / 'case-2-generate-drules-mini'
+
+        class Options(object):
+            pass
+
+        options = Options()
+        options.data = None
+        options.minzoom = 0
+        options.maxzoom = 10
+        options.txt = True
+        options.filename = str( assets_dir / "main.mapcss" )
+        options.outfile = str( assets_dir / "style_output" )
+        options.priorities_path = str( assets_dir / "include" )
+        priority_files = list((assets_dir / "include").glob("*.prio.txt"))
+        priority_snapshots = {
+            priority_file: priority_file.read_bytes()
+            for priority_file in priority_files
+        }
+
+        try:
+            # Save state
+            libkomwm.MULTIPROCESSING = False
+            prio_ranges_orig = deepcopy(libkomwm.prio_ranges)
+            libkomwm.visibilities = {}
+
+            # Run style generation
+            komap_mapswithme(options)
+
+            # Restore state
+            libkomwm.prio_ranges = prio_ranges_orig
+            libkomwm.MULTIPROCESSING = True
+            libkomwm.visibilities = {}
+
+            # Check that types.txt contains 1173 lines
+            with open(assets_dir / "types.txt", "rt") as typesFile:
+                lines = [line.strip() for line in typesFile]
+                self.assertEqual(len(lines), 1173, "Generated types.txt file should contain 1173 lines")
+                self.assertEqual(len([line for line in lines if line != "mapswithme"]), 148, "Actual types count should be 148 as in mapcss-mapping.csv")
+
+            # Check that style_output.bin has 20 styles
+            with open(assets_dir / "style_output.bin", "rb") as protobuf_file:
+                protobuf_data = protobuf_file.read()
+            drules = libkomwm.ContainerProto()
+            drules.ParseFromString(protobuf_data)
+
+            self.assertEqual(len(drules.cont), 20, "Generated style_output.bin should contain 20 styles")
+
+        finally:
+            # Clean up generated files
+            files2delete = ["classificator.txt", "colors.txt", "patterns.txt", "style_output.bin",
+                            "style_output.txt", "types.txt", "visibility.txt"]
+            for filename in files2delete:
+                (assets_dir / filename).unlink(missing_ok=True)
+            for priority_file, content in priority_snapshots.items():
+                priority_file.write_bytes(content)
+
+    def test_generate_drules_validation_errors(self):
+        # TODO: needs refactoring of libkomwm.validation_errors_count to have a list
+        #       of validation errors.
+        self.assertTrue(True)
+
+    def test_runtime_condition_variants_support_fork_modes(self):
+        original_mode = libkomwm.RUNTIME_CONDITION_MODE
+        runtime_conditions = ["night", "night", "wifi"]
+        try:
+            libkomwm.RUNTIME_CONDITION_MODE = "organicmaps"
+            self.assertEqual(
+                libkomwm.runtime_condition_variants(runtime_conditions),
+                ["night", "wifi"]
+            )
+
+            libkomwm.RUNTIME_CONDITION_MODE = "comaps"
+            self.assertEqual(
+                libkomwm.runtime_condition_variants(runtime_conditions),
+                ["night", "wifi", None]
+            )
+
+            libkomwm.RUNTIME_CONDITION_MODE = "mapsme"
+            self.assertEqual(
+                libkomwm.runtime_condition_variants(runtime_conditions),
+                ["night", "night", "wifi"]
+            )
+
+            libkomwm.RUNTIME_CONDITION_MODE = "mapsme-fallback"
+            self.assertEqual(
+                libkomwm.runtime_condition_variants(runtime_conditions),
+                ["night", "night", "wifi", None]
+            )
+
+            self.assertEqual(libkomwm.runtime_condition_variants([]), [None])
+        finally:
+            libkomwm.RUNTIME_CONDITION_MODE = original_mode
+
+    def test_compatibility_profiles_are_feature_configs(self):
+        self.assertEqual(
+            libkomwm.compatibility_profile_names(),
+            ("mapcss", "organicmaps", "comaps", "mapsme", "mapsme-fallback", "omim-2016")
+        )
+
+        canonical = libkomwm.build_compatibility_config("mapcss")
+        organic = libkomwm.build_compatibility_config("organicmaps")
+        comaps = libkomwm.build_compatibility_config("comaps")
+        mapsme = libkomwm.build_compatibility_config("mapsme")
+        omim_2016 = libkomwm.build_compatibility_config("omim-2016")
+
+        self.assertEqual(canonical.name, "mapcss")
+        self.assertTrue(canonical.use_priority_files)
+        self.assertFalse(canonical.mapsme_legacy_output)
+        self.assertTrue(organic.use_priority_files)
+        self.assertTrue(comaps.runtime_fallback)
+        self.assertTrue(mapsme.mapsme_legacy_output)
+        self.assertTrue(mapsme.match_all_class_tags)
+        self.assertFalse(mapsme.mapsme_2016_text_order)
+        self.assertTrue(omim_2016.mapsme_2016_text_order)
+
+    def test_compatibility_profile_overrides_are_explicit_features(self):
+        config = libkomwm.build_compatibility_config(
+            "organicmaps",
+            priority_mode="mapsme",
+            runtime_condition_mode="mapsme-fallback"
+        )
+
+        self.assertEqual(config.priority_mode, "mapsme")
+        self.assertFalse(config.use_priority_files)
+        self.assertTrue(config.mapsme_legacy_output)
+        self.assertTrue(config.raw_runtime_conditions)
+        self.assertTrue(config.runtime_fallback)
+
+    def test_programmatic_generation_defaults_to_base_profile(self):
+        original_profile = libkomwm.COMPATIBILITY_PROFILE
+        original_config = libkomwm.COMPATIBILITY
+        original_priority_mode = libkomwm.PRIORITY_MODE
+        original_runtime_mode = libkomwm.RUNTIME_CONDITION_MODE
+
+        try:
+            libkomwm.COMPATIBILITY_PROFILE = "mapsme"
+            libkomwm.COMPATIBILITY = libkomwm.build_compatibility_config("mapsme")
+            libkomwm.PRIORITY_MODE = "mapsme"
+            libkomwm.RUNTIME_CONDITION_MODE = "mapsme"
+
+            config = libkomwm.build_compatibility_config()
+            self.assertEqual(config.name, "mapcss")
+            self.assertTrue(config.use_priority_files)
+            self.assertEqual(libkomwm.resolve_default_maxzoom(None), libkomwm.DEFAULT_MAXZOOM)
+        finally:
+            libkomwm.COMPATIBILITY_PROFILE = original_profile
+            libkomwm.COMPATIBILITY = original_config
+            libkomwm.PRIORITY_MODE = original_priority_mode
+            libkomwm.RUNTIME_CONDITION_MODE = original_runtime_mode
+
+    def test_legacy_mapsme_priority_helpers(self):
+        base_style = {"z-index": 3}
+        explicit_style = {
+            "z-index": 3,
+            "-x-me-line-priority": 42,
+            "-x-me-icon-priority": 43,
+            "-x-me-area-priority": -44,
+        }
+
+        self.assertEqual(libkomwm.legacy_line_priority(base_style), 1003)
+        self.assertEqual(libkomwm.legacy_icon_priority(base_style), 16003)
+        self.assertEqual(libkomwm.legacy_line_priority(explicit_style), 42)
+        self.assertEqual(libkomwm.legacy_icon_priority(explicit_style), 43)
+        self.assertEqual(libkomwm.legacy_area_priority(explicit_style, 0), (-44, 0))
+        self.assertEqual(
+            libkomwm.legacy_area_priority({"fill-position": "background"}, 0),
+            (-16001, -1)
+        )
+
+    def test_default_maxzoom_depends_on_priority_mode(self):
+        self.assertEqual(
+            libkomwm.resolve_default_maxzoom(None, "priority_files"),
+            libkomwm.DEFAULT_MAXZOOM
+        )
+        self.assertEqual(
+            libkomwm.resolve_default_maxzoom(None, "mapsme"),
+            libkomwm.MAPSME_DEFAULT_MAXZOOM
+        )
+        self.assertEqual(libkomwm.resolve_default_maxzoom(17, "mapsme"), 17)
+
+    def test_line_casing_width_add_uses_base_width(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            data_dir = Path(tmpdir)
+            include_dir = data_dir / "include"
+            include_dir.mkdir()
+
+            (data_dir / "mapcss-mapping.csv").write_text("highway|primary;1;\n")
+            (data_dir / "mapcss-dynamic.txt").write_text("")
+            (include_dir / "priorities_1_BG-by-size.prio.txt").write_text("")
+            (include_dir / "priorities_2_BG-top.prio.txt").write_text("")
+            (include_dir / "priorities_3_FG.prio.txt").write_text(
+                "highway-primary\n"
+                "highway-primary::casing\n"
+                "=== 10\n"
+            )
+            (include_dir / "priorities_4_overlays.prio.txt").write_text("")
+            (data_dir / "style.mapcss").write_text(
+                "line|z10[highway=primary] { width: 2; color: #101010; }\n"
+                "line|z10[highway=primary]::casing { casing-width-add: 1; casing-color: #000000; }\n"
+            )
+
+            class Options(object):
+                pass
+
+            options = Options()
+            options.data = str(data_dir)
+            options.minzoom = 0
+            options.maxzoom = 10
+            options.txt = True
+            options.filename = str(data_dir / "style.mapcss")
+            options.outfile = str(data_dir / "style_output")
+            options.priorities_path = str(include_dir)
+
+            try:
+                libkomwm.MULTIPROCESSING = False
+                prio_ranges_orig = deepcopy(libkomwm.prio_ranges)
+                validation_errors_count_orig = libkomwm.validation_errors_count
+                libkomwm.visibilities = {}
+                libkomwm.validation_errors_count = 0
+
+                komap_mapswithme(options)
+
+                with open(data_dir / "style_output.bin", "rb") as protobuf_file:
+                    protobuf_data = protobuf_file.read()
+                drules = libkomwm.ContainerProto()
+                drules.ParseFromString(protobuf_data)
+
+                generated_lines = [
+                    line.width
+                    for element in drules.cont[0].element
+                    for line in element.lines
+                ]
+                self.assertIn(2.0, generated_lines)
+                self.assertIn(6.0, generated_lines)
+            finally:
+                libkomwm.prio_ranges = prio_ranges_orig
+                libkomwm.MULTIPROCESSING = True
+                libkomwm.visibilities = {}
+                libkomwm.validation_errors_count = validation_errors_count_orig

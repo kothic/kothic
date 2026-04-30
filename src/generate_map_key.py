@@ -1,15 +1,15 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-from .mapcss import MapCSS
-from .mapcss import webcolors
 import importlib
-whatever_to_hex = webcolors.webcolors.whatever_to_hex
-
 import json
+import sys
 
 import cairo
 
-import sys
+from .mapcss import MapCSS
+from .mapcss import webcolors
+
+whatever_to_hex = webcolors.webcolors.whatever_to_hex
 
 importlib.reload(sys)
 if hasattr(sys, "setdefaultencoding"):

@@ -1,0 +1,15 @@
+# This file is automatically re-formatted and re-sorted in priorities descending order
+# when generate_drules.sh is run. All comments (automatic priorities of e.g. optional captions, drule types visibilities, etc.)
+# are generated automatically for information only. Custom formatting and comments are not preserved.
+#
+# BG-by-size geometry: background areas rendered below BG-top and everything else.
+# Smaller areas are rendered above larger ones (area's size is estimated as the size of its' bounding box).
+# So effectively priority values of BG-by-size areas are not used at the moment.
+# But we might use them later for some special cases, e.g. to determine a main area type of a multi-type feature.
+# Keep them in a logical importance order please.
+#
+# Priorities ranges' rendering order overview:
+# - overlays (icons, captions...)
+# - FG: foreground areas and lines
+# - BG-top: water (linear and areal)
+# - BG-by-size: landcover areas sorted by their size

@@ -40,7 +40,6 @@ def get_vectors(bbox, zoom, style, vec="polygon"):
                 names.remove(i)
         names = ",".join(['"' + i + '"' for i in names])
 
-        taghint = "*"
         types = {"line": "line", "polygon": "area", "point": "node"}
         adp = ""
         if "get_sql_hints" in dir(style):
@@ -190,7 +189,7 @@ def get_vectors(bbox, zoom, style, vec="polygon"):
                     prop[k] = float(v)
                 if str(prop[k]) != v:  # leading zeros etc.. should be saved
                     prop[k] = v
-            except:
+            except ValueError:
                 pass
         geojson["properties"] = prop
         polygons.append(geojson)
@@ -236,7 +235,7 @@ file = "%s.js" % y
 try:
     if not os.path.exists(dir):
         os.makedirs(dir)
-except:
+except OSError:
     pass
 
 file = open(dir + file, "w")

@@ -47,11 +47,11 @@ def komap_js(mfile, style):
         if subclass != "default":
             styles = 'if(!("%s" in style)){style["%s"] = new Object;}' % (subclass, subclass)
         for k, v in chooser.styles[0].items():
-            if type(v) == str:
+            if isinstance(v, str):
                 try:
                     v = str(float(v))
                     styles += 'style["' + subclass + '"]["' + k + '"] = ' + v + ';'
-                except:
+                except ValueError:
                     styles += 'style["' + subclass + '"]["' + k + '"] = "' + v + '";'
         mfile.write("if(%s) {%s};\n" % (condition, styles))
     mfile.write("return style;}")

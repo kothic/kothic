@@ -715,8 +715,7 @@ def rgb_to_hex(rgb_triplet):
     '#2138c0'
 
     """
-    r, g, b = rgb_triplet
-    return '#%02x%02x%02x' % (int(round(r)), int(round(g)), int(round(b)))
+    return '#%02x%02x%02x' % (int(rgb_triplet[0]), int(rgb_triplet[1]), int(rgb_triplet[2]))
 
 
 def rgb_to_rgb_percent(rgb_triplet):
@@ -856,12 +855,12 @@ def whatever_to_rgb(string):
             try:
                 if string[:3] == "rgb":
                     return tuple([float(i) for i in string[4:-1].split(",")][0:3])
-            except:
+            except ValueError:
                 return hex_to_rgb("#" + md5(string).hexdigest()[:6])
 
 
 def whatever_to_hex(string):
-    if type(string) == tuple:
+    if isinstance(string, tuple):
         return cairo_to_hex(string).upper()
     return rgb_to_hex(whatever_to_rgb(string)).upper()
 

@@ -16,7 +16,6 @@
 #   along with kothic.  If not, see <http://www.gnu.org/licenses/>.
 
 
-from .debug import debug, Timer
 from .backend.postgis import PostGisBackend as DataBackend
 from .mapcss import MapCSS
 from twms import bbox, projections
