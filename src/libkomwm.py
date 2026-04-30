@@ -42,6 +42,22 @@ class CompatibilityConfig:
 
 
 COMPATIBILITY_PROFILES = {
+    'mapcss': CompatibilityConfig(
+        name='mapcss',
+        priority_mode='priority_files',
+        runtime_condition_mode='organicmaps',
+        default_maxzoom=DEFAULT_MAXZOOM,
+        use_priority_files=True,
+        legacy_zindex=False,
+        match_all_class_tags=False,
+        allow_duplicate_types=False,
+        sort_priority_file_rules=True,
+        strict_runtime_filtering=True,
+        subset_runtime_filtering=False,
+        raw_runtime_conditions=False,
+        runtime_fallback=False,
+        mapsme_legacy_output=False,
+    ),
     'organicmaps': CompatibilityConfig(
         name='organicmaps',
         priority_mode='priority_files',
@@ -125,7 +141,7 @@ COMPATIBILITY_PROFILES = {
     ),
 }
 
-DEFAULT_COMPATIBILITY_PROFILE = 'organicmaps'
+DEFAULT_COMPATIBILITY_PROFILE = 'mapcss'
 COMPATIBILITY_PROFILE = DEFAULT_COMPATIBILITY_PROFILE
 COMPATIBILITY = COMPATIBILITY_PROFILES[COMPATIBILITY_PROFILE]
 

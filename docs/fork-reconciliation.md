@@ -1,15 +1,20 @@
 # Fork reconciliation status
 
-Short version: one modern Kothic can now reproduce the current Organic Maps,
-CoMaps, and latest MAPS.ME fork outputs.  Compatibility is selected by feature
-profiles, not by sprinkling fork names through the generator.  The checked-in
-MAPS.ME drules in the old `omim` checkout are older than the latest MAPS.ME
-Kothic fork, so they remain a separate historical baseline.
+Short version: `mapcss` is the canonical profile.  It is the spec-first default
+for drules generation.  The fork-named profiles are compatibility profiles for
+checking current downstream output.
+
+One modern Kothic can reproduce the current Organic Maps, CoMaps, and latest
+MAPS.ME fork outputs.  Compatibility is selected by feature profiles, not by
+sprinkling fork names through the generator.  The checked-in MAPS.ME drules in
+the old `omim` checkout are older than the latest MAPS.ME Kothic fork, so they
+remain a separate historical baseline.
 
 ## What We Have
 
 | Consumer | Status | Mode to use |
 | --- | --- | --- |
+| New shared work | Spec-first canonical behavior. | `--compatibility-profile mapcss` or no profile flag |
 | Original Kothic | Kept as the base project and ported to Python 3. | Default renderer / MVT code paths. |
 | Organic Maps | Reproduces the fork output byte-for-byte for all six generated styles. | `--compatibility-profile organicmaps` |
 | CoMaps | Reproduces the fork output byte-for-byte for all six generated styles. | `--compatibility-profile comaps` |
@@ -32,11 +37,27 @@ behaviors, not special hard-coded fork branches.
 
 | Profile | Priority source | Runtime variants | Default max zoom | Main feature switches |
 | --- | --- | --- | --- | --- |
+| `mapcss` | priority files | deduplicated, strict filtering | `20` | canonical spec-first target, no legacy MAPS.ME priority/protobuf quirks |
 | `organicmaps` | priority files | deduplicated, strict filtering | `20` | priority imports, sorted drules, validation, `casing-width-add` |
 | `comaps` | priority files | deduplicated plus fallback rule, strict filtering | `20` | same as Organic Maps plus fallback runtime variant |
 | `mapsme` | legacy arithmetic priority | raw runtime variants, subset filtering | `19` | legacy z-index parser, all-class-tag chooser matching, duplicate active types allowed, old dash/casing/protobuf quirks |
 | `mapsme-fallback` | legacy arithmetic priority | raw runtime variants plus fallback rule, subset filtering | `19` | MAPS.ME legacy rendering plus fallback runtime variant |
 | `omim-2016` | legacy arithmetic priority | raw runtime variants, subset filtering | `19` | MAPS.ME legacy rendering plus the 2016 caption primary/secondary order |
+
+## Canonical Profile
+
+Use `--compatibility-profile mapcss` for new drules generation.
+
+Current `mapcss` behavior intentionally matches the strict priority-file family
+rather than MAPS.ME legacy arithmetic priorities:
+
+- MapCSS selectors and declaration order stay in the shared parser;
+- priority files define the renderer's non-MapCSS drape ordering policy;
+- runtime-condition variants are deduplicated;
+- runtime filtering is strict, so a runtime-specific rule does not leak into an
+  unrelated runtime variant;
+- legacy MAPS.ME z-index offsets, duplicate active types, raw runtime variants,
+  and proto serialization quirks stay behind compatibility profiles.
 
 ## The Main Gotcha
 
@@ -106,7 +127,7 @@ new Kothic as a drop-in replacement for old MAPS.ME scripts.
 
 So direct `libkomwm.py` now resolves default max zoom like this:
 
-- MAPS.ME-family profiles and no `-t`: use `19`;
+- MAPS.ME-family compatibility profiles and no `-t`: use `19`;
 - priority-file profiles and no `-t`: use `20`;
 - explicit `-t`: always respect the explicit value.
 
@@ -165,27 +186,18 @@ Verified output: all found MAPS.ME style `.bin` files matched the latest
 - `legacy/style-dark/style.mapcss`;
 - `legacy/style-light/style.mapcss`.
 
-## What To Do Next
+## Remaining Work
 
-If the goal is to support current consumers:
-
-1. Keep `organicmaps`, `comaps`, and latest `mapsme` profiles as they are.
-2. Continue adding tests around exact fork output.
-3. Do not change latest `mapsme` mode just to match old checked-in `omim`
-   binaries.
-
-If the goal is to reproduce old checked-in MAPS.ME `omim` drules exactly:
-
-1. Keep the existing `--compatibility-profile omim-2016` separate from latest
-   `mapsme`.
-2. Base remaining differences on submodule commit `c32d9c5`, not on latest
-   `mapsme/kothic`.
-3. Decide whether the current writer must emulate old proto2/default-field
-   presence for checked-in 2016 bytes, or whether text/semantic comparison is
-   enough for that historical baseline.
-4. Patch or emulate the old duplicate-type behavior for current
-   `mapcss-mapping.csv`.
-5. Then compare against `omim/data/drules_proto*.bin`.
+- Keep `mapcss` as the default canonical profile.
+- Keep fork profiles as compatibility checks while downstream projects still
+  need exact current-output comparisons.
+- Continue adding tests around exact fork output.
+- Do not change the latest `mapsme` profile just to match old checked-in
+  `omim` binaries.
+- For exact checked-in MAPS.ME `omim` byte reproduction, base any remaining
+  differences on submodule commit `c32d9c5`, not on latest `mapsme/kothic`.
+  The remaining known gap is old proto2/default-field presence for checked-in
+  2016 bytes.
 
 ## Quick Verification Commands
 

@@ -109,14 +109,18 @@ class LibKomwmTest(unittest.TestCase):
     def test_compatibility_profiles_are_feature_configs(self):
         self.assertEqual(
             libkomwm.compatibility_profile_names(),
-            ("organicmaps", "comaps", "mapsme", "mapsme-fallback", "omim-2016")
+            ("mapcss", "organicmaps", "comaps", "mapsme", "mapsme-fallback", "omim-2016")
         )
 
+        canonical = libkomwm.build_compatibility_config("mapcss")
         organic = libkomwm.build_compatibility_config("organicmaps")
         comaps = libkomwm.build_compatibility_config("comaps")
         mapsme = libkomwm.build_compatibility_config("mapsme")
         omim_2016 = libkomwm.build_compatibility_config("omim-2016")
 
+        self.assertEqual(canonical.name, "mapcss")
+        self.assertTrue(canonical.use_priority_files)
+        self.assertFalse(canonical.mapsme_legacy_output)
         self.assertTrue(organic.use_priority_files)
         self.assertTrue(comaps.runtime_fallback)
         self.assertTrue(mapsme.mapsme_legacy_output)
@@ -150,7 +154,7 @@ class LibKomwmTest(unittest.TestCase):
             libkomwm.RUNTIME_CONDITION_MODE = "mapsme"
 
             config = libkomwm.build_compatibility_config()
-            self.assertEqual(config.name, "organicmaps")
+            self.assertEqual(config.name, "mapcss")
             self.assertTrue(config.use_priority_files)
             self.assertEqual(libkomwm.resolve_default_maxzoom(None), libkomwm.DEFAULT_MAXZOOM)
         finally:

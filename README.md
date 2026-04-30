@@ -57,9 +57,11 @@ The repository intentionally supports several consumers that diverged in forks:
 * `src/libkomwm.py` keeps MapsMe/Organic Maps/CoMaps drules generation,
   including priority file imports and `--format-priorities-only`.
 * Drules generation uses feature profiles:
-  `organicmaps`, `comaps`, `mapsme`, `mapsme-fallback`, and `omim-2016`.
-  The older `--priority-mode` and `--runtime-condition-mode` flags remain as
-  explicit overrides for experiments.
+  `mapcss`, `organicmaps`, `comaps`, `mapsme`, `mapsme-fallback`, and
+  `omim-2016`.  The default `mapcss` profile is the spec-first target for new
+  shared work; the fork-named profiles are compatibility harnesses.  The older
+  `--priority-mode` and `--runtime-condition-mode` flags remain as explicit
+  overrides for experiments.
 * `src/libkomb.py` and `src/mvt_sql.py` keep the original Kothic MVT/Mapbox
   paths. The MapCSS package still exports `_test_feature_compatibility` for
   these legacy helpers.
@@ -68,4 +70,5 @@ The repository intentionally supports several consumers that diverged in forks:
   for exact runtime-selector variants.
 
 See `docs/fork-reconciliation.md` for the current fork-by-fork compatibility
-matrix and the status of checked-in MapsMe drules.
+matrix, the canonical `mapcss` profile, and the status of checked-in MapsMe
+drules.
