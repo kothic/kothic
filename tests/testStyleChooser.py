@@ -311,6 +311,17 @@ class StyleChooserTest(unittest.TestCase):
         self.assertEqual(len(matching_styles), 1)
         self.assertEqual(matching_styles[0]["width"], 4.0)
 
+        subset_styles = sc.updateStyles(
+            [],
+            object_tags,
+            1.0,
+            1.0,
+            [runtime_condition, Condition("eq", ("extra_tag", "name"))],
+            subset_runtime_filtering=True
+        )
+        self.assertEqual(len(subset_styles), 1)
+        self.assertEqual(subset_styles[0]["width"], 4.0)
+
         mismatching_styles = sc.updateStyles([], object_tags, 1.0, 1.0, [
             Condition("eq", ("extra_tag", "bridge"))
         ])

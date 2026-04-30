@@ -133,9 +133,10 @@ class MapCSS():
             if clname not in self.choosers_by_type_zoom_tag[type][zoom]:
                 self.choosers_by_type_zoom_tag[type][zoom][clname] = {'arr': [], 'set': set()}
         if type in self.choosers_by_type:
+            cltags = cltag if isinstance(cltag, (dict, set, list, tuple)) else {cltag}
             for chooser in self.choosers_by_type[type]:
                 chooser_tags = chooser.extract_tags()
-                if '*' in chooser_tags or cltag in chooser_tags:
+                if '*' in chooser_tags or any(tag in cltags for tag in chooser_tags):
                     for zoom in range(int(chooser.selzooms[0]), int(chooser.selzooms[1]) + 1):
                         if chooser not in self.choosers_by_type_zoom_tag[type][zoom][clname]['set']:
                             self.choosers_by_type_zoom_tag[type][zoom][clname]['arr'].append(chooser)
@@ -177,11 +178,13 @@ class MapCSS():
 
     # TODO: Renamed to `get_styles` because it returns a list of styles for each class `::XXX`
     # Refactoring idea: Maybe return dict with `object-id` as a key
-    def get_style(self, clname, type, tags, zoom, xscale, zscale, filter_by_runtime_conditions, strict_runtime_filtering=False):
+    def get_style(self, clname, type, tags, zoom, xscale, zscale, filter_by_runtime_conditions,
+                  strict_runtime_filtering=False, subset_runtime_filtering=False):
         style = []
         if type in self.choosers_by_type_zoom_tag:
             for chooser in self.choosers_by_type_zoom_tag[type][zoom][clname]:
-                style = chooser.updateStyles(style, tags, xscale, zscale, filter_by_runtime_conditions, strict_runtime_filtering)
+                style = chooser.updateStyles(style, tags, xscale, zscale, filter_by_runtime_conditions,
+                                             strict_runtime_filtering, subset_runtime_filtering)
         style = [x for x in style if x["object-id"] != "::*"]
         for x in style:
             for k, v in [('width', 0), ('casing-width', 0)]:
@@ -201,11 +204,14 @@ class MapCSS():
             return colors[0].styles[0]
         return None
 
-    def get_style_dict(self, clname, type, tags={}, zoom=0, xscale=1, zscale=.5, olddict={}, filter_by_runtime_conditions=None, strict_runtime_filtering=False):
+    def get_style_dict(self, clname, type, tags={}, zoom=0, xscale=1, zscale=.5, olddict={},
+                       filter_by_runtime_conditions=None, strict_runtime_filtering=False,
+                       subset_runtime_filtering=False):
         """
         Kothic styling API
         """
-        r = self.get_style(clname, type, tags, zoom, xscale, zscale, filter_by_runtime_conditions, strict_runtime_filtering)
+        r = self.get_style(clname, type, tags, zoom, xscale, zscale, filter_by_runtime_conditions,
+                           strict_runtime_filtering, subset_runtime_filtering)
         d = olddict
         for x in r:
             if x.get('object-id', '') not in d:
@@ -227,7 +233,8 @@ class MapCSS():
             raise Exception("Variable not found: " + str(format(name)))
         return self.variables[name] if name in self.variables else m.group()
 
-    def parse(self, css=None, clamp=True, stretch=1000, filename=None, static_tags={}, dynamic_tags=set()):
+    def parse(self, css=None, clamp=True, stretch=1000, filename=None, static_tags={},
+              dynamic_tags=set(), legacy_zindex=False):
         """
         Parses MapCSS given as string
         """
@@ -411,10 +418,11 @@ class MapCSS():
                         zindex.add(float(stylez.get('z-index', 0)))
                 zindex = list(zindex)
                 zindex.sort()
+                zoffset = len([x for x in zindex if x < 0]) if legacy_zindex else 0
                 for chooser in self.choosers:
                     for stylez in chooser.styles:
                         if 'z-index' in stylez:
-                            res = zindex.index(float(stylez.get('z-index', 0)))
+                            res = zindex.index(float(stylez.get('z-index', 0))) - zoffset
                             if stretch:
                                 stylez['z-index'] = stretch * res / len(zindex)
                             else:

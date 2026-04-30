@@ -96,6 +96,12 @@ class LibKomwmTest(unittest.TestCase):
                 ["night", "night", "wifi"]
             )
 
+            libkomwm.RUNTIME_CONDITION_MODE = "mapsme-fallback"
+            self.assertEqual(
+                libkomwm.runtime_condition_variants(runtime_conditions),
+                ["night", "night", "wifi", None]
+            )
+
             self.assertEqual(libkomwm.runtime_condition_variants([]), [None])
         finally:
             libkomwm.RUNTIME_CONDITION_MODE = original_mode

@@ -124,7 +124,8 @@ class StyleChooser:
         return rule.runtime_conditions
 
     # TODO: Rename to "applyStyles"
-    def updateStyles(self, sl, tags, xscale, zscale, filter_by_runtime_conditions, strict_runtime_filtering=False):
+    def updateStyles(self, sl, tags, xscale, zscale, filter_by_runtime_conditions,
+                     strict_runtime_filtering=False, subset_runtime_filtering=False):
         # Are any of the ruleChains fulfilled?
         rule_and_object_id = self.testChains(tags)
 
@@ -134,10 +135,15 @@ class StyleChooser:
         rule = rule_and_object_id[0]
         object_id = rule_and_object_id[1]
 
-        if ((filter_by_runtime_conditions is not None or strict_runtime_filtering)
-            and rule.runtime_conditions is not None
-            and filter_by_runtime_conditions != rule.runtime_conditions):
-            return sl
+        if rule.runtime_conditions is not None:
+            if strict_runtime_filtering and filter_by_runtime_conditions != rule.runtime_conditions:
+                return sl
+            if filter_by_runtime_conditions is not None and filter_by_runtime_conditions != rule.runtime_conditions:
+                if not subset_runtime_filtering:
+                    return sl
+                for condition in rule.runtime_conditions:
+                    if condition not in filter_by_runtime_conditions:
+                        return sl
 
         for r in self.styles:
             if self.has_evals:

@@ -154,13 +154,20 @@ def query_style(args):
 
         for runtime_conditions in runtime_conditions_arr:
             zstyle = {}
-            strict_runtime_filtering = RUNTIME_CONDITION_MODE != 'mapsme'
+            strict_runtime_filtering = PRIORITY_MODE != 'mapsme'
+            subset_runtime_filtering = PRIORITY_MODE == 'mapsme'
 
             # Get style for class 'cl' on zoom 'zoom' with corresponding runtime conditions
             if "area" not in cltags:
-                linestyle = style.get_style_dict(clname, "line", cltags, zoom, olddict=zstyle, filter_by_runtime_conditions=runtime_conditions, strict_runtime_filtering=strict_runtime_filtering)
+                linestyle = style.get_style_dict(clname, "line", cltags, zoom, olddict=zstyle,
+                                                 filter_by_runtime_conditions=runtime_conditions,
+                                                 strict_runtime_filtering=strict_runtime_filtering,
+                                                 subset_runtime_filtering=subset_runtime_filtering)
                 zstyle = linestyle
-            areastyle = style.get_style_dict(clname, "area", cltags, zoom, olddict=zstyle, filter_by_runtime_conditions=runtime_conditions, strict_runtime_filtering=strict_runtime_filtering)
+            areastyle = style.get_style_dict(clname, "area", cltags, zoom, olddict=zstyle,
+                                             filter_by_runtime_conditions=runtime_conditions,
+                                             strict_runtime_filtering=strict_runtime_filtering,
+                                             subset_runtime_filtering=subset_runtime_filtering)
             has_icons_for_areas = False
             for st in areastyle.values():
                 if "icon-image" in st or 'symbol-shape' in st or 'symbol-image' in st:
@@ -168,7 +175,10 @@ def query_style(args):
                     break
             zstyle = areastyle
             if "area" not in cltags:
-                nodestyle = style.get_style_dict(clname, "node", cltags, zoom, olddict=zstyle, filter_by_runtime_conditions=runtime_conditions, strict_runtime_filtering=strict_runtime_filtering)
+                nodestyle = style.get_style_dict(clname, "node", cltags, zoom, olddict=zstyle,
+                                                 filter_by_runtime_conditions=runtime_conditions,
+                                                 strict_runtime_filtering=strict_runtime_filtering,
+                                                 subset_runtime_filtering=subset_runtime_filtering)
                 zstyle = nodestyle
 
             results.append((cl, zoom, runtime_conditions, list(zstyle.values()), has_icons_for_areas))
@@ -182,6 +192,9 @@ def runtime_condition_variants(runtime_conditions):
 
     if RUNTIME_CONDITION_MODE == 'mapsme':
         return runtime_conditions
+
+    if RUNTIME_CONDITION_MODE == 'mapsme-fallback':
+        return runtime_conditions + [None]
 
     unique_conditions = []
     for new_rt_conditions in runtime_conditions:
@@ -735,11 +748,12 @@ def komap_mapswithme(options):
 
     # Parse style mapcss
     global style
-    style = MapCSS(options.minzoom, options.maxzoom)
     if PRIORITY_MODE == 'mapsme':
+        style = MapCSS(options.minzoom, options.maxzoom + 1)
         style.parse(filename=options.filename, static_tags=mapcss_static_tags,
-                    dynamic_tags=mapcss_dynamic_tags)
+                    dynamic_tags=mapcss_dynamic_tags, legacy_zindex=True)
     else:
+        style = MapCSS(options.minzoom, options.maxzoom)
         style.parse(clamp=False, stretch=LAYER_PRIORITY_RANGE,
                     filename=options.filename, static_tags=mapcss_static_tags,
                     dynamic_tags=mapcss_dynamic_tags)
@@ -748,6 +762,13 @@ def komap_mapswithme(options):
     clname_cltag_unique = set()
     for cl in class_order:
         clname = cl if cl.find('-') == -1 else cl[:cl.find('-')]
+        if PRIORITY_MODE == 'mapsme':
+            cltags = classificator[cl]
+            style.build_choosers_tree(clname, "line", cltags)
+            style.build_choosers_tree(clname, "area", cltags)
+            style.build_choosers_tree(clname, "node", cltags)
+            continue
+
         # Get first tag of the class/type.
         cltag = next(iter(classificator[cl].keys()))
         clname_cltag = clname + '$' + cltag
@@ -881,24 +902,26 @@ def komap_mapswithme(options):
                         elif st.get('-x-kot-layer') == 'bottom':
                             st['z-index'] = float(st.get('z-index', 0)) - 15001.
 
-                    if st.get('casing-width') not in (None, 0) or st.get('casing-width-add') is not None:  # and (st.get('width') or st.get('fill-color')):
+                    has_casing_width_add = PRIORITY_MODE != 'mapsme' and st.get('casing-width-add') is not None
+                    if st.get('casing-width') not in (None, 0) or has_casing_width_add:  # and (st.get('width') or st.get('fill-color')):
                         is_area_st = 'fill-color' in st
-                        if has_lines and not is_area_st and st.get('casing-linecap', 'butt') == 'butt':
+                        if has_lines and (PRIORITY_MODE == 'mapsme' or not is_area_st) and st.get('casing-linecap', 'butt') == 'butt':
                             dr_line = LineRuleProto()
 
                             base_width = st.get('width', 0)
-                            if base_width == 0:
+                            if base_width == 0 and PRIORITY_MODE != 'mapsme':
                                 for wst in zstyle:
                                     if wst.get('width') not in (None, 0):
                                         # Rail bridge styles use width from ::dash object instead of ::default.
                                         if base_width == 0 or wst.get('object-id') != '::default':
                                             base_width = wst.get('width', 0)
                                 # 'casing-width' has precedence over 'casing-width-add'.
-                                if st.get('casing-width') in (None, 0):
+                                if has_casing_width_add and st.get('casing-width') in (None, 0):
                                     st['casing-width'] = base_width + st.get('casing-width-add')
                                     base_width = 0
 
-                            dr_line.width = round(base_width + st.get('casing-width') * 2, 2)
+                            casing_width = base_width + st.get('casing-width') * 2
+                            dr_line.width = casing_width if PRIORITY_MODE == 'mapsme' else round(casing_width, 2)
                             dr_line.color = mwm_encode_color(colors, st, "casing")
                             if PRIORITY_MODE == 'mapsme':
                                 dr_line.priority = legacy_casing_line_priority(st)
@@ -914,6 +937,8 @@ def komap_mapswithme(options):
                             for i in st.get('casing-dashes', st.get('dashes', [])):
                                 dr_line.dashdot.dd.extend([float(i)])
                             addPattern(dr_line.dashdot.dd)
+                            if PRIORITY_MODE == 'mapsme':
+                                dr_line.dashdot.SetInParent()
                             dr_line.cap = dr_linecaps.get(st.get('casing-linecap', 'butt'), BUTTCAP)
                             dr_line.join = dr_linejoins.get(st.get('casing-linejoin', 'round'), ROUNDJOIN)
                             dr_element.lines.extend([dr_line])
@@ -940,7 +965,8 @@ def komap_mapswithme(options):
                             dr_line.width = st.get('width', 0)
                             dr_line.color = mwm_encode_color(colors, st)
                             for i in st.get('dashes', []):
-                                dr_line.dashdot.dd.extend([float(i)])
+                                dash = max(float(i), 1) if PRIORITY_MODE == 'mapsme' else float(i)
+                                dr_line.dashdot.dd.extend([dash])
                             addPattern(dr_line.dashdot.dd)
                             dr_line.cap = dr_linecaps.get(st.get('linecap', 'butt'), BUTTCAP)
                             dr_line.join = dr_linejoins.get(st.get('linejoin', 'round'), ROUNDJOIN)
@@ -965,7 +991,7 @@ def komap_mapswithme(options):
                                 store_visibility(cl, 'line', st.get('object-id'), zoom)
                             dr_element.lines.extend([dr_line])
 
-                    if st.get('shield-font-size'):
+                    if st.get('shield-font-size') and (PRIORITY_MODE != 'mapsme' or has_lines):
                         dr_element.shield.height = int(st.get('shield-font-size', 10))
                         dr_element.shield.text_color = mwm_encode_color(colors, st, "shield-text")
                         if st.get('shield-text-halo-radius', 0) != 0:
@@ -1020,8 +1046,8 @@ def komap_mapswithme(options):
 
                         dr_cur_subtext = dr_text.primary
                         for sp in has_text[:]:
-                            if PRIORITY_MODE == 'mapsme' and len(has_text) == 2:
-                                dr_cur_subtext = dr_text.secondary
+                            if PRIORITY_MODE == 'mapsme':
+                                dr_cur_subtext = dr_text.secondary if len(has_text) == 2 else dr_text.primary
                             dr_cur_subtext.height = int(float(sp.get('font-size', "10").split(",")[0]))
                             if PRIORITY_MODE != 'mapsme' and 'text-color' not in st:
                                 print(f'ERROR: text-color not set for z{zoom} {cl}')
@@ -1047,7 +1073,8 @@ def komap_mapswithme(options):
                             elif PRIORITY_MODE != 'mapsme' and text_priority_key == 'caption' and dr_element.symbol.priority:
                                 # On by default for all captions (not path texts) with icons.
                                 dr_cur_subtext.is_optional = True
-                            dr_cur_subtext = dr_text.secondary
+                            if PRIORITY_MODE != 'mapsme':
+                                dr_cur_subtext = dr_text.secondary
                             if PRIORITY_MODE == 'mapsme':
                                 has_text.pop()
 
@@ -1198,7 +1225,7 @@ def main():
     parser.add_option("-d", "--data-path", dest="data",
                       help="path to mapcss-mapping.csv and other files", metavar="PATH")
     parser.add_option("", "--runtime-condition-mode", dest="runtime_condition_mode",
-                      help="runtime condition compatibility mode: organicmaps, comaps, or mapsme",
+                      help="runtime condition compatibility mode: organicmaps, comaps, mapsme, or mapsme-fallback",
                       default=RUNTIME_CONDITION_MODE, metavar="MODE")
     parser.add_option("", "--priority-mode", dest="priority_mode",
                       help="priority compatibility mode: priority_files or mapsme",
@@ -1214,7 +1241,7 @@ def main():
     if options.priorities_path is not None:
         options.priorities_path = os.path.normpath(options.priorities_path)
 
-    if options.runtime_condition_mode not in ('organicmaps', 'comaps', 'mapsme'):
+    if options.runtime_condition_mode not in ('organicmaps', 'comaps', 'mapsme', 'mapsme-fallback'):
         parser.error("Unknown runtime condition mode.")
 
     if options.format_priorities_only:

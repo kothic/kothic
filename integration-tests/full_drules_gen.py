@@ -99,7 +99,7 @@ def main():
                       help="compare generated .bin/.txt files with baseline files from DIR",
                       metavar="DIR")
     parser.add_option("", "--runtime-condition-mode", dest="runtime_condition_mode",
-                      help="runtime condition compatibility mode: organicmaps, comaps, or mapsme",
+                      help="runtime condition compatibility mode: organicmaps, comaps, mapsme, or mapsme-fallback",
                       default=libkomwm.RUNTIME_CONDITION_MODE, metavar="MODE")
 
     (options, args) = parser.parse_args()
@@ -110,7 +110,7 @@ def main():
     if options.outdir is None:
         parser.error("Please specify base output path.")
 
-    if options.runtime_condition_mode not in ('organicmaps', 'comaps', 'mapsme'):
+    if options.runtime_condition_mode not in ('organicmaps', 'comaps', 'mapsme', 'mapsme-fallback'):
         parser.error("Unknown runtime condition mode.")
 
     full_styles_regenerate(options)

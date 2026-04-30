@@ -122,6 +122,42 @@ line|z7-9[highway=motorway],
         rule, object_id = parser.choosers[0].testChains({"highway": "trunk"})
         self.assertEqual(object_id, "::default")
 
+    def test_build_choosers_tree_matches_any_class_tag(self):
+        parser = MapCSS(0, 10)
+        parser.parse("""
+line|z5[name] { width: 3; }
+""", static_tags={"name": True})
+
+        parser.build_choosers_tree(
+            "amenity-cafe",
+            "line",
+            {"amenity": "cafe", "name": "Corner Cafe"}
+        )
+        parser.finalize_choosers_tree()
+
+        style = parser.get_style_dict(
+            "amenity-cafe",
+            "line",
+            {"amenity": "cafe", "name": "Corner Cafe"},
+            zoom=5,
+        )
+        self.assertEqual(style["::default"]["width"], 3.0)
+
+    def test_parse_legacy_zindex_keeps_negative_offset(self):
+        parser = MapCSS()
+        parser.parse("""
+line|z5[highway=service]::low { z-index: -10; width: 1; }
+line|z5[highway=service]::mid { z-index: 0; width: 2; }
+line|z5[highway=service]::high { z-index: 10; width: 3; }
+""", static_tags={"highway": True}, stretch=False, legacy_zindex=True)
+
+        zindexes = [
+            style["z-index"]
+            for chooser in parser.choosers
+            for style in chooser.styles
+        ]
+        self.assertEqual(zindexes, [-1, 0, 1])
+
     def test_parse_basic_chooser_3(self):
         parser = MapCSS()
         static_tags = {"addr:housenumber": True, "addr:street": False}
