@@ -60,3 +60,6 @@ The repository intentionally supports several consumers that diverged in forks:
 * Runtime-condition filtering is opt-in: callers that pass no runtime filter get
   the old unfiltered Kothic style resolution, while drules generation can ask
   for exact runtime-selector variants.
+
+See `docs/fork-reconciliation.md` for the current fork-by-fork compatibility
+matrix and the status of checked-in MapsMe drules.

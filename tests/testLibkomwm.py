@@ -125,6 +125,17 @@ class LibKomwmTest(unittest.TestCase):
             (-16001, -1)
         )
 
+    def test_default_maxzoom_depends_on_priority_mode(self):
+        self.assertEqual(
+            libkomwm.resolve_default_maxzoom(None, "priority_files"),
+            libkomwm.DEFAULT_MAXZOOM
+        )
+        self.assertEqual(
+            libkomwm.resolve_default_maxzoom(None, "mapsme"),
+            libkomwm.MAPSME_DEFAULT_MAXZOOM
+        )
+        self.assertEqual(libkomwm.resolve_default_maxzoom(17, "mapsme"), 17)
+
     def test_line_casing_width_add_uses_base_width(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             data_dir = Path(tmpdir)

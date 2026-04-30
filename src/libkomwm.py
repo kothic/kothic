@@ -17,6 +17,8 @@ PROFILE = False
 MULTIPROCESSING = True
 RUNTIME_CONDITION_MODE = 'organicmaps'
 PRIORITY_MODE = 'priority_files'
+DEFAULT_MAXZOOM = 20
+MAPSME_DEFAULT_MAXZOOM = 19
 
 # Priority values defined in *.prio.txt files are adjusted
 # to fit into the following "priorities ranges":
@@ -602,6 +604,14 @@ def legacy_circle_priority(st):
 
 def legacy_text_priority(st, base_z):
     return legacy_z_index_priority(st, '-x-me-text-priority', base_z, 19000)
+
+
+def resolve_default_maxzoom(maxzoom, priority_mode):
+    if maxzoom is not None:
+        return maxzoom
+    if priority_mode == 'mapsme':
+        return MAPSME_DEFAULT_MAXZOOM
+    return DEFAULT_MAXZOOM
 
 
 def legacy_area_priority(st, bgpos):
@@ -1212,7 +1222,7 @@ def main():
                       help="read MapCSS stylesheet from FILE", metavar="FILE")
     parser.add_option("-f", "--minzoom", dest="minzoom", default=0, type="int",
                       help="minimal available zoom level", metavar="ZOOM")
-    parser.add_option("-t", "--maxzoom", dest="maxzoom", default=20, type="int",
+    parser.add_option("-t", "--maxzoom", dest="maxzoom", default=None, type="int",
                       help="maximal available zoom level", metavar="ZOOM")
     parser.add_option("-o", "--output-file", dest="outfile", default="-",
                       help="output filename", metavar="FILE")
@@ -1235,6 +1245,8 @@ def main():
 
     if options.priority_mode not in ('priority_files', 'mapsme'):
         parser.error("Unknown priority mode.")
+
+    options.maxzoom = resolve_default_maxzoom(options.maxzoom, options.priority_mode)
 
     if options.priority_mode == 'priority_files' and (options.priorities_path is None or not os.path.isdir(options.priorities_path)):
         parser.error("A path to priorities *.prio.txt files is required.")
