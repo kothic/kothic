@@ -1,0 +1,6 @@
+colors {
+  GuiText-color: #FFFFFF;
+  GuiText-opacity: 0.7;
+  Route-color: #0000FF;
+  Route-opacity: 0.5;
+}

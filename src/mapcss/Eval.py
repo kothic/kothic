@@ -15,8 +15,10 @@
 #   You should have received a copy of the GNU General Public License
 #   along with kothic.  If not, see <http://www.gnu.org/licenses/>.
 
-NONE = ""
+import logging
 
+logger = logging.getLogger('mapcss.Eval')
+logger.setLevel(logging.ERROR)
 
 class Eval():
     def __init__(self, s='eval()'):
@@ -30,21 +32,6 @@ class Eval():
         except:
             # print "Can't compile %s" % s
             self.expr = compile("0", "MapCSS expression", "eval")
-    
-    def __eq__(self, a):
-        return self.expr_text == a.expr_text
-    
-    def to_mapbox_expression(self):
-        def to_mapbox_coalesce(*x):
-            return ["coalesce"] + list(x)
-        
-        def to_mapbox_get(x):
-            return ["get", x]
-
-        return eval(self.expr, {}, {
-                "any": to_mapbox_coalesce,
-                "tag": to_mapbox_get
-                })
 
     def extract_tags(self):
         """
@@ -58,11 +45,14 @@ class Eval():
             for t in x:
                 q = x
             return 0
-        tags = set([])
-        # print self.expr_text
 
+        # print self.expr_text
+        tags = set([])
+        def tags_add(x):
+            tags.add(x)
+            return 0
         a = eval(self.expr, {}, {
-                 "tag": lambda x: max([tags.add(x), " "]),
+                 "tag": lambda x: tags_add(x),
                  "prop": lambda x: 0,
                  "num": lambda x: 0,
                  "metric": fake_compute,
@@ -71,6 +61,8 @@ class Eval():
                  "any": fake_compute,
                  "min": fake_compute,
                  "max": fake_compute,
+                 "cond": fake_compute,
+                 "boolean": fake_compute,
                  })
         return tags
 
@@ -78,13 +70,15 @@ class Eval():
         """
         Compute this eval()
         """
-        for k, v in tags.items():
+        """
+        for k, v in tags.iteritems():
             try:
-                tag[k] = float(v)
+                tags[k] = float(v)
             except:
                 pass
+        """
         try:
-            return str(eval(self.expr, {}, {
+            result = eval(self.expr, {}, {
                             "tag": lambda x: tags.get(x, ""),
                             "prop": lambda x: props.get(x, ""),
                             "num": m_num,
@@ -96,13 +90,30 @@ class Eval():
                             "max": m_max,
                             "cond": m_cond,
                             "boolean": m_boolean
-                            }))
-        except:
+                            })
+
+            if type(result) == float:
+                # In Python2 and Python3 float to string behaves differently
+                # Python 2:
+                #   >>> str(2.8 + 0.4)
+                #   '3.2'
+                # Python 3:
+                #   >>> str(2.8 + 0.4)
+                #   '3.1999999999999997'
+                #
+                # See https://stackoverflow.com/q/25898733 for details
+                return "{:.4g}".format(result)
+
+            return str(result)
+        except Exception as e:
+            logger.warning(f"Error evaluating expression `{self.expr_text}`", e)
             return ""
 
     def __repr__(self):
         return "eval(%s)" % self.expr_text
 
+    def __eq__(self, other):
+        return type(self) == type(other) and self.expr_text == other.expr_text
 
 def m_boolean(expr):
     expr = str(expr)
@@ -180,6 +191,8 @@ def m_metric(x, t):
                 return float(x[0:-1]) * float(t)
         except:
             return ""
+
+
 # def str(x):
     #"""
     # str() MapCSS feature

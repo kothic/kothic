@@ -15,8 +15,6 @@
 #   You should have received a copy of the GNU General Public License
 #   along with kothic.  If not, see <http://www.gnu.org/licenses/>.
 
-from .Condition import Condition
-
 type_matches = {
     "": ('area', 'line', 'way', 'node'),
     "area": ("area", "way"),
@@ -27,6 +25,7 @@ type_matches = {
 
 class Rule():
     def __init__(self, s=''):
+        self.runtime_conditions = None
         self.conditions = []
         # self.isAnd = True
         self.minZoom = 0
@@ -34,19 +33,13 @@ class Rule():
         if s == "*":
             s = ""
         self.subject = s    # "", "way", "node" or "relation"
+        self.type_matches = type_matches[s] if s in type_matches else set()
 
     def __repr__(self):
-        return "%s|z%s-%s %s" % (self.subject, self.minZoom, self.maxZoom, self.conditions)
+        return "%s|z%s-%s %s %s" % (self.subject, self.minZoom, self.maxZoom, self.conditions, self.runtime_conditions)
 
-    def test(self, obj, tags, zoom):
-        if (zoom < self.minZoom) or (zoom > self.maxZoom):
-            return False
-
-        if (self.subject != '') and not _test_feature_compatibility(obj, self.subject):
-            return False
-
+    def test(self, tags):
         subpart = "::default"
-
         for condition in self.conditions:
             res = condition.test(tags)
             if not res:
@@ -55,85 +48,16 @@ class Rule():
                 subpart = res
         return subpart
 
-    def test_zoom(self, zoom):
-        return (zoom >= self.minZoom) and (zoom <= self.maxZoom)
-
     def get_compatible_types(self):
         return type_matches.get(self.subject, (self.subject,))
 
-    def get_all_tags(self, obj):
-        """
-        get all tags collected from every condition in a rule
-        """
-        if obj:
-            if (self.subject != '') and not _test_feature_compatibility(obj, self.subject):
-                return set()
-
-        tags = set()
-        for condition in self.conditions:
-            tags.update(condition.get_interesting_tags())
-        return tags
-
-    def get_interesting_tags(self, obj, zoom):
-        """
-        get tags required to be included for specific zoom level
-        """
-        if obj:
-            if (self.subject != '') and not _test_feature_compatibility(obj, self.subject):
-                return set()
-
-        if not self.test_zoom(zoom):
-            return set()
-
+    def extract_tags(self):
         a = set()
         for condition in self.conditions:
-            a.update(condition.get_interesting_tags())
+            tag = condition.extract_tag()
+            if tag != '*':
+                a.add(tag)
+            elif len(a) == 0:
+                return set(["*"])
+
         return a
-
-    def get_numerics(self):
-        a = set()
-        for condition in self.conditions:
-            a.add(condition.get_numerics())
-        a.discard(False)
-        return a
-
-    def get_sql_hints(self, obj, zoom):
-        if obj:
-            if (self.subject != '') and not _test_feature_compatibility(obj, self.subject):
-                return set()
-        if not self.test_zoom(zoom):
-            return set()
-        a = set()
-        b = set()
-        for condition in self.conditions:
-            q = condition.get_sql()
-            if q:
-                if q[1]:
-                    a.add(q[0])
-                    b.add(q[1])
-        b = " AND ".join(b)
-        return a, b
-
-def _test_feature_compatibility(f1, f2):
-    """
-    Checks if feature of type f1 is compatible with f2.
-    """
-    if f2 == f1:
-        return True
-    if f2 not in ("way", "area", "line"):
-        return False
-    elif f2 == "way" and f1 == "line":
-        return True
-    elif f2 == "way" and f1 == "area":
-        return True
-    elif f2 == "area" and f1 in ("way", "area"):
-#      if ":area" in tags:
-        return True
-#      else:
-#        return False
-    elif f2 == "line" and f1 in ("way", "line", "area"):
-        return True
-    else:
-        return False
-    # print f1, f2, True
-    return True

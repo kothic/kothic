@@ -715,8 +715,7 @@ def rgb_to_hex(rgb_triplet):
     '#2138c0'
 
     """
-    r, g, b = rgb_triplet
-    return '#%02x%02x%02x' % (int(round(r)), int(round(g)), int(round(b)))
+    return '#%02x%02x%02x' % (int(rgb_triplet[0]), int(rgb_triplet[1]), int(rgb_triplet[2]))
 
 
 def rgb_to_rgb_percent(rgb_triplet):

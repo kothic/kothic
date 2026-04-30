@@ -287,7 +287,4 @@ class TileSource:
 
 
 if __name__ == "__main__":
-
-    gtk.gdk.threads_init()
-    kap = KothicApp()
-    kap.main()
+    raise SystemExit("Run gtk-app.py to start the GTK application.")

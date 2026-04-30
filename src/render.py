@@ -21,6 +21,7 @@ import cairo
 import math
 import os as os_module
 from copy import deepcopy
+from functools import cmp_to_key, reduce
 import pangocairo
 import pango
 
@@ -303,7 +304,7 @@ class RasterTile:
             def compare_things(a, b):
                 """
                 Custom comparator for extlist sorting.
-                Sorts back-to-front, bottom-to-top, | > \ > _, horizontal-to-vertical.
+                Sorts back-to-front, bottom-to-top, | > \\ > _, horizontal-to-vertical.
                 """
                 t1, t2 = a[1], b[1]
                 if t1[1] > t2[1]:  # back-to-front
@@ -319,11 +320,11 @@ class RasterTile:
                 if t1[0] > t2[0]:
                     return -1
 
-                return cmp(math.sin(math.atan2(a[0][0][0] - a[0][1][0], a[0][0][0] - a[0][1][0])), math.sin(math.atan2(b[0][0][0] - b[0][1][0], b[0][0][0] - b[0][1][0])))
-                print(t1)
-                print(t2)
+                av = math.sin(math.atan2(a[0][0][0] - a[0][1][0], a[0][0][0] - a[0][1][0]))
+                bv = math.sin(math.atan2(b[0][0][0] - b[0][1][0], b[0][0][0] - b[0][1][0]))
+                return (av > bv) - (av < bv)
 
-            extlist.sort(compare_things)
+            extlist.sort(key=cmp_to_key(compare_things))
 
             # Pass 3. Rendering using painter's algorythm
             cr.set_dash([])

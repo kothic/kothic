@@ -1,0 +1,41 @@
+# This file is automatically re-formatted and re-sorted in priorities descending order
+# when generate_drules.sh is run. All comments (automatic priorities of e.g. optional captions, drule types visibilities, etc.)
+# are generated automatically for information only. Custom formatting and comments are not preserved.
+#
+# FG geometry: foreground lines and areas (e.g. buildings) are rendered always below overlays
+# and always on top of background geometry (BG-top & BG-by-size) even if a foreground feature
+# is layer=-10 (as tunnels should be visibile over landcover and water).
+#
+# Priorities ranges' rendering order overview:
+# - overlays (icons, captions...)
+# - FG: foreground areas and lines
+# - BG-top: water (linear and areal)
+# - BG-by-size: landcover areas sorted by their size
+
+highway-motorway                                    # line z6- (also has pathtext z10-, shield::shield z10-)
+highway-motorway-bridge                             # line z6- (also has pathtext z10-, shield::shield z10-)
+highway-motorway-tunnel                             # line z6- (also has pathtext z10-, shield::shield z10-)
+highway-trunk                                       # line z6- (also has pathtext z10-, shield::shield z10-)
+highway-trunk-bridge                                # line z6- (also has pathtext z10-, shield::shield z10-)
+highway-trunk-tunnel                                # line z6- (also has pathtext z10-, shield::shield z10-)
+highway-world_level                                 # line z4-9
+highway-world_towns_level                           # line z6-9
+=== 310
+
+highway-primary                                     # line z8- (also has pathtext z10-, shield::shield z10-)
+highway-primary-bridge                              # line z8- (also has pathtext z10-, shield::shield z10-)
+highway-primary-tunnel                              # line z8- (also has pathtext z10-, shield::shield z10-)
+=== 290
+
+highway-secondary                                   # line z10- (also has pathtext z10-)
+highway-secondary-bridge                            # line z10- (also has pathtext z10-)
+highway-secondary-tunnel                            # line z10- (also has pathtext z10-)
+=== 270
+
+highway-motorway_link                               # line z10- (also has pathtext z10-, shield::shield z10-)
+highway-motorway_link-bridge                        # line z10- (also has pathtext z10-, shield::shield z10-)
+highway-motorway_link-tunnel                        # line z10- (also has pathtext z10-, shield::shield z10-)
+highway-trunk_link                                  # line z10- (also has pathtext z10-, shield::shield z10-)
+highway-trunk_link-bridge                           # line z10- (also has pathtext z10-, shield::shield z10-)
+highway-trunk_link-tunnel                           # line z10- (also has pathtext z10-, shield::shield z10-)
+=== 228

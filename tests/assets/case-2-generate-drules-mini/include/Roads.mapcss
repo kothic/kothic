@@ -1,0 +1,135 @@
+/* ~~~~ CONTENT OF ROADS ~~~~~
+
+1.Z-INDEX ROADS
+2.WORLD LEVEL ROAD 4-9 ZOOM
+3.TRUNK & MOTORWAY 6-22 ZOOM
+  3.1 Trunk & Motorway 6-22 ZOOM
+  3.2 Trunk & Motorway tunnel 12-22 ZOOM
+  3.3 Trunk & Motorway bridge 13-22 ZOOM
+4.PRIMARY 8-22 ZOOM
+  4.1 Primary 8-22 ZOOM
+  4.2 Primary tunnel 14-22 ZOOM
+  4.3 Primary bridge 14-22 ZOOM
+5.SECONDARY 10-22 ZOOM
+  5.1 Secondary 10-22 ZOOM
+  5.2 Secondary tunnel 16-22 ZOOM
+  5.3 Secondary bridge 14-22 ZOOM
+6.TERTIARY & UNCLASSIFIED 11-22 ZOOM
+  6.1 Tertiary & Unclassified 11-22 ZOOM
+  6.2 Tertiary & Unclassified tunnel 16-22 ZOOM
+  6.3 Tertiary & Unclassified bridge 14-22 ZOOM
+7.RESIDENTAL, ROAD, STREETS & SERVICE 12-22 ZOOM
+  7.1 Residential, Road, Street 12-22 ZOOM
+  7.2 Residential, Road, Street tunnel 16-22 ZOOM
+  7.3 Residential, Road, Street bridge 14-22 ZOOM
+  7.4 Service 15-22 ZOOM
+8.OTHERS ROADS 13-22 ZOOM
+  8.1 Pedestrian & ford 13-22 ZOOM
+  8.2 Pedestrian & ford tunnel 16-22 ZOOM
+  8.3 Pedestrian & other brige 13-22 ZOOM
+  8.4 Cycleway 13-22 ZOOM
+  8.5 Construction 13-22 ZOOM
+  8.6 Track & Path 14-22 ZOOM
+  8.7 Footway 15-22 ZOOM
+  8.8 Steps 15-22 ZOOM
+  8.9 Bridleway 14-22 ZOOM
+  8.11 Runway 12-22 ZOOM
+9.RAIL 11-22 ZOOM
+  9.1 RAIL 11-22 ZOOM
+  9.2 Rail tunnel 14-22 ZOOM
+  9.3 Rail bridge 14-22 ZOOM
+  9.4 Monorail 14-22 ZOOM
+  9.5 Tram line 13-22 ZOOM
+  9.6 Funicular 12-22 ZOOM
+10.PISTE 12-22 ZOOM
+ 10.1 Lift 12-22 ZOOM
+ 10.2 Aerialway 12-22 ZOOM
+ 10.3 Piste & Route 14-22 ZOOM
+11.FERRY
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+*/
+
+/* 2.WORLD LEVEL ROAD 4-9 ZOOM */
+
+line|z6-9[highway=world_towns_level],
+line|z4-9[highway=world_level],
+{color: @trunk1;opacity: 1;}
+
+line|z4[highway=world_level]
+{width: 0.5;}
+line|z5-6[highway=world_level],
+{width: 0.7;}
+line|z6[highway=world_towns_level],
+{width: 0.9;}
+line|z7[highway=world_towns_level],
+line|z7[highway=world_level]
+{width: 0.7;}
+line|z8[highway=world_towns_level],
+line|z8[highway=world_level]
+{width: 0.9;}
+line|z9[highway=world_towns_level],
+line|z9[highway=world_level]
+{width: 0.8;}
+
+/* 3.TRUNK & MOTORWAY 6-22 ZOOM */
+
+line|z6[highway=trunk],
+line|z6[highway=motorway],
+{color: @trunk0; opacity: 0.3;}
+line|z7-9[highway=trunk],
+line|z7-9[highway=motorway],
+{color: @trunk0; opacity: 0.7;}
+
+line|z10-[highway=trunk],
+line|z10-[highway=motorway],
+{color: @trunk1; opacity: 0.7;}
+line|z10-[highway=motorway_link],
+line|z10-[highway=trunk_link],
+{color: @primary0; opacity: 0.7;}
+
+/* 3.1 Trunk & Motorway 6-22 ZOOM */
+
+line|z6[highway=trunk],
+line|z6[highway=motorway],
+{width: 0.8;}
+line|z7[highway=trunk],
+line|z7[highway=motorway]
+{width: 0.9;}
+line|z8[highway=trunk],
+line|z8[highway=motorway]
+{width: 1.1;}
+line|z9[highway=trunk],
+line|z9[highway=motorway]
+{width: 1.2;}
+line|z10[highway=trunk],
+line|z10[highway=motorway]
+{width: 1.5;}
+
+line|z10[highway=motorway_link],
+line|z10[highway=trunk_link]
+{width: 0.8;}
+
+
+/* 4.PRIMARY 8-22 ZOOM */
+
+line|z8-10[highway=primary],
+{color: @primary0; opacity: 0.7;}
+
+/* 4.1 Primary 8-22 ZOOM */
+
+line|z8[highway=primary],
+{width: 0.7;}
+line|z9[highway=primary],
+{width: 0.8;}
+line|z10[highway=primary],
+{width: 1.2;}
+
+/* 5.SECONDARY 10-22 ZOOM */
+
+line|z10[highway=secondary],
+{color: @secondary0; opacity: 0.8;}
+
+/* 5.1 Secondary 10-22 ZOOM */
+
+line|z10[highway=secondary],
+{width: 1.2;}

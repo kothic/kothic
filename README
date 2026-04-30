@@ -1,4 +1,8 @@
    Kothic  Map Renderer
+
+   The maintained project overview, Python 3 test command, and fork
+   compatibility notes live in README.md. This legacy README is kept so old
+   links to the original renderer instructions do not break.
    
    Depends:
    1. tWMS http://twms.googlecode.com/

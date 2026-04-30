@@ -20,15 +20,17 @@ from .Rule import Rule
 from .webcolors.webcolors import whatever_to_cairo as colorparser
 from .webcolors.webcolors import cairo_to_hex
 from .Eval import Eval
+from .Condition import  *
 
+TYPE_EVAL = type(Eval())
 
 def make_nice_style(r):
     ra = {}
     for a, b in r.items():
         "checking and nicifying style table"
-        if type(b) == type(Eval()):
+        if type(b) == TYPE_EVAL:
             ra[a] = b
-        elif "color" in a:
+        elif "color" in a and b.strip() != 'none':
             "parsing color value to 3-tuple"
             # print "res:", b
             if b and (type(b) != tuple):
@@ -38,7 +40,7 @@ def make_nice_style(r):
                 ra[a] = colorparser(b)
             elif b:
                 ra[a] = b
-        elif any(x in a for x in ("width", "z-index", "opacity", "offset", "radius", "extrude")):
+        elif any(x in a for x in ("width", "opacity", "offset", "radius", "extrude")):
             "these things are float's or not in table at all"
             try:
                 ra[a] = float(b)
@@ -56,19 +58,6 @@ def make_nice_style(r):
             ra[a] = b
     return ra
 
-needed = set([
-    "width",
-    "casing-width",
-    "fill-color",
-    "fill-image",
-    "icon-image",
-    "text",
-    "extrude",
-    "background-image",
-    "background-color",
-    "pattern-image",
-    "shield-text"
-])
 
 class StyleChooser:
     """
@@ -87,94 +76,68 @@ class StyleChooser:
     The styles property is an array of all the style objects to be drawn
         if any of the ruleChains evaluate to true.
     """
+    # TODO: use logging for debug logs
+
     def __repr__(self):
         return "{(%s) : [%s] }\n" % (self.ruleChains, self.styles)
 
     def __init__(self, scalepair):
         self.ruleChains = []
         self.styles = []
-        self.eval_type = type(Eval())
+        self.eval_type = TYPE_EVAL
         self.scalepair = scalepair
         self.selzooms = None
         self.compatible_types = set()
         self.has_evals = False
+        self.has_runtime_conditions = False
+        self.cached_tags = None
 
-    def get_numerics(self):
-        """
-        Returns a set of number-compared values.
-        """
+    def extract_tags(self):
+        if self.cached_tags is not None:
+            return self.cached_tags
         a = set()
         for r in self.ruleChains:
-            a.update(r.get_numerics())
-        a.discard(False)
+            a.update(r.extract_tags())
+            if "*" in a:
+                a = set('*')
+                break
+        if self.has_evals and "*" not in a:
+            for s in self.styles:
+                for v in list(s.values()):
+                    if type(v) == self.eval_type:
+                        a.update(v.extract_tags())
+        if len(a) == 0:
+            a = set('*')
+        self.cached_tags = a
         return a
 
-    def get_all_tags(self, ztype):
-        """
-        get all tags collected from every rule and eval() in a chooser
-        """
-        tags = set()
-        for rule in self.ruleChains:
-            tags.update(rule.get_all_tags(ztype))
-        
-        if tags:  # FIXME: semi-illegal optimization, may wreck in future on tagless matches
-            for r in self.styles:
-                for c, b in r.items():
-                    if type(b) == self.eval_type:
-                        tags.update(b.extract_tags())
-        
-        return tags
+    def get_runtime_conditions(self, tags):
+        if not self.has_runtime_conditions:
+            return None
 
-    def get_interesting_tags(self, ztype, zoom):
-        """
-        get tags required to be included for specific zoom level
-        """
-        ### FIXME
-        a = set()
-        if not needed.isdisjoint(set(self.styles[0].keys())):
-            for r in self.ruleChains:
-                a.update(r.get_interesting_tags(ztype, zoom))
-        if a:  # FIXME: semi-illegal optimization, may wreck in future on tagless matches
-            for r in self.styles:
-                for c, b in r.items():
-                    if type(b) == self.eval_type:
-                        a.update(b.extract_tags())
-        return a
+        rule_and_object_id = self.testChains(tags)
 
-    def get_sql_hints(self, type, zoom):
-        """
-        Returns a set of tags that were used in here in form of SQL-hints.
-        """
-        a = set()
-        b = ""
+        if not rule_and_object_id:
+            return None
 
-        if not needed.isdisjoint(set(self.styles[0].keys())):
-            for r in self.ruleChains:
-                p = r.get_sql_hints(type, zoom)
-                if p:
-                    q = "(" + p[1] + ")"  # [t[1] for t in p]
-                    if q == "()":
-                        q = ""
-                    if b and q:
-                        b += " OR " + q
-                    else:
-                        b = q
-                    a.update(p[0])
-        # no need to check for eval's
-        return a, b
+        rule = rule_and_object_id[0]
 
-    def updateStyles(self, sl, ftype, tags, zoom, scale, zscale):
+        return rule.runtime_conditions
+
+    # TODO: Rename to "applyStyles"
+    def updateStyles(self, sl, tags, xscale, zscale, filter_by_runtime_conditions):
         # Are any of the ruleChains fulfilled?
-        if self.selzooms:
-            if zoom < self.selzooms[0] or zoom > self.selzooms[1]:
-                return sl
+        rule_and_object_id = self.testChains(tags)
 
-        #if ftype not in self.compatible_types:
-#            return sl
+        if not rule_and_object_id:
+            return sl
 
-        object_id = self.testChain(self.ruleChains, ftype, tags, zoom)
+        rule = rule_and_object_id[0]
+        object_id = rule_and_object_id[1]
 
-        if not object_id:
+        if (filter_by_runtime_conditions is not None
+            and rule.runtime_conditions is not None
+            and filter_by_runtime_conditions != rule.runtime_conditions):
             return sl
 
         for r in self.styles:
@@ -183,15 +146,15 @@ class StyleChooser:
                 for a, b in r.items():
                     "calculating eval()'s"
                     if type(b) == self.eval_type:
+                        # TODO: Move next block to a separate function
                         combined_style = {}
                         for t in sl:
                             combined_style.update(t)
                         for p, q in combined_style.items():
                             if "color" in p:
                                 combined_style[p] = cairo_to_hex(q)
-                        b = b.compute(tags, combined_style, scale, zscale)
+                        b = b.compute(tags, combined_style, xscale, zscale)
                     ra[a] = b
-                #r = ra
                 ra = make_nice_style(ra)
             else:
                 ra = r.copy()
@@ -208,23 +171,25 @@ class StyleChooser:
                     x["object-id"] = oid
                     if oid == "::*":
                         hasall = True
-                if x.get("object-id") == ra["object-id"]:
-                    x.update(ra)
-                    break
+                else:
+                    if x.get("object-id") == ra["object-id"]:
+                        x.update(ra)
+                        break
             else:
                 if not hasall:
                     allinit.update(ra)
                     sl.append(allinit)
+
         return sl
 
-    def testChain(self, chain, obj, tags, zoom):
+    def testChains(self, tags):
         """
         Tests an object against a chain
         """
-        for r in chain:
-            tt = r.test(obj, tags, zoom)
+        for r in self.ruleChains:
+            tt = r.test(tags)
             if tt:
-                return tt
+                return r, tt
         return False
 
     def newGroup(self):
@@ -234,6 +199,7 @@ class StyleChooser:
         pass
 
     def newObject(self, e=''):
+        # print "newRule"
         """
         adds into the current ruleChain (starting a new Rule)
         """
@@ -243,6 +209,7 @@ class StyleChooser:
         self.ruleChains.append(rule)
 
     def addZoom(self, z):
+        # print "addZoom ", float(z[0]), ", ", float(z[1])
         """
         adds into the current ruleChain (existing Rule)
         """
@@ -250,15 +217,29 @@ class StyleChooser:
         self.ruleChains[-1].maxZoom = float(z[1])
 
     def addCondition(self, c):
+        # print "addCondition ", c
         """
         adds into the current ruleChain (existing Rule)
         """
         self.ruleChains[-1].conditions.append(c)
 
+    def addRuntimeCondition(self, c):
+        # print "addRuntimeCondition ", c
+        """
+        adds into the current ruleChain (existing Rule)
+        """
+        if self.ruleChains[-1].runtime_conditions is None:
+            self.ruleChains[-1].runtime_conditions = [c]
+            self.has_runtime_conditions = True
+        else:
+            self.ruleChains[-1].runtime_conditions.append(c)
+
     def addStyles(self, a):
+        # print "addStyle ", a
         """
         adds to this.styles
         """
+        # TODO: move next for-loop to a new method. Don't call it on every style append
         for r in self.ruleChains:
             if not self.selzooms:
                 self.selzooms = [r.minZoom, r.maxZoom]
@@ -279,9 +260,6 @@ class StyleChooser:
                             b = str(float(b) / 2)
                         except:
                             pass
-                if "text" == a[-4:]:
-                    if b[:5] != "eval(":
-                        b = "eval(tag(\"" + b + "\"))"
                 if b[:5] == "eval(":
                     b = Eval(b)
                     self.has_evals = True
