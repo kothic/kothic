@@ -106,6 +106,59 @@ class LibKomwmTest(unittest.TestCase):
         finally:
             libkomwm.RUNTIME_CONDITION_MODE = original_mode
 
+    def test_compatibility_profiles_are_feature_configs(self):
+        self.assertEqual(
+            libkomwm.compatibility_profile_names(),
+            ("organicmaps", "comaps", "mapsme", "mapsme-fallback", "omim-2016")
+        )
+
+        organic = libkomwm.build_compatibility_config("organicmaps")
+        comaps = libkomwm.build_compatibility_config("comaps")
+        mapsme = libkomwm.build_compatibility_config("mapsme")
+        omim_2016 = libkomwm.build_compatibility_config("omim-2016")
+
+        self.assertTrue(organic.use_priority_files)
+        self.assertTrue(comaps.runtime_fallback)
+        self.assertTrue(mapsme.mapsme_legacy_output)
+        self.assertTrue(mapsme.match_all_class_tags)
+        self.assertFalse(mapsme.mapsme_2016_text_order)
+        self.assertTrue(omim_2016.mapsme_2016_text_order)
+
+    def test_compatibility_profile_overrides_are_explicit_features(self):
+        config = libkomwm.build_compatibility_config(
+            "organicmaps",
+            priority_mode="mapsme",
+            runtime_condition_mode="mapsme-fallback"
+        )
+
+        self.assertEqual(config.priority_mode, "mapsme")
+        self.assertFalse(config.use_priority_files)
+        self.assertTrue(config.mapsme_legacy_output)
+        self.assertTrue(config.raw_runtime_conditions)
+        self.assertTrue(config.runtime_fallback)
+
+    def test_programmatic_generation_defaults_to_base_profile(self):
+        original_profile = libkomwm.COMPATIBILITY_PROFILE
+        original_config = libkomwm.COMPATIBILITY
+        original_priority_mode = libkomwm.PRIORITY_MODE
+        original_runtime_mode = libkomwm.RUNTIME_CONDITION_MODE
+
+        try:
+            libkomwm.COMPATIBILITY_PROFILE = "mapsme"
+            libkomwm.COMPATIBILITY = libkomwm.build_compatibility_config("mapsme")
+            libkomwm.PRIORITY_MODE = "mapsme"
+            libkomwm.RUNTIME_CONDITION_MODE = "mapsme"
+
+            config = libkomwm.build_compatibility_config()
+            self.assertEqual(config.name, "organicmaps")
+            self.assertTrue(config.use_priority_files)
+            self.assertEqual(libkomwm.resolve_default_maxzoom(None), libkomwm.DEFAULT_MAXZOOM)
+        finally:
+            libkomwm.COMPATIBILITY_PROFILE = original_profile
+            libkomwm.COMPATIBILITY = original_config
+            libkomwm.PRIORITY_MODE = original_priority_mode
+            libkomwm.RUNTIME_CONDITION_MODE = original_runtime_mode
+
     def test_legacy_mapsme_priority_helpers(self):
         base_style = {"z-index": 3}
         explicit_style = {

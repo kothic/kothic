@@ -4,6 +4,7 @@ from optparse import OptionParser
 import os
 import csv
 import functools
+from dataclasses import dataclass, replace
 from sys import exit
 from multiprocessing import Pool, set_start_method
 from collections import OrderedDict
@@ -19,6 +20,158 @@ RUNTIME_CONDITION_MODE = 'organicmaps'
 PRIORITY_MODE = 'priority_files'
 DEFAULT_MAXZOOM = 20
 MAPSME_DEFAULT_MAXZOOM = 19
+
+
+@dataclass(frozen=True)
+class CompatibilityConfig:
+    name: str
+    priority_mode: str
+    runtime_condition_mode: str
+    default_maxzoom: int
+    use_priority_files: bool
+    legacy_zindex: bool
+    match_all_class_tags: bool
+    allow_duplicate_types: bool
+    sort_priority_file_rules: bool
+    strict_runtime_filtering: bool
+    subset_runtime_filtering: bool
+    raw_runtime_conditions: bool
+    runtime_fallback: bool
+    mapsme_legacy_output: bool
+    mapsme_2016_text_order: bool = False
+
+
+COMPATIBILITY_PROFILES = {
+    'organicmaps': CompatibilityConfig(
+        name='organicmaps',
+        priority_mode='priority_files',
+        runtime_condition_mode='organicmaps',
+        default_maxzoom=DEFAULT_MAXZOOM,
+        use_priority_files=True,
+        legacy_zindex=False,
+        match_all_class_tags=False,
+        allow_duplicate_types=False,
+        sort_priority_file_rules=True,
+        strict_runtime_filtering=True,
+        subset_runtime_filtering=False,
+        raw_runtime_conditions=False,
+        runtime_fallback=False,
+        mapsme_legacy_output=False,
+    ),
+    'comaps': CompatibilityConfig(
+        name='comaps',
+        priority_mode='priority_files',
+        runtime_condition_mode='comaps',
+        default_maxzoom=DEFAULT_MAXZOOM,
+        use_priority_files=True,
+        legacy_zindex=False,
+        match_all_class_tags=False,
+        allow_duplicate_types=False,
+        sort_priority_file_rules=True,
+        strict_runtime_filtering=True,
+        subset_runtime_filtering=False,
+        raw_runtime_conditions=False,
+        runtime_fallback=True,
+        mapsme_legacy_output=False,
+    ),
+    'mapsme': CompatibilityConfig(
+        name='mapsme',
+        priority_mode='mapsme',
+        runtime_condition_mode='mapsme',
+        default_maxzoom=MAPSME_DEFAULT_MAXZOOM,
+        use_priority_files=False,
+        legacy_zindex=True,
+        match_all_class_tags=True,
+        allow_duplicate_types=True,
+        sort_priority_file_rules=False,
+        strict_runtime_filtering=False,
+        subset_runtime_filtering=True,
+        raw_runtime_conditions=True,
+        runtime_fallback=False,
+        mapsme_legacy_output=True,
+    ),
+    'mapsme-fallback': CompatibilityConfig(
+        name='mapsme-fallback',
+        priority_mode='mapsme',
+        runtime_condition_mode='mapsme-fallback',
+        default_maxzoom=MAPSME_DEFAULT_MAXZOOM,
+        use_priority_files=False,
+        legacy_zindex=True,
+        match_all_class_tags=True,
+        allow_duplicate_types=True,
+        sort_priority_file_rules=False,
+        strict_runtime_filtering=False,
+        subset_runtime_filtering=True,
+        raw_runtime_conditions=True,
+        runtime_fallback=True,
+        mapsme_legacy_output=True,
+    ),
+    'omim-2016': CompatibilityConfig(
+        name='omim-2016',
+        priority_mode='mapsme',
+        runtime_condition_mode='mapsme',
+        default_maxzoom=MAPSME_DEFAULT_MAXZOOM,
+        use_priority_files=False,
+        legacy_zindex=True,
+        match_all_class_tags=True,
+        allow_duplicate_types=True,
+        sort_priority_file_rules=False,
+        strict_runtime_filtering=False,
+        subset_runtime_filtering=True,
+        raw_runtime_conditions=True,
+        runtime_fallback=False,
+        mapsme_legacy_output=True,
+        mapsme_2016_text_order=True,
+    ),
+}
+
+DEFAULT_COMPATIBILITY_PROFILE = 'organicmaps'
+COMPATIBILITY_PROFILE = DEFAULT_COMPATIBILITY_PROFILE
+COMPATIBILITY = COMPATIBILITY_PROFILES[COMPATIBILITY_PROFILE]
+
+
+def compatibility_profile_names():
+    return tuple(COMPATIBILITY_PROFILES.keys())
+
+
+def build_compatibility_config(profile_name=None, priority_mode=None, runtime_condition_mode=None):
+    if profile_name is None:
+        profile_name = DEFAULT_COMPATIBILITY_PROFILE
+
+    if profile_name not in COMPATIBILITY_PROFILES:
+        raise ValueError(f'Unknown compatibility profile: {profile_name}')
+
+    config = COMPATIBILITY_PROFILES[profile_name]
+    if priority_mode is not None and priority_mode != config.priority_mode:
+        if priority_mode not in ('priority_files', 'mapsme'):
+            raise ValueError(f'Unknown priority mode: {priority_mode}')
+        use_priority_files = priority_mode == 'priority_files'
+        config = replace(
+            config,
+            priority_mode=priority_mode,
+            use_priority_files=use_priority_files,
+            mapsme_legacy_output=not use_priority_files,
+            legacy_zindex=not use_priority_files,
+            match_all_class_tags=not use_priority_files,
+            allow_duplicate_types=not use_priority_files,
+            sort_priority_file_rules=use_priority_files,
+            strict_runtime_filtering=use_priority_files,
+            subset_runtime_filtering=not use_priority_files,
+            mapsme_2016_text_order=False if use_priority_files else config.mapsme_2016_text_order,
+            default_maxzoom=DEFAULT_MAXZOOM if use_priority_files else MAPSME_DEFAULT_MAXZOOM,
+        )
+
+    if runtime_condition_mode is not None and runtime_condition_mode != config.runtime_condition_mode:
+        if runtime_condition_mode not in ('organicmaps', 'comaps', 'mapsme', 'mapsme-fallback'):
+            raise ValueError(f'Unknown runtime condition mode: {runtime_condition_mode}')
+        config = replace(
+            config,
+            runtime_condition_mode=runtime_condition_mode,
+            raw_runtime_conditions=runtime_condition_mode.startswith('mapsme'),
+            runtime_fallback=runtime_condition_mode in ('comaps', 'mapsme-fallback'),
+        )
+
+    return config
 
 # Priority values defined in *.prio.txt files are adjusted
 # to fit into the following "priorities ranges":
@@ -156,8 +309,8 @@ def query_style(args):
 
         for runtime_conditions in runtime_conditions_arr:
             zstyle = {}
-            strict_runtime_filtering = PRIORITY_MODE != 'mapsme'
-            subset_runtime_filtering = PRIORITY_MODE == 'mapsme'
+            strict_runtime_filtering = COMPATIBILITY.strict_runtime_filtering
+            subset_runtime_filtering = COMPATIBILITY.subset_runtime_filtering
 
             # Get style for class 'cl' on zoom 'zoom' with corresponding runtime conditions
             if "area" not in cltags:
@@ -188,15 +341,21 @@ def query_style(args):
 
 
 def runtime_condition_variants(runtime_conditions):
+    config = COMPATIBILITY
+    if config.runtime_condition_mode != RUNTIME_CONDITION_MODE:
+        # Preserve direct test/module compatibility when callers still mutate
+        # the historical global mode instead of installing a full profile.
+        config = build_compatibility_config(config.name, runtime_condition_mode=RUNTIME_CONDITION_MODE)
+
     if not runtime_conditions:
         # If there is no runtime conditions, do not filter style by runtime conditions.
         return [None]
 
-    if RUNTIME_CONDITION_MODE == 'mapsme':
-        return runtime_conditions
-
-    if RUNTIME_CONDITION_MODE == 'mapsme-fallback':
-        return runtime_conditions + [None]
+    if config.raw_runtime_conditions:
+        variants = list(runtime_conditions)
+        if config.runtime_fallback:
+            variants.append(None)
+        return variants
 
     unique_conditions = []
     for new_rt_conditions in runtime_conditions:
@@ -208,7 +367,7 @@ def runtime_condition_variants(runtime_conditions):
         if conditions_unique:
             unique_conditions.append(new_rt_conditions)
 
-    if RUNTIME_CONDITION_MODE == 'comaps':
+    if config.runtime_fallback:
         # CoMaps emits a base rule as a fallback in addition to runtime variants.
         unique_conditions.append(None)
 
@@ -606,12 +765,12 @@ def legacy_text_priority(st, base_z):
     return legacy_z_index_priority(st, '-x-me-text-priority', base_z, 19000)
 
 
-def resolve_default_maxzoom(maxzoom, priority_mode):
+def resolve_default_maxzoom(maxzoom, priority_mode=None, compatibility=None):
     if maxzoom is not None:
         return maxzoom
-    if priority_mode == 'mapsme':
-        return MAPSME_DEFAULT_MAXZOOM
-    return DEFAULT_MAXZOOM
+    if compatibility is None:
+        compatibility = build_compatibility_config(priority_mode=priority_mode)
+    return compatibility.default_maxzoom
 
 
 def legacy_area_priority(st, bgpos):
@@ -643,8 +802,16 @@ def format_priorities(options):
 def komap_mapswithme(options):
     global PRIORITY_MODE
     global RUNTIME_CONDITION_MODE
-    PRIORITY_MODE = getattr(options, 'priority_mode', PRIORITY_MODE)
-    RUNTIME_CONDITION_MODE = getattr(options, 'runtime_condition_mode', RUNTIME_CONDITION_MODE)
+    global COMPATIBILITY_PROFILE
+    global COMPATIBILITY
+    profile_name = getattr(options, 'compatibility_profile', None)
+    priority_override = getattr(options, 'priority_mode', None)
+    runtime_override = getattr(options, 'runtime_condition_mode', None)
+    COMPATIBILITY = build_compatibility_config(profile_name, priority_override, runtime_override)
+    COMPATIBILITY_PROFILE = COMPATIBILITY.name
+    PRIORITY_MODE = COMPATIBILITY.priority_mode
+    RUNTIME_CONDITION_MODE = COMPATIBILITY.runtime_condition_mode
+    options.maxzoom = resolve_default_maxzoom(getattr(options, 'maxzoom', None), compatibility=COMPATIBILITY)
 
     if options.data and os.path.isdir(options.data):
         ddir = options.data
@@ -705,7 +872,7 @@ def komap_mapswithme(options):
         cnt += 1
 
         cl = row[0].replace("|", "-")
-        if PRIORITY_MODE != 'mapsme' and cl in unique_types_check and row[2] != 'x':
+        if not COMPATIBILITY.allow_duplicate_types and cl in unique_types_check and row[2] != 'x':
             raise Exception('Duplicate type: {0}'.format(row[0]))
         pairs = [i.strip(']').split("=") for i in row[1].split(',')[0].split('[')]
         kv = OrderedDict()
@@ -735,7 +902,7 @@ def komap_mapswithme(options):
     mapping_file.close()
     types_file.close()
 
-    if PRIORITY_MODE == 'priority_files':
+    if COMPATIBILITY.use_priority_files:
         output = ''
         for prio_range in prio_ranges.keys():
             load_priorities(prio_range, options.priorities_path, unique_types_check, compress = False)
@@ -758,7 +925,7 @@ def komap_mapswithme(options):
 
     # Parse style mapcss
     global style
-    if PRIORITY_MODE == 'mapsme':
+    if COMPATIBILITY.legacy_zindex:
         style = MapCSS(options.minzoom, options.maxzoom + 1)
         style.parse(filename=options.filename, static_tags=mapcss_static_tags,
                     dynamic_tags=mapcss_dynamic_tags, legacy_zindex=True)
@@ -772,7 +939,7 @@ def komap_mapswithme(options):
     clname_cltag_unique = set()
     for cl in class_order:
         clname = cl if cl.find('-') == -1 else cl[:cl.find('-')]
-        if PRIORITY_MODE == 'mapsme':
+        if COMPATIBILITY.match_all_class_tags:
             cltags = classificator[cl]
             style.build_choosers_tree(clname, "line", cltags)
             style.build_choosers_tree(clname, "area", cltags)
@@ -835,7 +1002,7 @@ def komap_mapswithme(options):
         for result in results:
                 cl, zoom, runtime_conditions, zstyle, has_icons_for_areas = result
 
-                if PRIORITY_MODE == 'priority_files':
+                if COMPATIBILITY.sort_priority_file_rules:
                     # First, sort rules by ::object-id in captions (primary, secondary, none ..)
                     # then by other ::object-id in ascending order.
                     def rule_sort_key(dict_):
@@ -895,7 +1062,7 @@ def komap_mapswithme(options):
 
                 visstring[zoom] = "1"
 
-                if zoom == 0 and PRIORITY_MODE != 'mapsme':
+                if zoom == 0 and not COMPATIBILITY.mapsme_legacy_output:
                     continue
 
                 dr_element = DrawElementProto()
@@ -906,20 +1073,20 @@ def komap_mapswithme(options):
                         dr_element.apply_if.append(str(rc))
 
                 for st in zstyle:
-                    if PRIORITY_MODE == 'mapsme':
+                    if COMPATIBILITY.mapsme_legacy_output:
                         if st.get('-x-kot-layer') == 'top':
                             st['z-index'] = float(st.get('z-index', 0)) + 15001.
                         elif st.get('-x-kot-layer') == 'bottom':
                             st['z-index'] = float(st.get('z-index', 0)) - 15001.
 
-                    has_casing_width_add = PRIORITY_MODE != 'mapsme' and st.get('casing-width-add') is not None
+                    has_casing_width_add = not COMPATIBILITY.mapsme_legacy_output and st.get('casing-width-add') is not None
                     if st.get('casing-width') not in (None, 0) or has_casing_width_add:  # and (st.get('width') or st.get('fill-color')):
                         is_area_st = 'fill-color' in st
-                        if has_lines and (PRIORITY_MODE == 'mapsme' or not is_area_st) and st.get('casing-linecap', 'butt') == 'butt':
+                        if has_lines and (COMPATIBILITY.mapsme_legacy_output or not is_area_st) and st.get('casing-linecap', 'butt') == 'butt':
                             dr_line = LineRuleProto()
 
                             base_width = st.get('width', 0)
-                            if base_width == 0 and PRIORITY_MODE != 'mapsme':
+                            if base_width == 0 and not COMPATIBILITY.mapsme_legacy_output:
                                 for wst in zstyle:
                                     if wst.get('width') not in (None, 0):
                                         # Rail bridge styles use width from ::dash object instead of ::default.
@@ -931,9 +1098,9 @@ def komap_mapswithme(options):
                                     base_width = 0
 
                             casing_width = base_width + st.get('casing-width') * 2
-                            dr_line.width = casing_width if PRIORITY_MODE == 'mapsme' else round(casing_width, 2)
+                            dr_line.width = casing_width if COMPATIBILITY.mapsme_legacy_output else round(casing_width, 2)
                             dr_line.color = mwm_encode_color(colors, st, "casing")
-                            if PRIORITY_MODE == 'mapsme':
+                            if COMPATIBILITY.mapsme_legacy_output:
                                 dr_line.priority = legacy_casing_line_priority(st)
                             elif st.get('object-id') == '::default':
                                 # An automatic casing line should be rendered below the "main" line, hence auto priority -1.
@@ -947,7 +1114,7 @@ def komap_mapswithme(options):
                             for i in st.get('casing-dashes', st.get('dashes', [])):
                                 dr_line.dashdot.dd.extend([float(i)])
                             addPattern(dr_line.dashdot.dd)
-                            if PRIORITY_MODE == 'mapsme':
+                            if COMPATIBILITY.mapsme_legacy_output:
                                 dr_line.dashdot.SetInParent()
                             dr_line.cap = dr_linecaps.get(st.get('casing-linecap', 'butt'), BUTTCAP)
                             dr_line.join = dr_linejoins.get(st.get('casing-linejoin', 'round'), ROUNDJOIN)
@@ -975,12 +1142,12 @@ def komap_mapswithme(options):
                             dr_line.width = st.get('width', 0)
                             dr_line.color = mwm_encode_color(colors, st)
                             for i in st.get('dashes', []):
-                                dash = max(float(i), 1) if PRIORITY_MODE == 'mapsme' else float(i)
+                                dash = max(float(i), 1) if COMPATIBILITY.mapsme_legacy_output else float(i)
                                 dr_line.dashdot.dd.extend([dash])
                             addPattern(dr_line.dashdot.dd)
                             dr_line.cap = dr_linecaps.get(st.get('linecap', 'butt'), BUTTCAP)
                             dr_line.join = dr_linejoins.get(st.get('linejoin', 'round'), ROUNDJOIN)
-                            if PRIORITY_MODE == 'mapsme':
+                            if COMPATIBILITY.mapsme_legacy_output:
                                 dr_line.priority = legacy_line_priority(st)
                             else:
                                 dr_line.priority = get_drape_priority(cl, 'line', st.get('object-id'))
@@ -994,14 +1161,14 @@ def komap_mapswithme(options):
                             dr_line.pathsym.name = icon[0]
                             dr_line.pathsym.step = float(st.get('pattern-spacing', 0)) - 16
                             dr_line.pathsym.offset = st.get('pattern-offset', 0)
-                            if PRIORITY_MODE == 'mapsme':
+                            if COMPATIBILITY.mapsme_legacy_output:
                                 dr_line.priority = legacy_line_priority(st)
                             else:
                                 dr_line.priority = get_drape_priority(cl, 'line', st.get('object-id'))
                                 store_visibility(cl, 'line', st.get('object-id'), zoom)
                             dr_element.lines.extend([dr_line])
 
-                    if st.get('shield-font-size') and (PRIORITY_MODE != 'mapsme' or has_lines):
+                    if st.get('shield-font-size') and (not COMPATIBILITY.mapsme_legacy_output or has_lines):
                         dr_element.shield.height = int(st.get('shield-font-size', 10))
                         dr_element.shield.text_color = mwm_encode_color(colors, st, "shield-text")
                         if st.get('shield-text-halo-radius', 0) != 0:
@@ -1009,7 +1176,7 @@ def komap_mapswithme(options):
                         dr_element.shield.color = mwm_encode_color(colors, st, "shield")
                         if st.get('shield-outline-radius', 0) != 0:
                             dr_element.shield.stroke_color = mwm_encode_color(colors, st, "shield-outline", "white")
-                        if PRIORITY_MODE == 'mapsme':
+                        if COMPATIBILITY.mapsme_legacy_output:
                             dr_element.shield.priority = legacy_shield_priority(st)
                         else:
                             dr_element.shield.priority = get_drape_priority(cl, 'shield', st.get('object-id'))
@@ -1019,11 +1186,11 @@ def komap_mapswithme(options):
 
                     if has_icons:
                         if st.get('icon-image') and st.get('icon-image') != 'none':
-                            if PRIORITY_MODE == 'mapsme' and not has_icons_for_areas:
+                            if COMPATIBILITY.mapsme_legacy_output and not has_icons_for_areas:
                                 dr_element.symbol.apply_for_type = 1
                             icon = mwm_encode_image(st)
                             dr_element.symbol.name = icon[0]
-                            if PRIORITY_MODE == 'mapsme':
+                            if COMPATIBILITY.mapsme_legacy_output:
                                 dr_element.symbol.priority = legacy_icon_priority(st)
                             else:
                                 dr_element.symbol.priority = get_drape_priority(cl, 'icon', st.get('object-id'))
@@ -1035,7 +1202,7 @@ def komap_mapswithme(options):
                             # TODO: not used in current styles; do "circles" work in drape at all?
                             dr_element.circle.radius = float(st.get('symbol-size'))
                             dr_element.circle.color = mwm_encode_color(colors, st, 'symbol-fill')
-                            if PRIORITY_MODE == 'mapsme':
+                            if COMPATIBILITY.mapsme_legacy_output:
                                 dr_element.circle.priority = legacy_circle_priority(st)
                             else:
                                 dr_element.circle.priority = get_drape_priority(cl, 'circle', st.get('object-id'))
@@ -1045,7 +1212,7 @@ def komap_mapswithme(options):
                     if has_text and st.get('text') and st.get('text') != 'none':
                         # Take only first 2 captions: primary, secondary.
                         has_text = has_text[:2]
-                        if PRIORITY_MODE == 'mapsme':
+                        if COMPATIBILITY.mapsme_legacy_output and not COMPATIBILITY.mapsme_2016_text_order:
                             has_text.reverse()
 
                         dr_text = dr_element.caption
@@ -1056,10 +1223,10 @@ def komap_mapswithme(options):
 
                         dr_cur_subtext = dr_text.primary
                         for sp in has_text[:]:
-                            if PRIORITY_MODE == 'mapsme':
+                            if COMPATIBILITY.mapsme_legacy_output and not COMPATIBILITY.mapsme_2016_text_order:
                                 dr_cur_subtext = dr_text.secondary if len(has_text) == 2 else dr_text.primary
                             dr_cur_subtext.height = int(float(sp.get('font-size', "10").split(",")[0]))
-                            if PRIORITY_MODE != 'mapsme' and 'text-color' not in st:
+                            if not COMPATIBILITY.mapsme_legacy_output and 'text-color' not in st:
                                 print(f'ERROR: text-color not set for z{zoom} {cl}')
                                 validation_errors_count += 1
                             dr_cur_subtext.color = mwm_encode_color(colors, sp, "text")
@@ -1069,10 +1236,10 @@ def komap_mapswithme(options):
                                 dr_cur_subtext.offset_y = int(sp.get('text-offset-y', sp.get('text-offset', 0)))
                             elif 'text-offset-x' in sp:
                                 dr_cur_subtext.offset_x = int(sp.get('text-offset-x', 0))
-                            elif PRIORITY_MODE != 'mapsme' and st.get('text-position', 'center') == 'center' and dr_element.symbol.priority:
+                            elif not COMPATIBILITY.mapsme_legacy_output and st.get('text-position', 'center') == 'center' and dr_element.symbol.priority:
                                 print(f'ERROR: an icon is present, but caption\'s text-offset is not set for z{zoom} {cl}')
                                 validation_errors_count += 1
-                            if 'text' in sp and (PRIORITY_MODE == 'mapsme' and sp.get('text') != 'name' or PRIORITY_MODE != 'mapsme' and sp.get('text') not in ('name', 'int_name')):
+                            if 'text' in sp and (COMPATIBILITY.mapsme_legacy_output and sp.get('text') != 'name' or not COMPATIBILITY.mapsme_legacy_output and sp.get('text') not in ('name', 'int_name')):
                                 dr_cur_subtext.text = sp.get('text')
                             if 'text-optional' in sp:
                                 is_valid, value = to_boolean(sp.get('text-optional', ''))
@@ -1080,16 +1247,16 @@ def komap_mapswithme(options):
                                     dr_cur_subtext.is_optional = value
                                 else:
                                     dr_cur_subtext.is_optional = True
-                            elif PRIORITY_MODE != 'mapsme' and text_priority_key == 'caption' and dr_element.symbol.priority:
+                            elif not COMPATIBILITY.mapsme_legacy_output and text_priority_key == 'caption' and dr_element.symbol.priority:
                                 # On by default for all captions (not path texts) with icons.
                                 dr_cur_subtext.is_optional = True
-                            if PRIORITY_MODE != 'mapsme':
+                            if not COMPATIBILITY.mapsme_legacy_output or COMPATIBILITY.mapsme_2016_text_order:
                                 dr_cur_subtext = dr_text.secondary
-                            if PRIORITY_MODE == 'mapsme':
+                            if COMPATIBILITY.mapsme_legacy_output and not COMPATIBILITY.mapsme_2016_text_order:
                                 has_text.pop()
 
                         auto_comment = None
-                        if PRIORITY_MODE == 'mapsme':
+                        if COMPATIBILITY.mapsme_legacy_output:
                             base_z = 16000 if text_priority_key == 'pathtext' else 15000
                             dr_text.priority = legacy_text_priority(st, base_z)
                         elif text_priority_key == 'caption' and dr_element.symbol.priority:
@@ -1107,7 +1274,7 @@ def komap_mapswithme(options):
                             # A pathtext or a standalone caption.
                             dr_text.priority = get_drape_priority(cl, text_priority_key, st.get('object-id'))
 
-                        if PRIORITY_MODE != 'mapsme':
+                        if not COMPATIBILITY.mapsme_legacy_output:
                             store_visibility(cl, text_priority_key, st.get('object-id'), zoom, auto_comment)
 
                         # Process captions block once.
@@ -1116,7 +1283,7 @@ def komap_mapswithme(options):
                     if has_fills:
                         if 'fill-color' in st and st.get('fill-color') != 'none' and float(st.get('fill-opacity', 1)) > 0:
                             dr_element.area.color = mwm_encode_color(colors, st, "fill")
-                            if PRIORITY_MODE == 'mapsme':
+                            if COMPATIBILITY.mapsme_legacy_output:
                                 dr_element.area.priority, bgpos = legacy_area_priority(st, bgpos)
                             else:
                                 dr_element.area.priority = get_drape_priority(cl, 'area', st.get('object-id'))
@@ -1134,16 +1301,16 @@ def komap_mapswithme(options):
 
         visibility["world|" + class_tree[cl] + "|"] = "".join(visstring)
 
-    if PRIORITY_MODE != 'mapsme':
+    if not COMPATIBILITY.mapsme_legacy_output:
         validate_visibilities(options.maxzoom)
 
-    if PRIORITY_MODE != 'mapsme' and validation_errors_count:
+    if not COMPATIBILITY.mapsme_legacy_output and validation_errors_count:
         print()
         exit('FAILED to write regenerated drules files!\n'
              f'There are {validation_errors_count} validation errors (see in the log above).\n'
              'Fix all errors first and re-run.')
 
-    if PRIORITY_MODE == 'priority_files':
+    if COMPATIBILITY.use_priority_files:
         output = ''
         for prio_range in prio_ranges.keys():
             dump_priorities(prio_range, options.priorities_path, options.maxzoom)
@@ -1234,27 +1401,35 @@ def main():
                       help="path to priorities *.prio.txt files", metavar="PATH")
     parser.add_option("-d", "--data-path", dest="data",
                       help="path to mapcss-mapping.csv and other files", metavar="PATH")
+    parser.add_option("", "--compatibility-profile", dest="compatibility_profile",
+                      help="compatibility preset: " + ", ".join(compatibility_profile_names()),
+                      default=COMPATIBILITY_PROFILE, metavar="PROFILE")
     parser.add_option("", "--runtime-condition-mode", dest="runtime_condition_mode",
-                      help="runtime condition compatibility mode: organicmaps, comaps, mapsme, or mapsme-fallback",
-                      default=RUNTIME_CONDITION_MODE, metavar="MODE")
+                      help="override runtime condition mode: organicmaps, comaps, mapsme, or mapsme-fallback",
+                      default=None, metavar="MODE")
     parser.add_option("", "--priority-mode", dest="priority_mode",
-                      help="priority compatibility mode: priority_files or mapsme",
-                      default=PRIORITY_MODE, metavar="MODE")
+                      help="override priority mode: priority_files or mapsme",
+                      default=None, metavar="MODE")
 
     (options, args) = parser.parse_args()
 
-    if options.priority_mode not in ('priority_files', 'mapsme'):
-        parser.error("Unknown priority mode.")
+    try:
+        compatibility = build_compatibility_config(
+            options.compatibility_profile,
+            options.priority_mode,
+            options.runtime_condition_mode
+        )
+    except ValueError as e:
+        parser.error(str(e))
 
-    options.maxzoom = resolve_default_maxzoom(options.maxzoom, options.priority_mode)
+    options.priority_mode = compatibility.priority_mode
+    options.runtime_condition_mode = compatibility.runtime_condition_mode
+    options.maxzoom = resolve_default_maxzoom(options.maxzoom, compatibility=compatibility)
 
-    if options.priority_mode == 'priority_files' and (options.priorities_path is None or not os.path.isdir(options.priorities_path)):
+    if compatibility.use_priority_files and (options.priorities_path is None or not os.path.isdir(options.priorities_path)):
         parser.error("A path to priorities *.prio.txt files is required.")
     if options.priorities_path is not None:
         options.priorities_path = os.path.normpath(options.priorities_path)
-
-    if options.runtime_condition_mode not in ('organicmaps', 'comaps', 'mapsme', 'mapsme-fallback'):
-        parser.error("Unknown runtime condition mode.")
 
     if options.format_priorities_only:
         format_priorities(options)

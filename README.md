@@ -41,10 +41,12 @@ outdoors light, outdoors dark, vehicle light, vehicle dark and put `*.bin`
 and `*.txt` files into 'drules' subfolder.
 
 To compare generated files with an Organic Maps / CoMaps style-data baseline,
-pass the matching filename prefix and baseline directory explicitly:
+pass the matching compatibility profile, filename prefix, and baseline directory
+explicitly:
 
 ```shell
 python3 full_drules_gen.py -d path-to/data -o drules --txt \
+  --compatibility-profile organicmaps \
   --name-prefix drules_proto_ --compare-baseline path-to/data
 ```
 
@@ -54,6 +56,10 @@ The repository intentionally supports several consumers that diverged in forks:
 
 * `src/libkomwm.py` keeps MapsMe/Organic Maps/CoMaps drules generation,
   including priority file imports and `--format-priorities-only`.
+* Drules generation uses feature profiles:
+  `organicmaps`, `comaps`, `mapsme`, `mapsme-fallback`, and `omim-2016`.
+  The older `--priority-mode` and `--runtime-condition-mode` flags remain as
+  explicit overrides for experiments.
 * `src/libkomb.py` and `src/mvt_sql.py` keep the original Kothic MVT/Mapbox
   paths. The MapCSS package still exports `_test_feature_compatibility` for
   these legacy helpers.

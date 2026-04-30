@@ -88,7 +88,7 @@ def main():
                       help="output directory", metavar="DIR")
     parser.add_option("-f", "--minzoom", dest="minzoom", default=0, type="int",
                       help="minimal available zoom level", metavar="ZOOM")
-    parser.add_option("-t", "--maxzoom", dest="maxzoom", default=20, type="int",
+    parser.add_option("-t", "--maxzoom", dest="maxzoom", default=None, type="int",
                       help="maximal available zoom level", metavar="ZOOM")
     parser.add_option("-x", "--txt", dest="txt", action="store_true",
                       help="create a text file for output", default=False)
@@ -98,9 +98,12 @@ def main():
     parser.add_option("", "--compare-baseline", dest="baseline_dir",
                       help="compare generated .bin/.txt files with baseline files from DIR",
                       metavar="DIR")
+    parser.add_option("", "--compatibility-profile", dest="compatibility_profile",
+                      help="compatibility preset: " + ", ".join(libkomwm.compatibility_profile_names()),
+                      default=libkomwm.COMPATIBILITY_PROFILE, metavar="PROFILE")
     parser.add_option("", "--runtime-condition-mode", dest="runtime_condition_mode",
-                      help="runtime condition compatibility mode: organicmaps, comaps, mapsme, or mapsme-fallback",
-                      default=libkomwm.RUNTIME_CONDITION_MODE, metavar="MODE")
+                      help="override runtime condition mode: organicmaps, comaps, mapsme, or mapsme-fallback",
+                      default=None, metavar="MODE")
 
     (options, args) = parser.parse_args()
 
@@ -110,8 +113,16 @@ def main():
     if options.outdir is None:
         parser.error("Please specify base output path.")
 
-    if options.runtime_condition_mode not in ('organicmaps', 'comaps', 'mapsme', 'mapsme-fallback'):
-        parser.error("Unknown runtime condition mode.")
+    try:
+        compatibility = libkomwm.build_compatibility_config(
+            options.compatibility_profile,
+            runtime_condition_mode=options.runtime_condition_mode
+        )
+    except ValueError as e:
+        parser.error(str(e))
+    options.priority_mode = compatibility.priority_mode
+    options.runtime_condition_mode = compatibility.runtime_condition_mode
+    options.maxzoom = libkomwm.resolve_default_maxzoom(options.maxzoom, compatibility=compatibility)
 
     full_styles_regenerate(options)
     if options.baseline_dir:
