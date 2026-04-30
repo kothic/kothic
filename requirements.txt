@@ -1,3 +1,3 @@
-# The core is using protobuf 3.3.0 still (3party/protobuf/), so no point to require newer versions.
-# E.g. Ubuntu 24.04 LTS ships with python3-protobuf 3.21.12 and it works fine.
-protobuf~=3.21.0
+# The core is using protobuf 3.3.0 still (3party/protobuf/), so no point to require a narrow newer version.
+# Ubuntu 24.04's 3.21.12 and current protobuf 6.x both work with the checked-in generated bindings.
+protobuf>=3.20.0,<7.0.0

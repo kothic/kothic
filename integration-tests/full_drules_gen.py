@@ -26,13 +26,18 @@ styles = {
 }
 
 
+def output_name(options, style_name):
+    return options.name_prefix + style_name
+
+
 def full_styles_regenerate(options):
     log.info("Start generating styles")
     libkomwm.MULTIPROCESSING = False
     prio_ranges_orig = deepcopy(libkomwm.prio_ranges)
 
     for name, (style_path, include_path) in styles.items():
-        log.info(f"Generating {name} style ...")
+        generated_name = output_name(options, name)
+        log.info(f"Generating {generated_name} style ...")
 
         # Restore initial state
         libkomwm.prio_ranges = deepcopy(prio_ranges_orig)
@@ -40,11 +45,39 @@ def full_styles_regenerate(options):
 
         options.filename = options.data + '/' + style_path
         options.priorities_path = options.data + '/' + include_path
-        options.outfile = options.outdir + '/' + name
+        options.outfile = options.outdir + '/' + generated_name
 
         # Run generation
         libkomwm.komap_mapswithme(options)
-    log.info(f"Done!")
+
+
+def compare_content(file_a_path: str, file_b_path: str, binary=True) -> bool:
+    mode = "rb" if binary else "rt"
+    with open(file_a_path, mode) as file_a_obj, open(file_b_path, mode) as file_b_obj:
+        return file_a_obj.read() == file_b_obj.read()
+
+
+def compare_with_baseline(generated_dir, baseline_dir, options):
+    has_any_diff = False
+    suffixes = [(".bin", True)]
+    if options.txt:
+        suffixes.append((".txt", False))
+
+    for style_name in styles:
+        generated_name = output_name(options, style_name)
+        for suffix, binary in suffixes:
+            generated = f"{generated_dir}/{generated_name}{suffix}"
+            baseline = f"{baseline_dir}/{generated_name}{suffix}"
+            match = compare_content(generated, baseline, binary=binary)
+            if not match:
+                log.warning(f"File {generated_name}{suffix} doesn't match {baseline}")
+                has_any_diff = True
+
+    if not has_any_diff:
+        log.info("All generated files match")
+
+    return not has_any_diff
+
 
 def main():
     parser = OptionParser()
@@ -58,6 +91,12 @@ def main():
                       help="maximal available zoom level", metavar="ZOOM")
     parser.add_option("-x", "--txt", dest="txt", action="store_true",
                       help="create a text file for output", default=False)
+    parser.add_option("", "--name-prefix", dest="name_prefix", default="",
+                      help="prefix generated drules filenames, e.g. drules_proto_ for Organic Maps baselines",
+                      metavar="PREFIX")
+    parser.add_option("", "--compare-baseline", dest="baseline_dir",
+                      help="compare generated .bin/.txt files with baseline files from DIR",
+                      metavar="DIR")
 
     (options, args) = parser.parse_args()
 
@@ -68,6 +107,10 @@ def main():
         parser.error("Please specify base output path.")
 
     full_styles_regenerate(options)
+    if options.baseline_dir:
+        if not compare_with_baseline(options.outdir, options.baseline_dir, options):
+            raise SystemExit("Generated drules differ from baseline.")
+    log.info("Done!")
 
 if __name__ == '__main__':
     main()

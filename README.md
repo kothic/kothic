@@ -40,6 +40,14 @@ This command will run generation for styles - default light, default dark,
 outdoors light, outdoors dark, vehicle light, vehicle dark and put `*.bin`
 and `*.txt` files into 'drules' subfolder.
 
+To compare generated files with an Organic Maps / CoMaps style-data baseline,
+pass the matching filename prefix and baseline directory explicitly:
+
+```shell
+python3 full_drules_gen.py -d path-to/data -o drules --txt \
+  --name-prefix drules_proto_ --compare-baseline path-to/data
+```
+
 ## Compatibility notes
 
 The repository intentionally supports several consumers that diverged in forks:
