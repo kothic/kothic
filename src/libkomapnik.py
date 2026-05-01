@@ -18,6 +18,7 @@
 
 import os
 import math
+from xml.sax.saxutils import escape
 
 from .mapcss.webcolors.webcolors import whatever_to_hex as nicecolor
 
@@ -27,6 +28,9 @@ db_proj = ""
 table_prefix = ""
 db_user = ""
 db_name = ""
+db_password = ""
+db_host = ""
+db_port = ""
 db_srid = ""
 icons_path = ""
 world_bnd_path = ""
@@ -49,6 +53,23 @@ def get_id(i=0):
     global last_id
     last_id += i
     return last_id
+
+
+def xml_postgis_connection_parameters():
+    params = []
+    for name, value in (
+        ("password", db_password),
+        ("host", db_host),
+        ("port", db_port),
+    ):
+        if value:
+            params.append(
+                '            <Parameter name="%s">%s</Parameter>' % (
+                    name,
+                    escape(str(value)),
+                )
+            )
+    return "\n".join(params)
 
 
 def zoom_to_scaledenom(z1, z2=False):
@@ -354,13 +375,31 @@ def xml_layer(type="postgis", geom="point", interesting_tags="*", sql="true", zo
             <Parameter name="st_prefix">true</Parameter>
             <Parameter name="user">%s</Parameter>
             <Parameter name="dbname">%s</Parameter>
+%s
             <Parameter name="srid">%s</Parameter>
             <Parameter name="geometry_field">way</Parameter>
             <Parameter name="geometry_table">%s%s</Parameter>
             <Parameter name="estimate_extent">false</Parameter>
             <Parameter name="extent">-20037508.342789244, -20037508.342780735, 20037508.342789244, 20037508.342780709</Parameter>
           </Datasource>
-        </Layer>""" % (layer_id, db_proj, subs, zoom, interesting_tags, waystring, table_prefix, geom, sql, intersection_SQL, db_user, db_name, db_srid,  table_prefix, geom)
+        </Layer>""" % (
+            layer_id,
+            db_proj,
+            subs,
+            zoom,
+            interesting_tags,
+            waystring,
+            table_prefix,
+            geom,
+            sql,
+            intersection_SQL,
+            db_user,
+            db_name,
+            xml_postgis_connection_parameters(),
+            db_srid,
+            table_prefix,
+            geom,
+        )
     elif type == "postgis-process":
         return """
         <Layer name="l%s" status="on" srs="%s">
@@ -376,13 +415,27 @@ def xml_layer(type="postgis", geom="point", interesting_tags="*", sql="true", zo
             <Parameter name="st_prefix">true</Parameter>
             <Parameter name="user">%s</Parameter>
             <Parameter name="dbname">%s</Parameter>
+%s
             <Parameter name="srid">%s</Parameter>
             <Parameter name="geometry_field">way</Parameter>
             <Parameter name="geometry_table">%s%s</Parameter>
             <Parameter name="estimate_extent">false</Parameter>
             <Parameter name="extent">-20037508.342789244, -20037508.342780735, 20037508.342789244, 20037508.342780709</Parameter>
           </Datasource>
-        </Layer>""" % (layer_id, db_proj, subs, zoom, sql, intersection_SQL, db_user, db_name, db_srid,  table_prefix, geom)
+        </Layer>""" % (
+            layer_id,
+            db_proj,
+            subs,
+            zoom,
+            sql,
+            intersection_SQL,
+            db_user,
+            db_name,
+            xml_postgis_connection_parameters(),
+            db_srid,
+            table_prefix,
+            geom,
+        )
     elif type == "coast":
         if zoom < 9:
             return """
