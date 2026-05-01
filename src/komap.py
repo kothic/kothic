@@ -144,6 +144,13 @@ def main(argv=None):
         libkomapnik.table_prefix = config.get("mapnik", "table_prefix")
         libkomapnik.db_user = config.get("mapnik", "db_user")
         libkomapnik.db_name = config.get("mapnik", "db_name")
+        libkomapnik.db_password = config.get(
+            "mapnik",
+            "db_password",
+            fallback=config.get("mapnik", "db_passwd", fallback=""),
+        )
+        libkomapnik.db_host = config.get("mapnik", "db_host", fallback="")
+        libkomapnik.db_port = config.get("mapnik", "db_port", fallback="")
         libkomapnik.db_srid = config.get("mapnik", "db_srid")
         libkomapnik.icons_path = config.get("mapnik", "icons_path")
         libkomapnik.world_bnd_path = config.get("mapnik", "world_bnd_path")

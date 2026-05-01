@@ -7,6 +7,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from src import libkomb
+from src import libkomapnik
 from src import mvt_sql
 from src.mapcss import Condition
 
@@ -15,6 +16,9 @@ class KothicMvtHelpersTest(unittest.TestCase):
     def tearDown(self):
         mvt_sql.mapped_cols.clear()
         mvt_sql.osm2pgsql_avail_keys.clear()
+        libkomapnik.db_password = ""
+        libkomapnik.db_host = ""
+        libkomapnik.db_port = ""
 
     def test_mapbox_expression_collapses_repeated_zoom_values(self):
         self.assertEqual(
@@ -58,6 +62,30 @@ class KothicMvtHelpersTest(unittest.TestCase):
             mvt_sql.pixel_size_at_zoom(2),
             mvt_sql.pixel_size_at_zoom(1) / 2
         )
+
+    def test_postgis_connection_parameters_are_optional(self):
+        layer = libkomapnik.xml_layer("postgis", "point", ["name"], "true", zoom=10)
+
+        self.assertNotIn('<Parameter name="password">', layer)
+        self.assertNotIn('<Parameter name="host">', layer)
+        self.assertNotIn('<Parameter name="port">', layer)
+
+    def test_postgis_connection_parameters_are_rendered_when_configured(self):
+        libkomapnik.db_password = "secret&safe"
+        libkomapnik.db_host = "db.example.test"
+        libkomapnik.db_port = "5433"
+
+        layer = libkomapnik.xml_layer(
+            "postgis-process",
+            "polygon",
+            ["name"],
+            "select way, name from planet_osm_polygon",
+            zoom=10
+        )
+
+        self.assertIn('<Parameter name="password">secret&amp;safe</Parameter>', layer)
+        self.assertIn('<Parameter name="host">db.example.test</Parameter>', layer)
+        self.assertIn('<Parameter name="port">5433</Parameter>', layer)
 
 
 if __name__ == '__main__':
