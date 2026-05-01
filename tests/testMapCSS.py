@@ -41,6 +41,14 @@ class MapCSSTest(unittest.TestCase):
             "pattern-spacing": "@trunk0",
         })
 
+    def test_declarations_parse_colon_values_as_values(self):
+        decl = parseDeclaration(""" text:"addr:housename"; font-size: 9; """)
+
+        self.assertEqual(decl[0], {
+            "text": "addr:housename",
+            "font-size": "9",
+        })
+
     def test_parse_variables(self):
         parser = MapCSS()
         parser.parse("""
@@ -148,6 +156,57 @@ line|z7-9[highway=motorway],
 
         rule, object_id = parser.choosers[0].testChains({"highway": "trunk"})
         self.assertEqual(object_id, "::default")
+
+    def test_parse_scanner_handles_whitespace_comments_and_subparts(self):
+        parser = MapCSS()
+        parser.parse("""
+@road_color: #112233;
+/* A prose range like [12, 15] is not a condition. */
+way | z5-7 [ highway = primary ] ::casing,
+line|z8-[highway=secondary]::*
+{
+  color: @road_color;
+  width: 2;
+}
+""", static_tags={"highway": True})
+
+        self.assertEqual(len(parser.choosers), 1)
+        style_chooser = parser.choosers[0]
+        self.assertEqual(len(style_chooser.ruleChains), 2)
+        self.assertEqual(style_chooser.selzooms, [5, 19])
+
+        primary_rule, primary_object_id = style_chooser.testChains({"highway": "primary"})
+        self.assertEqual(primary_rule.subject, "way")
+        self.assertEqual(primary_rule.minZoom, 5)
+        self.assertEqual(primary_rule.maxZoom, 7)
+        self.assertEqual(primary_object_id, "::casing")
+
+        secondary_rule, secondary_object_id = style_chooser.testChains({"highway": "secondary"})
+        self.assertEqual(secondary_rule.subject, "line")
+        self.assertEqual(secondary_rule.minZoom, 8)
+        self.assertEqual(secondary_rule.maxZoom, 19)
+        self.assertEqual(secondary_object_id, "::*")
+
+        self.assertEqual(style_chooser.styles[0]["color"], (0.06666666666666667, 0.13333333333333333, 0.2))
+        self.assertEqual(style_chooser.styles[0]["width"], 2.0)
+
+    def test_parse_scanner_handles_wildcard_object_and_class(self):
+        parser = MapCSS()
+        parser.parse("""
+*|z3.railway::*
+{
+  opacity: 0.7;
+}
+""")
+
+        self.assertEqual(len(parser.choosers), 1)
+        style_chooser = parser.choosers[0]
+        self.assertEqual(style_chooser.selzooms, [3, 3])
+        self.assertEqual(style_chooser.ruleChains[0].subject, "")
+        self.assertEqual(
+            [condition.params for condition in style_chooser.ruleChains[0].conditions],
+            [("::class", ".railway"), ("::class", "::*")]
+        )
 
     def test_build_choosers_tree_matches_any_class_tag(self):
         parser = MapCSS(0, 10)

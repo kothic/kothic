@@ -17,13 +17,5 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
           pip install ruff
-      - name: Check Python 3 runtime blockers
-        run: ruff check --select=E9,F63,F7,F82 --exclude=src/drules_struct_pb2.py --output-format=github --target-version=py39
-      - name: Lint maintained Python surfaces
-        run: ruff check src tests integration-tests/*.py --exclude=src/drules_struct_pb2.py --output-format=github --target-version=py39
-      - name: Compile Python sources
-        run: python -m compileall -q src tests integration-tests
-      - name: Run unit-tests
-        run: python -m unittest discover -s tests
-      - name: Check fork drules compatibility
-        run: python integration-tests/check_fork_drules.py
+      - name: Run local CI check suite
+        run: python integration-tests/run_ci_checks.py
