@@ -971,6 +971,11 @@ def komap_mapswithme(options):
             style.build_choosers_tree(clname, "area", cltag)
             style.build_choosers_tree(clname, "node", cltag)
 
+    if COMPATIBILITY.mapsme_legacy_output:
+        style.restore_choosers_order("line")
+        style.restore_choosers_order("area")
+        style.restore_choosers_order("node")
+
     style.finalize_choosers_tree()
 
     # TODO: Introduce new function to work with colors for better testability

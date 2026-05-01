@@ -118,7 +118,29 @@ def normalize_drules(path):
 
     drules = drules_struct_pb2.ContainerProto()
     drules.ParseFromString(path.read_bytes())
+    normalize_mapsme_oracle_port_artifacts(drules)
     return drules.SerializeToString(deterministic=True)
+
+
+def normalize_mapsme_oracle_port_artifacts(message):
+    """Normalize Python 2 -> 3 port noise in the temporary MAPS.ME oracle."""
+    from google.protobuf.descriptor import FieldDescriptor
+
+    for field, value in message.ListFields():
+        if field.is_repeated:
+            if field.message_type and field.full_name == "ColorsElementProto.value":
+                value.sort(key=lambda item: (item.name, item.color, item.x, item.y))
+            if field.message_type:
+                for item in value:
+                    normalize_mapsme_oracle_port_artifacts(item)
+            elif field.type in (FieldDescriptor.TYPE_DOUBLE, FieldDescriptor.TYPE_FLOAT):
+                rounded = [round(item, 12) for item in value]
+                del value[:]
+                value.extend(rounded)
+        elif field.message_type:
+            normalize_mapsme_oracle_port_artifacts(value)
+        elif field.type in (FieldDescriptor.TYPE_DOUBLE, FieldDescriptor.TYPE_FLOAT):
+            setattr(message, field.name, round(value, 12))
 
 
 def compare_normalized_drules(generated, baseline, names):
@@ -286,7 +308,7 @@ def main():
         "--project",
         choices=("organicmaps", "comaps", "mapsme"),
         action="append",
-        help="Project to check. Defaults to CI-gated projects.",
+        help="Project to check. Defaults to all supported projects.",
     )
     parser.add_argument(
         "--keep-temp",
@@ -295,7 +317,7 @@ def main():
     )
     args = parser.parse_args()
 
-    projects = args.project or ("organicmaps", "comaps")
+    projects = args.project or ("organicmaps", "comaps", "mapsme")
     workspace = Path(tempfile.mkdtemp(prefix="kothic-fork-drules-"))
     print(f"workspace: {workspace}", flush=True)
     try:

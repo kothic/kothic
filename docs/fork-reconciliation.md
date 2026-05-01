@@ -213,19 +213,19 @@ git diff --check
 Fork output checks:
 
 - CI runs `integration-tests/check_fork_drules.py`. It sparse-checks out pinned
-  Organic Maps and CoMaps data, regenerates drules, and compares generated
-  output against checked-in/fork-generated baselines.
+  Organic Maps, CoMaps, and MAPS.ME data, regenerates drules, and compares
+  generated output against checked-in/fork-generated baselines.
 - Organic Maps: run `integration-tests/full_drules_gen.py` with
   `--compatibility-profile organicmaps` and compare all six `.bin` files with
   checked-in project output.
 - CoMaps: run the same script with `--compatibility-profile comaps`.
-- MAPS.ME latest is opt-in while PR #62 remains a draft: run
-  `integration-tests/check_fork_drules.py --project mapsme`, or run
-  `src/libkomwm.py` with
+- MAPS.ME latest: run `src/libkomwm.py` with
   `--compatibility-profile mapsme` and compare binary protobuf output for every
   MAPS.ME style file.  The CI harness ports the pinned Python 2 `mapsme/kothic`
   oracle to Python 3 in a temporary checkout before comparing output, so it
-  tests fork behavior instead of trusting old checked-in bytes.
+  tests fork behavior instead of trusting old checked-in bytes.  The comparison
+  canonicalizes Python-port-only noise: repeated color order and insignificant
+  float representation differences.
 - MAPS.ME checked-in `omim`: run `src/libkomwm.py` with
   `--compatibility-profile omim-2016` against the 2016 `omim/data/styles/*`
   inputs, then compare with `omim/data/drules_proto_{clear,dark,legacy}.bin`.
