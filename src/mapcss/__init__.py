@@ -142,6 +142,18 @@ class MapCSS():
                             self.choosers_by_type_zoom_tag[type][zoom][clname]['arr'].append(chooser)
                             self.choosers_by_type_zoom_tag[type][zoom][clname]['set'].add(chooser)
 
+    def restore_choosers_order(self, type):
+        if type not in self.choosers_by_type or type not in self.choosers_by_type_zoom_tag:
+            return
+        reference_choosers = self.choosers_by_type[type]
+        for zoom_choosers in self.choosers_by_type_zoom_tag[type].values():
+            for choosers_for_class in zoom_choosers.values():
+                chooser_set = choosers_for_class['set']
+                choosers_for_class['arr'] = [
+                    chooser for chooser in reference_choosers
+                    if chooser in chooser_set
+                ]
+
     def finalize_choosers_tree(self):
         for ftype in self.choosers_by_type_zoom_tag.keys():
             for zoom in self.choosers_by_type_zoom_tag[ftype].keys():
