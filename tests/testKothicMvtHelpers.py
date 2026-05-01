@@ -68,6 +68,39 @@ class KothicMvtHelpersTest(unittest.TestCase):
             mvt_sql.pixel_size_at_zoom(1) / 2
         )
 
+    def test_georgian_romanization_sql_uses_readable_mapping(self):
+        sql = mvt_sql.georgian_romanization_sql("tags->'name:ka'")
+
+        self.assertIn(
+            "translate(tags->'name:ka','აბგდევზთიკლმნოპრსტუფქყჯჰ','abgdevztiklmnoprstupkqjh')",
+            sql
+        )
+        self.assertIn("'ძ','dz'", sql)
+        self.assertIn("'ხ','kh'", sql)
+        self.assertIn("'ჟ','zh'", sql)
+        self.assertNotIn("ts’", sql)
+
+    def test_english_name_fallback_includes_georgian_romanization(self):
+        class Style:
+            choosers = []
+
+            def get_all_tags(self, _obj):
+                return {"name"}
+
+            def get_interesting_tags(self, _obj, _zoom):
+                return {"name"}
+
+        mvt_sql.get_vectors(0, 0, 0, 0, Style(), "point", 4096, ["en"])
+
+        name_en_sql = mvt_sql.mapped_cols["name:en"]
+
+        self.assertIn("tags->'name:ka'", name_en_sql)
+        self.assertIn("'ხ','kh'", name_en_sql)
+        self.assertLess(
+            name_en_sql.index("tags->'name:ka'"),
+            name_en_sql.index("tags->'name:be'")
+        )
+
     def test_postgis_connection_parameters_are_optional(self):
         layer = libkomapnik.xml_layer("postgis", "point", ["name"], "true", zoom=10)
 
