@@ -72,3 +72,7 @@ The repository intentionally supports several consumers that diverged in forks:
 See `docs/fork-reconciliation.md` for the current fork-by-fork compatibility
 matrix, the canonical `mapcss` profile, and the status of checked-in MapsMe
 drules.
+
+See `docs/kothic-js-lineage.md` for the relationship between this repository,
+`kothic-js`, the old in-tree JavaScript files, and the historical
+`kothic-js-mapcss` converter.

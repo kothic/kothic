@@ -67,6 +67,33 @@ class MapCSSTest(unittest.TestCase):
             "wave_length": "25"
         })
 
+    def test_variables_are_substituted_in_declarations_and_marked_used(self):
+        parser = MapCSS()
+        parser.parse("""
+@road_color: #ff0000;
+@unused_color: #00ff00;
+
+line|z10-[highway=primary] {
+  color: @road_color;
+}
+""", static_tags={"highway": True})
+
+        style = parser.choosers[0].styles[0]
+
+        self.assertEqual(style["color"], (1.0, 0.0, 0.0))
+        self.assertNotIn("road_color", parser.unused_variables)
+        self.assertIn("unused_color", parser.unused_variables)
+
+    def test_missing_variable_in_declaration_is_an_error(self):
+        parser = MapCSS()
+
+        with self.assertRaisesRegex(Exception, "Variable not found: missing_color"):
+            parser.parse("""
+line|z10-[highway=primary] {
+  color: @missing_color;
+}
+""", static_tags={"highway": True})
+
     def test_parse_import(self):
         parser = MapCSS()
         mapcssFile = Path(__file__).parent / 'assets' / 'case-1-import' / 'main.mapcss'

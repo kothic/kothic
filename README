@@ -21,10 +21,11 @@
       BBBike, Overpass, or another public OSM extract provider.
    3. Save it as small_test_osm_dump.osm, or replace the filename below
       with the path to your own extract.
-   4. cd src/
-   5. cat ../small_test_osm_dump.osm | python osm2tiles.py
-   6. wait a bit and check if tiles got generated
-   7. python kothic.py to run GUI
+   4. Run from the repository root:
+      python3 -m src.osm2tiles < small_test_osm_dump.osm
+   5. wait a bit and check if tiles got generated
+   6. The old GTK GUI entry point is src/gtk-app.py, but it depends on the
+      legacy PyGTK/tWMS stack and is not part of the maintained test path.
 
    The filename small_test_osm_dump.osm was only an example input dump name;
    this repository does not ship a canonical sample dump.

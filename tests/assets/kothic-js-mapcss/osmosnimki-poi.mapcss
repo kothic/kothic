@@ -1,0 +1,13 @@
+node|z16-[amenity=cinema] {
+    icon-image: cinema_14x14.png;
+}
+
+node|z17-[tourism=hotel] {
+    icon-image: hotell_14x14.png;
+    text: name;
+    text-offset: 3;
+    font-size: 9;
+    text-halo-radius: 1;
+    text-color: #623f00;
+    text-halo-color: #ffffff;
+}
