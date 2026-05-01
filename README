@@ -15,11 +15,21 @@
    7. python-shapely
    8. python-pyproj
 
-   To run:
-   1. Install all dependancies.
-   2. cd src/
-   3. cat small_test_osm_dump.osm | python osm2tiles.py
-   4. wait a bit and check if tiles got generated
-   5. python kothic.py to run GUI
+   To run the legacy tile import example:
+   1. Install all dependencies.
+   2. Download a small OSM XML extract, for example from Geofabrik,
+      BBBike, Overpass, or another public OSM extract provider.
+   3. Save it as small_test_osm_dump.osm, or replace the filename below
+      with the path to your own extract.
+   4. cd src/
+   5. cat ../small_test_osm_dump.osm | python osm2tiles.py
+   6. wait a bit and check if tiles got generated
+   7. python kothic.py to run GUI
+
+   The filename small_test_osm_dump.osm was only an example input dump name;
+   this repository does not ship a canonical sample dump.
+
+   To run the maintained Python 3 test suite, follow README.md from the
+   repository root.
 
    NOT READY FOR DAILY USAGE!
