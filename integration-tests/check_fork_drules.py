@@ -286,7 +286,7 @@ def main():
         "--project",
         choices=("organicmaps", "comaps", "mapsme"),
         action="append",
-        help="Project to check. Defaults to all supported projects.",
+        help="Project to check. Defaults to CI-gated projects.",
     )
     parser.add_argument(
         "--keep-temp",
@@ -295,7 +295,7 @@ def main():
     )
     args = parser.parse_args()
 
-    projects = args.project or ("organicmaps", "comaps", "mapsme")
+    projects = args.project or ("organicmaps", "comaps")
     workspace = Path(tempfile.mkdtemp(prefix="kothic-fork-drules-"))
     print(f"workspace: {workspace}", flush=True)
     try:
