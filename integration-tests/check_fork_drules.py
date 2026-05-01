@@ -208,6 +208,21 @@ def run_mapsme_generator(script, data_path, output_path, stylesheet, extra_args=
     ], env=env)
 
 
+def normalize_mapsme_oracle_input(data_path):
+    """Keep MAPS.ME oracle comparison focused on intentional legacy behavior.
+
+    The pinned MAPS.ME fork parser mis-parses declarations like
+    `text:"addr:housename"` as a key named `text:"addr`.  Modern Kothic should
+    parse that as the `text` property with a colon-bearing value.  Normalize the
+    temporary oracle input so the old fork produces the same semantic style
+    before comparing all other MAPS.ME compatibility details.
+    """
+    for stylesheet in data_path.glob("styles/*/*/*.mapcss"):
+        stylesheet.write_text(
+            stylesheet.read_text().replace('text:"addr:housename"', 'text: "addr:housename"')
+        )
+
+
 def check_organicmaps(workspace):
     checkout = workspace / "organicmaps"
     output = workspace / "organicmaps-generated"
@@ -277,6 +292,7 @@ def check_mapsme(workspace):
 
     shutil.copytree(data_checkout / "data", oracle_data)
     shutil.copytree(data_checkout / "data", generated_data)
+    normalize_mapsme_oracle_input(oracle_data)
     oracle_env = dict(os.environ, PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION="python")
 
     for output_name, stylesheet in MAPSME_STYLES:

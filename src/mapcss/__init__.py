@@ -18,9 +18,106 @@
 import re
 import os
 import logging
+from functools import lru_cache
 from .StyleChooser import StyleChooser
 from .Condition import Condition
 from .Rule import type_matches
+
+
+log = logging.getLogger('mapcss.parser')
+condition_log = logging.getLogger('mapcss.parser.condition')
+
+
+def _skip_whitespace(value, index):
+    while index < len(value) and value[index].isspace():
+        index += 1
+    return index
+
+
+def _consume_name(value, index, allow_dash=False, allow_star=False):
+    start = index
+    while index < len(value):
+        char = value[index]
+        if char == '*' and allow_star:
+            index += 1
+        elif char == '-' and allow_dash:
+            index += 1
+        elif char == '_' or char.isalnum():
+            index += 1
+        else:
+            break
+    if index == start:
+        raise Exception("Unexpected construction: " + value)
+    return value[start:index], index
+
+
+def _consume_class_token(value):
+    index = 1
+    if index < len(value) and value[index] == ':':
+        index += 1
+    token, index = _consume_name(value, index, allow_dash=True, allow_star=True)
+    return value[:index], value[_skip_whitespace(value, index):]
+
+
+def _consume_zoom_token(value):
+    index = _skip_whitespace(value, 1)
+    if index >= len(value) or value[index].lower() != 'z':
+        raise Exception("Unexpected construction: " + value)
+    index += 1
+    start = index
+    while index < len(value) and (value[index].isdigit() or value[index] == '-'):
+        index += 1
+    if index == start:
+        raise Exception("Unexpected construction: " + value)
+    return value[start:index], value[_skip_whitespace(value, index):]
+
+
+def _consume_until(value, start, stop):
+    end = value.find(stop, start)
+    if end == -1:
+        raise Exception("Unexpected construction: " + value)
+    return value[start:end], value[_skip_whitespace(value, end + len(stop)):]
+
+
+def _consume_condition_token(value):
+    return _consume_until(value, 1, ']')
+
+
+def _consume_declaration_token(value):
+    return _consume_until(value, 1, '}')
+
+
+def _consume_comment_token(value):
+    return _consume_until(value, 2, '*/')[1]
+
+
+def _consume_import_token(value):
+    prefix = '@import("'
+    suffix = '");'
+    if not value.startswith(prefix):
+        return None
+    imported, rest = _consume_until(value, len(prefix), suffix)
+    return imported, rest
+
+
+def _consume_variable_token(value):
+    index = 1
+    if index >= len(value) or not value[index].isalpha():
+        raise Exception("Unexpected construction: " + value)
+    name, index = _consume_name(value, index)
+    index = _skip_whitespace(value, index)
+    if index >= len(value) or value[index] != ':':
+        raise Exception("Unexpected construction: " + value)
+    index = _skip_whitespace(value, index + 1)
+    raw, rest = _consume_until(value, index, ';')
+    return name, raw.strip(), rest
+
+
+def _consume_object_token(value):
+    if value[0] == '*':
+        return '*', value[_skip_whitespace(value, 1):]
+    obj, index = _consume_name(value, 0)
+    return obj, value[_skip_whitespace(value, index):]
 
 
 def _test_feature_compatibility(feature_type, selector_type):
@@ -112,17 +209,17 @@ class MapCSS():
         self.style_loaded = False
 
     def parseZoom(self, s):
-        if ZOOM_MINMAX.match(s):
-            return tuple([float(i) for i in ZOOM_MINMAX.match(s).groups()])
-        elif ZOOM_MIN.match(s):
-            return float(ZOOM_MIN.match(s).groups()[0]), self.maxscale
-        elif ZOOM_MAX.match(s):
-            return float(self.minscale), float(ZOOM_MAX.match(s).groups()[0])
-        elif ZOOM_SINGLE.match(s):
-            return float(ZOOM_SINGLE.match(s).groups()[0]), float(ZOOM_SINGLE.match(s).groups()[0])
-        else:
-            # TODO: Should we raise an exception here?
-            logging.error("unparsed zoom: %s" % s)
+        if '-' in s:
+            start, end = s.split('-', 1)
+            return (
+                float(start) if start else float(self.minscale),
+                float(end) if end else float(self.maxscale),
+            )
+        if s.isdigit():
+            zoom = float(s)
+            return zoom, zoom
+        # TODO: Should we raise an exception here?
+        logging.error("unparsed zoom: %s" % s)
 
     def build_choosers_tree(self, clname, type, cltag):
         if type not in self.choosers_by_type_zoom_tag:
@@ -260,7 +357,6 @@ class MapCSS():
         if not self.style_loaded:
             self.choosers = []
 
-        log = logging.getLogger('mapcss.parser')
         previous = oNONE  # what was the previous CSS word?
         sc = StyleChooser(self.scalepair)  # currently being assembled
 
@@ -272,14 +368,15 @@ class MapCSS():
 
                 wasBroken = False
                 while (css):
+                    marker = css[0]
+
                     # Class - :motorway, :builtup, :hover
-                    if CLASS.match(css):
+                    if marker == ':' or marker == '.':
                         if previous == oDECLARATION:
                             self.choosers.append(sc)
                             sc = StyleChooser(self.scalepair)
-                        cond = CLASS.match(css).groups()[0]
-                        log.debug("class found: %s" % (cond))
-                        css = CLASS.sub("", css, 1)
+                        cond, css = _consume_class_token(css)
+                        log.debug("class found: %s", cond)
                         sc.addCondition(Condition('eq', ("::class", cond)))
                         previous = oCONDITION
 
@@ -295,24 +392,23 @@ class MapCSS():
                         #previous = oCONDITION
 
                     # Zoom
-                    elif ZOOM.match(css):
+                    elif marker == '|':
                         if (previous != oOBJECT & previous != oCONDITION):
                             sc.newObject()
-                        cond = ZOOM.match(css).groups()[0]
-                        log.debug("zoom found: %s" % (cond))
-                        css = ZOOM.sub("", css, 1)
+                        cond, css = _consume_zoom_token(css)
+                        log.debug("zoom found: %s", cond)
                         sc.addZoom(self.parseZoom(cond))
                         previous = oZOOM
 
                     # Grouping - just a comma
-                    elif GROUP.match(css):
-                        css = GROUP.sub("", css, 1)
+                    elif marker == ',':
+                        css = css[_skip_whitespace(css, 1):]
                         sc.newGroup()
                         had_main_tag = False
                         previous = oGROUP
 
                     # Condition - [highway=primary] or [population>1000]
-                    elif CONDITION.match(css):
+                    elif marker == '[':
                         if (previous == oDECLARATION):
                             self.choosers.append(sc)
                             sc = StyleChooser(self.scalepair)
@@ -320,7 +416,7 @@ class MapCSS():
                         if (previous != oOBJECT) and (previous != oZOOM) and (previous != oCONDITION):
                             sc.newObject()
                             had_main_tag = False
-                        cond = CONDITION.match(css).groups()[0]
+                        cond, css = _consume_condition_token(css)
                         c = parseCondition(cond)
                         tag = c.extract_tag()
                         tag_type = static_tags.get(tag, None)
@@ -340,66 +436,62 @@ class MapCSS():
                             sc.addRuntimeCondition(c)
                         else:
                             raise Exception("Unknown tag '" + tag + "' in condition " + cond)
-                        css = CONDITION.sub("", css, 1)
                         previous = oCONDITION
 
                     # Object - way, node, relation
-                    elif OBJECT.match(css):
+                    elif marker == '*' or marker == '_' or marker.isalnum():
                         if (previous == oDECLARATION):
                             self.choosers.append(sc)
                             sc = StyleChooser(self.scalepair)
-                        obj = OBJECT.match(css).groups()[0]
-                        log.debug("object found: %s" % (obj))
-                        css = OBJECT.sub("", css, 1)
+                        obj, css = _consume_object_token(css)
+                        log.debug("object found: %s", obj)
                         sc.newObject(obj)
                         had_main_tag = False
                         previous = oOBJECT
 
                     # Declaration - {...}
-                    elif DECLARATION.match(css):
+                    elif marker == '{':
                         if previous == oDECLARATION or previous == oNONE:
                             raise Exception("Declaration without conditions")
-                        decl = DECLARATION.match(css).groups()[0]
-                        log.debug("declaration found: %s" % (decl))
+                        decl, css = _consume_declaration_token(css)
+                        log.debug("declaration found: %s", decl)
                         sc.addStyles(self.subst_variables(parseDeclaration(decl)))
-                        css = DECLARATION.sub("", css, 1)
                         previous = oDECLARATION
 
                     # CSS comment
-                    elif COMMENT.match(css):
+                    elif marker == '/':
+                        if not css.startswith('/*'):
+                            raise Exception("Unexpected construction: " + css)
                         log.debug("comment found")
-                        css = COMMENT.sub("", css, 1)
+                        css = _consume_comment_token(css)
 
                     # @import("filename.css");
-                    elif IMPORT.match(css):
-                        log.debug("import found")
-                        import_filename = os.path.join(basepath, IMPORT.match(css).groups()[0])
-                        try:
-                            css = IMPORT.sub("", css, 1)
-                            with open(import_filename, "r") as import_file:
-                                import_text = import_file.read()
-                            stck[-1][1] = css # store remained part
-                            stck.append([import_filename, import_text, import_text])
-                            wasBroken = True
-                            break
-                        except IOError as e:
-                            raise Exception("Cannot import file " + import_filename + "\n" + str(e))
+                    elif marker == '@':
+                        imported = _consume_import_token(css)
+                        if imported:
+                            import_filename_part, css = imported
+                            log.debug("import found")
+                            import_filename = os.path.join(basepath, import_filename_part)
+                            try:
+                                with open(import_filename, "r") as import_file:
+                                    import_text = import_file.read()
+                                stck[-1][1] = css # store remained part
+                                stck.append([import_filename, import_text, import_text])
+                                wasBroken = True
+                                break
+                            except IOError as e:
+                                raise Exception("Cannot import file " + import_filename + "\n" + str(e))
 
-                    # Variables
-                    elif VARIABLE_SET.match(css):
-                        name = VARIABLE_SET.match(css).groups()[0]
-                        log.debug("variable set found: %s" % name)
-                        self.variables[name] = VARIABLE_SET.match(css).groups()[1]
+                        name, raw_value, css = _consume_variable_token(css)
+                        log.debug("variable set found: %s", name)
+                        self.variables[name] = raw_value
                         self.unused_variables.add( name )
-                        css = VARIABLE_SET.sub("", css, 1)
                         previous = oVARIABLE_SET
 
-                    # Unknown pattern
-                    elif UNKNOWN.match(css):
-                        raise Exception("Unknown construction: " + UNKNOWN.match(css).group())
-
-                    # Must be unreachable
                     else:
+                        match = UNKNOWN.match(css)
+                        if match:
+                            raise Exception("Unknown construction: " + match.group())
                         raise Exception("Unexpected construction: " + css)
 
                     stck[-1][1] = css # store remained part
@@ -457,71 +549,99 @@ class MapCSS():
             print(f"Warning: Unused variables: {', '.join(self.unused_variables)}")
 
 # TODO: move to Condition.py
+@lru_cache(maxsize=4096)
+def _is_condition_key(value, allow_dash=False):
+    if not value:
+        return False
+    for char in value:
+        if char == '-' and allow_dash:
+            continue
+        if char not in (':', '_') and not char.isalnum():
+            return False
+    return True
+
+
+def _split_condition_operator(value, operator):
+    index = value.find(operator)
+    if index == -1:
+        return None
+    return value[:index].strip(), value[index + len(operator):].lstrip()
+
+
+@lru_cache(maxsize=4096)
 def parseCondition(s):
-    log = logging.getLogger('mapcss.parser.condition')
+    operator_value = s.lstrip()
+    value = operator_value.strip()
 
-    if CONDITION_TRUE.match(s):
-        a = CONDITION_TRUE.match(s).groups()
-        log.debug("condition true: %s" % (a[0]))
-        return Condition('true', a)
+    if value.endswith('?'):
+        key = value[:-1].strip()
+        if key.startswith('!'):
+            key = key[1:].strip()
+            if _is_condition_key(key):
+                condition_log.debug("condition invtrue: %s", key)
+                return Condition('ne', (key, "yes"))
+        elif _is_condition_key(key):
+            condition_log.debug("condition true: %s", key)
+            return Condition('true', (key,))
 
-    if CONDITION_invTRUE.match(s):
-        a = CONDITION_invTRUE.match(s).groups()
-        log.debug("condition invtrue: %s" % (a[0]))
-        return Condition('ne', (a[0], "yes"))
+    if '!=' in value:
+        key, right = _split_condition_operator(value, '!=')
+        if right and _is_condition_key(key):
+            condition_log.debug("condition NE: %s = %s", key, right)
+            return Condition('ne', (key, right))
 
-    if CONDITION_FALSE.match(s):
-        a = CONDITION_FALSE.match(s).groups()
-        log.debug("condition false: %s" % (a[0]))
-        return Condition('false', a)
+    if '=~/' in value:
+        key, right = _split_condition_operator(value, '=~/')
+        if right and _is_condition_key(key):
+            pattern = right.strip()
+            if pattern.endswith('/'):
+                right = pattern[:-1]
+                condition_log.debug("condition REGEX: %s = %s", key, right)
+                return Condition('regex', (key, right))
 
-    if CONDITION_SET.match(s):
-        a = CONDITION_SET.match(s).groups()
-        log.debug("condition set: %s" % (a))
-        return Condition('set', a)
+    for operator, condition_type, message_operator in (
+        ('<=', '<=', 'LE'),
+        ('>=', '>=', 'GE'),
+    ):
+        if operator in operator_value:
+            key, right = _split_condition_operator(operator_value, operator)
+            if right and _is_condition_key(key):
+                condition_log.debug("condition %s: %s = %s", message_operator, key, right)
+                return Condition(condition_type, (key, right))
+            raise Exception("condition UNKNOWN: " + s)
 
-    if CONDITION_UNSET.match(s):
-        a = CONDITION_UNSET.match(s).groups()
-        log.debug("condition unset: %s" % (a))
-        return Condition('unset', a)
+    if '=' in value:
+        key, right = _split_condition_operator(value, '=')
+        if not right or not _is_condition_key(key):
+            raise Exception("condition UNKNOWN: " + s)
+        if right.strip() == 'no' and _is_condition_key(key):
+            condition_log.debug("condition false: %s", key)
+            return Condition('false', (key,))
+        condition_log.debug("condition EQ: %s = %s", key, right)
+        return Condition('eq', (key, right))
 
-    if CONDITION_NE.match(s):
-        a = CONDITION_NE.match(s).groups()
-        log.debug("condition NE: %s = %s" % (a[0], a[1]))
-        return Condition('ne', a)
+    for operator, condition_type, message_operator in (
+        ('<', '<', 'LT'),
+        ('>', '>', 'GT'),
+    ):
+        if operator in operator_value:
+            key, right = _split_condition_operator(operator_value, operator)
+            if right and _is_condition_key(key):
+                condition_log.debug("condition %s: %s = %s", message_operator, key, right)
+                return Condition(condition_type, (key, right))
+            raise Exception("condition UNKNOWN: " + s)
 
-    if CONDITION_LE.match(s):
-        a = CONDITION_LE.match(s).groups()
-        log.debug("condition LE: %s <= %s" % (a[0], a[1]))
-        return Condition('<=', a)
+    if _is_condition_key(value, allow_dash=True):
+        condition_log.debug("condition set: %s", (value,))
+        return Condition('set', (value,))
 
-    if CONDITION_GE.match(s):
-        a = CONDITION_GE.match(s).groups()
-        log.debug("condition GE: %s >= %s" % (a[0], a[1]))
-        return Condition('>=', a)
+    if value.startswith('!'):
+        key = value[1:]
+        if _is_condition_key(key):
+            condition_log.debug("condition unset: %s", (key,))
+            return Condition('unset', (key,))
 
-    if CONDITION_LT.match(s):
-        a = CONDITION_LT.match(s).groups()
-        log.debug("condition LT: %s < %s" % (a[0], a[1]))
-        return Condition('<', a)
-
-    if CONDITION_GT.match(s):
-        a = CONDITION_GT.match(s).groups()
-        log.debug("condition GT: %s > %s" % (a[0], a[1]))
-        return Condition('>', a)
-
-    if CONDITION_REGEX.match(s):
-        a = CONDITION_REGEX.match(s).groups()
-        log.debug("condition REGEX: %s = %s" % (a[0], a[1]))
-        return Condition('regex', a)
-
-    if CONDITION_EQ.match(s):
-        a = CONDITION_EQ.match(s).groups()
-        log.debug("condition EQ: %s = %s" % (a[0], a[1]))
-        return Condition('eq', a)
-
-    else:
-        raise Exception("condition UNKNOWN: " + s)
+    raise Exception("condition UNKNOWN: " + s)
 
 
 def parseDeclaration(s):
@@ -530,11 +650,11 @@ def parseDeclaration(s):
     """
     t = {}
     for a in s.split(';'):
-        # if ((o=ASSIGNMENT_EVAL.exec(a)))   { t[o[1].replace(DASH,'_')]=new Eval(o[2]); }
-        if ASSIGNMENT.match(a):
-            tzz = ASSIGNMENT.match(a).groups()
-            t[tzz[0]] = tzz[1].strip().strip('"')
-            logging.debug("%s == %s" % (tzz[0], tzz[1]))
+        declaration = a.strip()
+        if ':' in declaration:
+            key, value = declaration.split(':', 1)
+            t[key.strip()] = value.strip().strip('"')
+            logging.debug("%s == %s" % (key, value))
         else:
             logging.debug("unknown %s" % (a))
     return [t] # TODO: don't wrap `t` dict into a list. Return `t` instead.

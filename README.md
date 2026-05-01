@@ -23,6 +23,16 @@ python3 -m unittest discover -s tests
 this will search for all `test*.py` files within `tests` directory
 and execute tests from those files.
 
+Before pushing changes, run the same checks as GitHub Actions:
+
+```bash
+python3 integration-tests/run_ci_checks.py
+```
+
+This includes fork drules compatibility.  The MAPS.ME oracle still needs
+Python's `lib2to3`, so use the same Python 3.9 runtime as CI for a full local
+run.
+
 ## Running integration tests
 
 File `integration-tests/full_drules_gen.py` is intended to generate drules

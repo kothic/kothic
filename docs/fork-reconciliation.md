@@ -178,6 +178,12 @@ Important behavior kept in `--compatibility-profile mapsme`:
 - old protobuf serialization quirks such as empty `dashdot {}` for casing
   lines.
 
+The comparison harness intentionally does **not** preserve the old fork parser
+bug for colon-bearing declaration values like `text:"addr:housename"`.  Modern
+Kothic parses that as `text: addr:housename`; the MAPS.ME oracle input is
+normalized to the same semantic style before comparing the remaining legacy
+behavior.
+
 Verified output: all found MAPS.ME style `.bin` files matched the latest
 `mapsme/kothic` fork oracle:
 
