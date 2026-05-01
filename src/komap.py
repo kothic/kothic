@@ -76,6 +76,8 @@ def build_option_parser():
     parser.add_option("-g", "--glyphs-url", dest="glyphs_url", help="SDF Font glyphs URL to use in rendering")
     parser.add_option("-e", "--sprite-url", dest="sprite_url", help="URL of sprite to use in rendering")
     parser.add_option("-a", "--attribution-text", dest="attribution_text", help="Attribution and copyrights text to show on the rendered map")
+    parser.add_option("--style-name", dest="style_name",
+                      help="style name for generated kothic-js modules", metavar="NAME")
 
     return parser
 
@@ -99,6 +101,22 @@ def main(argv=None):
             return "(tags->'" + name + "')"
         else:
             return "(tags->'" + name + "') as \"" + name + '"'
+
+    if options.renderer == "js":
+        from . import kothic_js
+
+        js = kothic_js.convert_files(
+            options.filename,
+            name=options.style_name,
+            minzoom=options.minzoom,
+            maxzoom=options.maxzoom,
+        )
+        if options.outfile == "-":
+            sys.stdout.write(js)
+        else:
+            with open(options.outfile, "w") as mfile:
+                mfile.write(js)
+        return
 
     style = MapCSS(options.minzoom, options.maxzoom + 1)  # zoom levels
     for style_filename in options.filename:
@@ -130,10 +148,6 @@ def main(argv=None):
         mfile = sys.stdout
     else:
         mfile = open(options.outfile, "w")
-
-    if options.renderer == "js":
-        from . import libkojs
-        libkojs.komap_js(mfile, style)
 
     if options.renderer == "mapnik":
         from . import libkomapnik

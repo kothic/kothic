@@ -35,7 +35,7 @@ NEEDED_KEYS = set(["width", "casing-width", "casing-width-add", "fill-color", "f
 WHITESPACE = re.compile(r'\s+ ', re.S | re.X)
 
 COMMENT = re.compile(r'\/\* .*? \*\/ \s* ', re.S | re.X)
-CLASS = re.compile(r'([\.:]:?[*\w]+) \s* ', re.S | re.X)
+CLASS = re.compile(r'([\.:]:?[-*\w]+) \s* ', re.S | re.X)
 #NOT_CLASS = re.compile(r'!([\.:]\w+) \s* ', re.S | re.X)
 ZOOM = re.compile(r'\| \s* z([\d\-]+) \s* ', re.I | re.S | re.X)
 GROUP = re.compile(r', \s* ', re.I | re.S | re.X)
@@ -79,7 +79,7 @@ oCONDITION = 4
 oOBJECT = 5
 oDECLARATION = 6
 oSUBPART = 7
-oVARIABLE_SET = 8
+oVARIABLE_SET = 4 << 1
 
 # TODO: Following block of variables is never used
 DASH = re.compile(r'\-/g')
@@ -92,7 +92,7 @@ CENTER = re.compile(r'^center$/i')
 
 # TODO: Remove unused HEX variable
 HEX = re.compile(r'^#([0-9a-f]+)$/i')
-VARIABLE = re.compile(r'@([a-z][\w\d]*)')
+VARIABLE_REFERENCE = re.compile(r'@([a-z][\w\d]*)')
 
 
 class MapCSS():
@@ -107,7 +107,7 @@ class MapCSS():
         self.choosers = []
         self.choosers_by_type = {}
         self.choosers_by_type_zoom_tag = {}
-        self.variables = {}
+        self.variables = dict()
         self.unused_variables = set()
         self.style_loaded = False
 
@@ -231,20 +231,21 @@ class MapCSS():
             d[x.get('object-id', '')].update(x)
         return d
 
-    def subst_variables(self, t):
-        """ Expects an array from parseDeclaration. """
-        for k in t[0]:
-            t[0][k] = VARIABLE.sub(self.get_variable, t[0][k])
-        return t
+    def subst_variables(self, declarations):
+        """Replace variable references in parsed declaration dictionaries."""
+        for declaration in declarations:
+            for key, value in declaration.items():
+                declaration[key] = self.substitute_variable_references(value)
+        return declarations
+    def substitute_variable_references(self, value):
+        return VARIABLE_REFERENCE.sub(self.resolve_variable_reference, value)
 
-    def get_variable(self, m):
-        name = m.group()[1:]
-        if name in self.unused_variables:
-            self.unused_variables.remove(name)
+    def resolve_variable_reference(self, match):
+        name = match.group(1)
         if name not in self.variables:
-            raise Exception("Variable not found: " + str(format(name)))
-        return self.variables[name] if name in self.variables else m.group()
-
+            raise Exception("Variable not found: " + name)
+        self.unused_variables.discard(name)
+        return self.variables[name]
     def parse(self, css=None, clamp=True, stretch=1000, filename=None, static_tags={},
               dynamic_tags=set(), legacy_zindex=False):
         """
@@ -411,7 +412,7 @@ class MapCSS():
                 sc = StyleChooser(self.scalepair)
 
         except Exception as e:
-            filename = stck[-1][0] # filename
+            filename = stck[-1][0] or "<inline css>" # filename
             css_orig = stck[-1][2] # original
             css = stck[-1][1] # remained
             line = css_orig[:-len(css)].count("\n") + 1

@@ -92,7 +92,7 @@ class KothicApp:
 
     def load_style(self):
         self.style = Styling(0, 25)
-        self.style.parse(open("styles/osmosnimki-maps.mapcss", "r").read())
+        self.style.parse(open("styles/default.mapcss", "r").read())
 
     def reload_style(self, w):
         self.style = Styling(0, 25)

@@ -202,7 +202,7 @@ has_darker_casings({'highway': 'residential'})
 has_darker_casings({'highway': 'unclassified'})
 
 
-if TOTAL_TESTS > 0:
+if TOTAL_TESTS:
     print("Failed tests: %s (%s%%)" % (FAILED_TESTS, 100 * FAILED_TESTS / TOTAL_TESTS))
 print("Passed tests:", TOTAL_TESTS - FAILED_TESTS)
 print("Total tests:", TOTAL_TESTS)

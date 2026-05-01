@@ -191,6 +191,9 @@ Verified output: all found MAPS.ME style `.bin` files matched the latest
 - Keep `mapcss` as the default canonical profile.
 - Keep fork profiles as compatibility checks while downstream projects still
   need exact current-output comparisons.
+- Keep the JavaScript converter migration documented in
+  `docs/kothic-js-lineage.md`: `kothic-js-mapcss` behavior should move onto the
+  in-tree parser before the old standalone converter repository is archived.
 - Continue adding tests around exact fork output.
 - Do not change the latest `mapsme` profile just to match old checked-in
   `omim` binaries.

@@ -16,8 +16,9 @@
 #   along with kothic.  If not, see <http://www.gnu.org/licenses/>.
 
 import os
-import sqlite3
 import sys
+import sqlite3
+import tempfile
 from lxml import etree
 from twms import projections
 from .style import Styling
@@ -34,10 +35,8 @@ except ImportError:
     pass
 
 MAXZOOM = 16
-TEMPORARY_FILE_PATH = 'temp_file.bin'
-
+TEMPORARY_FILE_PREFIX = "kothic-osm2tiles-"
 proj = "EPSG:4326"
-
 style = Styling()
 
 #  elsif($k eq 'highway' and $v eq 'footway' or $v eq 'path' or $v eq 'track'){
@@ -76,31 +75,27 @@ def sanitize(string):
     string = string.replace("=", "###")
     return string
 
-print(sanitize(" ;="))
-
-
-def initDB(filename):
+def open_node_store(filename):
     conn = sqlite3.connect(filename)
-    c = conn.cursor()
-    # create table with the osm element integer id being the primary index
-    # - according to the sqlite documentation this will equal the index with the
-    #   built in rowid index, providing the same speedup as a separate index while
-    #   saving space - win-win ! :)
-    # - brief testing shows that this makes the osm -> tiles operation about 5% faster
-    #   but more importantly makes the temporary sqlite database 30% smaller! :)
-    c.execute('''CREATE TABLE nodes (id integer, lat real, lon real, PRIMARY KEY (id))''')
+    conn.execute("""
+        CREATE TABLE nodes (
+            id integer PRIMARY KEY,
+            lat real NOT NULL,
+            lon real NOT NULL
+        )
+    """)
     return conn
+def store_node(conn, node_id, lat, lon):
+    conn.execute(
+        "INSERT INTO nodes(id, lat, lon) VALUES (?, ?, ?)",
+        (node_id, lat, lon),
+    )
 
-
-def storeNode(conn, id, lat, lon):
-#  conn.execute("INSERT INTO nodes VALUES ('%d', %f, %f)" % (id, lat, lon))
-    conn.execute("INSERT INTO nodes(id, lat, lon) values (?, ?, ?)", (id, lat, lon))
-
-
-def getNode(conn, id):
-#  conn.execute("SELECT * FROM nodes WHERE id = '%s'" % id)
-    return conn.execute("SELECT lat, lon FROM nodes WHERE id = '%s'" % id).fetchone()
-
+def get_node(conn, node_id):
+    return conn.execute(
+        "SELECT lat, lon FROM nodes WHERE id = ?",
+        (node_id,),
+    ).fetchone()
 
 def main():
     DROPPED_POINTS = 0
@@ -112,12 +107,9 @@ def main():
     # osm_infile = open("minsk.osm", "rb")
     osm_infile = sys.stdin
 
-    # remove any stale temporary files
-    if os.path.exists(TEMPORARY_FILE_PATH):
-        os.remove(TEMPORARY_FILE_PATH)
-    conn = initDB(TEMPORARY_FILE_PATH)
-
-#  nodes = {}
+    temporary_file = tempfile.NamedTemporaryFile(prefix=TEMPORARY_FILE_PREFIX, delete=False)
+    temporary_file.close()
+    conn = open_node_store(temporary_file.name)
     curway = []
     tags = {}
     context = etree.iterparse(osm_infile)
@@ -131,18 +123,12 @@ def main():
             if NODES_READ % 100000 == 0:
                 conn.commit()
                 print("flushing to temporary storage")
-
-#      nodes[str(items["id"])] = (float(items["lon"]), float(items["lat"]))
-            storeNode(conn, int(items["id"]), float(items["lon"]), float(items["lat"]))
+            store_node(conn, int(items["id"]), float(items["lon"]), float(items["lat"]))
             tags = {}
         elif elem.tag == "nd":
-            result = getNode(conn, int(items["ref"]))
+            result = get_node(conn, int(items["ref"]))
             if result:
                 curway.append(result)
-#      try:
-#        curway.append(nodes[str(items["ref"])])
-#      except KeyError:
-#        pass
         elif elem.tag == "tag":
             tags[sanitize(items["k"])] = sanitize(items["v"])
         elif elem.tag == "way":
@@ -214,15 +200,15 @@ def main():
                 # ts = ""
     print("Tiles generated:", len(tilefiles))
     print("Nodes dropped when generalizing:", DROPPED_POINTS)
-#  print "Nodes in memory:", len(nodes)
     c = conn.cursor()
     c.execute('SELECT * from nodes')
     print("Nodes in memory:", len(c.fetchall()))
-
     # report temporary file size
-    print("Temporary file size:", os.path.getsize(TEMPORARY_FILE_PATH))
-
+    print("Temporary file size:", os.path.getsize(temporary_file.name))
     # remove temporary files
-    os.remove(TEMPORARY_FILE_PATH)
+    conn.close()
+    os.remove(temporary_file.name)
 
-main()
+
+if __name__ == "__main__":
+    main()

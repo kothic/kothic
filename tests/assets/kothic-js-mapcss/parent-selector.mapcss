@@ -1,0 +1,3 @@
+way[highway=tertiary] > node|z15-16[highway=turning_circle]::turning_circle-casing {
+    icon-image: symbols/turning_circle-tert-casing.18.png;
+}
