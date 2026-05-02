@@ -3,6 +3,7 @@
 import argparse
 import filecmp
 import os
+import re
 import shutil
 import subprocess
 import sys
@@ -62,6 +63,8 @@ MAPSME_STYLES = (
     ("drules_proto_vehicle_clear", "styles/vehicle/style-clear/style.mapcss"),
     ("drules_proto_vehicle_dark", "styles/vehicle/style-night/style.mapcss"),
 )
+
+MAPSME_TRAILING_UNQUOTED_CONDITION_SPACE = re.compile(r"(\[[^\]=]+=[^\]\" ]+) \]")
 
 
 def run(args, cwd=None, env=None):
@@ -212,14 +215,17 @@ def normalize_mapsme_oracle_input(data_path):
     """Keep MAPS.ME oracle comparison focused on intentional legacy behavior.
 
     The pinned MAPS.ME fork parser mis-parses declarations like
-    `text:"addr:housename"` as a key named `text:"addr`.  Modern Kothic should
-    parse that as the `text` property with a colon-bearing value.  Normalize the
-    temporary oracle input so the old fork produces the same semantic style
-    before comparing all other MAPS.ME compatibility details.
+    `text:"addr:housename"` as a key named `text:"addr`, and keeps trailing
+    spaces in unquoted selector values like `[amenity=car_wash ]`.  Modern
+    Kothic should parse those as the semantic `text` value and `car_wash`
+    condition.  Normalize the temporary oracle input so the old fork produces
+    the same semantic style before comparing all other MAPS.ME compatibility
+    details.
     """
     for stylesheet in (data_path / "styles").rglob("*.mapcss"):
+        text = stylesheet.read_text().replace('text:"addr:housename"', 'text: "addr:housename"')
         stylesheet.write_text(
-            stylesheet.read_text().replace('text:"addr:housename"', 'text: "addr:housename"')
+            MAPSME_TRAILING_UNQUOTED_CONDITION_SPACE.sub(r"\1]", text)
         )
 
 

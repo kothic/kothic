@@ -18,11 +18,16 @@ class CheckForkDrulesTest(unittest.TestCase):
             data_path = Path(temp_dir)
             include_path = data_path / "styles" / "vehicle" / "include" / "Basemap_label.mapcss"
             include_path.parent.mkdir(parents=True)
-            include_path.write_text('{text:"addr:housename";font-size: 12.5;}')
+            include_path.write_text(
+                'area|z18-[amenity=car_wash ] {text:"addr:housename";font-size: 12.5;}'
+            )
 
             check_fork_drules.normalize_mapsme_oracle_input(data_path)
 
-            self.assertEqual(include_path.read_text(), '{text: "addr:housename";font-size: 12.5;}')
+            self.assertEqual(
+                include_path.read_text(),
+                'area|z18-[amenity=car_wash] {text: "addr:housename";font-size: 12.5;}',
+            )
 
 
 if __name__ == "__main__":
