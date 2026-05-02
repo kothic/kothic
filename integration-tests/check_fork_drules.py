@@ -217,7 +217,7 @@ def normalize_mapsme_oracle_input(data_path):
     temporary oracle input so the old fork produces the same semantic style
     before comparing all other MAPS.ME compatibility details.
     """
-    for stylesheet in data_path.glob("styles/*/*/*.mapcss"):
+    for stylesheet in (data_path / "styles").rglob("*.mapcss"):
         stylesheet.write_text(
             stylesheet.read_text().replace('text:"addr:housename"', 'text: "addr:housename"')
         )
