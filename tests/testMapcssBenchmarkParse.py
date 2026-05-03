@@ -55,6 +55,46 @@ class MapcssBenchmarkParseTest(unittest.TestCase):
 
         self.assertEqual(stats["static_tags"], 1)
         self.assertEqual(stats["choosers"], 1)
+        self.assertGreater(stats["bytes"], len('@import("roads.mapcss");\n'))
+        self.assertEqual(stats["lines"], 2)
+
+    def test_parse_style_counts_imported_files_without_join_separators(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            fixture_dir = Path(tmpdir)
+            stylesheet = fixture_dir / "main.mapcss"
+            stylesheet.write_text('@import("roads.mapcss");', encoding="utf-8")
+            (fixture_dir / "roads.mapcss").write_text(
+                "way[highway=primary] { width: 2; }",
+                encoding="utf-8",
+            )
+
+            stats = mapcss_benchmark_parse.parse_style(stylesheet)
+
+        self.assertEqual(stats["static_tags"], 1)
+        self.assertEqual(stats["bytes"], (
+            len('@import("roads.mapcss");'.encode("utf-8"))
+            + len("way[highway=primary] { width: 2; }".encode("utf-8"))
+        ))
+        self.assertEqual(stats["lines"], 2)
+
+    def test_parse_style_ignores_commented_imports(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            fixture_dir = Path(tmpdir)
+            stylesheet = fixture_dir / "main.mapcss"
+            stylesheet.write_text(
+                '/* @import("missing.mapcss"); */\n'
+                "node[amenity=cafe] { icon-image: cafe; }\n",
+                encoding="utf-8",
+            )
+
+            stats = mapcss_benchmark_parse.parse_style(
+                stylesheet,
+                static_tags={"amenity": True},
+            )
+
+        self.assertEqual(stats["static_tags"], 1)
+        self.assertEqual(stats["choosers"], 1)
+        self.assertEqual(stats["lines"], 2)
 
     def test_format_report_is_copyable(self):
         report = mapcss_benchmark_parse.format_report({

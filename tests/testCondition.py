@@ -104,7 +104,7 @@ class ConditionTest(unittest.TestCase):
 
         cond:Condition = parseCondition("\tbbox_area > 4000000 ")
         self.assertEqual(cond.type, ">")
-        self.assertEqual(cond.params, ("bbox_area", "4000000 ")) # TODO fix parser to exclude trailing space
+        self.assertEqual(cond.params, ("bbox_area", "4000000"))
         self.assertTrue(cond.test({"bbox_area": "8000000"}))
         self.assertFalse(cond.test({"bbox_area": "4000000"}))
         self.assertFalse(cond.test({"highway": "secondary"}))
@@ -122,7 +122,7 @@ class ConditionTest(unittest.TestCase):
 
         cond:Condition = parseCondition("\tbbox_area < 4000000\n")
         self.assertEqual(cond.type, "<")
-        self.assertEqual(cond.params, ("bbox_area", "4000000\n")) # TODO fix parser to exclude trailing \n
+        self.assertEqual(cond.params, ("bbox_area", "4000000"))
         self.assertTrue(cond.test({"bbox_area": "100"}))
         self.assertTrue(cond.test({"bbox_area": "-1"}))
         self.assertTrue(cond.test({"bbox_area": "000"}))
@@ -145,7 +145,7 @@ class ConditionTest(unittest.TestCase):
 
         cond:Condition = parseCondition("\tbbox_area <= 4000000\n")
         self.assertEqual(cond.type, "<=")
-        self.assertEqual(cond.params, ("bbox_area", "4000000\n")) # TODO fix parser to exclude trailing \n
+        self.assertEqual(cond.params, ("bbox_area", "4000000"))
         self.assertTrue(cond.test({"bbox_area": "100"}))
         self.assertTrue(cond.test({"bbox_area": "-1"}))
         self.assertTrue(cond.test({"bbox_area": "000"}))
@@ -238,6 +238,17 @@ class ConditionTest(unittest.TestCase):
         #self.assertTrue(cond.test({"access": "no"}))      # test is not implemented for `false` condition
         #self.assertTrue(cond.test({"access": "private"})) # test is not implemented for `false` condition
         self.assertFalse(cond.test({"tunnel": "yes"}))
+
+        cond:Condition = parseCondition("access=No")
+        self.assertEqual(cond.type, "false")
+        self.assertEqual(cond.params, ("access", ))
+
+    def test_parser_strips_equality_value_whitespace(self):
+        cond:Condition = parseCondition(" amenity = car_wash \n")
+
+        self.assertEqual(cond.type, "eq")
+        self.assertEqual(cond.params, ("amenity", "car_wash"))
+        self.assertTrue(cond.test({"amenity": "car_wash"}))
 
     def test_parser_invTrue(self):
         """ Test conditions in format [!some_tag?] It works the same way as [some_tag != yes]

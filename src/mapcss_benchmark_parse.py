@@ -5,22 +5,33 @@ from pathlib import Path
 from .mapcss import MapCSS, COMMENT, CONDITION, IMPORT, parseCondition
 
 
-def read_stylesheet_tree(path, seen=None):
+def read_stylesheet_sources(path, seen=None):
     if seen is None:
         seen = set()
 
     path = path.resolve()
     if path in seen:
-        return ""
+        return []
     seen.add(path)
 
     source = path.read_text(encoding="utf-8")
     imported_sources = []
-    for match in IMPORT.finditer(source):
+    uncommented_source = COMMENT.sub("", source)
+    for match in IMPORT.finditer(uncommented_source):
         imported_path = path.parent / match.group(1)
-        imported_sources.append(read_stylesheet_tree(imported_path, seen))
+        imported_sources.extend(read_stylesheet_sources(imported_path, seen))
 
-    return "\n".join([source, *imported_sources])
+    return [source, *imported_sources]
+
+
+def read_stylesheet_tree(path, seen=None):
+    return "".join(read_stylesheet_sources(path, seen))
+
+
+def count_source_lines(source):
+    if not source:
+        return 0
+    return source.count("\n") + (0 if source.endswith("\n") else 1)
 
 
 def infer_static_tags(source):
@@ -36,8 +47,10 @@ def infer_static_tags(source):
 
 def parse_style(path, minzoom=0, maxzoom=30, static_tags=None):
     source = path.read_text(encoding="utf-8")
+    source_tree_parts = read_stylesheet_sources(path)
+    source_tree = "".join(source_tree_parts)
     parser = MapCSS(minzoom, maxzoom)
-    tags = static_tags if static_tags is not None else infer_static_tags(read_stylesheet_tree(path))
+    tags = static_tags if static_tags is not None else infer_static_tags(source_tree)
 
     started_at = time.perf_counter()
     parser.parse(source, filename=str(path), static_tags=tags)
@@ -45,8 +58,8 @@ def parse_style(path, minzoom=0, maxzoom=30, static_tags=None):
 
     return {
         "path": str(path),
-        "bytes": len(source.encode("utf-8")),
-        "lines": source.count("\n") + (0 if source.endswith("\n") else 1),
+        "bytes": sum(len(part.encode("utf-8")) for part in source_tree_parts),
+        "lines": sum(count_source_lines(part) for part in source_tree_parts),
         "static_tags": len(tags),
         "seconds": elapsed,
         "choosers": len(parser.choosers),
