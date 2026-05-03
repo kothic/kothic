@@ -55,6 +55,8 @@ class MapcssBenchmarkParseTest(unittest.TestCase):
 
         self.assertEqual(stats["static_tags"], 1)
         self.assertEqual(stats["choosers"], 1)
+        self.assertGreater(stats["bytes"], len('@import("roads.mapcss");\n'))
+        self.assertEqual(stats["lines"], 3)
 
     def test_format_report_is_copyable(self):
         report = mapcss_benchmark_parse.format_report({

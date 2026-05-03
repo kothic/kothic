@@ -214,12 +214,16 @@ def normalize_mapsme_oracle_input(data_path):
     The pinned MAPS.ME fork parser mis-parses declarations like
     `text:"addr:housename"` as a key named `text:"addr`.  Modern Kothic should
     parse that as the `text` property with a colon-bearing value.  Normalize the
-    temporary oracle input so the old fork produces the same semantic style
-    before comparing all other MAPS.ME compatibility details.
+    parse that as the `text` property with a colon-bearing value.  It also loses
+    area icon matching when a selector value has trailing whitespace, as in
+    `[amenity=car_wash ]`.  Normalize the temporary oracle input so the old fork
+    produces the same semantic style before comparing all other MAPS.ME
+    compatibility details.
     """
     for stylesheet in data_path.glob("styles/*/*/*.mapcss"):
         stylesheet.write_text(
             stylesheet.read_text().replace('text:"addr:housename"', 'text: "addr:housename"')
+            .replace("[amenity=car_wash ]", "[amenity=car_wash]")
         )
 
 

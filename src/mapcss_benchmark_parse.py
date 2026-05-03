@@ -36,8 +36,9 @@ def infer_static_tags(source):
 
 def parse_style(path, minzoom=0, maxzoom=30, static_tags=None):
     source = path.read_text(encoding="utf-8")
+    source_tree = read_stylesheet_tree(path)
     parser = MapCSS(minzoom, maxzoom)
-    tags = static_tags if static_tags is not None else infer_static_tags(read_stylesheet_tree(path))
+    tags = static_tags if static_tags is not None else infer_static_tags(source_tree)
 
     started_at = time.perf_counter()
     parser.parse(source, filename=str(path), static_tags=tags)
@@ -45,8 +46,8 @@ def parse_style(path, minzoom=0, maxzoom=30, static_tags=None):
 
     return {
         "path": str(path),
-        "bytes": len(source.encode("utf-8")),
-        "lines": source.count("\n") + (0 if source.endswith("\n") else 1),
+        "bytes": len(source_tree.encode("utf-8")),
+        "lines": source_tree.count("\n") + (0 if source_tree.endswith("\n") else 1),
         "static_tags": len(tags),
         "seconds": elapsed,
         "choosers": len(parser.choosers),
