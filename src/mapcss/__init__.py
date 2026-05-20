@@ -565,7 +565,7 @@ def _split_condition_operator(value, operator):
     index = value.find(operator)
     if index == -1:
         return None
-    return value[:index].strip(), value[index + len(operator):].lstrip()
+    return value[:index].strip(), value[index + len(operator):].strip()
 
 
 @lru_cache(maxsize=4096)
@@ -614,7 +614,7 @@ def parseCondition(s):
         key, right = _split_condition_operator(value, '=')
         if not right or not _is_condition_key(key):
             raise Exception("condition UNKNOWN: " + s)
-        if right.strip() == 'no' and _is_condition_key(key):
+        if right.strip().lower() == 'no' and _is_condition_key(key):
             condition_log.debug("condition false: %s", key)
             return Condition('false', (key,))
         condition_log.debug("condition EQ: %s = %s", key, right)
